@@ -15,8 +15,10 @@ Local Modifications:
        $ git remote add googleapis https://github.com/googleapis/googleapis
        $ git subtree add --prefix third_party/googleapis googleapis master --squash
        $ rm third_party/googleapis/.gitmodules
-       $ # For all submodules:
-       $ git rm third_party/googleapis/{path_to_submodule}
+       $ git rm third_party/googleapis/third_party/boringssl-with-bazel
+       $ git rm third_party/googleapis/third_party/nanopb
+       $ git rm third_party/googleapis/third_party/protobuf
+       $ git rm third_party/googleapis/third_party/zlib
 
        To update from remote on an ongoing basis:
        $ git fetch googleapis
