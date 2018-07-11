@@ -68,7 +68,7 @@ PrintMessage "Building the agent..."
 docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
     cprof-agent-builder bash \
     -c \
-    "cd ~/build && git clone --depth=1 https://github.com/googleapis/googleapis.git third_party/googleapis && tar xvf src.tar && make -f Makefile all" \
+    "cd ~/build && tar xvf src.tar && make -f Makefile all" \
     >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent binaries..."
