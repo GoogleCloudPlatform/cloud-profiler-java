@@ -1,0 +1,19 @@
+URL: https://github.com/googleapis/googleapis/commit/475d72b7405c92f06d7f2d4aba866278eb5ad8e9
+Version: https://github.com/googleapis/googleapis/commit/475d72b7405c92f06d7f2d4aba866278eb5ad8e9
+License: Apache 2.0
+License File: # LICENSE
+Description:
+       Public interface definitions of Google APIs.
+Local Modifications:
+       README.google was removed from .gitignore.
+       Remote submodules were not imported.
+       Remove .gitmodules.
+
+       Imported as a git-subtree.
+
+       $ git remote add googleapis https://github.com/googleapis/googleapis
+       $ git subtree add --prefix third_party/googleapis googleapis master --squash
+
+       To update from remote on an ongoing basis:
+       $ git fetch googleapis
+       $ git subtree pull --prefix third_party/googleapis googleapis master --squash
