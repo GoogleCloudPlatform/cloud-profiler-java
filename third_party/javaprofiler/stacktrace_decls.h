@@ -60,12 +60,15 @@ typedef struct {
   JVMPI_CallFrame *frames;
 } JVMPI_CallTrace;
 
-// The placeholder (fake) line number for native frames in
-// ASGCT_CallFrame. A native frame contains this value in the lineno
-// field. The method_id field contains the native PC, instead of a
-// jmethodID. Native frames can be recorded without changing the
-// layout of ASGCT_CallFrame this way.
+// Placeholder (fake) line number for native frames in ASGCT_CallFrame. A native
+// frame contains this value in the lineno field. The method_id field contains
+// the native PC, instead of a jmethodID. Native frames can be recorded without
+// changing the layout of ASGCT_CallFrame this way.
 const jint kNativeFrameLineNum = -99;
+
+// Placeholder (fake) line number for call trace error frames. The method_id
+// field contains a value from the CallTraceErrors enumeration defined below.
+const jint kCallTraceErrorLineNum = -100;
 
 enum CallTraceErrors {
   // 0 is reserved for native stack traces.  This includes JIT and GC threads.

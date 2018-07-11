@@ -38,7 +38,7 @@ namespace cloud {
 namespace profiler {
 
 google::javaprofiler::AsyncSafeTraceMultiset *Profiler::fixed_traces_ = nullptr;
-std::atomic<int> Profiler::failures_[kNumCallTraceErrors + 1];
+std::atomic<int> Profiler::unknown_stack_count_;
 
 namespace {
 
@@ -78,18 +78,20 @@ void Profiler::Handle(int signum, siginfo_t *info, void *context) {
 
     if (trace.num_frames < 0) {
       // Did not get a valid java trace.
-      int idx = -trace.num_frames;
-      if (idx > kNumCallTraceErrors) {
-        idx = -kUnknownState;
+      trace.frames[0] =
+          JVMPI_CallFrame{kCallTraceErrorLineNum,
+                          reinterpret_cast<jmethodID>(trace.num_frames)};
+      trace.num_frames = 1;
+      if (!fixed_traces_->Add(attr, &trace)) {
+        unknown_stack_count_++;
       }
-      failures_[idx]++;
       return;
     }
 
     if (frames[0].lineno >= 0) {
       // Leaf is a java frame, return java trace.
       if (!fixed_traces_->Add(attr, &trace)) {
-        failures_[-kUnknownState]++;
+        unknown_stack_count_++;
       }
       return;
     }
@@ -137,7 +139,7 @@ void Profiler::Handle(int signum, siginfo_t *info, void *context) {
   }
 
   if (!fixed_traces_->Add(attr, &trace)) {
-    failures_[-kUnknownState]++;
+    unknown_stack_count_++;
   }
 }
 
@@ -180,7 +182,7 @@ void Profiler::Reset() {
   } else {
     fixed_traces_->Reset();
   }
-  memset(failures_, 0, sizeof(failures_));
+  unknown_stack_count_ = 0;
 
   if (FLAGS_cprof_record_native_stack) {
     // When native stack collection requested, gather a single backtrace before
@@ -195,47 +197,11 @@ void Profiler::Reset() {
   old_action_ = handler_.SetAction(&Profiler::Handle);
 }
 
-string CallTraceErrorToName(int err) {
-  switch (err) {
-    case kNativeStackTrace:
-      return "[Native code]";
-    case kNoClassLoad:
-      return "[No class load event]";
-    case kGcActive:
-      return "[GC active]";
-    case kUnknownNotJava:
-    case kNotWalkableFrameNotJava:
-      return "[Unknown non-Java frame]";
-    case kUnknownJava:
-    case kNotWalkableFrameJava:
-      return "[Unknown Java frame]";
-    case kUnknownState:
-      return "[Unknown state]";
-    case kThreadExit:
-      return "[Thread exiting]";
-    case kDeopt:
-      return "[Deopt]";
-    case kSafepoint:
-      return "[Safepoint]";
-    default:
-      return "[Unknown]";
-  }
-}
-
 string Profiler::SerializeProfile(
     const google::javaprofiler::NativeProcessInfo &native_info) {
-
-  std::vector<FrameCount> extra_frames;
-  for (int i = 0; i <= kNumCallTraceErrors; i++) {
-    if (failures_[i] > 0) {
-      extra_frames.emplace_back(
-          FrameCount{CallTraceErrorToName(-i), failures_[i]});
-    }
-  }
-
-  return SerializeAndClearJavaCpuTraces(jvmti_, native_info, ProfileType(),
-                                        extra_frames, duration_nanos_,
-                                        period_nanos_, &aggregated_traces_);
+  return SerializeAndClearJavaCpuTraces(
+      jvmti_, native_info, ProfileType(), duration_nanos_, period_nanos_,
+      &aggregated_traces_, unknown_stack_count_);
 }
 
 bool AlmostThere(const struct timespec &finish, const struct timespec &lap) {

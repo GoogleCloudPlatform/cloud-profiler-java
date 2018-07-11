@@ -44,8 +44,7 @@ class ProfileProtoBuilder {
   void Populate(const char *profile_type,
                 const google::javaprofiler::TraceMultiset &traces,
                 int64_t duration_ns, int64_t period_ns);
-  void AddArtificialSample(const string &name, int64_t count, int64_t weight,
-                           int64_t attr);
+  void AddArtificialSample(const string &name, int64_t count, int64_t weight);
   int64_t TotalCount() const;
   int64_t TotalWeight() const;
 
@@ -63,6 +62,7 @@ class ProfileProtoBuilder {
                  int64_t weight, int64_t attr);
   uint64_t LocationID(const google::javaprofiler::JVMPI_CallFrame &frame);
   uint64_t LocationID(uint64_t address);
+  uint64_t LocationID(const string &name);
   uint64_t LocationID(const string &class_name, const string &method_name,
                       const string &signature, const string &file_name,
                       int line_number);
@@ -89,10 +89,40 @@ class ProfileProtoBuilder {
   DISALLOW_COPY_AND_ASSIGN(ProfileProtoBuilder);
 };
 
+namespace {
+
+string CallTraceErrorToName(int64_t err) {
+  switch (err) {
+    case kNativeStackTrace:
+      return "[Native code]";
+    case kNoClassLoad:
+      return "[No class load event]";
+    case kGcActive:
+      return "[GC active]";
+    case kUnknownNotJava:
+    case kNotWalkableFrameNotJava:
+      return "[Unknown non-Java frame]";
+    case kUnknownJava:
+    case kNotWalkableFrameJava:
+      return "[Unknown Java frame]";
+    case kUnknownState:
+      return "[Unknown state]";
+    case kThreadExit:
+      return "[Thread exiting]";
+    case kDeopt:
+      return "[Deopt]";
+    case kSafepoint:
+      return "[Safepoint]";
+    default:
+      return "[Unknown]";
+  }
+}
+
+}  // namespace
+
 void ProfileProtoBuilder::AddArtificialSample(const string &name, int64_t count,
-                                              int64_t weight, int64_t attr) {
-  std::vector<uint64_t> locations = {LocationID("", name, "", "", 0)};
-  AddSample(locations, count, weight, attr);
+                                              int64_t weight) {
+  AddSample({LocationID(name)}, count, weight, 0);
 }
 
 int64_t ProfileProtoBuilder::TotalCount() const { return total_count_; }
@@ -103,6 +133,11 @@ uint64_t ProfileProtoBuilder::LocationID(
     const google::javaprofiler::JVMPI_CallFrame &frame) {
   if (frame.lineno == google::javaprofiler::kNativeFrameLineNum) {
     return LocationID(reinterpret_cast<uint64_t>(frame.method_id));
+  }
+
+  if (frame.lineno == google::javaprofiler::kCallTraceErrorLineNum) {
+    return LocationID(
+        CallTraceErrorToName(reinterpret_cast<size_t>(frame.method_id)));
   }
 
   string method_name, class_name, file_name, signature;
@@ -130,6 +165,10 @@ uint64_t ProfileProtoBuilder::LocationID(uint64_t address) {
   loc->set_address(address);
 
   return location_id;
+}
+
+uint64_t ProfileProtoBuilder::LocationID(const string &name) {
+  return LocationID("", name, "", "", 0);
 }
 
 uint64_t ProfileProtoBuilder::LocationID(const string &class_name,
@@ -233,15 +272,11 @@ void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
 
 string SerializeAndClearJavaCpuTraces(
     jvmtiEnv *jvmti, const google::javaprofiler::NativeProcessInfo &native_info,
-    const char *profile_type, const std::vector<FrameCount> &extra_frames,
-    int64_t duration_ns, int64_t period_ns,
-    google::javaprofiler::TraceMultiset *traces) {
+    const char *profile_type, int64_t duration_ns, int64_t period_ns,
+    google::javaprofiler::TraceMultiset *traces, int64_t unknown_count) {
   ProfileProtoBuilder b(jvmti, native_info);
   b.Populate(profile_type, *traces, duration_ns, period_ns);
-  for (const auto &f : extra_frames) {
-    // TODO: Track and report attributes for artificial samples.
-    b.AddArtificialSample(f.name, f.value, f.value * period_ns, 0);
-  }
+  b.AddArtificialSample("[Unknown]", unknown_count, unknown_count * period_ns);
   LOG(INFO) << "Collected a profile: total count=" << b.TotalCount()
             << ", weight=" << b.TotalWeight();
 
