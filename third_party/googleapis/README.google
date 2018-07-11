@@ -8,11 +8,17 @@ Local Modifications:
        README.google was removed from .gitignore.
        Remote submodules were not imported.
        Remove .gitmodules.
+       Remove submodules from git index with 'git rm'.
 
        Imported as a git-subtree.
 
        $ git remote add googleapis https://github.com/googleapis/googleapis
        $ git subtree add --prefix third_party/googleapis googleapis master --squash
+       $ rm third_party/googleapis/.gitmodules
+       $ git rm third_party/googleapis/third_party/boringssl-with-bazel
+       $ git rm third_party/googleapis/third_party/nanopb
+       $ git rm third_party/googleapis/third_party/protobuf
+       $ git rm third_party/googleapis/third_party/zlib
 
        To update from remote on an ongoing basis:
        $ git fetch googleapis
