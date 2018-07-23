@@ -35,11 +35,17 @@ class Worker {
   void Start(JNIEnv *jni);
   void Stop();
 
+  string CollectProfile(string type, int64_t duration_nanos, int64_t sampling_period_nanos);
+
+  static bool IsProfilingEnabled();
   static void EnableProfiling();
   static void DisableProfiling();
 
  private:
   static void ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg);
+
+  string CollectProfileLocked(google::javaprofiler::NativeProcessInfo* ni,
+                              string type, int64_t duration_nanos, int64_t sampling_period_nanos);
 
   jvmtiEnv *jvmti_;
   ThreadTable *threads_;

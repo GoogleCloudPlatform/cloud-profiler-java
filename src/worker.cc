@@ -19,7 +19,7 @@
 #include "src/throttler_api.h"
 #include "src/throttler_timed.h"
 
-DEFINE_bool(cprof_enabled, true,
+DEFINE_bool(cprof_enabled, false,
             "when unset, unconditionally disable the profiling");
 DEFINE_string(
     cprof_profile_filename, "",
@@ -75,6 +75,10 @@ string Collect(Profiler *p,
 
 }  // namespace
 
+bool Worker::IsProfilingEnabled() {
+  return enabled_;
+}
+
 void Worker::EnableProfiling() {
   enabled_ = true;
 }
@@ -103,22 +107,12 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
       // Skip the collection and upload steps when profiling is disabled.
       continue;
     }
-    string profile;
-    string pt = t->ProfileType();
-    if (pt == kTypeCPU) {
-      CPUProfiler p(w->jvmti_, w->threads_, t->DurationNanos(),
-                    FLAGS_cprof_cpu_sampling_period_msec * kNanosPerMilli);
-      profile = Collect(&p, &n);
-    } else if (pt == kTypeWall) {
-      // Note that the requested sampling period for the wall profiling may be
-      // increased if the number of live threads is too large.
-      WallProfiler p(w->jvmti_, w->threads_, t->DurationNanos(),
-                     FLAGS_cprof_wall_sampling_period_msec * kNanosPerMilli);
-      profile = Collect(&p, &n);
-    } else {
-      LOG(ERROR) << "Unknown profile type '" << pt << "', skipping the upload";
-      continue;
-    }
+    string profile = w->CollectProfileLocked(&n,
+                                             t->ProfileType(),
+                                             t->DurationNanos(),
+                                             t->ProfileType() == kTypeCPU ?
+                                             FLAGS_cprof_cpu_sampling_period_msec * kNanosPerMilli :
+                                             FLAGS_cprof_wall_sampling_period_msec * kNanosPerMilli);
     if (profile.empty()) {
       LOG(ERROR) << "No profile bytes collected, skipping the upload";
       continue;
@@ -129,6 +123,33 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
   }
   LOG(INFO) << "Exiting the profiling loop";
 }
+
+string Worker::CollectProfile(string pt, int64_t duration, int64_t sampling_period_nanos) {
+  google::javaprofiler::NativeProcessInfo n("/proc/self/maps");
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  return CollectProfileLocked(&n, pt, duration, sampling_period_nanos);
+}
+
+string Worker::CollectProfileLocked(google::javaprofiler::NativeProcessInfo *n,
+                                    string pt, int64_t duration, int64_t sampling_period_nanos) {
+  string profile;
+  if (pt == kTypeCPU) {
+    CPUProfiler p(jvmti_, threads_, duration, sampling_period_nanos);
+    profile = Collect(&p, n);
+  } else if (pt == kTypeWall) {
+    // Note that the requested sampling period for the wall profiling may be
+    // increased if the number of live threads is too large.
+    WallProfiler p(jvmti_, threads_, duration, sampling_period_nanos);
+    profile = Collect(&p, n);
+  } else {
+    LOG(ERROR) << "Unknown profile type '" << pt << "', skipping the upload";
+    return "";
+  }
+
+  return profile;
+}
+
 
 }  // namespace profiler
 }  // namespace cloud

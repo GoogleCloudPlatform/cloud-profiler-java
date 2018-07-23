@@ -58,7 +58,7 @@ trap "{ echo 'FAILED: see ${LOG_FILE} for details' ; exit 1; }" ERR
 mkdir -p "${BUILD_TEMP_DIR}"
 
 PrintMessage "Building the builder Docker container..."
-docker build -t cprof-agent-builder . >> "${LOG_FILE}" 2>&1
+docker build -t cprof-agent-builder - < Dockerfile >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent code..."
 mkdir -p "${BUILD_TEMP_DIR}"/build
@@ -68,13 +68,14 @@ PrintMessage "Building the agent..."
 docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
     cprof-agent-builder bash \
     -c \
-    "cd ~/build && tar xvf src.tar && make -f Makefile all" \
+    "cd ~/build && tar xvf src.tar && make -f Makefile all && javac -d . --release 8 src/com/google/cloud/profiler/Profiler.java" \
     >> "${LOG_FILE}" 2>&1
+# Ideally the javac step is part of the makefile, but this makes it easier to maintain a fork
 
 PrintMessage "Packaging the agent binaries..."
 tar zcf "${BUILD_TEMP_DIR}"/profiler_java_agent.tar.gz \
     -C "${BUILD_TEMP_DIR}"/build/.out \
-    NOTICES profiler_java_agent.so \
+    NOTICES profiler_java_agent.so com \
     >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Agent built and stored locally in: ${BUILD_TEMP_DIR}/profiler_java_agent.tar.gz"

@@ -299,3 +299,51 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
 AGENTEXPORT void JNICALL Agent_OnUnload(JavaVM *vm) {
   return cloud::profiler::Agent_OnUnload(vm);
 }
+
+extern "C" AGENTEXPORT
+jboolean JNICALL
+Java_com_google_cloud_profiler_Profiler_isEnabled(
+    JNIEnv *, jclass) {
+  return cloud::profiler::Worker::IsProfilingEnabled();
+}
+
+extern "C" AGENTEXPORT
+void JNICALL
+Java_com_google_cloud_profiler_Profiler_enable(
+    JNIEnv *, jclass) {
+  cloud::profiler::Worker::EnableProfiling();
+}
+
+extern "C" AGENTEXPORT
+void JNICALL
+Java_com_google_cloud_profiler_Profiler_disable(
+    JNIEnv *, jclass) {
+  cloud::profiler::Worker::DisableProfiling();
+}
+
+extern "C" AGENTEXPORT
+jbyteArray JNICALL
+Java_com_google_cloud_profiler_Profiler_collect(
+    JNIEnv *env, jclass, jstring type, jlong duration, jlong sampling_period) {
+  const char *value_utf = env->GetStringUTFChars(type, nullptr);
+  string pt(value_utf);
+  env->ReleaseStringUTFChars(type, value_utf);
+
+  if (pt != "cpu" && pt != "wall") {
+    env->ThrowNew(env->FindClass("java/lang/RuntimeException"),
+                  "unknown profiling type");
+    return nullptr;
+  }
+
+  if (duration <= 0 || duration > 300 || sampling_period <= 0) {
+    env->ThrowNew(env->FindClass("java/lang/RuntimeException"),
+                  "bad arguments");
+    return nullptr;
+  }
+
+  string profile = cloud::profiler::worker->CollectProfile(pt, duration, sampling_period);
+
+  const auto output = env->NewByteArray(profile.length());
+  env->SetByteArrayRegion(output, 0, profile.length(), reinterpret_cast<const jbyte *>(profile.data()));
+  return output;
+}
