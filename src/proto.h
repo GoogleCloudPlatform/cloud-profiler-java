@@ -23,19 +23,13 @@
 namespace cloud {
 namespace profiler {
 
-struct FrameCount {
-  string name;
-  int64_t value;
-};
-
 // Generates a CPU profile in a compressed serialized profile.proto
 // from a collection of java stack traces, symbolized using the jvmti.
 // Data in traces will be cleared.
 string SerializeAndClearJavaCpuTraces(
     jvmtiEnv *jvmti, const google::javaprofiler::NativeProcessInfo &native_info,
-    const char *profile_type, const std::vector<FrameCount> &extra_frames,
-    int64_t duration_nanos, int64_t period_nanos,
-    google::javaprofiler::TraceMultiset *traces);
+    const char *profile_type, int64_t duration_nanos, int64_t period_nanos,
+    google::javaprofiler::TraceMultiset *traces, int64_t unknown_count);
 
 }  // namespace profiler
 }  // namespace cloud

@@ -61,9 +61,10 @@ using google::javaprofiler::kThreadExit;
 using google::javaprofiler::kDeopt;
 using google::javaprofiler::kSafepoint;
 
-using google::javaprofiler::kNumCallTraceErrors;
+using google::javaprofiler::kCallTraceErrorLineNum;
 using google::javaprofiler::kMaxFramesToCapture;
 using google::javaprofiler::kNativeFrameLineNum;
+using google::javaprofiler::kNumCallTraceErrors;
 
 using google::javaprofiler::JVMPI_CallFrame;
 using google::javaprofiler::JVMPI_CallTrace;

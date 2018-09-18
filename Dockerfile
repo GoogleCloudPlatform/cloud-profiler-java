@@ -90,7 +90,7 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
-RUN git clone --depth=1 --recursive -b v1.11.0 https://github.com/grpc/grpc.git /tmp/grpc && \
+RUN git clone --depth=1 --recursive -b v1.15.0 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
     cd third_party/protobuf && \
     ./autogen.sh && ./configure --with-pic CXXFLAGS=-Os && make -j && make install && ldconfig && \

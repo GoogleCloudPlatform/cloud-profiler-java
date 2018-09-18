@@ -92,8 +92,8 @@ class Profiler {
 
   struct sigaction old_action_;
 
-  static std::atomic<int> failures_[
-      google::javaprofiler::kNumCallTraceErrors + 1];  // 1-indexed.
+  // Number of samples where the stack aggregation failed.
+  static std::atomic<int> unknown_stack_count_;
 
   DISALLOW_COPY_AND_ASSIGN(Profiler);
 };
