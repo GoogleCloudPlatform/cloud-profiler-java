@@ -23,6 +23,10 @@
 
 #include "src/globals.h"
 
+#ifdef __APPLE__
+typedef long long timer_t;
+#endif
+
 namespace cloud {
 namespace profiler {
 
@@ -42,20 +46,26 @@ class ThreadTable {
   void UnregisterCurrent();
   // Returns the number of registered threads.
   int64_t Size() const;
-  // Returns the IDs of all registered threads.
-  std::vector<pid_t> Threads() const;
   // Starts per-thread timers.
   void StartTimers(int64_t period_usec);
   // Stops per-thread timers.
   void StopTimers();
   // Whether CPU time sampling is configured to use per-thread timers.
   bool UseTimers() const { return use_timers_; }
+  // Sends a signal to all registered threads, except this thread.
+  // Returns the number of threads signaled.
+  int64_t SignalAllExceptSelf(int signal);
 
  private:
   mutable std::mutex thread_mutex_;
+  struct ThreadInfo {
+    pthread_t pthread;
+    pid_t tid;
+    time_t timer;
+  };
   // List of threads and associated timers. The timer ID is kInvalidTimer when
   // the timer usage is off or the timer creation failed for the thread.
-  std::vector<std::pair<pid_t, timer_t>> threads_;
+  std::vector<ThreadInfo> threads_;
   // True when the timer usage is requested.
   bool use_timers_;
   // Non-zero when the thread timers have been started.
@@ -63,12 +73,6 @@ class ThreadTable {
 
   DISALLOW_COPY_AND_ASSIGN(ThreadTable);
 };
-
-// Returns the thread ID of the current thread.
-pid_t GetTid();
-
-// Sends a signal to the specified thread.
-bool TgKill(pid_t tid, int signum);
 
 }  // namespace profiler
 }  // namespace cloud

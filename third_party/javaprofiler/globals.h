@@ -99,8 +99,17 @@ class Accessors {
 
   template <class FunctionType>
   static inline FunctionType GetJvmFunction(const char *function_name) {
+    FunctionType result = bit_cast<FunctionType>(dlsym(RTLD_DEFAULT, function_name));
+    if (result) {
+      return result;
+    }
+
     // get handle to library
+#ifdef __APPLE__
+    static void *handle = dlopen("libjvm.dylib", RTLD_LAZY);
+#else
     static void *handle = dlopen("libjvm.so", RTLD_LAZY);
+#endif
     if (handle == NULL) {
       return NULL;
     }

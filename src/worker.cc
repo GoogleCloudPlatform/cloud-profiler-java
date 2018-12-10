@@ -91,6 +91,14 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
   Worker *w = static_cast<Worker *>(arg);
   google::javaprofiler::NativeProcessInfo n("/proc/self/maps");
 
+  while (!enabled_ && !w->stopping_) {
+    sleep(30);
+  }
+
+  if (w->stopping_) {
+    return;
+  }
+
   std::unique_ptr<Throttler> t =
       FLAGS_cprof_profile_filename.empty()
           ? std::unique_ptr<Throttler>(new APIThrottler())

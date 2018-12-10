@@ -68,9 +68,8 @@ PrintMessage "Building the agent..."
 docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
     cprof-agent-builder bash \
     -c \
-    "cd ~/build && tar xvf src.tar && make -f Makefile all && javac -d . --release 8 src/com/google/cloud/profiler/Profiler.java" \
+    "cd ~/build && tar xvf src.tar && make -f Makefile all" \
     >> "${LOG_FILE}" 2>&1
-# Ideally the javac step is part of the makefile, but this makes it easier to maintain a fork
 
 PrintMessage "Packaging the agent binaries..."
 tar zcf "${BUILD_TEMP_DIR}"/profiler_java_agent.tar.gz \

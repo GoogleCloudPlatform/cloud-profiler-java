@@ -13,6 +13,7 @@
 # limitations under the License.
 
 CC = g++
+UNAME := $(shell uname)
 
 # -fpermissive used to bypass <:: errors from gcc 4.7
 CFLAGS = \
@@ -32,7 +33,7 @@ CFLAGS = \
 
 SRC_ROOT_PATH=.
 
-JAVA_PATH ?= /usr/lib/jvm/java-7-openjdk-amd64
+JAVA_HOME ?= /usr/lib/jvm/java-7-openjdk-amd64
 PROTOC ?= /usr/local/bin/protoc
 PROTOC_GEN_GRPC ?= /usr/local/bin/grpc_cpp_plugin
 
@@ -45,8 +46,9 @@ INCLUDE_PATH ?= /usr/local/include
 PROTOBUF_INCLUDE_PATH ?= /usr/local/include
 
 INCLUDES = \
-	-I$(JAVA_PATH)/include \
-	-I$(JAVA_PATH)/include/linux \
+	-I$(JAVA_HOME)/include \
+	-I$(JAVA_HOME)/include/linux \
+	-I$(JAVA_HOME)/include/darwin \
 	-I$(SRC_ROOT_PATH) \
 	-I$(SRC_ROOT_PATH)/third_party \
 	-I$(GENFILES_PATH) \
@@ -54,8 +56,13 @@ INCLUDES = \
 	-I$(INCLUDE_PATH) \
 	-I$(PROTOBUF_INCLUDE_PATH) \
 
-TARGET_AGENT = $(OUT_PATH)/profiler_java_agent.so
+ifeq ($(UNAME), Darwin)
+	TARGET_AGENT = $(OUT_PATH)/profiler_java_agent.dylib
+else
+	TARGET_AGENT = $(OUT_PATH)/profiler_java_agent.so
+endif
 TARGET_NOTICES = $(OUT_PATH)/NOTICES
+TARGET_JAR = $(OUT_PATH)/profiler_java_agent.jar
 
 PROFILE_PROTO_SOURCES = \
 	$(GENFILES_PATH)/$(PROFILE_PROTO_PATH)/profile.pb.cc \
@@ -129,28 +136,45 @@ HEADERS = \
 	$(JAVAPROFILER_LIB_HEADERS) \
 
 VERSION_SCRIPT = $(JAVA_AGENT_PATH)/cloud_profiler_java_agent.lds
+EXPORTED_SYMBOLS_LIST = $(JAVA_AGENT_PATH)/cloud_profiler_java_agent_symbols
 OPT_FLAGS = -O3
-LDFLAGS = -static-libstdc++ -shared
-LDS_FLAGS = -Wl,-z,defs -Wl,--version-script=$(VERSION_SCRIPT)
-
+LDFLAGS = -static-libstdc++ 
 LIB_ROOT_PATH ?= /usr/local
+ifeq ($(UNAME), Darwin)
+	LDS_FLAGS = -Wl,-undefined,error -Wl,-exported_symbols_list,$(EXPORTED_SYMBOLS_LIST)
+	SSL_LIB_ROOT_PATH ?= $(LIB_ROOT_PATH)/opt/openssl
+	LDFLAGS += -dynamiclib
+else
+	LDS_FLAGS = -Wl,-z,defs -Wl,--version-script=$(VERSION_SCRIPT)
+	SSL_LIB_ROOT_PATH ?= $(LIB_ROOT_PATH)/ssl
+	LDFLAGS += -shared
+endif
 
 # Linking OpenSSL statically as different distributions have different version
 # of the libraries, including different soname. And we'd prefer to have a single
 # agent binary which runs everywhere.
 LIBS1= \
 	-ldl \
-	-lrt \
 	-pthread \
   $(LIB_ROOT_PATH)/lib/libcurl.a \
   $(LIB_ROOT_PATH)/lib/libglog.a \
 	$(LIB_ROOT_PATH)/lib/libgflags.a \
 
+ifneq ($(UNAME), Darwin)
+	LIBS1 += -lrt
+else
+	LIBS1 += $(LIB_ROOT_PATH)/lib/libcares.a 
+endif
+
 LIBS2= \
 	$(LIB_ROOT_PATH)/lib/libprotobuf.a \
-	$(LIB_ROOT_PATH)/ssl/lib/libssl.a \
-	$(LIB_ROOT_PATH)/ssl/lib/libcrypto.a \
+	$(SSL_LIB_ROOT_PATH)/lib/libssl.a \
+	$(SSL_LIB_ROOT_PATH)/lib/libcrypto.a \
 	-lz \
+
+ifeq ($(UNAME), Darwin)
+	LIBS2 += $(LIB_ROOT_PATH)/lib/libnghttp2.a -lldap
+endif
 
 GRPC_LIBS= \
 	$(LIB_ROOT_PATH)/lib/libgrpc++.a \
@@ -160,9 +184,10 @@ GRPC_LIBS= \
 all: \
 	$(TARGET_AGENT) \
 	$(TARGET_NOTICES) \
+	$(TARGET_JAR) \
 
 clean:
-	rm -f $(TARGET_AGENT)
+	rm -f $(TARGET_AGENT) $(TARGET_JAR)
 	rm -rf $(GENFILES_PATH)
 
 $(TARGET_AGENT): $(SOURCES) $(HEADERS)
@@ -202,7 +227,11 @@ $(GENFILES_PATH)/%.pb.h $(GENFILES_PATH)/%.pb.cc : %.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) --cpp_out=$(GENFILES_PATH) $<
 
-$(VERSION_SCRIPT):
-	echo "VERS_1.1 { global: ;" $(AGENT_EXPORTS)  "; local: *; };" > $@
+$(TARGET_JAR) : $(GENFILES_PATH)/com/google/cloud/profiler/*.class
+	mkdir -p $(dir $@)
+	jar -cf $@ -C $(GENFILES_PATH) com/google/cloud/profiler
+
+$(GENFILES_PATH)/com/google/cloud/profiler/%.class : $(JAVA_AGENT_PATH)/com/google/cloud/profiler/%.java
+	javac -d $(GENFILES_PATH) $<
 
 # vim: set ts=2 noet sw=2 sts=2 :

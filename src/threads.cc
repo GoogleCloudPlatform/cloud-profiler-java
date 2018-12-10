@@ -26,7 +26,25 @@ namespace {
 
 const timer_t kInvalidTimer = reinterpret_cast<timer_t>(-1LL);
 
+pid_t GetTid() { 
+#ifdef __APPLE__
+  return syscall(SYS_thread_selfid);
+#else
+  return syscall(__NR_gettid); 
+#endif
+}
+
+#ifndef __APPLE__
+bool TgKill(pid_t tid, int signum) {
+  return syscall(__NR_tgkill, getpid(), tid, signum) == 0;
+}
+#endif
+
 timer_t CreateTimer(pid_t tid) {
+#ifdef __APPLE__
+  LOG(ERROR) << "Timers aren't supported on OSX";
+  return kInvalidTimer;
+#else
   struct sigevent sevp = {};
   sevp.sigev_notify = SIGEV_THREAD_ID;
   sevp._sigev_un._tid = tid;
@@ -38,9 +56,13 @@ timer_t CreateTimer(pid_t tid) {
     return kInvalidTimer;
   }
   return timer;
+#endif
 }
 
 bool SetTimer(timer_t timer, int64_t period_usec) {
+#ifdef __APPLE__
+  return false;
+#else
   struct itimerspec its = {};
   its.it_interval.tv_sec = 0;
   its.it_interval.tv_nsec = period_usec * 1000;
@@ -51,13 +73,16 @@ bool SetTimer(timer_t timer, int64_t period_usec) {
     return false;
   }
   return true;
+#endif
 }
 
 void DeleteTimer(timer_t timer) {
+#ifndef __APPLE__
   int err = timer_delete(timer);
   if (err) {
     LOG(ERROR) << "Failed to delete timer: " << err;
   }
+#endif
 }
 
 }  // namespace
@@ -69,7 +94,7 @@ void ThreadTable::RegisterCurrent() {
     timer = CreateTimer(tid);
   }
   std::lock_guard<std::mutex> lock(thread_mutex_);
-  threads_.push_back({tid, timer});
+  threads_.push_back({pthread_self(), tid, timer});
   if (timer != kInvalidTimer && period_usec_ > 0) {
     SetTimer(timer, period_usec_);
   }
@@ -79,9 +104,9 @@ void ThreadTable::UnregisterCurrent() {
   pid_t tid = GetTid();
   std::lock_guard<std::mutex> lock(thread_mutex_);
   for (auto i = threads_.begin(); i != threads_.end(); ++i) {
-    if (i->first == tid) {
-      if (i->second != kInvalidTimer) {
-        DeleteTimer(i->second);
+    if (i->tid == tid) {
+      if (i->timer != kInvalidTimer) {
+        DeleteTimer(i->timer);
       }
       threads_.erase(i);
       return;
@@ -94,29 +119,32 @@ int64_t ThreadTable::Size() const {
   return threads_.size();
 }
 
-std::vector<pid_t> ThreadTable::Threads() const {
-  std::vector<pid_t> tids;
-  std::lock_guard<std::mutex> lock(thread_mutex_);
-  for (const auto& t : threads_) {
-    tids.push_back(t.first);
-  }
-  return tids;
-}
-
 void ThreadTable::StartTimers(int64_t period_usec) {
   std::lock_guard<std::mutex> lock(thread_mutex_);
   period_usec_ = period_usec;
   for (const auto& t : threads_) {
-    SetTimer(t.second, period_usec);
+    SetTimer(t.timer, period_usec);
   }
 }
 
 void ThreadTable::StopTimers() { StartTimers(0); }
 
-pid_t GetTid() { return syscall(__NR_gettid); }
+int64_t ThreadTable::SignalAllExceptSelf(int signal) {
+  std::lock_guard<std::mutex> lock(thread_mutex_);
 
-bool TgKill(pid_t tid, int signum) {
-  return syscall(__NR_tgkill, getpid(), tid, signum) == 0;
+  pid_t my_id = GetTid();
+  int64_t count = 0;
+  for (const auto& t : threads_) {
+    if (t.tid != my_id) {
+#ifdef __APPLE__
+      pthread_kill(t.pthread, signal);
+#else
+      TgKill(t->tid, signal);
+#endif
+      count++;
+    }
+  }
+  return count;
 }
 
 }  // namespace profiler

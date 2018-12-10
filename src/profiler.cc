@@ -132,7 +132,11 @@ void Profiler::Handle(int signum, siginfo_t *info, void *context) {
     // counter in such case to provide at least some clue into where the time is
     // being spent. The alternative would be to mark such samples as erroneous
     // but it appears even having just the shared object name is more useful.
+#ifdef __APPLE__
+    uint64_t pc = static_cast<ucontext_t*>(context)->uc_mcontext->__ss.__rip;
+#else
     uint64_t pc = static_cast<ucontext_t*>(context)->uc_mcontext.gregs[REG_RIP];
+#endif
     trace.frames[0] =
         JVMPI_CallFrame{kNativeFrameLineNum, reinterpret_cast<jmethodID>(pc)};
     ++trace.num_frames;
@@ -294,7 +298,6 @@ int64_t WallProfiler::EffectivePeriodNanos(int64_t period_nanos,
 
 bool WallProfiler::Collect() {
   Reset();
-  pid_t my_tid = GetTid();
 
   Clock *clock = DefaultClock();
   struct timespec profile_period = {0, period_nanos_};
@@ -314,20 +317,13 @@ bool WallProfiler::Collect() {
       Flush();
     }
     clock->SleepUntil(next);
-    std::vector<pid_t> threads = threads_->Threads();
-    if (threads.size() > FLAGS_cprof_wall_num_threads_cutoff) {
+    if (threads_->Size() > FLAGS_cprof_wall_num_threads_cutoff) {
       LOG(WARNING) << "Aborting wall profiling due to too many threads. "
-                   << "Got " << threads.size() << " threads. "
+                   << "Got " << threads_->Size() << " threads. "
                    << "Want up to " << FLAGS_cprof_wall_num_threads_cutoff;
       return false;  // Too many threads, abort
     }
-    count += threads.size();
-    for (pid_t tid : threads) {
-      if (tid != my_tid) {
-        // Skip profiler worker thread.
-        TgKill(tid, SIGPROF);
-      }
-    }
+    count += threads_->SignalAllExceptSelf(SIGPROF);
     next = TimeAdd(next, profile_period);
   }
   // Delay to allow last signals to be processed.

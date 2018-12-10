@@ -18,6 +18,7 @@
 
 #include "src/string.h"
 #include "src/worker.h"
+#include "third_party/javaprofiler/clock.h"
 #include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/stacktraces.h"
 
@@ -28,6 +29,8 @@ DEFINE_bool(cprof_force_debug_non_safepoints, true,
             "when true, force DebugNonSafepoints flag by subscribing to the"
             "code generation events. This improves the accuracy of profiles,"
             "but may incur a bit of overhead.");
+
+using google::javaprofiler::kNanosPerSecond;
 
 namespace cloud {
 namespace profiler {
@@ -278,6 +281,10 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   google::javaprofiler::Asgct::SetAsgct(
       google::javaprofiler::Accessors::GetJvmFunction<
       google::javaprofiler::ASGCTType>("AsyncGetCallTrace"));
+  if (!google::javaprofiler::Asgct::GetAsgct()) {
+    LOG(ERROR) << "Failed to find AsyncGetCallTrace";
+    return 1;
+  }
 
   worker = new Worker(jvmti, threads);
   return 0;
@@ -291,7 +298,7 @@ void JNICALL Agent_OnUnload(JavaVM *vm) {
 }  // namespace profiler
 }  // namespace cloud
 
-AGENTEXPORT jint JNICALL
+extern "C" AGENTEXPORT jint JNICALL
 Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   return cloud::profiler::Agent_OnLoad(vm, options, reserved);
 }
@@ -335,7 +342,7 @@ Java_com_google_cloud_profiler_Profiler_collect(
     return nullptr;
   }
 
-  if (duration <= 0 || duration > 300 || sampling_period <= 0) {
+  if (duration <= 0 || duration > 300 * kNanosPerSecond || sampling_period <= 0) {
     env->ThrowNew(env->FindClass("java/lang/RuntimeException"),
                   "bad arguments");
     return nullptr;

@@ -66,14 +66,27 @@ class Clock {
 
   // Blocks the current thread until the specified point in time.
   virtual void SleepUntil(struct timespec ts) {
+#ifdef __APPLE__
+    struct timespec now = Now();
+    int64_t to_sleep = TimeSpecToNanos(ts) - TimeSpecToNanos(now);
+    if (to_sleep > 0) {
+      SleepFor(NanosToTimeSpec(to_sleep));
+    }
+#else
     while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, nullptr) > 0) {
     }
+#endif
   }
 
   // Blocks the current thread for the specified duration.
   virtual void SleepFor(struct timespec ts) {
+#ifdef __APPLE__
+    while (nanosleep(&ts, &ts) > 0) {
+    }
+#else
     while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) > 0) {
     }
+#endif
   }
 };
 

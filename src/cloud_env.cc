@@ -67,7 +67,9 @@ string GceMetadataRequest(HTTPRequest* req, const string& path) {
 }
 
 const char* Getenv(const string& var) {
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17)
+#if __APPLE__
+  return getenv(var.c_str());
+#elif __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17)
   return secure_getenv(var.c_str());
 #else
   return __secure_getenv(var.c_str());
