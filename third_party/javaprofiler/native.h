@@ -29,9 +29,8 @@ namespace javaprofiler {
 // NativeProcessInfo maintains information about native libraries.
 class NativeProcessInfo {
  public:
-  // procmaps_filename contains the path of a file describing the memory
-  // regions in the current process, in /proc/<pid>/maps format.
-  explicit NativeProcessInfo(const string &procmaps_filename);
+  // 0 is self
+  explicit NativeProcessInfo(const pid_t pid);
 
   struct Mapping {
     uint64_t start, limit;
@@ -42,7 +41,7 @@ class NativeProcessInfo {
   const std::vector<Mapping> &Mappings() const { return mappings_; }
 
  private:
-  const string procmaps_filename_;
+  const pid_t pid_;
   std::vector<Mapping> mappings_;
   DISALLOW_COPY_AND_ASSIGN(NativeProcessInfo);
 };

@@ -232,6 +232,7 @@ $(TARGET_JAR) : $(GENFILES_PATH)/com/google/cloud/profiler/*.class
 	jar -cf $@ -C $(GENFILES_PATH) com/google/cloud/profiler
 
 $(GENFILES_PATH)/com/google/cloud/profiler/%.class : $(JAVA_AGENT_PATH)/com/google/cloud/profiler/%.java
+	mkdir -p $(dir $@)
 	javac -d $(GENFILES_PATH) $<
 
 # vim: set ts=2 noet sw=2 sts=2 :

@@ -62,7 +62,7 @@ docker build -t cprof-agent-builder - < Dockerfile >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent code..."
 mkdir -p "${BUILD_TEMP_DIR}"/build
-tar cf "${BUILD_TEMP_DIR}"/build/src.tar . >> "${LOG_FILE}" 2>&1
+tar cf "${BUILD_TEMP_DIR}"/build/src.tar --exclude .genfiles . >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Building the agent..."
 docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
@@ -74,7 +74,7 @@ docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
 PrintMessage "Packaging the agent binaries..."
 tar zcf "${BUILD_TEMP_DIR}"/profiler_java_agent.tar.gz \
     -C "${BUILD_TEMP_DIR}"/build/.out \
-    NOTICES profiler_java_agent.so com \
+    NOTICES profiler_java_agent.so profiler_java_agent.jar profiler_java_agent.dylib \
     >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Agent built and stored locally in: ${BUILD_TEMP_DIR}/profiler_java_agent.tar.gz"

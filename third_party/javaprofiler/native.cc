@@ -21,6 +21,12 @@
 #include "third_party/javaprofiler/native.h"
 
 #include <libgen.h>
+#ifdef __APPLE__
+#include <mach/mach.h>
+#include <mach/task.h>
+#include <mach/mach_vm.h>
+#include <libproc.h>
+#endif
 
 #include <cinttypes>
 #include <cstdio>
@@ -30,16 +36,70 @@
 namespace google {
 namespace javaprofiler {
 
-NativeProcessInfo::NativeProcessInfo(const string &procmaps_filename)
-    : procmaps_filename_(procmaps_filename) {
+NativeProcessInfo::NativeProcessInfo(const pid_t pid)
+    : pid_(pid) {
   Refresh();
 }
 
+#ifdef __APPLE__
 void NativeProcessInfo::Refresh() {
-  FILE *f = fopen(procmaps_filename_.c_str(), "r");
+  kern_return_t err = KERN_SUCCESS;
+  uint32_t depth = 0;
+  vm_address_t address = 0;
+  vm_size_t size = 0;
+  mach_port_t task = mach_task_self();
+
+  if (pid_ != 0) {
+    LOG(ERROR) << "non-self memory reads are unsupported.";
+    return;
+  }
+
+  while (true) {
+    struct vm_region_submap_info_64 info;
+    mach_msg_type_number_t count = VM_REGION_SUBMAP_INFO_COUNT_64;
+    
+    err = vm_region_recurse_64(task, &address, &size, &depth,
+                               (vm_region_info_64_t)&info, &count);
+    if (err == KERN_INVALID_ADDRESS) {
+      break;
+    }
+
+    if (err != KERN_SUCCESS) {
+      LOG(ERROR) << "Failed to read memory map: " << err;
+      return;
+    }
+
+    if (info.is_submap) {
+      depth++;
+    } else {
+      char buf[1024] = {0};
+      errno = 0;
+      proc_regionfilename(getpid(), address, buf, sizeof(buf));
+      if (errno == 0 && buf[0] != 0) {
+        mappings_.emplace_back(
+            Mapping{address, address + size, string(buf)});
+      } else {
+        LOG(INFO) << "proc_regionfilename failed: " << errno << " on " << address << "-" << size;
+      }
+
+      address += size;
+    }
+  }
+}
+#else
+void NativeProcessInfo::Refresh() {
+  std::string procmaps_filename;
+  if (pid_ == 0) {
+    procmaps_filename = "/proc/self/maps";
+  } else {
+    procmaps_filename = "/proc/";
+    procmaps_filename += pid_;
+    procmaps_filename += "/maps";
+  }
+  FILE *f = fopen(procmaps_filename.c_str(), "r");
 
   if (f == nullptr) {
-    LOG(ERROR) << "Could not open maps file: " << procmaps_filename_;
+    LOG(ERROR) << "Could not open maps file: " << procmaps_filename;
     return;
   }
 
@@ -81,6 +141,7 @@ void NativeProcessInfo::Refresh() {
   }
   fclose(f);
 }
+#endif
 
 }  // namespace javaprofiler
 }  // namespace google

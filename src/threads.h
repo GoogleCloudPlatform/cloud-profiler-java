@@ -61,7 +61,7 @@ class ThreadTable {
   struct ThreadInfo {
     pthread_t pthread;
     pid_t tid;
-    time_t timer;
+    timer_t timer;
   };
   // List of threads and associated timers. The timer ID is kInvalidTimer when
   // the timer usage is off or the timer creation failed for the thread.

@@ -72,7 +72,7 @@ using google::javaprofiler::JVMPI_CallTrace;
 // Gets us around -Wunused-parameter
 #define IMPLICITLY_USE(x) (void) x;
 
-#define AGENTEXPORT __attribute__((visibility("default"))) JNIEXPORT
+#define AGENTEXPORT extern "C" __attribute__((visibility("default"))) JNIEXPORT
 
 // Wrap JVMTI functions in this in functions that expect a return
 // value and require cleanup.

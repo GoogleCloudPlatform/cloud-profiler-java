@@ -298,7 +298,7 @@ void JNICALL Agent_OnUnload(JavaVM *vm) {
 }  // namespace profiler
 }  // namespace cloud
 
-extern "C" AGENTEXPORT jint JNICALL
+AGENTEXPORT jint JNICALL
 Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   return cloud::profiler::Agent_OnLoad(vm, options, reserved);
 }
@@ -307,28 +307,28 @@ AGENTEXPORT void JNICALL Agent_OnUnload(JavaVM *vm) {
   return cloud::profiler::Agent_OnUnload(vm);
 }
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 jboolean JNICALL
 Java_com_google_cloud_profiler_Profiler_isEnabled(
     JNIEnv *, jclass) {
   return cloud::profiler::Worker::IsProfilingEnabled();
 }
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 void JNICALL
 Java_com_google_cloud_profiler_Profiler_enable(
     JNIEnv *, jclass) {
   cloud::profiler::Worker::EnableProfiling();
 }
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 void JNICALL
 Java_com_google_cloud_profiler_Profiler_disable(
     JNIEnv *, jclass) {
   cloud::profiler::Worker::DisableProfiling();
 }
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 jbyteArray JNICALL
 Java_com_google_cloud_profiler_Profiler_collect(
     JNIEnv *env, jclass, jstring type, jlong duration, jlong sampling_period) {

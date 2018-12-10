@@ -89,7 +89,7 @@ void Worker::DisableProfiling() {
 
 void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
   Worker *w = static_cast<Worker *>(arg);
-  google::javaprofiler::NativeProcessInfo n("/proc/self/maps");
+  google::javaprofiler::NativeProcessInfo n(0);
 
   while (!enabled_ && !w->stopping_) {
     sleep(30);
@@ -133,7 +133,7 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
 }
 
 string Worker::CollectProfile(string pt, int64_t duration, int64_t sampling_period_nanos) {
-  google::javaprofiler::NativeProcessInfo n("/proc/self/maps");
+  google::javaprofiler::NativeProcessInfo n(0);
 
   std::lock_guard<std::mutex> lock(mutex_);
   return CollectProfileLocked(&n, pt, duration, sampling_period_nanos);

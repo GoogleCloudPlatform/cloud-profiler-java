@@ -17,21 +17,21 @@
 #include "src/worker.h"
 #include "third_party/javaprofiler/stacktraces.h"
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 void JNICALL
 Java_com_google_cloud_dataflow_worker_profiler_Profiler_enable(
     JNIEnv *, jclass) {
   cloud::profiler::Worker::EnableProfiling();
 }
 
-extern "C" AGENTEXPORT
+AGENTEXPORT
 void JNICALL
 Java_com_google_cloud_dataflow_worker_profiler_Profiler_disable(
     JNIEnv *, jclass) {
   cloud::profiler::Worker::DisableProfiling();
 }
 
-extern "C" AGENTEXPORT jint JNICALL
+AGENTEXPORT jint JNICALL
 Java_com_google_cloud_dataflow_worker_profiler_Profiler_registerAttribute(
     JNIEnv *env, jclass, jstring value) {
   const char *value_utf = env->GetStringUTFChars(value, nullptr);
@@ -40,7 +40,7 @@ Java_com_google_cloud_dataflow_worker_profiler_Profiler_registerAttribute(
   return static_cast<jint>(ret);
 }
 
-extern "C" AGENTEXPORT jint JNICALL
+AGENTEXPORT jint JNICALL
 Java_com_google_cloud_dataflow_worker_profiler_Profiler_setAttribute(
     JNIEnv *env, jclass, jint attr) {
   int64_t ret = google::javaprofiler::Accessors::GetAttribute();
@@ -48,7 +48,7 @@ Java_com_google_cloud_dataflow_worker_profiler_Profiler_setAttribute(
   return static_cast<jint>(ret);
 }
 
-extern "C" AGENTEXPORT jint JNICALL
+AGENTEXPORT jint JNICALL
 Java_com_google_cloud_dataflow_worker_profiler_Profiler_getAttribute(
     JNIEnv *env, jclass) {
   int64_t ret = google::javaprofiler::Accessors::GetAttribute();

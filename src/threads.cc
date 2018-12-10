@@ -139,7 +139,7 @@ int64_t ThreadTable::SignalAllExceptSelf(int signal) {
 #ifdef __APPLE__
       pthread_kill(t.pthread, signal);
 #else
-      TgKill(t->tid, signal);
+      TgKill(t.tid, signal);
 #endif
       count++;
     }
