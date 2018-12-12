@@ -17,8 +17,13 @@
 namespace google {
 namespace javaprofiler {
 
+#ifdef HAVE_TLS
 __thread JNIEnv *Accessors::env_;
 __thread int64_t Accessors::attr_;
+#else
+pthread_key_t Accessors::env_key_;
+pthread_key_t Accessors::attr_key_;
+#endif
 ASGCTType Asgct::asgct_;
 
 std::mutex *AttributeTable::mutex_;

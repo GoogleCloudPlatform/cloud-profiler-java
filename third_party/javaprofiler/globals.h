@@ -17,9 +17,16 @@
 #ifndef THIRD_PARTY_JAVAPROFILER_GLOBALS_H_
 #define THIRD_PARTY_JAVAPROFILER_GLOBALS_H_
 
+#ifndef __APPLE__
+#define HAVE_TLS
+#endif
+
 #include <assert.h>
 #include <dlfcn.h>
 #include <jvmti.h>
+#ifndef HAVE_TLS
+#include <pthread.h>
+#endif
 
 #include "third_party/javaprofiler/jvmti_error.h"
 
@@ -85,17 +92,52 @@ class JvmtiScopedPtr {
 // Accessors for a JNIEnv for this thread.
 class Accessors {
  public:
-  static void SetCurrentJniEnv(JNIEnv *env) { env_ = env; }
+  static void Init() {
+#ifndef HAVE_TLS
+    pthread_key_create(&env_key_, NULL);
+    pthread_key_create(&attr_key_, free);
+#endif
+  }
 
-  static JNIEnv *CurrentJniEnv() { return env_; }
+  static void SetCurrentJniEnv(JNIEnv *env) {
+#ifndef HAVE_TLS
+    pthread_setspecific(env_key_, env);
+#else
+    env_ = env;
+#endif
+  }
 
-  static void Init() {}
+  static JNIEnv *CurrentJniEnv() {
+#ifndef HAVE_TLS
+    return reinterpret_cast<JNIEnv*>(pthread_getspecific(env_key_));
+#else
+    return env_;
+#endif
+  }
 
   static void Destroy() {}
 
-  static void SetAttribute(int64_t value) { attr_ = value; }
+  static void SetAttribute(int64_t value) {
+#ifndef HAVE_TLS
+    int64_t *attr = reinterpret_cast<int64_t*>(pthread_getspecific(attr_key_));
+    if (!attr) {
+      attr = (int64_t *) malloc(sizeof(*attr));
+    }
+    *attr = value;
+    pthread_setspecific(attr_key_, attr);
+#else
+    attr_ = value;
+#endif
+  }
 
-  static int64_t GetAttribute() { return attr_; }
+  static int64_t GetAttribute() {
+#ifndef HAVE_TLS
+    int64_t *attr = reinterpret_cast<int64_t*>(pthread_getspecific(attr_key_));
+    return attr ? *attr : 0;
+#else
+    return attr_;
+#endif
+  }
 
   template <class FunctionType>
   static inline FunctionType GetJvmFunction(const char *function_name) {
@@ -119,6 +161,10 @@ class Accessors {
   }
 
  private:
+#ifndef HAVE_TLS
+  static pthread_key_t env_key_;
+  static pthread_key_t attr_key_;
+
   // This is dangerous. TLS accesses are by default not async safe, as
   // they can call malloc for lazy initialization. The initial-exec
   // TLS mode avoids this potential allocation, with the limitation
@@ -127,7 +173,7 @@ class Accessors {
   // profiler agent, which is relatively small. We do provide a way
   // to override the TLS model for compilation environments where the
   // TLS access is async-safe.
-#ifdef JAVAPROFILER_GLOBAL_DYNAMIC_TLS
+#elif defined(JAVAPROFILER_GLOBAL_DYNAMIC_TLS)
   static __thread JNIEnv *env_ __attribute__((tls_model("global-dynamic")));
   static __thread int64_t attr_ __attribute__((tls_model("global-dynamic")));
 #else
