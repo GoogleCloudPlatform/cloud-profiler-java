@@ -15,24 +15,23 @@
 #include <jni.h>
 
 #include "src/worker.h"
+#include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/stacktraces.h"
 
-extern "C" AGENTEXPORT
-void JNICALL
-Java_com_google_cloud_dataflow_worker_profiler_Profiler_enable(
-    JNIEnv *, jclass) {
+extern "C" AGENTEXPORT void JNICALL
+Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_enable(JNIEnv *,
+                                                                      jclass) {
   cloud::profiler::Worker::EnableProfiling();
 }
 
-extern "C" AGENTEXPORT
-void JNICALL
-Java_com_google_cloud_dataflow_worker_profiler_Profiler_disable(
-    JNIEnv *, jclass) {
+extern "C" AGENTEXPORT void JNICALL
+Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_disable(JNIEnv *,
+                                                                       jclass) {
   cloud::profiler::Worker::DisableProfiling();
 }
 
 extern "C" AGENTEXPORT jint JNICALL
-Java_com_google_cloud_dataflow_worker_profiler_Profiler_registerAttribute(
+Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_registerAttribute(
     JNIEnv *env, jclass, jstring value) {
   const char *value_utf = env->GetStringUTFChars(value, nullptr);
   int ret = google::javaprofiler::AttributeTable::RegisterString(value_utf);
@@ -41,7 +40,7 @@ Java_com_google_cloud_dataflow_worker_profiler_Profiler_registerAttribute(
 }
 
 extern "C" AGENTEXPORT jint JNICALL
-Java_com_google_cloud_dataflow_worker_profiler_Profiler_setAttribute(
+Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_setAttribute(
     JNIEnv *env, jclass, jint attr) {
   int64_t ret = google::javaprofiler::Accessors::GetAttribute();
   google::javaprofiler::Accessors::SetAttribute(static_cast<int64_t>(attr));
@@ -49,7 +48,7 @@ Java_com_google_cloud_dataflow_worker_profiler_Profiler_setAttribute(
 }
 
 extern "C" AGENTEXPORT jint JNICALL
-Java_com_google_cloud_dataflow_worker_profiler_Profiler_getAttribute(
+Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_getAttribute(
     JNIEnv *env, jclass) {
   int64_t ret = google::javaprofiler::Accessors::GetAttribute();
   return static_cast<jint>(ret);

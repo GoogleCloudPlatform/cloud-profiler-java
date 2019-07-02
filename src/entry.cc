@@ -18,7 +18,9 @@
 
 #include "src/string.h"
 #include "src/worker.h"
+#include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/globals.h"
+#include "third_party/javaprofiler/heap_sampler.h"
 #include "third_party/javaprofiler/stacktraces.h"
 
 DEFINE_bool(cprof_cpu_use_per_thread_timers, false,
@@ -28,6 +30,10 @@ DEFINE_bool(cprof_force_debug_non_safepoints, true,
             "when true, force DebugNonSafepoints flag by subscribing to the"
             "code generation events. This improves the accuracy of profiles,"
             "but may incur a bit of overhead.");
+DEFINE_bool(cprof_enable_heap_sampling, false,
+            "when unset, heap allocation sampling is disabled");
+DEFINE_int32(cprof_heap_sampling_interval, 512 * 1024,
+             "sampling interval for heap allocation sampling, 512k by default");
 
 namespace cloud {
 namespace profiler {
@@ -111,6 +117,12 @@ void JNICALL OnVMInit(jvmtiEnv *jvmti, JNIEnv *jni_env, jthread thread) {
     jclass klass = class_list[i];
     CreateJMethodIDsForClass(jvmti, klass);
   }
+
+  if (FLAGS_cprof_enable_heap_sampling) {
+    google::javaprofiler::HeapMonitor::Enable(
+        jvmti, jni_env, FLAGS_cprof_heap_sampling_interval);
+  }
+
   worker->Start(jni_env);
 }
 
@@ -132,9 +144,13 @@ void JNICALL OnVMDeath(jvmtiEnv *jvmti_env, JNIEnv *jni_env) {
   worker->Stop();
   delete worker;
   worker = NULL;
+
+  if (google::javaprofiler::HeapMonitor::Enabled()) {
+    google::javaprofiler::HeapMonitor::Disable();
+  }
 }
 
-static bool PrepareJvmti(jvmtiEnv *jvmti) {
+static bool PrepareJvmti(JavaVM *vm, jvmtiEnv *jvmti) {
   LOG(INFO) << "Prepare JVMTI";
 
   // Set the list of permissions to do the various internal VM things
@@ -175,20 +191,23 @@ static bool PrepareJvmti(jvmtiEnv *jvmti) {
       return false;
     }
   }
+
   return true;
 }
 
 static bool RegisterJvmti(jvmtiEnv *jvmti) {
   // Create the list of callbacks to be called on given events.
-  jvmtiEventCallbacks *callbacks = new jvmtiEventCallbacks();
-  memset(callbacks, 0, sizeof(jvmtiEventCallbacks));
+  jvmtiEventCallbacks callbacks;
+  memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
 
-  callbacks->ThreadStart = &OnThreadStart;
-  callbacks->ThreadEnd = &OnThreadEnd;
-  callbacks->VMInit = &OnVMInit;
-  callbacks->VMDeath = &OnVMDeath;
-  callbacks->ClassLoad = &OnClassLoad;
-  callbacks->ClassPrepare = &OnClassPrepare;
+  callbacks.ThreadStart = &OnThreadStart;
+  callbacks.ThreadEnd = &OnThreadEnd;
+  callbacks.VMInit = &OnVMInit;
+  callbacks.VMDeath = &OnVMDeath;
+  callbacks.ClassLoad = &OnClassLoad;
+  callbacks.ClassPrepare = &OnClassPrepare;
+
+  google::javaprofiler::HeapMonitor::AddCallback(&callbacks);
 
   std::vector<jvmtiEvent> events = {
       JVMTI_EVENT_CLASS_LOAD, JVMTI_EVENT_CLASS_PREPARE,
@@ -197,12 +216,12 @@ static bool RegisterJvmti(jvmtiEnv *jvmti) {
   };
 
   if (FLAGS_cprof_force_debug_non_safepoints) {
-    callbacks->CompiledMethodLoad = &OnCompiledMethodLoad;
+    callbacks.CompiledMethodLoad = &OnCompiledMethodLoad;
     events.push_back(JVMTI_EVENT_COMPILED_METHOD_LOAD);
   }
 
   JVMTI_ERROR_1(
-      (jvmti->SetEventCallbacks(callbacks, sizeof(jvmtiEventCallbacks))),
+      (jvmti->SetEventCallbacks(&callbacks, sizeof(jvmtiEventCallbacks))),
       false);
 
   // Enable the callbacks to be triggered when the events occur.
@@ -248,16 +267,21 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   ParseArguments(options);  // Initializes logger -- do not log before this call
   LOG(INFO) << "Profiler agent loaded";
 
-  google::javaprofiler::Accessors::Init();
   google::javaprofiler::AttributeTable::Init();
 
-  if ((err = (vm->GetEnv(reinterpret_cast<void **>(&jvmti), JVMTI_VERSION))) !=
-      JNI_OK) {
+  // Try to get the latest JVMTI_VERSION the agent was built with.
+  err = vm->GetEnv(reinterpret_cast<void **>(&jvmti), JVMTI_VERSION);
+  if (err == JNI_EVERSION) {
+    // The above call can fail if the VM is actually from an older VM, therefore
+    // try to get an older JVMTI (compatible with JDK8).
+    err = (vm->GetEnv(reinterpret_cast<void **>(&jvmti), JVMTI_VERSION_1_2));
+  }
+  if (err != JNI_OK) {
     LOG(ERROR) << "JNI Error " << err;
     return 1;
   }
 
-  if (!PrepareJvmti(jvmti)) {
+  if (!PrepareJvmti(vm, jvmti)) {
     LOG(ERROR) << "Failed to initialize JVMTI.  Continuing...";
     return 0;
   }
@@ -285,7 +309,6 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
 
 void JNICALL Agent_OnUnload(JavaVM *vm) {
   IMPLICITLY_USE(vm);
-  google::javaprofiler::Accessors::Destroy();
 }
 
 }  // namespace profiler

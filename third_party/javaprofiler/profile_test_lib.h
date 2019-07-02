@@ -17,10 +17,29 @@
 #ifndef THIRD_PARTY_JAVAPROFILER_PROFILE_TEST_H__
 #define THIRD_PARTY_JAVAPROFILER_PROFILE_TEST_H__
 
-#include "third_party/java/jdk/include/jvmti.h"
+#include <jvmti.h>
+
+#include "third_party/javaprofiler/profile_proto_builder.h"
+#include "third_party/javaprofiler/stacktrace_decls.h"
 
 namespace google {
 namespace javaprofiler {
+
+class TestProfileFrameCache : public ProfileFrameCache {
+  void ProcessTraces(const ProfileStackTrace *traces, int num_traces) override {
+  }
+
+  perftools::profiles::Location *GetLocation(
+      const JVMPI_CallFrame &jvm_frame,
+      LocationBuilder *location_builder) override {
+    return &nop_;
+  }
+
+  string GetFunctionName(const JVMPI_CallFrame &jvm_frame) { return ""; }
+
+ private:
+  perftools::profiles::Location nop_;
+};
 
 class JvmProfileTestLib {
  public:
@@ -29,6 +48,27 @@ class JvmProfileTestLib {
   }
 
   static struct jvmtiInterface_1_ GetDispatchTable();
+
+  /**
+   * Returns a jthread object that can be used by the various JvmProfileTestLib
+   * methods. It is not a real jthread object but is an identifier to a "fake"
+   * thread that is mocked to be at a given point in the code.
+   * ie. GetStackTrace will return something sane.
+   *
+   * thread_id should be an integer with 0 < thread_id < N;
+   * N being the value returned by GetMaxThreads.
+   *
+   * implementation dependent on the test framework.
+   * A return of 0 signifies the thread_id is not supported.
+   */
+  static jthread GetThread(int thread_id);
+
+  /**
+   * Returns the number of threads that are supported by GetThread and
+   * subsequent methods that would take a thread as argument to fake
+   * various threads in action.
+   */
+  static int GetMaxThreads();
 };
 
 }  // namespace javaprofiler

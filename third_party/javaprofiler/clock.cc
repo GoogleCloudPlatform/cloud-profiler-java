@@ -21,6 +21,16 @@ namespace {
   Clock DefaultClockInstance;
 }
 
+bool AlmostThere(Clock* clock, const struct timespec& finish,
+                 const struct timespec& lap) {
+  const int64_t kMarginLaps = 2;
+
+  struct timespec now = clock->Now();
+  struct timespec laps = {lap.tv_sec * kMarginLaps, lap.tv_nsec * kMarginLaps};
+
+  return TimeLessThan(finish, TimeAdd(now, laps));
+}
+
 Clock* DefaultClock() {
   return &DefaultClockInstance;
 }

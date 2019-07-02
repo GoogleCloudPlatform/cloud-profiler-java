@@ -29,10 +29,11 @@ CFLAGS = \
 	-g0 \
 	-DSTANDALONE_BUILD \
 	-D_GNU_SOURCE \
+	-DENABLE_HEAP_SAMPLING
 
 SRC_ROOT_PATH=.
 
-JAVA_PATH ?= /usr/lib/jvm/java-7-openjdk-amd64
+JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64
 PROTOC ?= /usr/local/bin/protoc
 PROTOC_GEN_GRPC ?= /usr/local/bin/grpc_cpp_plugin
 
@@ -70,23 +71,33 @@ PROFILER_API_SOURCES = \
 	$(GENFILES_PATH)/google/rpc/error_details.pb.cc \
 
 JAVAPROFILER_LIB_SOURCES = \
+	$(JAVAPROFILER_LIB_PATH)/accessors.cc \
+	$(JAVAPROFILER_LIB_PATH)/async_ref_counted_string.cc \
 	$(JAVAPROFILER_LIB_PATH)/clock.cc \
 	$(JAVAPROFILER_LIB_PATH)/display.cc \
+	$(JAVAPROFILER_LIB_PATH)/heap_sampler.cc \
 	$(JAVAPROFILER_LIB_PATH)/native.cc \
+	$(JAVAPROFILER_LIB_PATH)/profile_proto_builder.cc \
 	$(JAVAPROFILER_LIB_PATH)/stacktrace_fixer.cc \
 	$(JAVAPROFILER_LIB_PATH)/stacktraces.cc \
+	$(JAVAPROFILER_LIB_PATH)/tags.cc \
 
 # Add any header not already as a .cc in JAVAPROFILER_LIB_SOURCES.
 JAVAPROFILER_LIB_HEADERS = \
+	$(JAVAPROFILER_LIB_PATH)/accessors.h \
+	$(JAVAPROFILER_LIB_PATH)/async_ref_counted_string.h \
+	$(JAVAPROFILER_LIB_PATH)/heap_sampler.h \
 	$(JAVAPROFILER_LIB_PATH)/jvmti_error.h \
+	$(JAVAPROFILER_LIB_PATH)/profile_proto_builder.h \
 	$(JAVAPROFILER_LIB_PATH)/stacktrace_decls.h \
 	$(JAVAPROFILER_LIB_PATH)/stacktraces.h \
+	$(JAVAPROFILER_LIB_PATH)/tags.h \
 
 SOURCES = \
 	$(JAVA_AGENT_PATH)/cloud_env.cc \
-	$(JAVA_AGENT_PATH)/config_dataflow_jni.cc \
 	$(JAVA_AGENT_PATH)/entry.cc \
 	$(JAVA_AGENT_PATH)/http.cc \
+	$(JAVA_AGENT_PATH)/jni.cc \
 	$(JAVA_AGENT_PATH)/pem_roots.cc \
 	$(JAVA_AGENT_PATH)/profiler.cc \
 	$(JAVA_AGENT_PATH)/proto.cc \

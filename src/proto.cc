@@ -41,7 +41,7 @@ class ProfileProtoBuilder {
   }
 
   // Populate the profile with a set of traces
-  void Populate(const char *profile_type,
+  void Populate(JNIEnv *jni, const char *profile_type,
                 const google::javaprofiler::TraceMultiset &traces,
                 int64_t duration_ns, int64_t period_ns);
   void AddArtificialSample(const string &name, int64_t count, int64_t weight);
@@ -60,7 +60,8 @@ class ProfileProtoBuilder {
  private:
   void AddSample(const std::vector<uint64_t> &locations, int64_t count,
                  int64_t weight, int64_t attr);
-  uint64_t LocationID(const google::javaprofiler::JVMPI_CallFrame &frame);
+  uint64_t LocationID(JNIEnv *jni,
+                      const google::javaprofiler::JVMPI_CallFrame &frame);
   uint64_t LocationID(uint64_t address);
   uint64_t LocationID(const string &name);
   uint64_t LocationID(const string &class_name, const string &method_name,
@@ -130,7 +131,7 @@ int64_t ProfileProtoBuilder::TotalCount() const { return total_count_; }
 int64_t ProfileProtoBuilder::TotalWeight() const { return total_weight_; }
 
 uint64_t ProfileProtoBuilder::LocationID(
-    const google::javaprofiler::JVMPI_CallFrame &frame) {
+    JNIEnv *jni, const google::javaprofiler::JVMPI_CallFrame &frame) {
   if (frame.lineno == google::javaprofiler::kNativeFrameLineNum) {
     return LocationID(reinterpret_cast<uint64_t>(frame.method_id));
   }
@@ -142,7 +143,7 @@ uint64_t ProfileProtoBuilder::LocationID(
 
   string method_name, class_name, file_name, signature;
   int line_number = 0;
-  google::javaprofiler::GetStackFrameElements(jvmti_, frame, &file_name,
+  google::javaprofiler::GetStackFrameElements(jni, jvmti_, frame, &file_name,
                                               &class_name, &method_name,
                                               &signature, &line_number);
   google::javaprofiler::FixMethodParameters(&signature);
@@ -211,8 +212,9 @@ uint64_t ProfileProtoBuilder::LocationID(const string &class_name,
 }
 
 void ProfileProtoBuilder::Populate(
-    const char *profile_type, const google::javaprofiler::TraceMultiset &traces,
-    int64_t duration_ns, int64_t period_ns) {
+    JNIEnv *jni, const char *profile_type,
+    const google::javaprofiler::TraceMultiset &traces, int64_t duration_ns,
+    int64_t period_ns) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
 
   profile->mutable_period_type()->set_type(builder_.StringId(profile_type));
@@ -233,7 +235,7 @@ void ProfileProtoBuilder::Populate(
     if (count != 0) {
       std::vector<uint64_t> locations;
       for (const auto &frame : trace.first.frames) {
-        locations.push_back(LocationID(frame));
+        locations.push_back(LocationID(jni, frame));
       }
       AddSample(locations, count, count * period_ns, trace.first.attr);
     }
@@ -271,11 +273,12 @@ void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
 }
 
 string SerializeAndClearJavaCpuTraces(
-    jvmtiEnv *jvmti, const google::javaprofiler::NativeProcessInfo &native_info,
+    JNIEnv *env, jvmtiEnv *jvmti,
+    const google::javaprofiler::NativeProcessInfo &native_info,
     const char *profile_type, int64_t duration_ns, int64_t period_ns,
     google::javaprofiler::TraceMultiset *traces, int64_t unknown_count) {
   ProfileProtoBuilder b(jvmti, native_info);
-  b.Populate(profile_type, *traces, duration_ns, period_ns);
+  b.Populate(env, profile_type, *traces, duration_ns, period_ns);
   b.AddArtificialSample("[Unknown]", unknown_count, unknown_count * period_ns);
   LOG(INFO) << "Collected a profile: total count=" << b.TotalCount()
             << ", weight=" << b.TotalWeight();

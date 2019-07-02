@@ -18,15 +18,19 @@
 #include <sstream>
 #include <string>
 
+#include "src/clock.h"
 #include "src/http.h"
 #include "src/string.h"
 
+DEFINE_int32(cprof_gce_metadata_server_retry_count, 3,
+             "Number of retries to Google Compute Engine metadata host");
+DEFINE_int32(
+    cprof_gce_metadata_server_retry_sleep_sec, 1,
+    "Seconds to sleep between retries to Google Compute Engine metadata host");
 DEFINE_string(cprof_gce_metadata_server_address, "169.254.169.254:80",
               "Google Compute Engine metadata host to use");
-
 DEFINE_string(cprof_access_token_test_only, "",
               "override OAuth2 access token for testing");
-
 DEFINE_string(cprof_project_id, "", "cloud project ID");
 DEFINE_string(cprof_zone_name, "", "zone name");
 DEFINE_string(cprof_service, "", "deployment service name");
@@ -47,23 +51,40 @@ const char kNoData[] = "";
 namespace {
 
 string GceMetadataRequest(HTTPRequest* req, const string& path) {
+  Clock* clock = DefaultClock();
   req->AddHeader("Metadata-Flavor", "Google");
   req->SetTimeout(2);  // seconds
 
   string url = FLAGS_cprof_gce_metadata_server_address + path, resp;
-  if (!req->DoGet(url, &resp)) {
-    LOG(ERROR) << "Error making HTTP request to the GCE metadata server";
-    return kNoData;
-  }
 
-  int resp_code = req->GetResponseCode();
-  if (resp_code != kHTTPStatusOK) {
-    LOG(ERROR) << "Request to the GCE metadata server failed, status code: "
-               << resp_code;
-    return kNoData;
-  }
+  int retry_sleep_sec = FLAGS_cprof_gce_metadata_server_retry_sleep_sec;
+  int retry_count = FLAGS_cprof_gce_metadata_server_retry_count;
+  struct timespec retry_ts = NanosToTimeSpec(kNanosPerSecond * retry_sleep_sec);
 
-  return resp;
+  for (int i = 0; i <= retry_count; i++) {
+    if (!req->DoGet(url, &resp)) {
+      if (i < retry_count) {
+        LOG(ERROR) << "Error making HTTP request for " << url
+                   << " to the GCE metadata server. "
+                   << "Will retry in " << retry_ts.tv_sec << "s";
+        clock->SleepFor(retry_ts);
+      } else {
+        LOG(ERROR) << "Error making HTTP request for " << url
+                   << " to the GCE metadata server.";
+      }
+      continue;
+    }
+    int resp_code = req->GetResponseCode();
+    if (resp_code != kHTTPStatusOK) {
+      LOG(ERROR) << "Request to the GCE metadata server for " << url
+                 << " failed, status code: " << resp_code;
+      return kNoData;
+    }
+    return resp;
+  }
+  LOG(ERROR) << "Unable to contact GCE metadata server for " << url << " after "
+             << retry_count << " retries.";
+  return kNoData;
 }
 
 const char* Getenv(const string& var) {
@@ -82,15 +103,25 @@ CloudEnv::CloudEnv() {
   } else if (!FLAGS_cprof_target.empty()) {
     service_ = FLAGS_cprof_target;
   } else {
-    const char* val = Getenv("GAE_SERVICE");
-    service_ = val == nullptr ? "" : val;
+    for (const string& env_var : {"GAE_SERVICE", "K_SERVICE"}) {
+      const char* val = Getenv(env_var);
+      if (val != nullptr) {
+        service_ = val;
+        break;
+      }
+    }
   }
 
   if (!FLAGS_cprof_service_version.empty()) {
     service_version_ = FLAGS_cprof_service_version;
   } else {
-    const char* val = Getenv("GAE_VERSION");
-    service_version_ = val == nullptr ? "" : val;
+    for (const string& env_var : {"GAE_VERSION", "K_REVISION"}) {
+      const char* val = Getenv(env_var);
+      if (val != nullptr) {
+        service_version_ = val;
+        break;
+      }
+    }
   }
 
   if (!FLAGS_cprof_project_id.empty()) {

@@ -33,6 +33,8 @@
 #include "grpcpp/security/credentials.h"
 #include "grpcpp/support/channel_arguments.h"
 
+#include "third_party/javaprofiler/heap_sampler.h"
+
 // API curated profiling configuration.
 DEFINE_string(cprof_api_address, "cloudprofiler.googleapis.com",
               "API server address");
@@ -165,7 +167,13 @@ bool InitializeDeployment(CloudEnv* env, const string& labels,
 
   string service = env->Service();
   if (service.empty()) {
-    LOG(ERROR) << "Deployment service is not configured";
+    LOG(ERROR) << "Deployment service name is not configured";
+    return false;
+  }
+  if (!IsValidServiceName(service)) {
+    LOG(ERROR)
+        << "Deployment service name '" << service
+        << "' does not match pattern '^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$'";
     return false;
   }
   d->set_target(service);
@@ -190,6 +198,11 @@ bool InitializeDeployment(CloudEnv* env, const string& labels,
   for (const auto& kv : label_kvs) {
     (*d->mutable_labels())[kv.first] = kv.second;
   }
+
+  LOG(INFO) << "Initialized deployment: project_id=" << project_id
+            << ", service=" << service
+            << ", service_version=" << service_version
+            << ", zone_name=" << zone_name;
   return true;
 }
 
@@ -208,6 +221,29 @@ bool AddProfileLabels(api::Profile* p, const string& labels) {
 
 }  // namespace
 
+// Returns true if the service name matches the regex
+// "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
+bool IsValidServiceName(string s) {
+  if (s.length() < 1 || s.length() > 255) {
+    return false;
+  }
+  if (s[0] < 'a' || s[0] > 'z') {
+    return false;
+  }
+  if ((s.back() < 'a' || s.back() > 'z') &&
+      (s.back() < '0' || s.back() > '9')) {
+    return false;
+  }
+  for (size_t i = 1; i < s.length() - 1; ++i) {
+    char c = s[i];
+    if ((c < 'a' || c > 'z') && (c < '0' || c > '9') && c != '.' && c != '-' &&
+        c != '_') {
+      return false;
+    }
+  }
+  return true;
+}
+
 APIThrottler::APIThrottler()
     : APIThrottler(DefaultCloudEnv(), DefaultClock(), nullptr) {}
 
@@ -220,7 +256,8 @@ APIThrottler::APIThrottler(
       clock_(clock),
       stub_(std::move(stub)),
       types_({api::CPU, api::WALL}),
-      creation_backoff_envelope_ns_(kBackoffNanos) {
+      creation_backoff_envelope_ns_(kBackoffNanos),
+      closed_(false) {
   grpc_init();
   gpr_set_log_function(GRPCLog);
 
@@ -232,6 +269,11 @@ APIThrottler::APIThrottler(
     LOG(INFO) << "Will use profiler service " << FLAGS_cprof_api_address
               << " to create and upload profiles";
     stub_ = NewProfilerServiceStub(FLAGS_cprof_api_address);
+  }
+
+  if (google::javaprofiler::HeapMonitor::Enabled()) {
+    LOG(INFO) << "Heap allocation sampling supported for this JDK";
+    types_.push_back(api::HEAP);
   }
 }
 
@@ -254,13 +296,14 @@ bool APIThrottler::WaitNext() {
     LOG(ERROR) << "Failed to initialize deployment, stop profiling";
     return false;
   }
+  req.set_parent("projects/" + req.deployment().project_id());
 
   while (true) {
     LOG(INFO) << "Creating a new profile via profiler service";
 
-    grpc::ClientContext ctx;
     profile_.Clear();
-    grpc::Status st = stub_->CreateProfile(&ctx, req, &profile_);
+    ResetClientContext();
+    grpc::Status st = stub_->CreateProfile(ctx_.get(), req, &profile_);
     if (st.ok()) {
       LOG(INFO) << "Profile created: " << ProfileType() << " "
                 << profile_.name();
@@ -268,7 +311,10 @@ bool APIThrottler::WaitNext() {
       creation_backoff_envelope_ns_ = kBackoffNanos;
       break;
     }
-    OnCreationError(ctx, st);
+    if (closed_) {
+      return false;
+    }
+    OnCreationError(st);
   }
 
   return true;
@@ -281,6 +327,8 @@ string APIThrottler::ProfileType() {
       return kTypeCPU;
     case api::WALL:
       return kTypeWall;
+    case api::HEAP:
+      return kTypeHeap;
     default:
       const string& pt_name = api::ProfileType_Name(pt);
       LOG(ERROR) << "Unsupported profile type " << pt_name;
@@ -297,8 +345,6 @@ bool APIThrottler::Upload(string profile) {
   LOG(INFO) << "Uploading " << profile.size() << " bytes of '" << ProfileType()
             << "' profile data";
 
-  grpc::ClientContext ctx;
-
   if (!AddProfileLabels(&profile_, FLAGS_cprof_profile_labels)) {
     LOG(ERROR) << "Failed to add profile labels, won't upload the profile";
     return false;
@@ -308,7 +354,8 @@ bool APIThrottler::Upload(string profile) {
   *req.mutable_profile() = profile_;
 
   req.mutable_profile()->set_profile_bytes(std::move(profile));
-  grpc::Status st = stub_->UpdateProfile(&ctx, req, &profile_);
+  ResetClientContext();
+  grpc::Status st = stub_->UpdateProfile(ctx_.get(), req, &profile_);
 
   if (!st.ok()) {
     // TODO: Recognize and retry transient errors.
@@ -319,11 +366,10 @@ bool APIThrottler::Upload(string profile) {
   return true;
 }
 
-void APIThrottler::OnCreationError(const grpc::ClientContext& ctx,
-                                   const grpc::Status& st) {
+void APIThrottler::OnCreationError(const grpc::Status& st) {
   if (st.error_code() == grpc::StatusCode::ABORTED) {
     int64_t backoff_ns;
-    if (AbortedBackoffDuration(ctx, &backoff_ns)) {
+    if (AbortedBackoffDuration(*ctx_, &backoff_ns)) {
       if (backoff_ns > 0) {
         LOG(INFO) << "Got ABORTED, will retry after backing off for "
                   << backoff_ns / kNanosPerMilli << "ms";
@@ -341,6 +387,20 @@ void APIThrottler::OnCreationError(const grpc::ClientContext& ctx,
   creation_backoff_envelope_ns_ = std::min(
       static_cast<int64_t>(creation_backoff_envelope_ns_ * kBackoffFactor),
       kMaxBackoffNanos);
+}
+
+void APIThrottler::ResetClientContext() {
+  std::lock_guard<std::mutex> lock(ctx_mutex_);
+  ctx_.reset(new grpc::ClientContext());  // NOLINT
+  if (closed_) {
+    ctx_->TryCancel();
+  }
+}
+
+void APIThrottler::Close() {
+  std::lock_guard<std::mutex> lock(ctx_mutex_);
+  closed_ = true;
+  ctx_->TryCancel();
 }
 
 }  // namespace profiler

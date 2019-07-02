@@ -15,6 +15,7 @@
  */
 
 #include <jvmti.h>
+
 #include <string>
 
 #include "third_party/javaprofiler/globals.h"
@@ -36,11 +37,10 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location);
 // the information provided by the frame and using the JVMTI environment.
 // When unknown, it fills the parameters with: UnknownFile, UnknownClass,
 // UnknownMethod, "", and -1.
-bool GetStackFrameElements(jvmtiEnv *jvmti,
-                           const JVMPI_CallFrame &frame,
-                           string *file_name, string *class_name,
-                           string *method_name, string *signature,
-                           int *line_number);
+bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
+                           const JVMPI_CallFrame &frame, string *file_name,
+                           string *class_name, string *method_name,
+                           string *signature, int *line_number);
 
 // Fill the file_name, class_name, method_name, and line_number parameters using
 // the information provided by the frame and using the JVMTI environment.

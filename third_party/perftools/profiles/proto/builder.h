@@ -20,7 +20,9 @@
 #include <memory>
 #include <string>
 #include <tuple>
+
 #include <unordered_map>
+
 namespace perftools {
 namespace profiles {
 
@@ -28,8 +30,26 @@ typedef int64_t int64;
 typedef uint64_t uint64;
 typedef std::string string;
 
-}
-}
+typedef std::unordered_map<string, int64> StringIndexMap;
+
+class FunctionHasher {
+ public:
+  size_t operator()(const std::tuple<int64, int64, int64, int64> &f) const {
+    int64 hash = std::get<0>(f);
+    hash = hash + ((hash << 8) ^ std::get<1>(f));
+    hash = hash + ((hash << 8) ^ std::get<2>(f));
+    hash = hash + ((hash << 8) ^ std::get<3>(f));
+    return static_cast<size_t>(hash);
+  }
+};
+
+typedef std::unordered_map<std::tuple<int64, int64, int64, int64>, int64,
+                           FunctionHasher>
+    FunctionIndexMap;
+
+}  // namespace profiles
+}  // namespace perftools
+
 #include "perftools/profiles/proto/profile.pb.h"
 
 namespace perftools {
@@ -100,22 +120,9 @@ class Builder {
   Profile *mutable_profile() { return profile_.get(); }
 
  private:
-  // Holds the information about a function to facilitate deduplication.
-  typedef std::tuple<int64, int64, int64, int64> Function;
-  class FunctionHasher {
-   public:
-    size_t operator()(const Function &f) const {
-      int64 hash = std::get<0>(f);
-      hash = hash + ((hash << 8) ^ std::get<1>(f));
-      hash = hash + ((hash << 8) ^ std::get<2>(f));
-      hash = hash + ((hash << 8) ^ std::get<3>(f));
-      return static_cast<size_t>(hash);
-    }
-  };
-
-  // Hashes to deduplicate strings and functions.
-  std::unordered_map<string, int64> strings_;
-  std::unordered_map<Function, int64, FunctionHasher> functions_;
+  // Maps to deduplicate strings and functions.
+  StringIndexMap strings_;
+  FunctionIndexMap functions_;
 
   // Actual profile being updated.
   std::unique_ptr<Profile> profile_;

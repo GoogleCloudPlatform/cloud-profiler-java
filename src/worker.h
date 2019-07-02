@@ -43,6 +43,7 @@ class Worker {
 
   jvmtiEnv *jvmti_;
   ThreadTable *threads_;
+  std::unique_ptr<Throttler> throttler_;
   std::mutex mutex_;  // Held by the worker thread while it's running.
   std::atomic<bool> stopping_;
   static std::atomic<bool> enabled_;

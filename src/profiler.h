@@ -57,7 +57,7 @@ class Profiler {
 
   // Serialize the collected traces into a compressed serialized profile.proto
   string SerializeProfile(
-      const google::javaprofiler::NativeProcessInfo &native_info);
+      JNIEnv *jni, const google::javaprofiler::NativeProcessInfo &native_info);
 
   // Signal handler, which records the current stack trace into the profile.
   static void Handle(int signum, siginfo_t *info, void *context);
