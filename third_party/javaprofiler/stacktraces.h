@@ -31,7 +31,7 @@ namespace google {
 namespace javaprofiler {
 
 // Maximum number of frames to store from the stack traces sampled.
-const int kMaxFramesToCapture = 128;
+const int kMaxFramesToCapture = 1024;
 
 uint64_t CalculateHash(int64_t attr, int num_frames,
                        const JVMPI_CallFrame *frame);

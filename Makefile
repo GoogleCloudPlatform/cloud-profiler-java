@@ -156,14 +156,13 @@ endif
 LIBS1= \
 	-ldl \
 	-pthread \
-  $(LIB_ROOT_PATH)/lib/libcurl.a \
-  $(LIB_ROOT_PATH)/lib/libglog.a \
+	$(LIB_ROOT_PATH)/lib/libglog.a \
 	$(LIB_ROOT_PATH)/lib/libgflags.a \
 
 ifneq ($(UNAME), Darwin)
-	LIBS1 += -lrt
+	LIBS1 += -lrt $(LIB_ROOT_PATH)/lib/libcurl.a
 else
-	LIBS1 += $(LIB_ROOT_PATH)/lib/libcares.a 
+	LIBS1 += $(LIB_ROOT_PATH)/lib/libcares.a $(LIB_ROOT_PATH)/opt/curl/lib/libcurl.a
 endif
 
 LIBS2= \
@@ -173,13 +172,13 @@ LIBS2= \
 	-lz \
 
 ifeq ($(UNAME), Darwin)
-	LIBS2 += $(LIB_ROOT_PATH)/lib/libnghttp2.a -lldap
+	LIBS2 += -lldap -framework Security
 endif
 
 GRPC_LIBS= \
 	$(LIB_ROOT_PATH)/lib/libgrpc++.a \
-  $(LIB_ROOT_PATH)/lib/libgrpc.a \
-  $(LIB_ROOT_PATH)/lib/libgpr.a \
+	$(LIB_ROOT_PATH)/lib/libgrpc.a \
+	$(LIB_ROOT_PATH)/lib/libgpr.a \
 
 all: \
 	$(TARGET_AGENT) \
