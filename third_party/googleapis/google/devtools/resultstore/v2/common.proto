@@ -1,4 +1,4 @@
-// Copyright 2018 Google Inc.
+// Copyright 2018 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
 syntax = "proto3";
 
@@ -22,7 +23,6 @@ import "google/protobuf/timestamp.proto";
 option go_package = "google.golang.org/genproto/googleapis/devtools/resultstore/v2;resultstore";
 option java_multiple_files = true;
 option java_package = "com.google.devtools.resultstore.v2";
-
 
 // Describes the status of a resource in both enum and string form.
 // Only use description when conveying additional info not captured in the enum
@@ -140,6 +140,12 @@ enum Language {
 
   // Webtesting
   WEB = 19;
+
+  // Scala
+  SCALA = 20;
+
+  // Protocol Buffer
+  PROTO = 21;
 }
 
 // Status of a resource.

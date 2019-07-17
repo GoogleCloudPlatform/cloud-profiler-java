@@ -16,12 +16,6 @@ language_settings:
     package_name: Google\Cloud\Tasks\V2beta2
   nodejs:
     package_name: tasks.v2beta2
-# The configuration for the license header to put on generated files.
-license_header:
-  # The file containing the copyright line(s).
-  copyright_file: copyright-google.txt
-  # The file containing the raw license header without any copyright line(s).
-  license_file: license-header-apache-2.0.txt
 # A list of API interface configurations.
 interfaces:
   # The fully qualified name of the API interface.
@@ -39,6 +33,9 @@ interfaces:
   collections:
   - name_pattern: projects/{project}
     entity_name: project
+    language_overrides:
+    - language: csharp
+      common_resource_name: Google.Api.Gax.ResourceNames.ProjectName
   - name_pattern: projects/{project}/locations/{location}
     entity_name: location
   - name_pattern: projects/{project}/locations/{location}/queues/{queue}
@@ -78,10 +75,6 @@ interfaces:
   #
   #   required_fields - Fields that are always required for a request to be
   #   valid.
-  #
-  #   request_object_method - Turns on or off the generation of a method whose
-  #   sole parameter is a request object. Not all languages will generate this
-  #   method.
   #
   #   resource_name_treatment - An enum that specifies how to treat the resource
   #   name formats defined in the field_name_patterns and
@@ -132,7 +125,6 @@ interfaces:
     - parent
     header_request_params:
     - parent
-    request_object_method: true
     page_streaming:
       request:
         page_size_field: page_size
@@ -155,7 +147,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -173,7 +164,6 @@ interfaces:
     - queue
     header_request_params:
     - parent
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -190,7 +180,6 @@ interfaces:
     - queue
     header_request_params:
     - queue.name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -206,7 +195,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -222,7 +210,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -238,7 +225,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -254,7 +240,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -270,7 +255,6 @@ interfaces:
     - resource
     header_request_params:
     - resource
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -288,7 +272,6 @@ interfaces:
     - policy
     header_request_params:
     - resource
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -306,7 +289,6 @@ interfaces:
     - permissions
     header_request_params:
     - resource
-    request_object_method: true
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -322,7 +304,6 @@ interfaces:
     - parent
     header_request_params:
     - parent
-    request_object_method: true
     page_streaming:
       request:
         page_size_field: page_size
@@ -345,7 +326,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -363,7 +343,6 @@ interfaces:
     - task
     header_request_params:
     - parent
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -379,7 +358,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -392,7 +370,6 @@ interfaces:
     - lease_duration
     header_request_params:
     - parent
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -410,7 +387,6 @@ interfaces:
     - schedule_time
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -430,7 +406,6 @@ interfaces:
     - lease_duration
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -448,7 +423,6 @@ interfaces:
     - schedule_time
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -464,7 +438,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:

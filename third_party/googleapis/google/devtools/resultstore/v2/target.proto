@@ -1,4 +1,4 @@
-// Copyright 2018 Google Inc.
+// Copyright 2018 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
 syntax = "proto3";
 
@@ -22,7 +23,6 @@ import "google/devtools/resultstore/v2/file.proto";
 option go_package = "google.golang.org/genproto/googleapis/devtools/resultstore/v2;resultstore";
 option java_multiple_files = true;
 option java_package = "com.google.devtools.resultstore.v2";
-
 
 // Each Target represents data for a given target in a given Invocation.
 // ConfiguredTarget and Action resources under each Target contain the bulk of
@@ -71,7 +71,7 @@ message Target {
   // Provides a hint to clients as to whether to display the Target to users.
   // If true then clients likely want to display the Target by default.
   // Once set to true, this may not be set back to false.
-  bool is_visible = 9;
+  bool visible = 10;
 }
 
 // Attributes that apply to all targets.
