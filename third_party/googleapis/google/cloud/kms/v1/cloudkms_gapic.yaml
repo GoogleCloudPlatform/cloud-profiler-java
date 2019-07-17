@@ -8,22 +8,17 @@ language_settings:
     package_name: google.cloud.kms_v1.gapic
   go:
     package_name: cloud.google.com/go/kms/apiv1
-    domain_layer_location: cloud.google.com/go/kms
+    release_level: GA
   csharp:
     package_name: Google.Cloud.Kms.V1
   ruby:
     package_name: Google::Cloud::Kms::V1
+    release_level: GA
   php:
     package_name: Google\Cloud\Kms\V1
   nodejs:
     package_name: kms.v1
     domain_layer_location: google-cloud
-# The configuration for the license header to put on generated files.
-license_header:
-  # The file containing the copyright line(s).
-  copyright_file: copyright-google.txt
-  # The file containing the raw license header without any copyright line(s).
-  license_file: license-header-apache-2.0.txt
 collection_oneofs:
 - oneof_name: key_oneof
   collection_names:
@@ -49,6 +44,8 @@ interfaces:
     entity_name: crypto_key_path
   - name_pattern: projects/{project}/locations/{location}
     entity_name: location
+  - name_pattern: projects/{project}/locations/{location}/keyRings/{key_ring}/importJobs/{import_job}
+    entity_name: import_job
   - name_pattern: projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}
     entity_name: crypto_key
   - name_pattern: projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}
@@ -86,10 +83,6 @@ interfaces:
     #
     #   required_fields - Fields that are always required for a request to be
     #   valid.
-    #
-    #   request_object_method - Turns on or off the generation of a method whose
-    #   sole parameter is a request object. Not all languages will generate this
-    #   method.
     #
     #   resource_name_treatment - An enum that specifies how to treat the resource
     #   name formats defined in the field_name_patterns and
@@ -139,7 +132,6 @@ interfaces:
     - parent
     header_request_params:
     - parent
-    request_object_method: true
     page_streaming:
       request:
         page_size_field: page_size
@@ -153,6 +145,28 @@ interfaces:
       parent: location
     resource_name_treatment: STATIC_TYPES
     timeout_millis: 60000
+  - name: ListImportJobs
+    flattening:
+      groups:
+      - parameters:
+        - parent
+    required_fields:
+    - parent
+    header_request_params:
+    - parent
+    page_streaming:
+      request:
+        page_size_field: page_size
+        token_field: page_token
+      response:
+        token_field: next_page_token
+        resources_field: import_jobs
+    retry_codes_name: idempotent
+    retry_params_name: default
+    field_name_patterns:
+      parent: key_ring
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
   - name: ListCryptoKeys
     flattening:
       groups:
@@ -162,7 +176,6 @@ interfaces:
     - parent
     header_request_params:
     - parent
-    request_object_method: true
     page_streaming:
       request:
         page_size_field: page_size
@@ -185,7 +198,6 @@ interfaces:
     - parent
     header_request_params:
     - parent
-    request_object_method: true
     page_streaming:
       request:
         page_size_field: page_size
@@ -208,11 +220,25 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
       name: key_ring
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+  - name: GetImportJob
+    flattening:
+      groups:
+      - parameters:
+        - name
+    required_fields:
+    - name
+    header_request_params:
+    - name
+    retry_codes_name: idempotent
+    retry_params_name: default
+    field_name_patterns:
+      name: import_job
     resource_name_treatment: STATIC_TYPES
     timeout_millis: 60000
   - name: GetCryptoKey
@@ -224,7 +250,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -240,7 +265,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
@@ -260,13 +284,35 @@ interfaces:
     - key_ring
     header_request_params:
     - parent
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
       parent: location
     resource_name_treatment: STATIC_TYPES
     timeout_millis: 60000
+  - name: CreateImportJob
+    flattening:
+      groups:
+      - parameters:
+        - parent
+        - import_job_id
+        - import_job
+    required_fields:
+    - parent
+    - import_job_id
+    - import_job
+    header_request_params:
+    - parent
+    retry_codes_name: non_idempotent
+    retry_params_name: default
+    field_name_patterns:
+      parent: key_ring
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+    sample_code_init_fields:
+    - import_job_id=my-import-job
+    - import_job.import_method=RSA_OAEP_3072_SHA1_AES_256
+    - import_job.protection_level=HSM
   - name: CreateCryptoKey
     flattening:
       groups:
@@ -280,7 +326,6 @@ interfaces:
     - crypto_key
     header_request_params:
     - parent
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -303,7 +348,19 @@ interfaces:
     - crypto_key_version
     header_request_params:
     - parent
-    request_object_method: true
+    retry_codes_name: non_idempotent
+    retry_params_name: default
+    field_name_patterns:
+      parent: crypto_key
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+  - name: ImportCryptoKeyVersion
+    required_fields:
+    - parent
+    - algorithm
+    - import_job
+    header_request_params:
+    - parent
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -321,7 +378,6 @@ interfaces:
     - update_mask
     header_request_params:
     - crypto_key.name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -339,7 +395,6 @@ interfaces:
     - update_mask
     header_request_params:
     - crypto_key_version.name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -357,8 +412,7 @@ interfaces:
     - plaintext
     header_request_params:
     - name
-    request_object_method: true
-    retry_codes_name: non_idempotent
+    retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
       name: crypto_key_path
@@ -375,8 +429,7 @@ interfaces:
     - ciphertext
     header_request_params:
     - name
-    request_object_method: true
-    retry_codes_name: non_idempotent
+    retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
       name: crypto_key
@@ -393,7 +446,6 @@ interfaces:
     - crypto_key_version_id
     header_request_params:
     - name
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -409,7 +461,6 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: non_idempotent
     retry_params_name: default
     field_name_patterns:
@@ -425,8 +476,56 @@ interfaces:
     - name
     header_request_params:
     - name
-    request_object_method: false
     retry_codes_name: non_idempotent
+    retry_params_name: default
+    field_name_patterns:
+      name: crypto_key_version
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+  - name: GetPublicKey
+    flattening:
+      groups:
+      - parameters:
+        - name
+    required_fields:
+    - name
+    header_request_params:
+    - name
+    retry_codes_name: idempotent
+    retry_params_name: default
+    field_name_patterns:
+      name: crypto_key_version
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+  - name: AsymmetricDecrypt
+    flattening:
+      groups:
+      - parameters:
+        - name
+        - ciphertext
+    required_fields:
+    - name
+    - ciphertext
+    header_request_params:
+    - name
+    retry_codes_name: idempotent
+    retry_params_name: default
+    field_name_patterns:
+      name: crypto_key_version
+    resource_name_treatment: STATIC_TYPES
+    timeout_millis: 60000
+  - name: AsymmetricSign
+    flattening:
+      groups:
+      - parameters:
+        - name
+        - digest
+    required_fields:
+    - name
+    - digest
+    header_request_params:
+    - name
+    retry_codes_name: idempotent
     retry_params_name: default
     field_name_patterns:
       name: crypto_key_version
@@ -446,7 +545,6 @@ interfaces:
     field_name_patterns:
       resource: key_oneof
     resource_name_treatment: STATIC_TYPES
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     timeout_millis: 60000
@@ -467,7 +565,6 @@ interfaces:
     field_name_patterns:
       resource: key_oneof
     resource_name_treatment: STATIC_TYPES
-    request_object_method: false
     retry_codes_name: idempotent
     retry_params_name: default
     timeout_millis: 60000
@@ -490,7 +587,6 @@ interfaces:
     field_name_patterns:
       resource: key_oneof
     resource_name_treatment: STATIC_TYPES
-    request_object_method: true
     retry_codes_name: non_idempotent
     retry_params_name: default
     timeout_millis: 60000
@@ -521,6 +617,9 @@ resource_name_generation:
 - message_name: ListKeyRingsRequest
   field_entity_map:
     parent: location
+- message_name: ListImportJobsRequest
+  field_entity_map:
+    parent: key_ring
 - message_name: ListCryptoKeysRequest
   field_entity_map:
     parent: key_ring
@@ -530,6 +629,9 @@ resource_name_generation:
 - message_name: GetKeyRingRequest
   field_entity_map:
     name: key_ring
+- message_name: GetImportJobRequest
+  field_entity_map:
+    name: import_job
 - message_name: GetCryptoKeyRequest
   field_entity_map:
     name: crypto_key
@@ -539,10 +641,16 @@ resource_name_generation:
 - message_name: CreateKeyRingRequest
   field_entity_map:
     parent: location
+- message_name: CreateImportJobRequest
+  field_entity_map:
+    parent: key_ring
 - message_name: CreateCryptoKeyRequest
   field_entity_map:
     parent: key_ring
 - message_name: CreateCryptoKeyVersionRequest
+  field_entity_map:
+    parent: crypto_key
+- message_name: ImportCryptoKeyVersionRequest
   field_entity_map:
     parent: crypto_key
 - message_name: EncryptRequest
@@ -558,5 +666,14 @@ resource_name_generation:
   field_entity_map:
     name: crypto_key_version
 - message_name: RestoreCryptoKeyVersionRequest
+  field_entity_map:
+    name: crypto_key_version
+- message_name: GetPublicKeyRequest
+  field_entity_map:
+    name: crypto_key_version
+- message_name: AsymmetricSignRequest
+  field_entity_map:
+    name: crypto_key_version
+- message_name: AsymmetricDecryptRequest
   field_entity_map:
     name: crypto_key_version

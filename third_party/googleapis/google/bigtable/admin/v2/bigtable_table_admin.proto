@@ -1,4 +1,4 @@
-// Copyright 2018 Google Inc.
+// Copyright 2018 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
 syntax = "proto3";
 
@@ -29,7 +30,6 @@ option java_multiple_files = true;
 option java_outer_classname = "BigtableTableAdminProto";
 option java_package = "com.google.bigtable.admin.v2";
 option php_namespace = "Google\\Cloud\\Bigtable\\Admin\\V2";
-
 
 // Service for creating, configuring, and deleting Cloud Bigtable tables.
 //
@@ -55,7 +55,8 @@ service BigtableTableAdmin {
   // feature might be changed in backward-incompatible ways and is not
   // recommended for production use. It is not subject to any SLA or deprecation
   // policy.
-  rpc CreateTableFromSnapshot(CreateTableFromSnapshotRequest) returns (google.longrunning.Operation) {
+  rpc CreateTableFromSnapshot(CreateTableFromSnapshotRequest)
+      returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/instances/*}/tables:createFromSnapshot"
       body: "*"
@@ -108,7 +109,8 @@ service BigtableTableAdmin {
   // CheckConsistency to check whether mutations to the table that finished
   // before this call started have been replicated. The tokens will be available
   // for 90 days.
-  rpc GenerateConsistencyToken(GenerateConsistencyTokenRequest) returns (GenerateConsistencyTokenResponse) {
+  rpc GenerateConsistencyToken(GenerateConsistencyTokenRequest)
+      returns (GenerateConsistencyTokenResponse) {
     option (google.api.http) = {
       post: "/v2/{name=projects/*/instances/*/tables/*}:generateConsistencyToken"
       body: "*"
@@ -118,7 +120,8 @@ service BigtableTableAdmin {
   // Checks replication consistency based on a consistency token, that is, if
   // replication has caught up based on the conditions specified in the token
   // and the check request.
-  rpc CheckConsistency(CheckConsistencyRequest) returns (CheckConsistencyResponse) {
+  rpc CheckConsistency(CheckConsistencyRequest)
+      returns (CheckConsistencyResponse) {
     option (google.api.http) = {
       post: "/v2/{name=projects/*/instances/*/tables/*}:checkConsistency"
       body: "*"
@@ -133,7 +136,8 @@ service BigtableTableAdmin {
   // feature might be changed in backward-incompatible ways and is not
   // recommended for production use. It is not subject to any SLA or deprecation
   // policy.
-  rpc SnapshotTable(SnapshotTableRequest) returns (google.longrunning.Operation) {
+  rpc SnapshotTable(SnapshotTableRequest)
+      returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2/{name=projects/*/instances/*/tables/*}:snapshot"
       body: "*"
@@ -271,6 +275,10 @@ message ListTablesRequest {
   // The view to be applied to the returned tables' fields.
   // Defaults to `NAME_ONLY` if unspecified; no others are currently supported.
   Table.View view = 2;
+
+  // Maximum number of results per page.
+  // CURRENTLY UNIMPLEMENTED AND IGNORED.
+  int32 page_size = 4;
 
   // The value of `next_page_token` returned by a previous call.
   string page_token = 3;
@@ -445,7 +453,8 @@ message ListSnapshotsRequest {
   // e.g., `projects/<project>/instances/<instance>/clusters/-`.
   string parent = 1;
 
-  // The maximum number of snapshots to return.
+  // The maximum number of snapshots to return per page.
+  // CURRENTLY UNIMPLEMENTED AND IGNORED.
   int32 page_size = 2;
 
   // The value of `next_page_token` returned by a previous call.
