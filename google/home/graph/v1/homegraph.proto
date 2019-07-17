@@ -35,10 +35,12 @@ service HomeGraphApiService {
   //
   //
   // Third-party user's identity is passed in as agent_user_id.
-  // (see [RequestSyncDevicesRequest][google.home.graph.v1.RequestSyncDevicesRequest]) and forwarded back to the agent.
-  // Agent is identified by the API key or JWT signed by the partner's service
-  // account.
-  rpc RequestSyncDevices(RequestSyncDevicesRequest) returns (RequestSyncDevicesResponse) {
+  // (see
+  // [RequestSyncDevicesRequest][google.home.graph.v1.RequestSyncDevicesRequest])
+  // and forwarded back to the agent. Agent is identified by the API key or JWT
+  // signed by the partner's service account.
+  rpc RequestSyncDevices(RequestSyncDevicesRequest)
+      returns (RequestSyncDevicesResponse) {
     option (google.api.http) = {
       post: "/v1/devices:requestSync"
       body: "*"
@@ -56,7 +58,8 @@ service HomeGraphApiService {
   //
   // Third-party user's identity is passed in as agent_user_id.
   // Agent is identified by the JWT signed by the partner's service account.
-  rpc ReportStateAndNotification(ReportStateAndNotificationRequest) returns (ReportStateAndNotificationResponse) {
+  rpc ReportStateAndNotification(ReportStateAndNotificationRequest)
+      returns (ReportStateAndNotificationResponse) {
     option (google.api.http) = {
       post: "/v1/devices:reportStateAndNotification"
       body: "*"
@@ -125,15 +128,13 @@ message RequestSyncDevicesRequest {
 
 // Response type for RequestSyncDevices call. Intentionally empty upon success.
 // An HTTP response code is returned with more details upon failure.
-message RequestSyncDevicesResponse {
-
-}
+message RequestSyncDevicesResponse {}
 
 // Sample ReportStateAndNotificationRequest, with states and notifications
 // defined per device_id (eg: "123" and "456" in the following example):
 // {
 //   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-//   "agent_user_id": "1234",
+//   "agentUserId": "1234",
 //   "payload": {
 //     "devices": {
 //       "states": {
@@ -174,7 +175,7 @@ message RequestSyncDevicesResponse {
 // Notifications, or both. This request uses globally unique flattened state
 // names instead of namespaces based on traits to align with the existing QUERY
 // and EXECUTE APIs implemented by 90+ Smart Home partners.
-// Next tag: 5.
+// Next tag: 6.
 message ReportStateAndNotificationRequest {
   // Request id used for debugging.
   string request_id = 1;
@@ -184,6 +185,9 @@ message ReportStateAndNotificationRequest {
 
   // Required. Third-party user id.
   string agent_user_id = 2;
+
+  // Token to maintain state in the follow up notification response.
+  string follow_up_token = 5;
 
   // State of devices to update and notification metadata for devices. For
   // example, if a user turns a light on manually, a State update should be
