@@ -15,24 +15,34 @@
 #
 # Base image
 #
-FROM debian:jessie
+FROM ubuntu:trusty
 
 #
 # Dependencies
 #
+
+# Install JDK 11 as sampling heap profiler depends on the new JVMTI APIs.
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:openjdk-r/ppa
+RUN apt-get update
+
+# Installing openjdk-11-jdk-headless can be very slow due to repo download
+# speed.
 
 # Everything we can get through apt-get
 RUN apt-get update && apt-get -y -q install \
   apt-utils \
   autoconf \
   automake \
+  cmake \
   curl \
   g++ \
   git \
+  libcurl4-openssl-dev \
   libssl-dev \
   libtool \
   make \
-  openjdk-7-jdk \
+  openjdk-11-jdk-headless \
   python \
   unzip \
   zlib1g-dev
@@ -46,13 +56,6 @@ RUN git clone --depth=1 -b curl-7_55_1 https://github.com/curl/curl.git /tmp/cur
                 --with-pic --with-ssl && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/curl
-
-# cmake
-RUN git clone -b v3.6.2 https://github.com/Kitware/CMake.git /tmp/cmake && \
-    cd /tmp/cmake && \
-    ./bootstrap && \
-    make -j && make install && \
-    cd ~ && rm -rf /tmp/cmake
 
 # gflags
 RUN git clone --depth=1 -b v2.1.2 https://github.com/gflags/gflags.git /tmp/gflags && \
@@ -90,12 +93,26 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
-RUN git clone --depth=1 --recursive -b v1.15.0 https://github.com/grpc/grpc.git /tmp/grpc && \
+RUN git clone --depth=1 --recursive -b v1.21.0 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
-    cd third_party/protobuf && \
-    ./autogen.sh && ./configure --with-pic CXXFLAGS=-Os && make -j && make install && ldconfig && \
-    cd ../.. && \
-    CPPFLAGS="-I /usr/local/ssl/include" make -j CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
-    CPPFLAGS="-I /usr/local/ssl/include" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
-    rm -rf /tmp/grpc
 
+# TODO: Remove patch when GKE Istio versions support HTTP 1.0 or
+# gRPC http_cli supports HTTP 1.1
+# This sed command is needed until GKE provides Istio 1.1+ exclusively which
+# supports HTTP 1.0.
+    sed -i 's/1\.0/1.1/g' src/core/lib/http/format_request.cc && \
+
+# TODO: Remove patch when GKE Istio versions support unambiguous
+# FQDNs in rule sets.
+# https://github.com/istio/istio/pull/14405 is merged but wait till GKE
+# Istio versions includes this PR
+    sed -i 's/metadata\.google\.internal\./metadata.google.internal/g' src/core/lib/security/credentials/google_default/google_default_credentials.cc && \
+    sed -i 's/metadata\.google\.internal\./metadata.google.internal/g' src/core/lib/security/credentials/credentials.h && \
+    cd third_party/protobuf && \
+    ./autogen.sh && \
+    ./configure --with-pic CXXFLAGS="$(pkg-config --cflags protobuf)" LIBS="$(pkg-config --libs protobuf)" LDFLAGS="-Wl,--no-as-needed" && \
+    make -j && make install && ldconfig && \
+    cd ../.. && \
+    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-Wl,--no-as-needed" make -j CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
+    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-Wl,--no-as-needed" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
+    rm -rf /tmp/grpc

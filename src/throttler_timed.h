@@ -17,6 +17,7 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_THROTTLER_TIMED_H_
 #define CLOUD_PROFILER_AGENT_JAVA_THROTTLER_TIMED_H_
 
+#include <atomic>
 #include <memory>
 #include <random>
 
@@ -37,17 +38,22 @@ class TimedThrottler : public Throttler {
 
   // Testing-only constructor.
   TimedThrottler(std::unique_ptr<ProfileUploader> uploader, Clock* clock,
-                 bool fixed_seed);
+                 bool no_randomize);
 
   bool WaitNext() override;
   string ProfileType() override;
   int64_t DurationNanos() override;
   bool Upload(string profile) override;
+  void Close() override;
 
  private:
   Clock* clock_;
-  int64_t duration_cpu_ns_, duration_wall_ns_;
+  int64_t duration_cpu_ns_;
+  int64_t duration_wall_ns_;
+  bool enable_heap_;
   int64_t interval_ns_;
+  // The throttler is closing, cancel ongoing and future requests.
+  std::atomic<bool> closed_;
 
   std::default_random_engine gen_;
   std::uniform_int_distribution<int64_t> dist_;

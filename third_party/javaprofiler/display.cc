@@ -15,8 +15,6 @@
 #include "third_party/javaprofiler/display.h"
 
 #include <inttypes.h>
-#include <jni.h>
-#include <jvmti.h>
 #include <cstring>
 
 #include "third_party/javaprofiler/stacktrace_fixer.h"
@@ -67,8 +65,6 @@ void GetMethodName(jvmtiEnv *jvmti, jmethodID method_id, string *method_name,
     return;
   }
 
-  signature_ptr.AbandonBecauseOfError();
-  name_ptr.AbandonBecauseOfError();
   static int once = 0;
   if (!once) {
     once = 1;
@@ -92,13 +88,12 @@ void GetMethodName(jvmtiEnv *jvmti, jmethodID method_id, string *method_name,
   *signature = kSignatureUnknown;
 }
 
-static void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
+void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
                                 jclass declaring_class, string *file_name,
                                 string *class_name) {
   JvmtiScopedPtr<char> source_name_ptr(jvmti);
   if (JVMTI_ERROR_NONE !=
       jvmti->GetSourceFileName(declaring_class, source_name_ptr.GetRef())) {
-    source_name_ptr.AbandonBecauseOfError();
     *file_name = kFileUnknown;
   } else {
     *file_name = source_name_ptr.Get();
@@ -108,7 +103,6 @@ static void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
   if (JVMTI_ERROR_NONE != jvmti->GetClassSignature(declaring_class,
                                                    signature_ptr.GetRef(),
                                                    nullptr)) {
-    signature_ptr.AbandonBecauseOfError();
     *class_name = kClassUnknown;
   } else {
     bool cleaned = CleanJavaSignature(signature_ptr.Get());
@@ -120,6 +114,32 @@ static void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
     } else {
       *class_name = signature_ptr.Get();
     }
+  }
+}
+
+void FillFieldsWithUnknown(string *file_name, string *class_name,
+                                  string *method_name, string *signature,
+                                  int *line_number) {
+  *file_name = kFileUnknown;
+  *class_name = kClassUnknown;
+  *method_name = kMethodUnknown;
+  *signature = kSignatureUnknown;
+  if (line_number) {
+    *line_number = 0;
+  }
+}
+
+void FillMethodSignatureAndLine(jvmtiEnv *jvmti,
+                                       const JVMPI_CallFrame &frame,
+                                       string *method_name, string *signature,
+                                       int *line_number) {
+  GetMethodName(jvmti, frame.method_id, method_name, signature);
+
+  // frame.lineno is actually a bci if it is a Java method; Asgct is piggy
+  // backing on the structure field. For natives, this would be -1 and
+  // GetLineNumber handles it.
+  if (line_number) {
+    *line_number = GetLineNumber(jvmti, frame.method_id, frame.lineno);
   }
 }
 
@@ -148,8 +168,6 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
         no_debug_info = true;
       }
     }
-
-    table_ptr_ctr.AbandonBecauseOfError();
     return -1;
   }
 
@@ -177,36 +195,10 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
   return -1;
 }
 
-static void FillFieldsWithUnknown(string *file_name, string *class_name,
-                                  string *method_name, string *signature,
-                                  int *line_number) {
-  *file_name = kFileUnknown;
-  *class_name = kClassUnknown;
-  *method_name = kMethodUnknown;
-  *signature = kSignatureUnknown;
-  if (line_number) {
-    *line_number = 0;
-  }
-}
-
-static void FillMethodSignatureAndLine(jvmtiEnv *jvmti,
-                                       const JVMPI_CallFrame &frame,
-                                       string *method_name, string *signature,
-                                       int *line_number) {
-  GetMethodName(jvmti, frame.method_id, method_name, signature);
-
-  // frame.lineno is actually a bci if it is a Java method; Asgct is piggy
-  // backing on the structure field. For natives, this would be -1 and
-  // GetLineNumber handles it.
-  if (line_number) {
-    *line_number = GetLineNumber(jvmti, frame.method_id, frame.lineno);
-  }
-}
-
-bool GetStackFrameElements(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
-                           string *file_name, string *class_name,
-                           string *method_name, string *signature,
-                           int *line_number) {
+bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
+                           const JVMPI_CallFrame &frame, string *file_name,
+                           string *class_name, string *method_name,
+                           string *signature, int *line_number) {
   if (!jvmti) {
     FillFieldsWithUnknown(file_name, class_name, method_name, signature,
                           line_number);
@@ -223,6 +215,7 @@ bool GetStackFrameElements(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
     return true;
   }
 
+  ScopedLocalRef<jclass> declaring_class_managed(jni, declaring_class);
   return GetStackFrameElements(jvmti, frame, declaring_class, file_name,
                                class_name, method_name, signature, line_number);
 }

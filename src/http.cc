@@ -58,6 +58,7 @@ void HTTPRequest::SetTimeout(int timeout_sec) {
 
 bool HTTPRequest::DoGet(const string& url, string *data) {
   data->clear();
+  curl_easy_setopt(curl_, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
   curl_easy_setopt(curl_, CURLOPT_WRITEDATA, data);
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, ResponseCallback);
   return DoRequest(url);

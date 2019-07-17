@@ -26,6 +26,7 @@
 #include <glog/logging.h>
 #include <string>
 
+using std::hash;
 using std::string;
 
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
@@ -73,8 +74,6 @@ class JvmtiScopedPtr {
 
   T *Get() { return ref_; }
 
-  void AbandonBecauseOfError() { ref_ = NULL; }
-
  private:
   jvmtiEnv *jvmti_;
   T *ref_;
@@ -82,49 +81,24 @@ class JvmtiScopedPtr {
   DISALLOW_IMPLICIT_CONSTRUCTORS(JvmtiScopedPtr);
 };
 
-// Accessors for a JNIEnv for this thread.
-class Accessors {
+template <class T>
+class ScopedLocalRef {
  public:
-  static void SetCurrentJniEnv(JNIEnv *env) { env_ = env; }
+  ScopedLocalRef(JNIEnv *jni, T ref) : jni_(jni), ref_(ref) {}
 
-  static JNIEnv *CurrentJniEnv() { return env_; }
-
-  static void Init() {}
-
-  static void Destroy() {}
-
-  static void SetAttribute(int64_t value) { attr_ = value; }
-
-  static int64_t GetAttribute() { return attr_; }
-
-  template <class FunctionType>
-  static inline FunctionType GetJvmFunction(const char *function_name) {
-    // get handle to library
-    static void *handle = dlopen("libjvm.so", RTLD_LAZY);
-    if (handle == NULL) {
-      return NULL;
+  ~ScopedLocalRef() {
+    if (NULL != ref_) {
+      jni_->DeleteLocalRef(ref_);
     }
-
-    // get address of function, return null if not found
-    return bit_cast<FunctionType>(dlsym(handle, function_name));
   }
 
+  T Get() { return ref_; }
+
  private:
-  // This is dangerous. TLS accesses are by default not async safe, as
-  // they can call malloc for lazy initialization. The initial-exec
-  // TLS mode avoids this potential allocation, with the limitation
-  // that there is a fixed amount of space to hold all TLS variables
-  // referenced in the module. This should be OK for the cloud
-  // profiler agent, which is relatively small. We do provide a way
-  // to override the TLS model for compilation environments where the
-  // TLS access is async-safe.
-#ifdef JAVAPROFILER_GLOBAL_DYNAMIC_TLS
-  static __thread JNIEnv *env_ __attribute__((tls_model("global-dynamic")));
-  static __thread int64_t attr_ __attribute__((tls_model("global-dynamic")));
-#else
-  static __thread JNIEnv *env_ __attribute__((tls_model("initial-exec")));
-  static __thread int64_t attr_ __attribute__((tls_model("initial-exec")));
-#endif
+  JNIEnv *jni_;
+  T ref_;
+
+  DISALLOW_IMPLICIT_CONSTRUCTORS(ScopedLocalRef);
 };
 
 }  // namespace javaprofiler

@@ -33,7 +33,7 @@ namespace javaprofiler {
 // Maximum number of frames to store from the stack traces sampled.
 const int kMaxFramesToCapture = 128;
 
-uint64_t CalculateHash(int64_t attr, int num_frames,
+uint64 CalculateHash(int64 attr, int num_frames,
                        const JVMPI_CallFrame *frame);
 bool Equal(int num_frames, const JVMPI_CallFrame *f1,
            const JVMPI_CallFrame *f2);
@@ -121,8 +121,6 @@ class AsyncSafeTraceMultiset {
 
   void Reset() {
     memset(traces_, 0, sizeof(traces_));
-    memset(frame_buffer_, 0, sizeof(frame_buffer_));
-    active_insertions_ = 0;
   }
 
   // Add a trace to the set. If it is already present, increment its
@@ -135,10 +133,10 @@ class AsyncSafeTraceMultiset {
   // there is no valid trace at this location.  This operation is
   // thread safe with respect to Add() but only a single call to
   // Extract can be done at a time.
-  int Extract(int location, int64_t *attr, int max_frames,
-              JVMPI_CallFrame *frames, int64_t *count);
+  int Extract(int location, int64 *attr, int max_frames,
+              JVMPI_CallFrame *frames, int64 *count);
 
-  int64_t MaxEntries() const { return kMaxStackTraces; }
+  int64 MaxEntries() const { return kMaxStackTraces; }
 
  private:
   struct TraceData {
@@ -146,12 +144,16 @@ class AsyncSafeTraceMultiset {
     // this will represent a sample label.
     int attr;
     // trace is a triple containing the JNIEnv and the individual call frames.
-    // The frames are stored in AsyncSafeTraceMultiset::frame_buffer_
+    // The frames are stored in frame_buffer.
     JVMPI_CallTrace trace;
+    // frame_buffer is the storage for stack frames.
+    JVMPI_CallFrame frame_buffer[kMaxFramesToCapture];
     // Number of times a trace has been encountered.
     // 0 indicates that the trace is unused
     // <0 values are reserved, used for concurrency control.
-    std::atomic<int64_t> count;
+    std::atomic<int64> count;
+    // Number of active attempts to increase the counter on the trace.
+    std::atomic<int> active_updates;
   };
 
   // TODO: Re-evaluate MaxStackTraces, to minimize storage
@@ -160,13 +162,9 @@ class AsyncSafeTraceMultiset {
   static const int kMaxStackTraces = 2048;
 
   // Sentinel to use as trace count while the frames are being updated.
-  static const int64_t kTraceCountLocked = -1;
-
-  // Number of calls to Add() currently in progress.
-  std::atomic<int> active_insertions_;
+  static const int64 kTraceCountLocked = -1;
 
   TraceData traces_[kMaxStackTraces];
-  JVMPI_CallFrame frame_buffer_[kMaxStackTraces][kMaxFramesToCapture];
   DISALLOW_COPY_AND_ASSIGN(AsyncSafeTraceMultiset);
 };
 
@@ -179,7 +177,7 @@ class TraceMultiset {
  private:
   typedef struct {
     std::vector<JVMPI_CallFrame> frames;
-    int64_t attr;
+    int64 attr;
   } CallTrace;
 
   struct CallTraceHash {
@@ -201,7 +199,7 @@ class TraceMultiset {
     }
   };
 
-  typedef std::unordered_map<CallTrace, uint64_t, CallTraceHash, CallTraceEqual>
+  typedef std::unordered_map<CallTrace, uint64, CallTraceHash, CallTraceEqual>
       CountMap;
 
  public:
@@ -209,8 +207,8 @@ class TraceMultiset {
 
   // Add a trace to the array. If it is already in the array,
   // increment its count.
-  void Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
-           int64_t count);
+  void Add(int64 attr, int num_frames, JVMPI_CallFrame *frames,
+           int64 count);
 
   typedef CountMap::iterator iterator;
   typedef CountMap::const_iterator const_iterator;

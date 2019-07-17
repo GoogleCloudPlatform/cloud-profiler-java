@@ -69,7 +69,7 @@ message Profile {
   repeated string string_table = 6;
   // frames with Function.function_name fully matching the following
   // regexp will be dropped from the samples, along with their successors.
-  int64 drop_frames = 7;   // Index into string table.
+  int64 drop_frames = 7;  // Index into string table.
   // frames with Function.function_name fully matching the following
   // regexp will be kept, even if it matches drop_functions.
   int64 keep_frames = 8;  // Index into string table.
@@ -81,13 +81,13 @@ message Profile {
   int64 time_nanos = 9;
   // Duration of the profile, if a duration makes sense.
   int64 duration_nanos = 10;
-  // The kind of events between sampled ocurrences.
+  // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
   ValueType period_type = 11;
   // The number of events between sampled occurrences.
   int64 period = 12;
   // Freeform text associated to the profile.
-  repeated int64 comment = 13; // Indices into string table.
+  repeated int64 comment = 13;  // Indices into string table.
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
   int64 default_sample_type = 14;
@@ -95,8 +95,8 @@ message Profile {
 
 // ValueType describes the semantics and measurement units of a value.
 message ValueType {
-  int64 type = 1; // Index into string table.
-  int64 unit = 2; // Index into string table.
+  int64 type = 1;  // Index into string table.
+  int64 unit = 2;  // Index into string table.
 }
 
 // Each Sample records values encountered in some program
@@ -111,7 +111,7 @@ message Sample {
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
   // When aggregating multiple samples into a single sample, the
-  // result has a list of values that is the elemntwise sum of the
+  // result has a list of values that is the element-wise sum of the
   // lists of the originals.
   repeated int64 value = 2;
   // label includes additional context for this sample. It can include
@@ -120,10 +120,10 @@ message Sample {
 }
 
 message Label {
-  int64 key = 1;   // Index into string table
+  int64 key = 1;  // Index into string table
 
   // At most one of the following must be present
-  int64 str = 2;   // Index into string table
+  int64 str = 2;  // Index into string table
   int64 num = 3;
 
   // Should only be present when num is present.
@@ -203,12 +203,12 @@ message Function {
   // Unique nonzero id for the function.
   uint64 id = 1;
   // Name of the function, in human-readable form if available.
-  int64 name = 2; // Index into string table
+  int64 name = 2;  // Index into string table
   // Name of the function, as identified by the system.
   // For instance, it can be a C++ mangled name.
-  int64 system_name = 3; // Index into string table
+  int64 system_name = 3;  // Index into string table
   // Source file containing the function.
-  int64 filename = 4; // Index into string table
+  int64 filename = 4;  // Index into string table
   // Line number in source file.
   int64 start_line = 5;
 }

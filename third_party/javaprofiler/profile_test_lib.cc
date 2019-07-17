@@ -56,6 +56,10 @@ static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
       CreateJvmtiString(jvmti, "thirdMethodName", name_str);
       CreateJvmtiString(jvmti, "()V", sig_str);
       break;
+    case 4:
+      CreateJvmtiString(jvmti, "fourthMethodName$$Lambda$42.42", name_str);
+      CreateJvmtiString(jvmti, "()V", sig_str);
+      break;
     default:
       ADD_FAILURE() << "Unknown method id in test.";
   }
@@ -74,6 +78,9 @@ static jvmtiError GetClassSignature(jvmtiEnv* jvmti, jclass declaring_class,
       break;
     case 3:
       CreateJvmtiString(jvmti, "Lcom/google/ThirdClass;", sig_str);
+      break;
+    case 4:
+      CreateJvmtiString(jvmti, "Lcom/google/FourthClass;", sig_str);
       break;
     default:
       ADD_FAILURE() << "Unknown class id in test.";
@@ -100,6 +107,9 @@ static jvmtiError GetSourceFileName(jvmtiEnv *env, jclass klass,
         break;
       case 3:
         *source_name_ptr = strdup("ThirdClass.java");
+        break;
+      case 4:
+        *source_name_ptr = strdup("FourthClass.java");
         break;
       default:
         ADD_FAILURE() << "Unknown class id in test.";
@@ -130,6 +140,39 @@ static jvmtiError GetLineNumberTable(jvmtiEnv *env, jmethodID method,
   return JVMTI_ERROR_NONE;
 }
 
+static jvmtiError GetStackTrace(jvmtiEnv* env, jthread thread, jint start_depth,
+                                jint max_frame_count,
+                                jvmtiFrameInfo* frame_buffer, jint* count_ptr) {
+  uint64 thread_num = reinterpret_cast<uint64>(thread);
+
+  if (thread_num < 0 || thread_num >= JvmProfileTestLib::GetMaxThreads()) {
+    *count_ptr = 0;
+    return JVMTI_ERROR_NONE;
+  }
+
+  std::vector<jvmtiFrameInfo> frames;
+
+  switch (thread_num) {
+    case 0:
+      frames.push_back({reinterpret_cast<jmethodID>(1), 30});
+      frames.push_back({reinterpret_cast<jmethodID>(2), 64});
+      break;
+    case 1:
+      frames.push_back({reinterpret_cast<jmethodID>(3), 128});
+      break;
+  }
+
+  jint count = std::min(max_frame_count, (jint) frames.size());
+  memcpy(frame_buffer, &frames[0], sizeof(*frame_buffer) * count);
+  *count_ptr = count;
+
+  return JVMTI_ERROR_NONE;
+}
+
+static jvmtiError ForceGarbageCollection(jvmtiEnv* env) {
+  return JVMTI_ERROR_NONE;
+}
+
 struct jvmtiInterface_1_ JvmProfileTestLib::GetDispatchTable() {
   struct jvmtiInterface_1_ jvmti_dispatch_table;
   jvmti_dispatch_table.GetMethodName = &GetMethodName;
@@ -139,7 +182,19 @@ struct jvmtiInterface_1_ JvmProfileTestLib::GetDispatchTable() {
   jvmti_dispatch_table.GetLineNumberTable = &GetLineNumberTable;
   jvmti_dispatch_table.Allocate = &Allocate;
   jvmti_dispatch_table.Deallocate = &Deallocate;
+  jvmti_dispatch_table.GetStackTrace = &GetStackTrace;
+  jvmti_dispatch_table.ForceGarbageCollection = &ForceGarbageCollection;
   return jvmti_dispatch_table;
+}
+
+int JvmProfileTestLib::GetMaxThreads() { return 2; }
+
+jthread JvmProfileTestLib::GetThread(int thread_id) {
+  if (thread_id < 0 || thread_id >= GetMaxThreads()) {
+    return 0;
+  }
+
+  return reinterpret_cast<jthread>(thread_id);
 }
 
 }  // namespace javaprofiler

@@ -25,6 +25,7 @@
 #include "src/clock.h"
 #include "src/globals.h"
 #include "src/proto.h"
+#include "third_party/javaprofiler/accessors.h"
 
 DEFINE_int32(cprof_wall_num_threads_cutoff, 4096,
              "Do not take wall profiles if more than this # of threads exist.");
@@ -36,6 +37,8 @@ DEFINE_bool(cprof_record_native_stack, false,
 
 namespace cloud {
 namespace profiler {
+
+using google::javaprofiler::AlmostThere;
 
 google::javaprofiler::AsyncSafeTraceMultiset *Profiler::fixed_traces_ = nullptr;
 std::atomic<int> Profiler::unknown_stack_count_;
@@ -151,8 +154,7 @@ bool SignalHandler::SetSigprofInterval(int64_t period_usec) {
   timer.it_interval.tv_usec = period_usec;
   timer.it_value = timer.it_interval;
   if (setitimer(ITIMER_PROF, &timer, 0) == -1) {
-    fprintf(stderr, "Scheduling profiler interval failed with error %d\n",
-            errno);
+    LOG(ERROR) << "Scheduling profiler interval failed with error " << errno;
     return false;
   }
   return true;
@@ -198,22 +200,10 @@ void Profiler::Reset() {
 }
 
 string Profiler::SerializeProfile(
-    const google::javaprofiler::NativeProcessInfo &native_info) {
+    JNIEnv *jni, const google::javaprofiler::NativeProcessInfo &native_info) {
   return SerializeAndClearJavaCpuTraces(
-      jvmti_, native_info, ProfileType(), duration_nanos_, period_nanos_,
+      jni, jvmti_, native_info, ProfileType(), duration_nanos_, period_nanos_,
       &aggregated_traces_, unknown_stack_count_);
-}
-
-bool AlmostThere(const struct timespec &finish, const struct timespec &lap) {
-  // Determine if there is time for another lap before reaching the
-  // finish line. Have a margin of multiple laps to ensure we do not
-  // overrun the finish line.
-  int64_t margin_laps = 2;
-
-  struct timespec now = DefaultClock()->Now();
-  struct timespec laps = {lap.tv_sec * margin_laps, lap.tv_nsec * margin_laps};
-
-  return TimeLessThan(finish, TimeAdd(now, laps));
 }
 
 bool CPUProfiler::Collect() {
@@ -231,7 +221,7 @@ bool CPUProfiler::Collect() {
 
   // Sleep until finish_line, but wakeup periodically to flush the
   // internal tables.
-  while (!AlmostThere(finish_line, flush_interval)) {
+  while (!AlmostThere(clock, finish_line, flush_interval)) {
     clock->SleepFor(flush_interval);
     Flush();
   }

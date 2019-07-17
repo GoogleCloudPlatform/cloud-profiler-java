@@ -30,14 +30,19 @@ namespace profiler {
 
 namespace {
 
-const int64_t kRandomRange = 65536;
+const int64_t kRandomRange = 100000;
 
 // Gets the sampling configuration from the flags.
-int64_t GetConfiguration(int64_t *duration_cpu_ns, int64_t *duration_wall_ns) {
+int64_t GetConfiguration(int64_t* duration_cpu_ns, int64_t* duration_wall_ns,
+                         bool* enable_heap) {
   int64_t duration_ns = FLAGS_cprof_duration_sec * kNanosPerSecond;
 
   *duration_cpu_ns = 0;
   *duration_wall_ns = 0;
+
+  // Currently heap is always disabled if not forced explictly.
+  *enable_heap = false;
+
   if (FLAGS_cprof_force == "") {
     *duration_cpu_ns = duration_ns;
     *duration_wall_ns = duration_ns;
@@ -45,6 +50,8 @@ int64_t GetConfiguration(int64_t *duration_cpu_ns, int64_t *duration_wall_ns) {
     *duration_cpu_ns = duration_ns;
   } else if (FLAGS_cprof_force == kTypeWall) {
     *duration_wall_ns = duration_ns;
+  } else if (FLAGS_cprof_force == kTypeHeap) {
+    *enable_heap = true;
   } else {
     LOG(ERROR) << "Unrecognized option cprof_force=" << FLAGS_cprof_force
                << ", profiling disabled";
@@ -83,13 +90,19 @@ TimedThrottler::TimedThrottler(const string& path)
     : TimedThrottler(UploaderFromFlags(path), DefaultClock(), false) {}
 
 TimedThrottler::TimedThrottler(std::unique_ptr<ProfileUploader> uploader,
-                               Clock* clock, bool fixed_seed)
-    : clock_(clock), profile_count_(), uploader_(std::move(uploader)) {
-  interval_ns_ = GetConfiguration(&duration_cpu_ns_, &duration_wall_ns_);
+                               Clock* clock, bool no_randomize)
+    : clock_(clock),
+      closed_(false),
+      profile_count_(),
+      uploader_(std::move(uploader)) {
+  interval_ns_ =
+      GetConfiguration(&duration_cpu_ns_, &duration_wall_ns_, &enable_heap_);
+
   LOG(INFO) << "sampling duration: cpu=" << duration_cpu_ns_ / kNanosPerSecond
-            << "s, wall=" << duration_wall_ns_ / kNanosPerSecond << "s";
+            << "s, wall=" << duration_wall_ns_ / kNanosPerSecond;
   LOG(INFO) << "sampling interval: " << interval_ns_ / kNanosPerSecond << "s";
   LOG(INFO) << "sampling delay: " << FLAGS_cprof_delay_sec << "s";
+  LOG(INFO) << "heap sampling enabled: " << enable_heap_;
 
   struct timespec now = clock_->Now();
 
@@ -100,19 +113,19 @@ TimedThrottler::TimedThrottler(std::unique_ptr<ProfileUploader> uploader,
     next_interval_ = TimeAdd(next_interval_, delay_ts);
   }
 
-  // Create a random number generator, seeded on the microseconds from the
-  // current timer if not asked for fixed seed (which should only be used for
-  // determinism in tests).
-  gen_ = std::default_random_engine(fixed_seed ? 10 : now.tv_nsec / 1000);
-  dist_ = std::uniform_int_distribution<int64_t>(0, kRandomRange);
+  // Create a random number generator, seeded on the current time.
+  gen_ = std::default_random_engine(now.tv_nsec / 1000);
+  dist_ = std::uniform_int_distribution<int64_t>(
+      no_randomize ? kRandomRange : 0, kRandomRange);
 
   // This will get popped on the first WaitNext() call.
   cur_.push_back({"", 0});
 }
 
 bool TimedThrottler::WaitNext() {
-  if (!uploader_ || (duration_cpu_ns_ == 0 && duration_wall_ns_ == 0)) {
-    // Refuse profiling if both CPU and wall are disabled or no uploader.
+  if (!uploader_ ||
+      (duration_cpu_ns_ == 0 && duration_wall_ns_ == 0 && !enable_heap_)) {
+    // Refuse profiling if CPU, wall, and heap are disabled or no uploader.
     LOG(WARNING) << "Profiling disabled";
     return false;
   }
@@ -139,6 +152,16 @@ bool TimedThrottler::WaitNext() {
 
     struct timespec profiling_start =
         TimeAdd(next_interval_, NanosToTimeSpec(wait_ns));
+
+    // Wait till the next profiling time polling for the cancellation.
+    const struct timespec poll_interval = {0, 500 * 1000 * 1000};  // 0.5s
+    while (!google::javaprofiler::AlmostThere(clock_, profiling_start,
+                                              poll_interval)) {
+      clock_->SleepFor(poll_interval);
+      if (closed_) {
+        return false;
+      }
+    }
     clock_->SleepUntil(profiling_start);
     next_interval_ = TimeAdd(next_interval_, NanosToTimeSpec(interval_ns_));
 
@@ -147,6 +170,9 @@ bool TimedThrottler::WaitNext() {
     }
     if (duration_wall_ns_ > 0) {
       cur_.push_back({kTypeWall, duration_wall_ns_});
+    }
+    if (enable_heap_) {
+      cur_.push_back({kTypeHeap, 0});
     }
     // Randomize the profile type order.
     std::shuffle(cur_.begin(), cur_.end(), gen_);
@@ -169,6 +195,8 @@ bool TimedThrottler::Upload(string profile) {
   }
   return uploader_->Upload(cur_.back().first, profile);
 }
+
+void TimedThrottler::Close() { closed_ = true; }
 
 }  // namespace profiler
 }  // namespace cloud

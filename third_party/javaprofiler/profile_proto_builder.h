@@ -17,13 +17,16 @@
 #ifndef THIRD_PARTY_JAVAPROFILER_PROFILE_PROTO_BUILDER_H__
 #define THIRD_PARTY_JAVAPROFILER_PROFILE_PROTO_BUILDER_H__
 
+#include <jvmti.h>
 #include <link.h>
+
+#include <cmath>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "perftools/profiles/proto/builder.h"
-#include "third_party/java/jdk/include/jvmti.h"
 #include "third_party/javaprofiler/stacktrace_decls.h"
 
 namespace google {
@@ -50,9 +53,8 @@ class TraceSamples {
                     const JVMPI_CallTrace &trace2) const;
   };
 
-  __gnu_cxx::hash_map<JVMPI_CallTrace, perftools::profiles::Sample *, TraceHash,
-                      TraceEquals>
-      traces_;
+  std::unordered_map<JVMPI_CallTrace, perftools::profiles::Sample *, TraceHash,
+      TraceEquals> traces_;
 };
 
 // Store locations previously seen so that the profile is only
@@ -88,9 +90,8 @@ class LocationBuilder {
 
   perftools::profiles::Builder *builder_;
 
-  __gnu_cxx::hash_map<LocationInfo, perftools::profiles::Location *,
-                      LocationInfoHash, LocationInfoEquals>
-      locations_;
+  std::unordered_map<LocationInfo, perftools::profiles::Location *,
+      LocationInfoHash, LocationInfoEquals> locations_;
 };
 
 // Remember traces and use the information to create locations with native
@@ -113,11 +114,11 @@ class ProfileProtoBuilder {
  public:
   virtual ~ProfileProtoBuilder() {}
 
-  // Add traces to the proto.
+  // Add traces to the proto. The elements of the array are copied over.
   void AddTraces(const ProfileStackTrace *traces, int num_traces);
 
   // Add traces to the proto, where each trace has a defined count
-  // of occurrences.
+  // of occurrences. The elements of the arrays are copied over.
   void AddTraces(const ProfileStackTrace *traces,
                  const int32 *counts,
                  int num_traces);
@@ -130,14 +131,29 @@ class ProfileProtoBuilder {
   // this has undefined behavior.
   virtual std::unique_ptr<perftools::profiles::Profile> CreateProto() = 0;
 
+  // Create a heap profile.
+  // jvmti_env can be null as well but then all calls to AddTraces will return
+  // unknown.
+  // ForHeap/ForNativeHeap is the only case where we accept a null cache since
+  // the heap profiles can be using JVMTI's GetStackTrace and remain in pure
+  // Java land frames. Other ForX methods will fail an assertion when attempting
+  // a nullptr cache.
   static std::unique_ptr<ProfileProtoBuilder> ForHeap(
-      jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache);
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+      ProfileFrameCache *cache = nullptr);
 
-  static std::unique_ptr<ProfileProtoBuilder> ForCpu(
-      jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache);
+  static std::unique_ptr<ProfileProtoBuilder> ForNativeHeap(
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+      ProfileFrameCache *cache = nullptr);
+
+  static std::unique_ptr<ProfileProtoBuilder> ForCpu(JNIEnv *jni_env,
+                                                     jvmtiEnv *jvmti_env,
+                                                     int64 sampling_rate,
+                                                     ProfileFrameCache *cache);
 
   static std::unique_ptr<ProfileProtoBuilder> ForContention(
-      jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache);
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+      ProfileFrameCache *cache);
 
  protected:
   struct SampleType {
@@ -148,9 +164,11 @@ class ProfileProtoBuilder {
     string unit;
   };
 
-  ProfileProtoBuilder(jvmtiEnv *jvmti_env,
-                      ProfileFrameCache *native_cache,
-                      int64 sampling_rate,
+  // Create the profile proto builder, if native_cache is nullptr, then no
+  // information about native frames can be provided. The proto buffer will then
+  // contain "Unknown native method" frames.
+  ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
+                      ProfileFrameCache *native_cache, int64 sampling_rate,
                       const SampleType &count_type,
                       const SampleType &metric_type);
 
@@ -166,6 +184,7 @@ class ProfileProtoBuilder {
   std::unique_ptr<perftools::profiles::Profile> CreateSampledProto();
 
   perftools::profiles::Builder builder_;
+  int64 sampling_rate_ = 0;
 
  private:
   // Track progress through a stack as we traverse it, in order to determine
@@ -207,28 +226,28 @@ class ProfileProtoBuilder {
 
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
-  void InitSampleValues(perftools::profiles::Sample *sample, jint metric);
-  void InitSampleValues(perftools::profiles::Sample *sample, jint count,
-                        jint metric);
-  void UpdateSampleValues(perftools::profiles::Sample *sample, jint count,
-                          jint size);
+  void InitSampleValues(perftools::profiles::Sample *sample, int64 metric);
+  void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
+                        int64 metric);
+  void UpdateSampleValues(perftools::profiles::Sample *sample, int64 count,
+                          int64 size);
   void AddTrace(const ProfileStackTrace &trace, int32 count);
-  void AddJavaInfo(const google::javaprofiler::JVMPI_CallFrame &jvm_frame,
+  void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
                    perftools::profiles::Profile *profile,
                    perftools::profiles::Sample *sample,
                    StackState *stack_state);
-  void AddNativeInfo(const google::javaprofiler::JVMPI_CallFrame &jvm_frame,
+  void AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                      perftools::profiles::Profile *profile,
                      perftools::profiles::Sample *sample,
                      StackState *stack_state);
   void UnsampleMetrics();
 
+  JNIEnv *jni_env_;
   jvmtiEnv *jvmti_env_;
 
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;
-  int64 sampling_rate_ = 0;
 };
 
 // Computes the ratio to use to scale heap data to unsample it.
@@ -241,13 +260,12 @@ double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value);
 
 class CpuProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  CpuProfileProtoBuilder(jvmtiEnv *jvmti_env,
-                         int64 sampling_rate,
-                         ProfileFrameCache *cache)
-      : ProfileProtoBuilder(jvmti_env, cache, sampling_rate,
-                            ProfileProtoBuilder::SampleType("samples", "count"),
-                            ProfileProtoBuilder::SampleType("cpu",
-                                                            "nanoseconds")) {
+  CpuProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+                         int64 sampling_rate, ProfileFrameCache *cache)
+      : ProfileProtoBuilder(
+            jni_env, jvmti_env, cache, sampling_rate,
+            ProfileProtoBuilder::SampleType("samples", "count"),
+            ProfileProtoBuilder::SampleType("cpu", "nanoseconds")) {
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 
@@ -261,52 +279,83 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
 
 class HeapProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  HeapProfileProtoBuilder(jvmtiEnv *jvmti_env,
-                          int64 sampling_rate,
-                          ProfileFrameCache *cache)
-      : ProfileProtoBuilder(jvmti_env, cache, sampling_rate,
-                            ProfileProtoBuilder::SampleType("inuse_objects",
-                                                            "count"),
-                            ProfileProtoBuilder::SampleType("inuse_space",
-                                                            "bytes")) {
-  }
+  HeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+                          int64 sampling_rate, ProfileFrameCache *cache)
+      : ProfileProtoBuilder(
+            jni_env, jvmti_env, cache, sampling_rate,
+            ProfileProtoBuilder::SampleType("inuse_objects", "count"),
+            ProfileProtoBuilder::SampleType("inuse_space", "bytes")) {}
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateUnsampledProto();
   }
 
  protected:
+  // Depending on the JDK or how we got the frames (e.g. internal JVM or
+  // JVMTI), we might have native frames on top of the Java frames
+  // (basically where the JVM internally allocated the object).
+  // Returns the first Java frame index or 0 if none were found.
   int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override {
-    for (int i = 0; i < trace.num_frames; ++i) {
-      if (trace.frames[i].lineno !=
-          google::javaprofiler::kNativeFrameLineNum) {
+    // Skip until we see the first Java frame.
+    for (int i = 0; i < trace.num_frames; i++) {
+      if (trace.frames[i].lineno != kNativeFrameLineNum) {
         return i;
       }
     }
 
-    return trace.num_frames;
+    // All are native is weird for Java heap samples but do nothing in this
+    // case.
+    return 0;
+  }
+};
+
+class NativeHeapProfileProtoBuilder : public HeapProfileProtoBuilder {
+ public:
+  NativeHeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+                                int64 sampling_rate, ProfileFrameCache *cache)
+      : HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache) {}
+
+ protected:
+  // In cases of long native frames, we really only want to skip the
+  // frames_to_skip first frames, which would be something akin to:
+  //   absl::base_internal::MallocHook::InvokeNewHookSlow
+  //   absl::base_internal::MallocHook::InvokeNewHook
+  //   calloc
+  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override {
+    // If frames_to_skip changes, change the number of frames checked against
+    // kNativeFrameLineNum below to check the correct number of frames.
+    const int frames_to_skip = 3;
+    return (trace.num_frames >= frames_to_skip
+            && trace.frames[0].lineno == kNativeFrameLineNum
+            && trace.frames[1].lineno == kNativeFrameLineNum
+            && trace.frames[2].lineno == kNativeFrameLineNum)
+        ? frames_to_skip : 0;
   }
 };
 
 class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  ContentionProfileProtoBuilder(jvmtiEnv *jvmti_env,
-                                int64 sampling_rate,
-                                ProfileFrameCache *cache)
-      : ProfileProtoBuilder(jvmti_env, cache, sampling_rate,
-                            ProfileProtoBuilder::SampleType("contentions",
-                                                            "count"),
-                            ProfileProtoBuilder::SampleType("delay",
-                                                            "microseconds")) {
+  ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+                                int64 sampling_rate, ProfileFrameCache *cache)
+      : ProfileProtoBuilder(
+            jni_env, jvmti_env, cache, sampling_rate,
+            ProfileProtoBuilder::SampleType("contentions", "count"),
+            ProfileProtoBuilder::SampleType("delay", "microseconds")) {
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() {
-    return CreateSampledProto();
+    MultiplyBySamplingRate();
+    builder_.Finalize();
+    return std::unique_ptr<perftools::profiles::Profile>(builder_.Consume());
   }
 
  protected:
   int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override { return 0; }
+
+ private:
+  // Multiply the (count, metric) values by the sampling_rate.
+  void MultiplyBySamplingRate();
 };
 
 }  // namespace javaprofiler

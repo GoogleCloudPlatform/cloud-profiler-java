@@ -17,7 +17,9 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 #define CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 
+#include <atomic>
 #include <memory>
+#include <mutex>  // NOLINT
 #include <random>
 #include <vector>
 
@@ -25,7 +27,6 @@
 #include "src/cloud_env.h"
 #include "src/throttler.h"
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
-
 #include "grpcpp/client_context.h"
 #include "grpcpp/support/status.h"
 
@@ -52,12 +53,16 @@ class APIThrottler : public Throttler {
   string ProfileType() override;
   int64_t DurationNanos() override;
   bool Upload(string profile) override;
+  void Close() override;
 
  private:
   // Takes a backoff on profile creation error. The backoff duration
   // may be specified by the server. Otherwise it will be a randomized
   // exponentially increasing value, bounded by kMaxBackoffNanos.
-  void OnCreationError(const grpc::ClientContext& ctx, const grpc::Status& st);
+  void OnCreationError(const grpc::Status& st);
+
+  // Resets the client gRPC context for the next call.
+  void ResetClientContext();
 
  private:
   CloudEnv* env_;
@@ -72,7 +77,17 @@ class APIThrottler : public Throttler {
   int64_t creation_backoff_envelope_ns_;
   std::default_random_engine gen_;
   std::uniform_int_distribution<int64_t> dist_;
+
+  // The throttler is closing, cancel ongoing and future requests.
+  std::atomic<bool> closed_;
+  std::mutex ctx_mutex_;
+  std::unique_ptr<grpc::ClientContext> ctx_;
 };
+
+// Returns true if the service name matches the regex
+// "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
+// Public for testing.
+bool IsValidServiceName(string service);
 
 }  // namespace profiler
 }  // namespace cloud

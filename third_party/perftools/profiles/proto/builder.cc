@@ -18,10 +18,11 @@
 #include <unistd.h>
 
 #include <map>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include <unordered_map>
+#include <unordered_set>
 #include "glog/logging.h"
 #include "google/protobuf/io/gzip_stream.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
@@ -30,6 +31,13 @@ using google::protobuf::io::StringOutputStream;
 using google::protobuf::io::GzipOutputStream;
 using google::protobuf::io::FileOutputStream;
 using google::protobuf::RepeatedField;
+
+namespace perftools {
+namespace profiles {
+typedef std::unordered_map<uint64, uint64> IndexMap;
+typedef std::unordered_set<uint64> IndexSet;
+}  // namespace profiles
+}  // namespace perftools
 
 namespace perftools {
 namespace profiles {
@@ -60,7 +68,8 @@ uint64 Builder::FunctionId(const char *name, const char *system_name,
   int64 system_name_index = StringId(system_name);
   int64 file_index = StringId(file);
 
-  Function fn(name_index, system_name_index, file_index, start_line);
+  auto fn =
+      std::make_tuple(name_index, system_name_index, file_index, start_line);
 
   int64 index = profile_->function_size() + 1;
   const auto inserted = functions_.insert(std::make_pair(fn, index));
@@ -122,7 +131,8 @@ bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
 // Returns a bool indicating if the profile is valid. It logs any
 // errors it encounters.
 bool Builder::CheckValid(const Profile &profile) {
-  std::unordered_set<uint64> mapping_ids;
+  IndexSet mapping_ids;
+  mapping_ids.reserve(profile.mapping_size());
   for (const auto &mapping : profile.mapping()) {
     const int64 id = mapping.id();
     if (id != 0) {
@@ -134,7 +144,8 @@ bool Builder::CheckValid(const Profile &profile) {
     }
   }
 
-  std::unordered_set<uint64> function_ids;
+  IndexSet function_ids;
+  function_ids.reserve(profile.function_size());
   for (const auto &function : profile.function()) {
     const int64 id = function.id();
     if (id != 0) {
@@ -146,7 +157,8 @@ bool Builder::CheckValid(const Profile &profile) {
     }
   }
 
-  std::unordered_set<uint64> location_ids;
+  IndexSet location_ids;
+  location_ids.reserve(profile.location_size());
   for (const auto &location : profile.location()) {
     const int64 id = location.id();
     if (id != 0) {
@@ -211,7 +223,8 @@ bool Builder::CheckValid(const Profile &profile) {
 // - Associates locations to the corresponding mappings.
 bool Builder::Finalize() {
   if (profile_->location_size() == 0) {
-    std::unordered_map<uint64, uint64> address_to_id;
+    IndexMap address_to_id;
+    address_to_id.reserve(profile_->sample_size());
     for (auto &sample : *profile_->mutable_sample()) {
       // Copy sample locations into a temp vector, and then clear and
       // repopulate it with the corresponding location IDs.

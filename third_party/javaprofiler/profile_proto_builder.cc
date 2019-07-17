@@ -24,13 +24,16 @@ namespace javaprofiler {
 const int kCount = 0;
 const int kMetric = 1;
 
-ProfileProtoBuilder::ProfileProtoBuilder(jvmtiEnv *jvmti_env,
+ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                                          ProfileFrameCache *native_cache,
                                          int64 sampling_rate,
                                          const SampleType &count_type,
                                          const SampleType &metric_type)
-    : jvmti_env_(jvmti_env), native_cache_(native_cache),
-    location_builder_(&builder_), sampling_rate_(sampling_rate) {
+    : sampling_rate_(sampling_rate),
+      jni_env_(jni_env),
+      jvmti_env_(jvmti_env),
+      native_cache_(native_cache),
+      location_builder_(&builder_) {
   AddSampleType(count_type);
   AddSampleType(metric_type);
   SetPeriodType(metric_type);
@@ -38,7 +41,9 @@ ProfileProtoBuilder::ProfileProtoBuilder(jvmtiEnv *jvmti_env,
 
 void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
                                     int num_traces) {
-  native_cache_->ProcessTraces(traces, num_traces);
+  if (native_cache_) {
+    native_cache_->ProcessTraces(traces, num_traces);
+  }
 
   for (int i = 0; i < num_traces; ++i) {
     AddTrace(traces[i], 1);
@@ -48,7 +53,9 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
 void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
                                     const int32 *counts,
                                     int num_traces) {
-  native_cache_->ProcessTraces(traces, num_traces);
+  if (native_cache_) {
+    native_cache_->ProcessTraces(traces, num_traces);
+  }
 
   for (int i = 0; i < num_traces; ++i) {
     AddTrace(traces[i], counts[i]);
@@ -63,7 +70,8 @@ void ProfileProtoBuilder::AddArtificialTrace(const string& name, int count,
   auto profile = builder_.mutable_profile();
   auto sample = profile->add_sample();
   sample->add_location_id(location->id());
-  InitSampleValues(sample, count, count * sampling_rate);
+  // Move count * sampling rate to 64-bit.
+  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate);
 }
 
 void ProfileProtoBuilder::UnsampleMetrics() {
@@ -107,18 +115,18 @@ void ProfileProtoBuilder::SetPeriodType(const SampleType &metric_type) {
 }
 
 void ProfileProtoBuilder::UpdateSampleValues(
-    perftools::profiles::Sample *sample, jint count, jint size) {
+    perftools::profiles::Sample *sample, int64 count, int64 size) {
   sample->set_value(kCount, sample->value(kCount) + count);
   sample->set_value(kMetric, sample->value(kMetric) + size);
 }
 
 void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, jint metric) {
+    perftools::profiles::Sample *sample, int64 metric) {
   InitSampleValues(sample, 1, metric);
 }
 
 void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, jint count, jint metric) {
+    perftools::profiles::Sample *sample, int64 count, int64 metric) {
   sample->add_value(count);
   sample->add_value(metric);
 }
@@ -155,7 +163,7 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &trace,
 }
 
 void ProfileProtoBuilder::AddJavaInfo(
-    const google::javaprofiler::JVMPI_CallFrame &jvm_frame,
+    const JVMPI_CallFrame &jvm_frame,
     perftools::profiles::Profile *profile,
     perftools::profiles::Sample *sample,
     StackState *stack_state) {
@@ -163,7 +171,7 @@ void ProfileProtoBuilder::AddJavaInfo(
 
   if (!jvm_frame.method_id) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "Unknown method", "", 0);
+        "", "[Unknown method]", "", 0);
     sample->add_location_id(location->id());
     return;
   }
@@ -173,12 +181,10 @@ void ProfileProtoBuilder::AddJavaInfo(
   string method_name;
   string signature;
   int line_number;
-  google::javaprofiler::GetStackFrameElements(jvmti_env_, jvm_frame,
-                                              &file_name, &class_name,
-                                              &method_name, &signature,
-                                              &line_number);
+  GetStackFrameElements(jni_env_, jvmti_env_, jvm_frame, &file_name,
+                        &class_name, &method_name, &signature, &line_number);
 
-  ::google::javaprofiler::FixMethodParameters(&signature);
+  FixMethodParameters(&signature);
   string full_method_name = class_name + "." + method_name + signature;
 
   perftools::profiles::Location *location = location_builder_.LocationFor(
@@ -187,11 +193,17 @@ void ProfileProtoBuilder::AddJavaInfo(
   sample->add_location_id(location->id());
 }
 
-void ProfileProtoBuilder::AddNativeInfo(
-    const google::javaprofiler::JVMPI_CallFrame &jvm_frame,
-    perftools::profiles::Profile *profile,
-    perftools::profiles::Sample *sample,
-    StackState *stack_state) {
+void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
+                                        perftools::profiles::Profile *profile,
+                                        perftools::profiles::Sample *sample,
+                                        StackState *stack_state) {
+  if (!native_cache_) {
+    perftools::profiles::Location *location = location_builder_.LocationFor(
+        "", "[Unknown non-Java frame]", "", 0);
+    sample->add_location_id(location->id());
+    return;
+  }
+
   string function_name = native_cache_->GetFunctionName(jvm_frame);
   perftools::profiles::Location *location =
     native_cache_->GetLocation(jvm_frame,
@@ -203,6 +215,21 @@ void ProfileProtoBuilder::AddNativeInfo(
   if (!stack_state->SkipFrame()) {
     location->set_address(reinterpret_cast<uint64>(jvm_frame.method_id));
     sample->add_location_id(location->id());
+  }
+}
+
+void ContentionProfileProtoBuilder::MultiplyBySamplingRate() {
+  auto profile = builder_.mutable_profile();
+
+  for (int i = 0; i < profile->sample_size(); ++i) {
+    auto sample = profile->mutable_sample(i);
+
+    auto count = sample->value(kCount);
+    auto metric_value = sample->value(kMetric);
+
+    sample->set_value(kCount, static_cast<double>(count) * sampling_rate_);
+    sample->set_value(kMetric,
+                      static_cast<double>(metric_value) * sampling_rate_);
   }
 }
 
@@ -251,9 +278,9 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   auto line = location->add_line();
 
-  // TODO: Handle library name etc too...
+  auto simplified_name = SimplifyFunctionName(function_name);
   auto function_id = builder_->FunctionId(
-      function_name.c_str(), "", file_name.c_str(), 0);
+      simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);
 
   line->set_function_id(function_id);
   line->set_line(line_number);
@@ -335,21 +362,38 @@ double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
-    jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache) {
-  return std::unique_ptr<ProfileProtoBuilder>(new HeapProfileProtoBuilder(
-      jvmti_env, sampling_rate, cache));
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+    ProfileFrameCache *cache) {
+  // Cache can be nullptr because the heap sampler can be using a JVMTI
+  // Java-only stackframe gatherer.
+  return std::unique_ptr<ProfileProtoBuilder>(
+      new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
+}
+
+std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForNativeHeap(
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+    ProfileFrameCache *cache) {
+  assert(cache != nullptr);
+  return std::unique_ptr<ProfileProtoBuilder>(new NativeHeapProfileProtoBuilder(
+      jni_env, jvmti_env, sampling_rate, cache));
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
-    jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache) {
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+    ProfileFrameCache *cache) {
+  CHECK (cache != nullptr)
+      << "CPU profiles may have native frames, cache must be provided";
   return std::unique_ptr<ProfileProtoBuilder>(
-      new CpuProfileProtoBuilder(jvmti_env, sampling_rate, cache));
+      new CpuProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
-    jvmtiEnv *jvmti_env, int64 sampling_rate, ProfileFrameCache *cache) {
-  return std::unique_ptr<ProfileProtoBuilder>(
-      new ContentionProfileProtoBuilder(jvmti_env, sampling_rate, cache));
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+    ProfileFrameCache *cache) {
+  CHECK (cache != nullptr)
+      << "Contention profiles may have native frames, cache must be provided";
+  return std::unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(
+      jni_env, jvmti_env, sampling_rate, cache));
 }
 
 }  // namespace javaprofiler

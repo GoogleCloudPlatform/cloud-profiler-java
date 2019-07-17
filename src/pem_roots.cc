@@ -973,29 +973,6 @@ JJUEeKgDu+6B5dpffItKoZB0JaezPkvILFa9x8jvOOJckvB595yEunQtYQEgfn7R
 
 # Note: "GlobalSign Root CA - R7" not added on purpose. It is P-521.
 
-# Operating CA: GlobalSign
-# Issuer: C=BE, O=GlobalSign nv-sa, OU=Root CA, CN=GlobalSign Root CA - R8
-# Subject: C=BE, O=GlobalSign nv-sa, OU=Root CA, CN=GlobalSign Root CA - R8
-# Label: "GlobalSign Root CA - R8"
-# Serial: 1462505469299036457243287072048861
-# MD5 Fingerprint: 26:15:db:de:38:b4:45:5e:19:3f:1b:57:af:53:2b:36
-# SHA1 Fingerprint: 62:01:ff:ce:4f:09:cd:c7:e0:2f:e1:10:f4:fd:67:f0:37:1a:2f:2a
-# SHA256 Fingerprint: ae:48:51:ff:42:03:9b:ad:e0:58:27:91:51:d8:26:83:04:1d:25:98:e2:40:68:3c:c5:6d:76:fb:8c:f5:3d:42
------BEGIN CERTIFICATE-----
-MIICMzCCAbmgAwIBAgIOSBtqCfT5YHE6/oHMht0wCgYIKoZIzj0EAwMwXDELMAkG
-A1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExEDAOBgNVBAsTB1Jv
-b3QgQ0ExIDAeBgNVBAMTF0dsb2JhbFNpZ24gUm9vdCBDQSAtIFI4MB4XDTE2MDYx
-NTAwMDAwMFoXDTM2MDYxNTAwMDAwMFowXDELMAkGA1UEBhMCQkUxGTAXBgNVBAoT
-EEdsb2JhbFNpZ24gbnYtc2ExEDAOBgNVBAsTB1Jvb3QgQ0ExIDAeBgNVBAMTF0ds
-b2JhbFNpZ24gUm9vdCBDQSAtIFI4MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEuO58
-MIfYlB9Ua22Ynfx1+1uIq0K6jX05ft1EPTk84QWhSmRgrDemc7D5yUVLCwbQOuDx
-bV/6XltaUrV240bb1R6MdHpCyUE1T8bU4ihgqzSKzrFAI0alrhkkUnyQVUTOo0Iw
-QDAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQULzoS
-JoDoisJQeG0GxDR+4kk5V3YwCgYIKoZIzj0EAwMDaAAwZQIxAMehPbKSkPrKXeAn
-hII7Icz0jfiUVvIgXxHArLxfFaULyBZDp/jFf40goH9e/BYcJwIwHoz1Vr8425zm
-pteEKebfDVMu6CsBt30JPLEyahqauArq6K0I8nQ51SsiNtzvRmbY
------END CERTIFICATE-----
-
 # Operating CA: GoDaddy
 # Issuer: CN=Go Daddy Root Certificate Authority - G2 O=GoDaddy.com, Inc.
 # Subject: CN=Go Daddy Root Certificate Authority - G2 O=GoDaddy.com, Inc.

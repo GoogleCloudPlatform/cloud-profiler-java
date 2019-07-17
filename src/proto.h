@@ -27,7 +27,8 @@ namespace profiler {
 // from a collection of java stack traces, symbolized using the jvmti.
 // Data in traces will be cleared.
 string SerializeAndClearJavaCpuTraces(
-    jvmtiEnv *jvmti, const google::javaprofiler::NativeProcessInfo &native_info,
+    JNIEnv *jni, jvmtiEnv *jvmti,
+    const google::javaprofiler::NativeProcessInfo &native_info,
     const char *profile_type, int64_t duration_nanos, int64_t period_nanos,
     google::javaprofiler::TraceMultiset *traces, int64_t unknown_count);
 

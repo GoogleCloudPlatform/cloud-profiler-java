@@ -27,6 +27,7 @@ namespace profiler {
 // Supported profile types.
 constexpr char kTypeCPU[] = "cpu";
 constexpr char kTypeWall[] = "wall";
+constexpr char kTypeHeap[] = "heap";
 
 // Iterator-like abstraction used to guide a profiling loop comprising of
 // waiting for when the next profile may be collected and saving its data once
@@ -60,6 +61,10 @@ class Throttler {
 
   // Upload the compressed profile proto bytes. Returns false on error.
   virtual bool Upload(string profile) = 0;
+
+  // Closes the throttler by trying to cancel WaitNext() / Upload() in flight.
+  // Those calls may return cancellation error. This method is thread-safe.
+  virtual void Close() = 0;
 };
 
 }  // namespace profiler

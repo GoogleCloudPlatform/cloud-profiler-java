@@ -17,8 +17,6 @@
 namespace google {
 namespace javaprofiler {
 
-__thread JNIEnv *Accessors::env_;
-__thread int64_t Accessors::attr_;
 ASGCTType Asgct::asgct_;
 
 std::mutex *AttributeTable::mutex_;
@@ -26,23 +24,23 @@ std::unordered_map<string, int> *AttributeTable::string_map_;
 std::vector<string> *AttributeTable::strings_;
 
 bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
-  uint64_t hash_val = CalculateHash(attr, trace->num_frames, &trace->frames[0]);
+  uint64 hash_val = CalculateHash(attr, trace->num_frames, &trace->frames[0]);
 
-  active_insertions_.fetch_add(1, std::memory_order_acquire);
-  for (int64_t i = 0; i < MaxEntries(); i++) {
-    int64_t idx = (i + hash_val) % MaxEntries();
+  for (int64 i = 0; i < MaxEntries(); i++) {
+    int64 idx = (i + hash_val) % MaxEntries();
     auto &entry = traces_[idx];
-    int64_t count_zero = 0;
-    int64_t count = entry.count.load(std::memory_order_acquire);
+    int64 count_zero = 0;
+    entry.active_updates.fetch_add(1, std::memory_order_acquire);
+    int64 count = entry.count.load(std::memory_order_acquire);
     switch (count) {
       case 0:
         if (entry.count.compare_exchange_weak(count_zero, kTraceCountLocked,
                                               std::memory_order_relaxed)) {
           // This entry is reserved, there is no danger of interacting
-          // with Extract, so decrement active_insertions early.
-          active_insertions_.fetch_add(-1, std::memory_order_release);
+          // with Extract, so decrement active_updates early.
+          entry.active_updates.fetch_sub(1, std::memory_order_release);
           // memcpy is not async safe
-          JVMPI_CallFrame *fb = frame_buffer_[idx];
+          JVMPI_CallFrame *fb = entry.frame_buffer;
           int num_frames = trace->num_frames;
           for (int frame_num = 0; frame_num < num_frames; ++frame_num) {
             fb[frame_num].lineno = trace->frames[frame_num].lineno;
@@ -51,7 +49,7 @@ bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
           entry.trace.frames = fb;
           entry.trace.num_frames = num_frames;
           entry.attr = attr;
-          entry.count.store(int64_t(1), std::memory_order_release);
+          entry.count.store(static_cast<int64>(1), std::memory_order_release);
           return true;
         }
         break;
@@ -70,25 +68,25 @@ bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
           if (count != kTraceCountLocked &&
               entry.count.compare_exchange_weak(count, count + 1,
                                                 std::memory_order_relaxed)) {
-            active_insertions_.fetch_add(-1, std::memory_order_release);
+            entry.active_updates.fetch_sub(1, std::memory_order_release);
             return true;
           }
         }
     }
+    // Did nothing, but we still need storage ordering between this
+    // store and preceding loads.
+    entry.active_updates.fetch_sub(1, std::memory_order_release);
   }
-  // Did nothing, but we still need storage ordering between this
-  // store and preceding loads.
-  active_insertions_.fetch_add(-1, std::memory_order_release);
   return false;
 }
 
-int AsyncSafeTraceMultiset::Extract(int location, int64_t *attr, int max_frames,
-                                    JVMPI_CallFrame *frames, int64_t *count) {
+int AsyncSafeTraceMultiset::Extract(int location, int64 *attr, int max_frames,
+                                    JVMPI_CallFrame *frames, int64 *count) {
   if (location < 0 || location >= MaxEntries()) {
     return 0;
   }
   auto &entry = traces_[location];
-  int64_t c = entry.count.load(std::memory_order_acquire);
+  int64 c = entry.count.load(std::memory_order_acquire);
   if (c <= 0) {
     // Unused or in process of being updated, skip for now.
     return 0;
@@ -101,22 +99,15 @@ int AsyncSafeTraceMultiset::Extract(int location, int64_t *attr, int max_frames,
   c = entry.count.exchange(kTraceCountLocked, std::memory_order_acquire);
 
   *attr = entry.attr;
-  bool all_quiet = false;
   for (int i = 0; i < num_frames; ++i) {
     frames[i].lineno = entry.trace.frames[i].lineno;
     frames[i].method_id = entry.trace.frames[i].method_id;
-    if (all_quiet == false &&
-        active_insertions_.load(std::memory_order_acquire) == 0) {
-      all_quiet = true;
-    }
   }
 
-  if (!all_quiet) {
-    while (active_insertions_.load(std::memory_order_acquire) != 0) {
-      // spin
-      // TODO: Introduce a limit to detect and break
-      // deadlock
-    }
+  while (entry.active_updates.load(std::memory_order_acquire) != 0) {
+    // spin
+    // TODO: Introduce a limit to detect and break
+    // deadlock
   }
 
   entry.count.store(0, std::memory_order_release);
@@ -124,8 +115,8 @@ int AsyncSafeTraceMultiset::Extract(int location, int64_t *attr, int max_frames,
   return num_frames;
 }
 
-void TraceMultiset::Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
-                        int64_t count) {
+void TraceMultiset::Add(int64 attr, int num_frames, JVMPI_CallFrame *frames,
+                        int64 count) {
   CallTrace t;
   t.attr = attr;
   t.frames = std::vector<JVMPI_CallFrame>(frames, frames + num_frames);
@@ -140,10 +131,10 @@ void TraceMultiset::Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
 
 int HarvestSamples(AsyncSafeTraceMultiset *from, TraceMultiset *to) {
   int trace_count = 0;
-  int64_t num_traces = from->MaxEntries();
-  for (int64_t i = 0; i < num_traces; i++) {
+  int64 num_traces = from->MaxEntries();
+  for (int64 i = 0; i < num_traces; i++) {
     JVMPI_CallFrame frame[kMaxFramesToCapture];
-    int64_t attr, count;
+    int64 attr, count;
 
     int num_frames =
         from->Extract(i, &attr, kMaxFramesToCapture, &frame[0], &count);
@@ -155,10 +146,10 @@ int HarvestSamples(AsyncSafeTraceMultiset *from, TraceMultiset *to) {
   return trace_count;
 }
 
-uint64_t CalculateHash(int64_t attr, int num_frames,
+uint64 CalculateHash(int64 attr, int num_frames,
                        const JVMPI_CallFrame *frame) {
   // Make hash-value
-  uint64_t h = attr;
+  uint64 h = attr;
   h += h << 10;
   h ^= h >> 6;
   for (int i = 0; i < num_frames; i++) {
