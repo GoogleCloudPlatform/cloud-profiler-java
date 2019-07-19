@@ -176,21 +176,59 @@ void ProfileProtoBuilder::AddJavaInfo(
     return;
   }
 
+  MethodInfo *method_info = Method(jvm_frame.method_id);
+  sample->add_location_id(Location(method_info, jvm_frame));
+}
+
+int64 ProfileProtoBuilder::Location(MethodInfo *method,
+                                       const JVMPI_CallFrame &frame) {
+  // lineno is actually the BCI of the frame.
+  int bci = frame.lineno;
+
+  int64 location_id = method->Location(bci);
+
+  // Non-zero as a location id is a valid location ID.
+  if (location_id != MethodInfo::kInvalidLocationId) {
+    return location_id;
+  }
+
+  int line_number = GetLineNumber(jvmti_env_, frame.method_id, bci);
+
+  perftools::profiles::Location *location =
+      location_builder_.LocationFor(method->ClassName(),
+                                    method->MethodName(),
+                                    method->FileName(),
+                                    line_number);
+
+  method->AddLocation(bci, location->id());
+  return location->id();
+}
+
+MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
+  auto it = methods_.find(method_id);
+  if (it != methods_.end()) {
+    return it->second.get();
+  }
+
   string file_name;
   string class_name;
   string method_name;
   string signature;
-  int line_number;
+
+  // Ignore lineno since we pass nullptr anyway.
+  JVMPI_CallFrame jvm_frame = { 0, method_id };
   GetStackFrameElements(jni_env_, jvmti_env_, jvm_frame, &file_name,
-                        &class_name, &method_name, &signature, &line_number);
+                        &class_name, &method_name, &signature, nullptr);
 
   FixMethodParameters(&signature);
   string full_method_name = class_name + "." + method_name + signature;
 
-  perftools::profiles::Location *location = location_builder_.LocationFor(
-      class_name, full_method_name, file_name, line_number);
+  std::unique_ptr<MethodInfo> unique_method(
+      new MethodInfo(full_method_name, class_name, file_name));
 
-  sample->add_location_id(location->id());
+  auto method_ptr = unique_method.get();
+  methods_[method_id] = std::move(unique_method);
+  return method_ptr;
 }
 
 void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,

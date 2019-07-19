@@ -69,6 +69,11 @@ class JvmProfileTestLib {
    * various threads in action.
    */
   static int GetMaxThreads();
+
+  // Various call counters for testing purposes.
+  static std::atomic<int> line_number_call_count;
+  static std::atomic<int> method_declaring_class_call_count;
+  static std::atomic<int> method_name_call_count;
 };
 
 }  // namespace javaprofiler

@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "perftools/profiles/proto/builder.h"
+#include "third_party/javaprofiler/method_info.h"
 #include "third_party/javaprofiler/stacktrace_decls.h"
 
 namespace google {
@@ -242,9 +243,25 @@ class ProfileProtoBuilder {
                      StackState *stack_state);
   void UnsampleMetrics();
 
+  MethodInfo *Method(jmethodID id);
+  int64 Location(MethodInfo *method, const JVMPI_CallFrame &frame);
+
   JNIEnv *jni_env_;
   jvmtiEnv *jvmti_env_;
 
+  // Caching jmethodID resolution:
+  //   - This allows a one-time calculation of a given jmethodID during proto
+  //     creation.
+  //   - The cache reduces the number of JVMTI calls to symbolize the stacks.
+  //   - jmethodIDs are never invalid per se or re-used: if ever the jmethodID's
+  //     class is unloaded, the JVMTI calls will return an error code that
+  //     caught by the various JVMTI calls done.
+  // Though it would theoretically be possible to cache the jmethodID for the
+  // lifetime of the program, this just implementation keeps the cache live
+  // during this proto creation. The reason is that jmethodIDs might become
+  // stale/unloaded and there would need to be extra work to determine
+  // cache-size management.
+  std::unordered_map<jmethodID, std::unique_ptr<MethodInfo>> methods_;
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;

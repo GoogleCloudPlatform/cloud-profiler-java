@@ -76,6 +76,7 @@ JAVAPROFILER_LIB_SOURCES = \
 	$(JAVAPROFILER_LIB_PATH)/clock.cc \
 	$(JAVAPROFILER_LIB_PATH)/display.cc \
 	$(JAVAPROFILER_LIB_PATH)/heap_sampler.cc \
+	$(JAVAPROFILER_LIB_PATH)/method_info.cc \
 	$(JAVAPROFILER_LIB_PATH)/native.cc \
 	$(JAVAPROFILER_LIB_PATH)/profile_proto_builder.cc \
 	$(JAVAPROFILER_LIB_PATH)/stacktrace_fixer.cc \
@@ -88,6 +89,7 @@ JAVAPROFILER_LIB_HEADERS = \
 	$(JAVAPROFILER_LIB_PATH)/async_ref_counted_string.h \
 	$(JAVAPROFILER_LIB_PATH)/heap_sampler.h \
 	$(JAVAPROFILER_LIB_PATH)/jvmti_error.h \
+	$(JAVAPROFILER_LIB_PATH)/method_info.h \
 	$(JAVAPROFILER_LIB_PATH)/profile_proto_builder.h \
 	$(JAVAPROFILER_LIB_PATH)/stacktrace_decls.h \
 	$(JAVAPROFILER_LIB_PATH)/stacktraces.h \

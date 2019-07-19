@@ -19,6 +19,10 @@
 namespace google {
 namespace javaprofiler {
 
+std::atomic<int> JvmProfileTestLib::line_number_call_count;
+std::atomic<int> JvmProfileTestLib::method_declaring_class_call_count;
+std::atomic<int> JvmProfileTestLib::method_name_call_count;
+
 static jvmtiError Allocate(jvmtiEnv* jvmti,
                            jlong size,
                            unsigned char** mem_ptr) {
@@ -43,6 +47,8 @@ static void CreateJvmtiString(jvmtiEnv* jvmti,
 static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
                                 char** name_str, char** sig_str,
                                 char** gsig_str) {
+  JvmProfileTestLib::method_name_call_count++;
+
   switch (reinterpret_cast<uint64>(method_id)) {
     case 1:
       CreateJvmtiString(jvmti, "methodName", name_str);
@@ -91,6 +97,7 @@ static jvmtiError GetClassSignature(jvmtiEnv* jvmti, jclass declaring_class,
 
 static jvmtiError GetMethodDeclaringClass(jvmtiEnv *env, jmethodID method,
                                           jclass *declaring_class) {
+  JvmProfileTestLib::method_declaring_class_call_count++;
   *declaring_class = reinterpret_cast<jclass>(method);
   return JVMTI_ERROR_NONE;
 }
@@ -130,6 +137,8 @@ static jvmtiLineNumberEntry fake_line_number_table[] = {
 static jvmtiError GetLineNumberTable(jvmtiEnv *env, jmethodID method,
                                      jint *entry_count_ptr,
                                      jvmtiLineNumberEntry **table_ptr) {
+  JvmProfileTestLib::line_number_call_count++;
+
   size_t table_size = arraysize(fake_line_number_table) *
       sizeof(jvmtiLineNumberEntry);
   env->Allocate(table_size, reinterpret_cast<unsigned char**>(table_ptr));
