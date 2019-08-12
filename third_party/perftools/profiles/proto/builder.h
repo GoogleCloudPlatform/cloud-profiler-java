@@ -16,6 +16,7 @@
 #define PERFTOOLS_PROFILES_PROTO_BUILDER_H_
 
 #include <stddef.h>
+
 #include <algorithm>
 #include <memory>
 #include <string>
