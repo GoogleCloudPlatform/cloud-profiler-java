@@ -400,7 +400,9 @@ void APIThrottler::ResetClientContext() {
 void APIThrottler::Close() {
   std::lock_guard<std::mutex> lock(ctx_mutex_);
   closed_ = true;
-  ctx_->TryCancel();
+  if (ctx_) {
+    ctx_->TryCancel();
+  }
 }
 
 }  // namespace profiler
