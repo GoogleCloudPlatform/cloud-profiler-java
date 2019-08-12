@@ -46,16 +46,16 @@ class TraceSamples {
 
  private:
   struct TraceHash {
-    size_t operator()(const JVMPI_CallTrace &trace) const;
+    size_t operator()(const JVMPI_CallTrace *trace) const;
   };
 
   struct TraceEquals {
-    bool operator()(const JVMPI_CallTrace &trace1,
-                    const JVMPI_CallTrace &trace2) const;
+    bool operator()(const JVMPI_CallTrace *trace1,
+                    const JVMPI_CallTrace *trace2) const;
   };
 
-  std::unordered_map<JVMPI_CallTrace, perftools::profiles::Sample *, TraceHash,
-      TraceEquals> traces_;
+  std::unordered_map<const JVMPI_CallTrace *, perftools::profiles::Sample *,
+      TraceHash, TraceEquals> traces_;
 };
 
 // Store locations previously seen so that the profile is only
@@ -115,11 +115,13 @@ class ProfileProtoBuilder {
  public:
   virtual ~ProfileProtoBuilder() {}
 
-  // Add traces to the proto. The elements of the array are copied over.
+  // Add traces to the proto. The traces array must not be deleted
+  // before calling CreateProto.
   void AddTraces(const ProfileStackTrace *traces, int num_traces);
 
   // Add traces to the proto, where each trace has a defined count
-  // of occurrences. The elements of the arrays are copied over.
+  // of occurrences. The traces array must not be deleted
+  // before calling CreateProto.
   void AddTraces(const ProfileStackTrace *traces,
                  const int32 *counts,
                  int num_traces);

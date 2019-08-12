@@ -83,13 +83,18 @@ class HeapEventStorage {
                     std::unique_ptr<std::vector<JVMPI_CallFrame>> frames)
         : object_(object), size_(size), frames_(std::move(frames)) {}
 
-    void AddToProto(const std::unique_ptr<ProfileProtoBuilder> &builder);
+    std::vector<JVMPI_CallFrame> *Frames() const {
+      return frames_.get();
+    }
+
+    int Size() const {
+      return size_;
+    }
 
     void DeleteWeakReference(JNIEnv* env) {
       env->DeleteWeakGlobalRef(object_);
       object_ = nullptr;
     }
-
 
     bool IsLive(JNIEnv *env) {
       // When GC collects the object, the object represented by the weak
@@ -106,6 +111,10 @@ class HeapEventStorage {
     int size_;
     std::unique_ptr<std::vector<JVMPI_CallFrame>> frames_;
   };
+
+  static std::unique_ptr<perftools::profiles::Profile> ConvertToProto(
+    ProfileProtoBuilder *builder,
+    const std::vector<std::unique_ptr<HeapObjectTrace>> &objects);
 
   std::unique_ptr<perftools::profiles::Profile> GetProfiles(
       JNIEnv* env, int sampling_interval, bool force_gc, bool get_live);

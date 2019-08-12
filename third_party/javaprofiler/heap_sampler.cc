@@ -62,14 +62,6 @@ HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
       jvmti_(jvmti), cache_(cache) {
 }
 
-void HeapEventStorage::HeapObjectTrace::AddToProto(
-    const std::unique_ptr<ProfileProtoBuilder> &builder) {
-  JVMPI_CallTrace call_trace{nullptr, static_cast<int>(frames_->size()),
-                             frames_->data()};
-  ProfileStackTrace trace = {&call_trace, size_};
-  builder->AddTraces(&trace, 1);
-}
-
 void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
                            jclass klass, jlong size) {
   const int kMaxFrames = 128;
@@ -133,6 +125,33 @@ void HeapEventStorage::CompactSamples(JNIEnv *env) {
   newly_allocated_objects_.clear();
 }
 
+std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::ConvertToProto(
+    ProfileProtoBuilder *builder,
+    const std::vector<std::unique_ptr<HeapObjectTrace>> &objects) {
+
+  std::size_t objects_size = objects.size();
+
+  std::unique_ptr<google::javaprofiler::ProfileStackTrace[]> stack_trace_data(
+      new google::javaprofiler::ProfileStackTrace[objects_size]);
+
+  std::unique_ptr<JVMPI_CallTrace[]> call_trace_data(
+      new JVMPI_CallTrace[objects_size]);
+
+  for (int i = 0; i < objects_size; ++i) {
+    auto *object = objects[i].get();
+    auto *call_target = call_trace_data.get() + i;
+    auto *trace_target = stack_trace_data.get() + i;
+
+    auto *frames = object->Frames();
+    *call_target = {nullptr, static_cast<int>(frames->size()), frames->data()};
+    *trace_target = {call_target, object->Size()};
+  }
+
+  builder->AddTraces(stack_trace_data.get(), objects_size);
+
+  return builder->CreateProto();
+}
+
 std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::GetProfiles(
     JNIEnv *env, int sampling_interval, bool force_gc, bool get_live) {
   auto builder =
@@ -151,16 +170,11 @@ std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::GetProfiles(
     std::lock_guard<std::mutex> lock(storage_lock_);
 
     if (get_live) {
-      for (auto &elem : live_objects_) {
-        elem->AddToProto(builder);
-      }
-    } else {
-      for (auto &elem : garbage_objects_) {
-        elem->AddToProto(builder);
-      }
+      return ConvertToProto(builder.get(), live_objects_);
     }
+
+    return ConvertToProto(builder.get(), garbage_objects_);
   }
-  return builder->CreateProto();
 }
 
 bool HeapMonitor::CreateGCWaitingThread(jvmtiEnv* jvmti, JNIEnv* jni) {

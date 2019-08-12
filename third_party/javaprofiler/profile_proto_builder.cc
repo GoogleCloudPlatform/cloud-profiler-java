@@ -326,19 +326,19 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
   return location;
 }
 
-size_t TraceSamples::TraceHash::operator()(const JVMPI_CallTrace &trace) const {
+size_t TraceSamples::TraceHash::operator()(const JVMPI_CallTrace *trace) const {
   unsigned int h = 1;
-  for (int f = 0; f < trace.num_frames; f++) {
+  for (int f = 0; f < trace->num_frames; f++) {
     {
       int len = sizeof(jint);
-      char *arr = reinterpret_cast<char *>(&trace.frames[f].lineno);
+      char *arr = reinterpret_cast<char *>(&trace->frames[f].lineno);
       for (int i = 0; i < len; i++) {
         h = 31U * h + arr[i];
       }
     }
     {
       int len = sizeof(jmethodID);
-      char *arr = reinterpret_cast<char *>(&trace.frames[f].method_id);
+      char *arr = reinterpret_cast<char *>(&trace->frames[f].method_id);
       for (int i = 0; i < len; i++) {
         h = 31U * h + arr[i];
       }
@@ -348,17 +348,17 @@ size_t TraceSamples::TraceHash::operator()(const JVMPI_CallTrace &trace) const {
 }
 
 bool TraceSamples::TraceEquals::operator()(
-    const JVMPI_CallTrace &trace1, const JVMPI_CallTrace &trace2) const {
-  if (trace1.num_frames != trace2.num_frames) {
+    const JVMPI_CallTrace *trace1, const JVMPI_CallTrace *trace2) const {
+  if (trace1->num_frames != trace2->num_frames) {
     return false;
   }
 
-  for (int i = 0; i < trace1.num_frames; ++i) {
-    if (trace1.frames[i].method_id != trace2.frames[i].method_id) {
+  for (int i = 0; i < trace1->num_frames; ++i) {
+    if (trace1->frames[i].method_id != trace2->frames[i].method_id) {
       return false;
     }
 
-    if (trace1.frames[i].lineno != trace2.frames[i].lineno) {
+    if (trace1->frames[i].lineno != trace2->frames[i].lineno) {
       return false;
     }
   }
@@ -368,7 +368,7 @@ bool TraceSamples::TraceEquals::operator()(
 
 perftools::profiles::Sample *TraceSamples::SampleFor(
     const JVMPI_CallTrace &trace) const {
-  auto found = traces_.find(trace);
+  auto found = traces_.find(&trace);
   if (found == traces_.end()) {
     return nullptr;
   }
@@ -378,7 +378,7 @@ perftools::profiles::Sample *TraceSamples::SampleFor(
 
 void TraceSamples::Add(const JVMPI_CallTrace &trace,
                        perftools::profiles::Sample *sample) {
-  traces_[trace] = sample;
+  traces_[&trace] = sample;
 }
 
 double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
