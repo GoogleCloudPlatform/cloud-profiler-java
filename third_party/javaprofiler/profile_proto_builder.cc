@@ -316,7 +316,8 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   auto line = location->add_line();
 
-  auto simplified_name = SimplifyFunctionName(function_name);
+  string simplified_name = function_name;
+  SimplifyFunctionName(&simplified_name);
   auto function_id = builder_->FunctionId(
       simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);
 

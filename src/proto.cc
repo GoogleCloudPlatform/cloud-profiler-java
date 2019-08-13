@@ -189,8 +189,8 @@ uint64_t ProfileProtoBuilder::LocationID(const string &class_name,
     frame_name += signature;
   }
 
-  const string simplified_name =
-      ::google::javaprofiler::SimplifyFunctionName(frame_name);
+  string simplified_name = frame_name;
+  ::google::javaprofiler::SimplifyFunctionName(&simplified_name);
 
   uint64_t function_id = builder_.FunctionId(
       simplified_name.c_str(), frame_name.c_str(), file_name.c_str(), 0);

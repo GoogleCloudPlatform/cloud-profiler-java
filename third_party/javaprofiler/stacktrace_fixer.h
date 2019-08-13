@@ -26,7 +26,7 @@ namespace google {
 namespace javaprofiler {
   // Simplifies the name of a function to make it more human readable, and group
   // related functions under a single name.
-  string SimplifyFunctionName(const string& name);
+  void SimplifyFunctionName(string *name);
 
   // Fix the parameter signature from a JVM type signature to a pretty-print
   // one.
