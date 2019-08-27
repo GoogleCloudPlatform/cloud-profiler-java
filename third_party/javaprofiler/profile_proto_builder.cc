@@ -383,11 +383,7 @@ void TraceSamples::Add(const JVMPI_CallTrace &trace,
 }
 
 double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
-  if (rate <= 1) {
-    return 1.0;
-  }
-
-  if (count < 1) {
+  if (rate <= 1 || count < 1 || metric_value < 1) {
     return 1.0;
   }
 
