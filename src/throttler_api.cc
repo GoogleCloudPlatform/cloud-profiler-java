@@ -19,20 +19,18 @@
 
 #include "src/clock.h"
 #include "src/cloud_env.h"
+#include "src/globals.h"
 #include "src/pem_roots.h"
 #include "src/string.h"
-
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "google/protobuf/duration.pb.h"  // NOLINT
 #include "google/rpc/error_details.pb.h"  // NOLINT
-
 #include "grpc/grpc_security.h"
 #include "grpc/support/log.h"
 #include "grpc/support/string_util.h"
 #include "grpcpp/create_channel.h"
 #include "grpcpp/security/credentials.h"
 #include "grpcpp/support/channel_arguments.h"
-
 #include "third_party/javaprofiler/heap_sampler.h"
 
 // API curated profiling configuration.
@@ -112,7 +110,13 @@ NewProfilerServiceStub(const string& addr) {
       return nullptr;
     }
   }
-  std::shared_ptr<grpc::ChannelInterface> ch = grpc::CreateChannel(addr, creds);
+
+  grpc::ChannelArguments channel_arguments;
+  channel_arguments.SetUserAgentPrefix(
+      "gcloud-java-profiler/" + std::string(CLOUD_PROFILER_AGENT_VERSION));
+
+  std::shared_ptr<grpc::ChannelInterface> ch =
+      grpc::CreateCustomChannel(addr, creds, channel_arguments);
   if (ch == nullptr) {
     LOG(ERROR) << "Failed to create gRPC channel";
     return nullptr;
@@ -392,6 +396,9 @@ void APIThrottler::OnCreationError(const grpc::Status& st) {
 void APIThrottler::ResetClientContext() {
   std::lock_guard<std::mutex> lock(ctx_mutex_);
   ctx_.reset(new grpc::ClientContext());  // NOLINT
+  ctx_->AddMetadata("x-goog-api-client",
+                    "gccl/" + std::string(CLOUD_PROFILER_AGENT_VERSION));
+
   if (closed_) {
     ctx_->TryCancel();
   }

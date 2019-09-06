@@ -27,6 +27,10 @@
 #include "third_party/javaprofiler/jvmti_error.h"
 #include "third_party/javaprofiler/stacktraces.h"
 
+#ifndef CLOUD_PROFILER_AGENT_VERSION
+#define CLOUD_PROFILER_AGENT_VERSION "unknown"
+#endif
+
 #include <glog/logging.h>
 
 #include <string>

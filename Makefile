@@ -31,6 +31,10 @@ CFLAGS = \
 	-D_GNU_SOURCE \
 	-DENABLE_HEAP_SAMPLING
 
+ifneq ($(AGENT_VERSION),)
+  CFLAGS += -DCLOUD_PROFILER_AGENT_VERSION=\"$(AGENT_VERSION)\"
+endif
+
 SRC_ROOT_PATH=.
 
 JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64

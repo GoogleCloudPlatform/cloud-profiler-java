@@ -16,6 +16,7 @@
 
 #include <string>
 
+#include "src/globals.h"
 #include "src/string.h"
 #include "src/worker.h"
 #include "third_party/javaprofiler/accessors.h"
@@ -265,8 +266,10 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   jvmtiEnv *jvmti;
 
   ParseArguments(options);  // Initializes logger -- do not log before this call
-  LOG(INFO) << "Profiler agent loaded";
 
+  LOG(INFO) << "Stackdriver Profiler Java agent version: "
+            << CLOUD_PROFILER_AGENT_VERSION;
+  LOG(INFO) << "Profiler agent loaded";
   google::javaprofiler::AttributeTable::Init();
 
   // Try to get the latest JVMTI_VERSION the agent was built with.
