@@ -33,21 +33,21 @@ class HTTPRequest {
   HTTPRequest();
   virtual ~HTTPRequest();
 
-  virtual void AddAuthBearerHeader(const string& token);
-  virtual void AddContentTypeHeader(const string& content_type);
-  virtual void AddHeader(const string& name, const string& value);
+  virtual void AddAuthBearerHeader(const std::string& token);
+  virtual void AddContentTypeHeader(const std::string& content_type);
+  virtual void AddHeader(const std::string& name, const std::string& value);
   virtual void SetTimeout(int timeout_sec);
 
-  virtual bool DoGet(const string& url, string *data);
-  virtual bool DoPut(const string& url, const string& data);
+  virtual bool DoGet(const std::string& url, std::string* data);
+  virtual bool DoPut(const std::string& url, const std::string& data);
 
   virtual int GetResponseCode();
 
  private:
-  bool DoRequest(const string& url);
+  bool DoRequest(const std::string& url);
 
-  static size_t ResponseCallback(void *contents, size_t size, size_t nmemb,
-                                 string *resp);
+  static size_t ResponseCallback(void* contents, size_t size, size_t nmemb,
+                                 std::string* resp);
 
   CURL* curl_;
   struct curl_slist* headers_;

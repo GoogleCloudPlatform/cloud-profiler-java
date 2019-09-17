@@ -19,26 +19,27 @@
 namespace cloud {
 namespace profiler {
 
-std::vector<string> Split(const string& s, char sp) {
+std::vector<std::string> Split(const std::string& s, char sp) {
   std::stringstream ss(s);
-  string cur;
-  std::vector<string> ret;
+  std::string cur;
+  std::vector<std::string> ret;
   while (std::getline(ss, cur, sp)) {
     ret.push_back(std::move(cur));
   }
   return ret;
 }
 
-bool ParseKeyValueList(const string& s, std::map<string, string>* out) {
+bool ParseKeyValueList(const std::string& s,
+                       std::map<std::string, std::string>* out) {
   if (out == nullptr) {
     return false;
   }
-  for (const string& kv : Split(s, ',')) {
+  for (const std::string& kv : Split(s, ',')) {
     size_t pos = kv.find_first_of('=');
-    if (pos == 0 || pos == string::npos) {
+    if (pos == 0 || pos == std::string::npos) {
       return false;
     }
-    string k = kv.substr(0, pos);
+    std::string k = kv.substr(0, pos);
     if (k.empty()) {
       return false;
     }

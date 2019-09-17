@@ -72,8 +72,8 @@ void Worker::Stop() {
 
 namespace {
 
-string Collect(Profiler *p, JNIEnv *env,
-               google::javaprofiler::NativeProcessInfo *native_info) {
+std::string Collect(Profiler *p, JNIEnv *env,
+                    google::javaprofiler::NativeProcessInfo *native_info) {
   const char *profile_type = p->ProfileType();
   if (!p->Collect()) {
     LOG(ERROR) << "Failure: Could not collect " << profile_type << " profile";
@@ -134,8 +134,8 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
     // so that, if ever JNI handle leaks do happen again, this will release the
     // handles automatically.
     JNILocalFrame local_frame(jni_env);
-    string profile;
-    string pt = w->throttler_->ProfileType();
+    std::string profile;
+    std::string pt = w->throttler_->ProfileType();
     if (pt == kTypeCPU) {
       CPUProfiler p(w->jvmti_, w->threads_, w->throttler_->DurationNanos(),
                     FLAGS_cprof_cpu_sampling_period_msec * kNanosPerMilli);

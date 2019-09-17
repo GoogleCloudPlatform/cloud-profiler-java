@@ -32,10 +32,10 @@ class CloudEnv {
   virtual ~CloudEnv() {}
 
   // Returns the current cloud project ID.
-  virtual string ProjectID();
+  virtual std::string ProjectID();
 
   // Returns the current cloud zone (e.g. 'us-central1-a').
-  virtual string ZoneName();
+  virtual std::string ZoneName();
 
   // Returns a valid OAuth2 access token representing the service account
   // identity of the instance or an empty string if the instance does not have a
@@ -43,31 +43,31 @@ class CloudEnv {
   // access token. The token may carry limited set of OAuth2 scopes, so the
   // later use of the token for a specific operation may fail with an
   // authorization error.
-  virtual string Oauth2AccessToken();
+  virtual std::string Oauth2AccessToken();
 
   // Returns the profiled service name for the current environment.
-  virtual string Service();
+  virtual std::string Service();
 
   // Returns the profiled service version for the current environment.
-  virtual string ServiceVersion();
+  virtual std::string ServiceVersion();
 
   // Implements the method using the given HTTP request for communication.
   // Visible for testing.
-  string ProjectID(HTTPRequest* req);
+  std::string ProjectID(HTTPRequest* req);
 
   // Implements the method using the given HTTP request for communication.
   // Visible for testing.
-  string ZoneName(HTTPRequest* req);
+  std::string ZoneName(HTTPRequest* req);
 
   // Implements the method using the given HTTP request for communication.
   // Visible for testing.
-  string Oauth2AccessToken(HTTPRequest* req);
+  std::string Oauth2AccessToken(HTTPRequest* req);
 
  private:
-  string project_id_;
-  string zone_name_;
-  string service_;
-  string service_version_;
+  std::string project_id_;
+  std::string zone_name_;
+  std::string service_;
+  std::string service_version_;
   DISALLOW_COPY_AND_ASSIGN(CloudEnv);
 };
 

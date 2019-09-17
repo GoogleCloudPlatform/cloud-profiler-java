@@ -26,7 +26,7 @@ namespace profiler {
 // Generates a CPU profile in a compressed serialized profile.proto
 // from a collection of java stack traces, symbolized using the jvmti.
 // Data in traces will be cleared.
-string SerializeAndClearJavaCpuTraces(
+std::string SerializeAndClearJavaCpuTraces(
     JNIEnv *jni, jvmtiEnv *jvmti,
     const google::javaprofiler::NativeProcessInfo &native_info,
     const char *profile_type, int64_t duration_nanos, int64_t period_nanos,

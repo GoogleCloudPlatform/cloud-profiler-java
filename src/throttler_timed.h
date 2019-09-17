@@ -34,16 +34,16 @@ class TimedThrottler : public Throttler {
   // Creates a timed throttler where path specifies the prefix path at which to
   // store the collected profiles. The path may be a Google Cloud Storage path,
   // prefixed with "gs://".
-  explicit TimedThrottler(const string& path);
+  explicit TimedThrottler(const std::string& path);
 
   // Testing-only constructor.
   TimedThrottler(std::unique_ptr<ProfileUploader> uploader, Clock* clock,
                  bool no_randomize);
 
   bool WaitNext() override;
-  string ProfileType() override;
+  std::string ProfileType() override;
   int64_t DurationNanos() override;
-  bool Upload(string profile) override;
+  bool Upload(std::string profile) override;
   void Close() override;
 
  private:
@@ -61,7 +61,7 @@ class TimedThrottler : public Throttler {
   // Counts profile sets really (CPU + wall).
   int profile_count_;
 
-  std::vector<std::pair<string, int64_t>> cur_;
+  std::vector<std::pair<std::string, int64_t>> cur_;
   std::unique_ptr<ProfileUploader> uploader_;
 };
 

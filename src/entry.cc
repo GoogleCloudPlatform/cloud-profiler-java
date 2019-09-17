@@ -241,11 +241,11 @@ static void ParseArguments(const char *options) {
   if (options == nullptr) {
     options = "";
   }
-  std::vector<string> split_options = Split(options, ',');
+  std::vector<std::string> split_options = Split(options, ',');
 
   std::vector<char *> argv_vector;
   argv_vector.push_back(const_cast<char *>("cprof_java_agent"));
-  for (const string &split_option : split_options) {
+  for (const std::string &split_option : split_options) {
     argv_vector.push_back(const_cast<char *>(split_option.c_str()));
   }
 

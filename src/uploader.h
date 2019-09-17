@@ -25,12 +25,14 @@ namespace profiler {
 class ProfileUploader {
  public:
   virtual ~ProfileUploader() {}
-  virtual bool Upload(const string &profile_type, const string &profile) = 0;
+  virtual bool Upload(const std::string& profile_type,
+                      const std::string& profile) = 0;
 };
 
 // Returns the path to use for a profile.  The path will contain the current
 // timestamp which makes it fairly (but not necessarily globally) unique.
-string ProfilePath(const string& prefix, const string& profile_type);
+std::string ProfilePath(const std::string& prefix,
+                        const std::string& profile_type);
 
 }  // namespace profiler
 }  // namespace cloud

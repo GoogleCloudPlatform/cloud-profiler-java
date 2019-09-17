@@ -50,9 +50,9 @@ class APIThrottler : public Throttler {
           types);
 
   bool WaitNext() override;
-  string ProfileType() override;
+  std::string ProfileType() override;
   int64_t DurationNanos() override;
-  bool Upload(string profile) override;
+  bool Upload(std::string profile) override;
   void Close() override;
 
  private:
@@ -87,7 +87,7 @@ class APIThrottler : public Throttler {
 // Returns true if the service name matches the regex
 // "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
 // Public for testing.
-bool IsValidServiceName(string service);
+bool IsValidServiceName(std::string service);
 
 }  // namespace profiler
 }  // namespace cloud

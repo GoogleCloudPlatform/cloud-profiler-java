@@ -199,7 +199,7 @@ void Profiler::Reset() {
   old_action_ = handler_.SetAction(&Profiler::Handle);
 }
 
-string Profiler::SerializeProfile(
+std::string Profiler::SerializeProfile(
     JNIEnv *jni, const google::javaprofiler::NativeProcessInfo &native_info) {
   return SerializeAndClearJavaCpuTraces(
       jni, jvmti_, native_info, ProfileType(), duration_nanos_, period_nanos_,

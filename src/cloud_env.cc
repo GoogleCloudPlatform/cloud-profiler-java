@@ -50,12 +50,12 @@ const char kNoData[] = "";
 
 namespace {
 
-string GceMetadataRequest(HTTPRequest* req, const string& path) {
+std::string GceMetadataRequest(HTTPRequest* req, const std::string& path) {
   Clock* clock = DefaultClock();
   req->AddHeader("Metadata-Flavor", "Google");
   req->SetTimeout(2);  // seconds
 
-  string url = FLAGS_cprof_gce_metadata_server_address + path, resp;
+  std::string url = FLAGS_cprof_gce_metadata_server_address + path, resp;
 
   int retry_sleep_sec = FLAGS_cprof_gce_metadata_server_retry_sleep_sec;
   int retry_count = FLAGS_cprof_gce_metadata_server_retry_count;
@@ -87,7 +87,7 @@ string GceMetadataRequest(HTTPRequest* req, const string& path) {
   return kNoData;
 }
 
-const char* Getenv(const string& var) {
+const char* Getenv(const std::string& var) {
 #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17)
   return secure_getenv(var.c_str());
 #else
@@ -103,7 +103,7 @@ CloudEnv::CloudEnv() {
   } else if (!FLAGS_cprof_target.empty()) {
     service_ = FLAGS_cprof_target;
   } else {
-    for (const string& env_var : {"GAE_SERVICE", "K_SERVICE"}) {
+    for (const std::string& env_var : {"GAE_SERVICE", "K_SERVICE"}) {
       const char* val = Getenv(env_var);
       if (val != nullptr) {
         service_ = val;
@@ -115,7 +115,7 @@ CloudEnv::CloudEnv() {
   if (!FLAGS_cprof_service_version.empty()) {
     service_version_ = FLAGS_cprof_service_version;
   } else {
-    for (const string& env_var : {"GAE_VERSION", "K_REVISION"}) {
+    for (const std::string& env_var : {"GAE_VERSION", "K_REVISION"}) {
       const char* val = Getenv(env_var);
       if (val != nullptr) {
         service_version_ = val;
@@ -144,17 +144,17 @@ CloudEnv::CloudEnv() {
   }
 }
 
-string CloudEnv::ProjectID() {
+std::string CloudEnv::ProjectID() {
   HTTPRequest req;
   return ProjectID(&req);
 }
 
-string CloudEnv::ProjectID(HTTPRequest* req) {
+std::string CloudEnv::ProjectID(HTTPRequest* req) {
   if (!project_id_.empty()) {
     return project_id_;
   }
 
-  string resp = GceMetadataRequest(req, kProjectIDPath);
+  std::string resp = GceMetadataRequest(req, kProjectIDPath);
   if (resp == kNoData) {
     LOG(ERROR) << "Failed to read the project ID from the VM metadata";
     return resp;
@@ -164,23 +164,23 @@ string CloudEnv::ProjectID(HTTPRequest* req) {
   return project_id_;
 }
 
-string CloudEnv::ZoneName() {
+std::string CloudEnv::ZoneName() {
   HTTPRequest req;
   return ZoneName(&req);
 }
 
-string CloudEnv::ZoneName(HTTPRequest* req) {
+std::string CloudEnv::ZoneName(HTTPRequest* req) {
   if (!zone_name_.empty()) {
     return zone_name_;
   }
 
-  string resp = GceMetadataRequest(req, kZoneNamePath);
+  std::string resp = GceMetadataRequest(req, kZoneNamePath);
   if (resp == kNoData) {
     LOG(ERROR) << "Failed to read the zone name";
     return kNoData;
   }
 
-  std::vector<string> elems = Split(resp, '/');
+  std::vector<std::string> elems = Split(resp, '/');
   if (elems.empty() || elems.back().empty()) {
     LOG(ERROR) << "Failed to parse the zone name";
     return kNoData;
@@ -190,27 +190,27 @@ string CloudEnv::ZoneName(HTTPRequest* req) {
   return zone_name_;
 }
 
-string CloudEnv::Oauth2AccessToken() {
+std::string CloudEnv::Oauth2AccessToken() {
   HTTPRequest req;
   return Oauth2AccessToken(&req);
 }
 
-string CloudEnv::Oauth2AccessToken(HTTPRequest* req) {
+std::string CloudEnv::Oauth2AccessToken(HTTPRequest* req) {
   if (!FLAGS_cprof_access_token_test_only.empty()) {
     LOG(WARNING) << "Using access token from flags, test-only";
     return FLAGS_cprof_access_token_test_only;
   }
 
   // TODO: Cache the access token as it's valid for ~1 hour.
-  string resp = GceMetadataRequest(req, kTokenPath);
+  std::string resp = GceMetadataRequest(req, kTokenPath);
   if (resp == kNoData) {
     LOG(ERROR) << "Failed to acquire an access token";
     return resp;
   }
 
-  std::vector<string> lines = Split(resp, '\n');
-  for (const string& line : lines) {
-    std::vector<string> pair = Split(line, ' ');
+  std::vector<std::string> lines = Split(resp, '\n');
+  for (const std::string& line : lines) {
+    std::vector<std::string> pair = Split(line, ' ');
     if (pair.size() != 2) {
       LOG(ERROR) << "'" << line << "'"
                  << " malformed: two tokens expected";
@@ -224,9 +224,9 @@ string CloudEnv::Oauth2AccessToken(HTTPRequest* req) {
   return kNoData;
 }
 
-string CloudEnv::Service() { return service_; }
+std::string CloudEnv::Service() { return service_; }
 
-string CloudEnv::ServiceVersion() { return service_version_; }
+std::string CloudEnv::ServiceVersion() { return service_version_; }
 
 CloudEnv* DefaultCloudEnv() {
   // Deferred initialization to make sure the flags are parsed.

@@ -52,7 +52,7 @@ class Throttler {
   // Returns the profile type (one of kType* constants) that the client should
   // collect at this iteration. The return value is undefined when not preceded
   // by a successful call to WaitNext().
-  virtual string ProfileType() = 0;
+  virtual std::string ProfileType() = 0;
 
   // Returns the duration in nanoseconds of the profile that the client should
   // collect at this iteration. The return value is undefined when not preceded
@@ -60,7 +60,7 @@ class Throttler {
   virtual int64_t DurationNanos() = 0;
 
   // Upload the compressed profile proto bytes. Returns false on error.
-  virtual bool Upload(string profile) = 0;
+  virtual bool Upload(std::string profile) = 0;
 
   // Closes the throttler by trying to cancel WaitNext() / Upload() in flight.
   // Those calls may return cancellation error. This method is thread-safe.

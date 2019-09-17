@@ -26,10 +26,11 @@ namespace profiler {
 
 class FileUploader : public cloud::profiler::ProfileUploader {
  public:
-  explicit FileUploader(const string& prefix) : prefix_(prefix) {}
+  explicit FileUploader(const std::string &prefix) : prefix_(prefix) {}
 
-  bool Upload(const string &profile_type, const string &profile) override {
-    string filename = ProfilePath(prefix_, profile_type);
+  bool Upload(const std::string &profile_type,
+              const std::string &profile) override {
+    std::string filename = ProfilePath(prefix_, profile_type);
 
     FILE *f = fopen(filename.c_str(), "w");
     if (f == nullptr) {
@@ -51,7 +52,7 @@ class FileUploader : public cloud::profiler::ProfileUploader {
   }
 
  private:
-  string prefix_;
+  std::string prefix_;
   DISALLOW_COPY_AND_ASSIGN(FileUploader);
 };
 

@@ -36,15 +36,16 @@ class GcsUploader : public cloud::profiler::ProfileUploader {
  public:
   // Constructs an uploader to GCS which uses the specified caller-owned
   // environment object and the specified profile path prefix.
-  GcsUploader(CloudEnv* env, const string& prefix)
+  GcsUploader(CloudEnv* env, const std::string& prefix)
       : env_(env), prefix_(prefix) {}
 
   // Implements ProfileUploader interface.
-  bool Upload(const string& profile_type, const string& profile) override;
+  bool Upload(const std::string& profile_type,
+              const std::string& profile) override;
 
  private:
   CloudEnv* env_;
-  string prefix_;
+  std::string prefix_;
   DISALLOW_COPY_AND_ASSIGN(GcsUploader);
 };
 

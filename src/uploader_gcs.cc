@@ -28,11 +28,12 @@ namespace profiler {
 
 const char kGcsHost[] = "https://storage.googleapis.com";
 
-bool GcsUploader::Upload(const string &profile_type, const string &profile) {
+bool GcsUploader::Upload(const std::string &profile_type,
+                         const std::string &profile) {
   LOG(INFO) << "Uploading " << profile.size() << " byte " << profile_type
             << " profile to GCS";
 
-  string access_token = env_->Oauth2AccessToken();
+  std::string access_token = env_->Oauth2AccessToken();
   if (access_token.empty()) {
     LOG(ERROR) << "Failed to gather an OAuth2 access token for GCS upload";
     return false;
@@ -44,7 +45,8 @@ bool GcsUploader::Upload(const string &profile_type, const string &profile) {
   uploadReq.AddHeader("Content-Length", std::to_string(profile.size()));
   uploadReq.SetTimeout(FLAGS_cprof_gcs_upload_timeout_sec);
 
-  string url = string(kGcsHost) + "/" + ProfilePath(prefix_, profile_type);
+  std::string url =
+      std::string(kGcsHost) + "/" + ProfilePath(prefix_, profile_type);
   if (!uploadReq.DoPut(url, profile)) {
     LOG(ERROR) << "Error making profile upload HTTP request to GCS";
     return false;

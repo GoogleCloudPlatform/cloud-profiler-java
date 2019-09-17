@@ -60,20 +60,20 @@ int64_t GetConfiguration(int64_t* duration_cpu_ns, int64_t* duration_wall_ns,
   return FLAGS_cprof_interval_sec * kNanosPerSecond;
 }
 
-bool StartsWith(const string& s, const string& prefix) {
+bool StartsWith(const std::string& s, const std::string& prefix) {
   return s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0;
 }
 
-string TryStripPrefix(const string& s, const string& prefix) {
+std::string TryStripPrefix(const std::string& s, const std::string& prefix) {
   return StartsWith(s, prefix) ? s.substr(prefix.size()) : s;
 }
 
-std::unique_ptr<ProfileUploader> UploaderFromFlags(const string& path) {
+std::unique_ptr<ProfileUploader> UploaderFromFlags(const std::string& path) {
   if (path.empty()) {
     LOG(ERROR) << "Expected non-empty profile path";
     return nullptr;
   }
-  string filename = TryStripPrefix(path, "gs://");
+  std::string filename = TryStripPrefix(path, "gs://");
   if (filename != path) {
     LOG(INFO) << "Will upload profiles to Google Cloud Storage";
     return std::unique_ptr<ProfileUploader>(
@@ -86,7 +86,7 @@ std::unique_ptr<ProfileUploader> UploaderFromFlags(const string& path) {
 
 }  // namespace
 
-TimedThrottler::TimedThrottler(const string& path)
+TimedThrottler::TimedThrottler(const std::string& path)
     : TimedThrottler(UploaderFromFlags(path), DefaultClock(), false) {}
 
 TimedThrottler::TimedThrottler(std::unique_ptr<ProfileUploader> uploader,
@@ -181,7 +181,7 @@ bool TimedThrottler::WaitNext() {
   return true;
 }
 
-string TimedThrottler::ProfileType() {
+std::string TimedThrottler::ProfileType() {
   return cur_.empty() ? "" : cur_.back().first;
 }
 
@@ -189,7 +189,7 @@ int64_t TimedThrottler::DurationNanos() {
   return cur_.empty() ? 0 : cur_.back().second;
 }
 
-bool TimedThrottler::Upload(string profile) {
+bool TimedThrottler::Upload(std::string profile) {
   if (cur_.empty() || !uploader_) {
     return false;
   }

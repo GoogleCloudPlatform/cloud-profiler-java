@@ -27,12 +27,13 @@ namespace cloud {
 namespace profiler {
 
 // Splits a string by the specified character, e.g. ("a,b", ',') -> ["a", "b"].
-std::vector<string> Split(const string& s, char sp);
+std::vector<std::string> Split(const std::string& s, char sp);
 
 // Parses a comma-separated key/value string (e.g. "foo=1,bar=2") into a map.
 // Of duplicate keys the rightmost value wins. Returns false if the string is
 // not in the expected format.
-bool ParseKeyValueList(const string& s, std::map<string, string>* out);
+bool ParseKeyValueList(const std::string& s,
+                       std::map<std::string, std::string>* out);
 
 }  // namespace profiler
 }  // namespace cloud

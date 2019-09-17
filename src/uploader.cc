@@ -19,7 +19,8 @@
 namespace cloud {
 namespace profiler {
 
-string ProfilePath(const string& prefix, const string& profile_type) {
+std::string ProfilePath(const std::string& prefix,
+                        const std::string& profile_type) {
   using std::chrono::system_clock;
   int64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(
                           system_clock::now().time_since_epoch())

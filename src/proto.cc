@@ -44,12 +44,13 @@ class ProfileProtoBuilder {
   void Populate(JNIEnv *jni, const char *profile_type,
                 const google::javaprofiler::TraceMultiset &traces,
                 int64_t duration_ns, int64_t period_ns);
-  void AddArtificialSample(const string &name, int64_t count, int64_t weight);
+  void AddArtificialSample(const std::string &name, int64_t count,
+                           int64_t weight);
   int64_t TotalCount() const;
   int64_t TotalWeight() const;
 
-  string Emit() {
-    string out;
+  std::string Emit() {
+    std::string out;
     builder_.Emit(&out);
     return out;
   }
@@ -63,10 +64,11 @@ class ProfileProtoBuilder {
   uint64_t LocationID(JNIEnv *jni,
                       const google::javaprofiler::JVMPI_CallFrame &frame);
   uint64_t LocationID(uint64_t address);
-  uint64_t LocationID(const string &name);
-  uint64_t LocationID(const string &class_name, const string &method_name,
-                      const string &signature, const string &file_name,
-                      int line_number);
+  uint64_t LocationID(const std::string &name);
+  uint64_t LocationID(const std::string &class_name,
+                      const std::string &method_name,
+                      const std::string &signature,
+                      const std::string &file_name, int line_number);
 
   jvmtiEnv *jvmti_;
   int64_t total_count_ = 0;
@@ -92,7 +94,7 @@ class ProfileProtoBuilder {
 
 namespace {
 
-string CallTraceErrorToName(int64_t err) {
+std::string CallTraceErrorToName(int64_t err) {
   switch (err) {
     case kNativeStackTrace:
       return "[Native code]";
@@ -121,8 +123,8 @@ string CallTraceErrorToName(int64_t err) {
 
 }  // namespace
 
-void ProfileProtoBuilder::AddArtificialSample(const string &name, int64_t count,
-                                              int64_t weight) {
+void ProfileProtoBuilder::AddArtificialSample(const std::string &name,
+                                              int64_t count, int64_t weight) {
   AddSample({LocationID(name)}, count, weight, 0);
 }
 
@@ -141,7 +143,7 @@ uint64_t ProfileProtoBuilder::LocationID(
         CallTraceErrorToName(reinterpret_cast<size_t>(frame.method_id)));
   }
 
-  string method_name, class_name, file_name, signature;
+  std::string method_name, class_name, file_name, signature;
   int line_number = 0;
   google::javaprofiler::GetStackFrameElements(jni, jvmti_, frame, &file_name,
                                               &class_name, &method_name,
@@ -168,18 +170,18 @@ uint64_t ProfileProtoBuilder::LocationID(uint64_t address) {
   return location_id;
 }
 
-uint64_t ProfileProtoBuilder::LocationID(const string &name) {
+uint64_t ProfileProtoBuilder::LocationID(const std::string &name) {
   return LocationID("", name, "", "", 0);
 }
 
-uint64_t ProfileProtoBuilder::LocationID(const string &class_name,
-                                         const string &method_name,
-                                         const string &signature,
-                                         const string &file_name,
+uint64_t ProfileProtoBuilder::LocationID(const std::string &class_name,
+                                         const std::string &method_name,
+                                         const std::string &signature,
+                                         const std::string &file_name,
                                          int line_number) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
 
-  string frame_name;
+  std::string frame_name;
   if (!class_name.empty()) {
     frame_name = class_name + ".";
   }
@@ -189,7 +191,7 @@ uint64_t ProfileProtoBuilder::LocationID(const string &class_name,
     frame_name += signature;
   }
 
-  string simplified_name = frame_name;
+  std::string simplified_name = frame_name;
   ::google::javaprofiler::SimplifyFunctionName(&simplified_name);
 
   uint64_t function_id = builder_.FunctionId(
@@ -272,7 +274,7 @@ void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
   }
 }
 
-string SerializeAndClearJavaCpuTraces(
+std::string SerializeAndClearJavaCpuTraces(
     JNIEnv *env, jvmtiEnv *jvmti,
     const google::javaprofiler::NativeProcessInfo &native_info,
     const char *profile_type, int64_t duration_ns, int64_t period_ns,

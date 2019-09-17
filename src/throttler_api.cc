@@ -98,7 +98,7 @@ grpc_ssl_roots_override_result OverrideSSLRoots(char** pem_root_certs) {
 
 // Creates the profiler gRPC API stub. Returns nullptr on error.
 std::unique_ptr<api::grpc::ProfilerService::StubInterface>
-NewProfilerServiceStub(const string& addr) {
+NewProfilerServiceStub(const std::string& addr) {
   std::shared_ptr<grpc::ChannelCredentials> creds;
   if (FLAGS_cprof_use_insecure_creds_for_testing) {
     creds = grpc::InsecureChannelCredentials();
@@ -131,7 +131,7 @@ NewProfilerServiceStub(const string& addr) {
   return stub;
 }
 
-string DebugString(const grpc::Status& st) {
+std::string DebugString(const grpc::Status& st) {
   std::ostringstream os;
   os << st.error_code() << " (" << st.error_message() << ")";  // NOLINT
   return os.str();
@@ -160,16 +160,16 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
 
 // Initializes deployment information from environment properties and label
 // string in "name1=val1,name2=val2,..." format. Returns false on error.
-bool InitializeDeployment(CloudEnv* env, const string& labels,
+bool InitializeDeployment(CloudEnv* env, const std::string& labels,
                           api::Deployment* d) {
-  string project_id = env->ProjectID();
+  std::string project_id = env->ProjectID();
   if (project_id.empty()) {
     LOG(ERROR) << "Project ID is unknown";
     return false;
   }
   d->set_project_id(project_id);
 
-  string service = env->Service();
+  std::string service = env->Service();
   if (service.empty()) {
     LOG(ERROR) << "Deployment service name is not configured";
     return false;
@@ -182,18 +182,18 @@ bool InitializeDeployment(CloudEnv* env, const string& labels,
   }
   d->set_target(service);
 
-  std::map<string, string> label_kvs;
+  std::map<std::string, std::string> label_kvs;
   if (!ParseKeyValueList(labels, &label_kvs)) {
     LOG(ERROR) << "Failed to parse deployment labels '" << labels << "'";
     return false;
   }
 
-  string service_version = env->ServiceVersion();
+  std::string service_version = env->ServiceVersion();
   if (!service_version.empty()) {
     label_kvs[kServiceVersionLabel] = service_version;
   }
 
-  string zone_name = env->ZoneName();
+  std::string zone_name = env->ZoneName();
   if (!zone_name.empty()) {
     label_kvs[kZoneNameLabel] = zone_name;
   }
@@ -210,8 +210,8 @@ bool InitializeDeployment(CloudEnv* env, const string& labels,
   return true;
 }
 
-bool AddProfileLabels(api::Profile* p, const string& labels) {
-  std::map<string, string> label_kvs;
+bool AddProfileLabels(api::Profile* p, const std::string& labels) {
+  std::map<std::string, std::string> label_kvs;
   if (!ParseKeyValueList(labels, &label_kvs)) {
     LOG(ERROR) << "Failed to parse profile labels '" << labels << "'";
     return false;
@@ -227,7 +227,7 @@ bool AddProfileLabels(api::Profile* p, const string& labels) {
 
 // Returns true if the service name matches the regex
 // "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
-bool IsValidServiceName(string s) {
+bool IsValidServiceName(std::string s) {
   if (s.length() < 1 || s.length() > 255) {
     return false;
   }
@@ -324,7 +324,7 @@ bool APIThrottler::WaitNext() {
   return true;
 }
 
-string APIThrottler::ProfileType() {
+std::string APIThrottler::ProfileType() {
   api::ProfileType pt = profile_.profile_type();
   switch (pt) {
     case api::CPU:
@@ -334,7 +334,7 @@ string APIThrottler::ProfileType() {
     case api::HEAP:
       return kTypeHeap;
     default:
-      const string& pt_name = api::ProfileType_Name(pt);
+      const std::string& pt_name = api::ProfileType_Name(pt);
       LOG(ERROR) << "Unsupported profile type " << pt_name;
       return "unsupported-" + pt_name;
   }
@@ -345,7 +345,7 @@ int64_t APIThrottler::DurationNanos() {
   return d.seconds() * kNanosPerSecond + d.nanos();
 }
 
-bool APIThrottler::Upload(string profile) {
+bool APIThrottler::Upload(std::string profile) {
   LOG(INFO) << "Uploading " << profile.size() << " bytes of '" << ProfileType()
             << "' profile data";
 
