@@ -414,12 +414,13 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForNativeHeap(
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-    ProfileFrameCache *cache) {
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 duration_ns,
+    int64 sampling_rate, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "CPU profiles may have native frames, cache must be provided";
   return std::unique_ptr<ProfileProtoBuilder>(
-      new CpuProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
+      new CpuProfileProtoBuilder(jni_env, jvmti_env, duration_ns,
+                                 sampling_rate, cache));
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(

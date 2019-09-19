@@ -151,6 +151,7 @@ class ProfileProtoBuilder {
 
   static std::unique_ptr<ProfileProtoBuilder> ForCpu(JNIEnv *jni_env,
                                                      jvmtiEnv *jvmti_env,
+                                                     int64 duration_ns,
                                                      int64 sampling_rate,
                                                      ProfileFrameCache *cache);
 
@@ -280,11 +281,13 @@ double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value);
 class CpuProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   CpuProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                         int64 sampling_rate, ProfileFrameCache *cache)
+                         int64 duration_ns, int64 sampling_rate,
+                         ProfileFrameCache *cache)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("samples", "count"),
             ProfileProtoBuilder::SampleType("cpu", "nanoseconds")) {
+    builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 
