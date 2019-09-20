@@ -122,6 +122,7 @@ bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
   int fd =
       TEMP_FAILURE_RETRY(open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0444));
   if (fd == -1) {
+    PLOG(ERROR) << "Failed to open file " << filename;
     return false;
   }
   int ret = MarshalToFile(profile, fd);
