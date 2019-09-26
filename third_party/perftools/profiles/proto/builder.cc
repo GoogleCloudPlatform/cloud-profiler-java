@@ -89,7 +89,7 @@ uint64 Builder::FunctionId(const char *name, const char *system_name,
   return index;
 }
 
-bool Builder::Emit(string *output) {
+bool Builder::Emit(std::string *output) {
   *output = "";
   if (!profile_ || !Finalize()) {
     return false;
@@ -97,7 +97,7 @@ bool Builder::Emit(string *output) {
   return Marshal(*profile_, output);
 }
 
-bool Builder::Marshal(const Profile &profile, string *output) {
+bool Builder::Marshal(const Profile &profile, std::string *output) {
   *output = "";
   StringOutputStream stream(output);
   GzipOutputStream gzip_stream(&stream);
