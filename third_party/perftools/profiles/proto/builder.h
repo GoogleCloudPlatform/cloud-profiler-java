@@ -90,12 +90,12 @@ class Builder {
   // Serializes and compresses the profile into a string, replacing
   // its contents. It calls Finalize() and returns whether the
   // encoding was successful.
-  bool Emit(string *output);
+  bool Emit(std::string *output);
 
   // Serializes and compresses a profile into a string, replacing its
   // contents. Returns false if there were errors on the serialization
   // or compression, and the output string will not contain valid data.
-  static bool Marshal(const Profile &profile, string *output);
+  static bool Marshal(const Profile &profile, std::string *output);
 
   // Serializes and compresses a profile into a file represented by a
   // file descriptor. Returns false if there were errors on the
