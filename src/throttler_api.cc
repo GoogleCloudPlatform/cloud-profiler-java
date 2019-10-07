@@ -15,6 +15,7 @@
 #include "src/throttler_api.h"
 
 #include <algorithm>
+#include <chrono>  // NOLINT
 #include <sstream>
 
 #include "src/clock.h"
@@ -335,6 +336,14 @@ bool APIThrottler::WaitNext() {
 
     profile_.Clear();
     ResetClientContext();
+
+    // The system clock is used here directly, because clock_->now() returns
+    // CLOCK_MONOTONIC, not CLOCK_REALTIME time.
+    // The API server sets a 1 hour server-side timeout. All agents should set
+    // a corresponding 1 hour timeout for CreateProfile requests.
+    ctx_->set_deadline(std::chrono::system_clock::now() +
+                       std::chrono::hours{1});
+
     grpc::Status st = stub_->CreateProfile(ctx_.get(), req, &profile_);
     if (st.ok()) {
       LOG(INFO) << "Profile created: " << ProfileType() << " "
@@ -387,6 +396,13 @@ bool APIThrottler::Upload(std::string profile) {
 
   req.mutable_profile()->set_profile_bytes(std::move(profile));
   ResetClientContext();
+
+  // The system clock is used here directly, because clock_->now() returns
+  // CLOCK_MONOTONIC, not CLOCK_REALTIME time.
+  // The API server sets a 20 second server-side timeout. All agents should set
+  // a corresponding 20 second timeout for UpdateProfile requests.
+  ctx_->set_deadline(std::chrono::system_clock::now() +
+                     std::chrono::seconds{20});
   grpc::Status st = stub_->UpdateProfile(ctx_.get(), req, &profile_);
 
   if (!st.ok()) {
