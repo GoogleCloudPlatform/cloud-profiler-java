@@ -305,7 +305,7 @@ std::string APIThrottler::JavaVersion(JNIEnv* jni) {
   }
   // Copy the returned value and release the memory allocated by JNI.
   const char* s = jni->GetStringUTFChars(jstr, nullptr);
-  std::string ret = string(s);
+  std::string ret = std::string(s);
   jni->ReleaseStringUTFChars(jstr, s);
   return ret;
 }
