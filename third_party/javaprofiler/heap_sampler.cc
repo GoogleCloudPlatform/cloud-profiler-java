@@ -208,8 +208,20 @@ bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
   // If ever this was run with a JDK before JDK11, it would not set this bit as
   // it was added at the end of the structure. Therefore this is a cheap way to
   // check for a runtime "are we running with JDK11+".
-  return caps.can_generate_sampled_object_alloc_events
-      && caps.can_generate_garbage_collection_events;
+  if (!caps.can_generate_sampled_object_alloc_events ||
+      !caps.can_generate_garbage_collection_events) {
+    // Provide more debug information that this will fail: JVMTI_VERSION and
+    // sizeof is really lower level but helps figure out compilation
+    // environments.
+    LOG(WARNING) << "Capabilites not set up: Sampled: "
+                 << caps.can_generate_sampled_object_alloc_events
+                 << "; GC Collection: "
+                 << caps.can_generate_garbage_collection_events
+                 << "; Size of capabilities: " << sizeof(jvmtiCapabilities)
+                 << "; JVMTI_VERSION: " << JVMTI_VERSION;
+    return false;
+  }
+  return true;
 #else
   return false;
 #endif
@@ -226,8 +238,8 @@ void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
 #ifdef ENABLE_HEAP_SAMPLING
   if (!Supported(jvmti)) {
-    LOG(INFO) << "Heap sampling is not supported by the JVM, disabling the "
-              << " heap sampling monitor";
+    LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
+                 << " heap sampling monitor";
     return false;
   }
 
