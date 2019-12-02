@@ -15,7 +15,7 @@
 #
 # Base image
 #
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 
 #
 # Dependencies
@@ -93,7 +93,7 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
-RUN git clone --depth=1 --recursive -b v1.21.0 https://github.com/grpc/grpc.git /tmp/grpc && \
+RUN git clone --depth=1 --recursive -b v1.25.0 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
 
 # TODO: Remove patch when GKE Istio versions support HTTP 1.0 or
