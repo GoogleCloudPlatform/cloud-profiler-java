@@ -15,7 +15,7 @@
 #
 # Base image
 #
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 
 #
 # Dependencies
@@ -93,21 +93,8 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
-RUN git clone --depth=1 --recursive -b v1.21.0 https://github.com/grpc/grpc.git /tmp/grpc && \
+RUN git clone --depth=1 --recursive -b v1.25.0 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
-
-# TODO: Remove patch when GKE Istio versions support HTTP 1.0 or
-# gRPC http_cli supports HTTP 1.1
-# This sed command is needed until GKE provides Istio 1.1+ exclusively which
-# supports HTTP 1.0.
-    sed -i 's/1\.0/1.1/g' src/core/lib/http/format_request.cc && \
-
-# TODO: Remove patch when GKE Istio versions support unambiguous
-# FQDNs in rule sets.
-# https://github.com/istio/istio/pull/14405 is merged but wait till GKE
-# Istio versions includes this PR
-    sed -i 's/metadata\.google\.internal\./metadata.google.internal/g' src/core/lib/security/credentials/google_default/google_default_credentials.cc && \
-    sed -i 's/metadata\.google\.internal\./metadata.google.internal/g' src/core/lib/security/credentials/credentials.h && \
     cd third_party/protobuf && \
     ./autogen.sh && \
     ./configure --with-pic CXXFLAGS="$(pkg-config --cflags protobuf)" LIBS="$(pkg-config --libs protobuf)" LDFLAGS="-Wl,--no-as-needed" && \

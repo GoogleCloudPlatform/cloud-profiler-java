@@ -47,7 +47,7 @@ void Worker::Start(JNIEnv *jni) {
   // Initialize the throttler here rather in the constructor, since the
   // constructor is invoked too early, before the heap profiler is initialized.
   throttler_ = FLAGS_cprof_profile_filename.empty()
-                   ? std::unique_ptr<Throttler>(new APIThrottler())
+                   ? std::unique_ptr<Throttler>(new APIThrottler(jni))
                    : std::unique_ptr<Throttler>(
                          new TimedThrottler(FLAGS_cprof_profile_filename));
 

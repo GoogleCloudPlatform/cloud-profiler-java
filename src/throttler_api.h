@@ -17,10 +17,13 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 #define CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 
+#include <jni.h>
+
 #include <atomic>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <random>
+#include <string>
 #include <vector>
 
 #include "src/clock.h"
@@ -36,12 +39,13 @@ namespace profiler {
 // Throttler implementation using the Cloud Profiler API.
 class APIThrottler : public Throttler {
  public:
-  APIThrottler();
+  explicit APIThrottler(JNIEnv* jni_env);
   // Testing-only constructor.
   APIThrottler(CloudEnv* env, Clock* clock,
                std::unique_ptr<google::devtools::cloudprofiler::v2::grpc::
                                    ProfilerService::StubInterface>
-                   stub);
+                   stub,
+               JNIEnv* jni_env);
 
   // Set the list of supported profile types. The list is used in the profile
   // creation call to the server to specify the supported types.
@@ -56,6 +60,7 @@ class APIThrottler : public Throttler {
   void Close() override;
 
  private:
+  FRIEND_TEST(APIThrottlerTest, TestCreatesAndUploadsProfile);
   // Takes a backoff on profile creation error. The backoff duration
   // may be specified by the server. Otherwise it will be a randomized
   // exponentially increasing value, bounded by kMaxBackoffNanos.
@@ -63,6 +68,9 @@ class APIThrottler : public Throttler {
 
   // Resets the client gRPC context for the next call.
   void ResetClientContext();
+
+  // Determines and returns Java version.
+  static std::string JavaVersion(JNIEnv* jni_env);
 
  private:
   CloudEnv* env_;
@@ -72,6 +80,7 @@ class APIThrottler : public Throttler {
       stub_;
   google::devtools::cloudprofiler::v2::Profile profile_;
   std::vector<google::devtools::cloudprofiler::v2::ProfileType> types_;
+  const std::string java_version_;
 
   // Profile creation error handling.
   int64_t creation_backoff_envelope_ns_;

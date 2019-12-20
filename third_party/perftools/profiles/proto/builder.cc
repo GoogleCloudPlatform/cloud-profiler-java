@@ -89,7 +89,7 @@ uint64 Builder::FunctionId(const char *name, const char *system_name,
   return index;
 }
 
-bool Builder::Emit(string *output) {
+bool Builder::Emit(std::string *output) {
   *output = "";
   if (!profile_ || !Finalize()) {
     return false;
@@ -97,7 +97,7 @@ bool Builder::Emit(string *output) {
   return Marshal(*profile_, output);
 }
 
-bool Builder::Marshal(const Profile &profile, string *output) {
+bool Builder::Marshal(const Profile &profile, std::string *output) {
   *output = "";
   StringOutputStream stream(output);
   GzipOutputStream gzip_stream(&stream);
@@ -119,8 +119,9 @@ bool Builder::MarshalToFile(const Profile &profile, int fd) {
 }
 
 bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
-  int fd =
-      TEMP_FAILURE_RETRY(open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0444));
+  int fd;
+  while ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0444)) < 0 &&
+         errno == EINTR) {}
   if (fd == -1) {
     PLOG(ERROR) << "Failed to open file " << filename;
     return false;

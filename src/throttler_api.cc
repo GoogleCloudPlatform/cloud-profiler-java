@@ -15,6 +15,7 @@
 #include "src/throttler_api.h"
 
 #include <algorithm>
+#include <chrono>  // NOLINT
 #include <sstream>
 
 #include "src/clock.h"
@@ -248,22 +249,26 @@ bool IsValidServiceName(std::string s) {
   return true;
 }
 
-APIThrottler::APIThrottler()
-    : APIThrottler(DefaultCloudEnv(), DefaultClock(), nullptr) {}
+APIThrottler::APIThrottler(JNIEnv* jni)
+    : APIThrottler(DefaultCloudEnv(), DefaultClock(), nullptr, jni) {}
 
 APIThrottler::APIThrottler(
     CloudEnv* env, Clock* clock,
     std::unique_ptr<google::devtools::cloudprofiler::v2::grpc::ProfilerService::
                         StubInterface>
-        stub)
+        stub,
+    JNIEnv* jni)
     : env_(env),
       clock_(clock),
       stub_(std::move(stub)),
       types_({api::CPU, api::WALL}),
+      java_version_(JavaVersion(jni)),
       creation_backoff_envelope_ns_(kBackoffNanos),
       closed_(false) {
   grpc_init();
   gpr_set_log_function(GRPCLog);
+
+  LOG(INFO) << "Java version: " << java_version_;
 
   // Create a random number generator.
   gen_ = std::default_random_engine(clock_->Now().tv_nsec / 1000);
@@ -279,6 +284,30 @@ APIThrottler::APIThrottler(
     LOG(INFO) << "Heap allocation sampling supported for this JDK";
     types_.push_back(api::HEAP);
   }
+}
+
+std::string APIThrottler::JavaVersion(JNIEnv* jni) {
+  const std::string kUnknownVersion = "unknown_version";
+
+  jclass system_class = jni->FindClass("java/lang/System");
+  if (system_class == nullptr) {
+    return kUnknownVersion;
+  }
+  jmethodID get_property_method = jni->GetStaticMethodID(
+      system_class, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+  if (get_property_method == nullptr) {
+    return kUnknownVersion;
+  }
+  jstring jstr = reinterpret_cast<jstring>(jni->CallStaticObjectMethod(
+      system_class, get_property_method, jni->NewStringUTF("java.version")));
+  if (jstr == nullptr) {
+    return kUnknownVersion;
+  }
+  // Copy the returned value and release the memory allocated by JNI.
+  const char* s = jni->GetStringUTFChars(jstr, nullptr);
+  std::string ret = std::string(s);
+  jni->ReleaseStringUTFChars(jstr, s);
+  return ret;
 }
 
 void APIThrottler::SetProfileTypes(const std::vector<api::ProfileType>& types) {
@@ -307,6 +336,14 @@ bool APIThrottler::WaitNext() {
 
     profile_.Clear();
     ResetClientContext();
+
+    // The system clock is used here directly, because clock_->now() returns
+    // CLOCK_MONOTONIC, not CLOCK_REALTIME time.
+    // The API server sets a 1 hour server-side timeout. All agents should set
+    // a corresponding 1 hour timeout for CreateProfile requests.
+    ctx_->set_deadline(std::chrono::system_clock::now() +
+                       std::chrono::hours{1});
+
     grpc::Status st = stub_->CreateProfile(ctx_.get(), req, &profile_);
     if (st.ok()) {
       LOG(INFO) << "Profile created: " << ProfileType() << " "
@@ -359,6 +396,13 @@ bool APIThrottler::Upload(std::string profile) {
 
   req.mutable_profile()->set_profile_bytes(std::move(profile));
   ResetClientContext();
+
+  // The system clock is used here directly, because clock_->now() returns
+  // CLOCK_MONOTONIC, not CLOCK_REALTIME time.
+  // The API server sets a 20 second server-side timeout. All agents should set
+  // a corresponding 20 second timeout for UpdateProfile requests.
+  ctx_->set_deadline(std::chrono::system_clock::now() +
+                     std::chrono::seconds{20});
   grpc::Status st = stub_->UpdateProfile(ctx_.get(), req, &profile_);
 
   if (!st.ok()) {
@@ -397,7 +441,8 @@ void APIThrottler::ResetClientContext() {
   std::lock_guard<std::mutex> lock(ctx_mutex_);
   ctx_.reset(new grpc::ClientContext());  // NOLINT
   ctx_->AddMetadata("x-goog-api-client",
-                    "gccl/" + std::string(CLOUD_PROFILER_AGENT_VERSION));
+                    "gccl/" + std::string(CLOUD_PROFILER_AGENT_VERSION) +
+                        " gl-java/" + java_version_);
 
   if (closed_) {
     ctx_->TryCancel();
