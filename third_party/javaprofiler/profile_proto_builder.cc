@@ -91,12 +91,18 @@ void ProfileProtoBuilder::UnsampleMetrics() {
 
 unique_ptr<perftools::profiles::Profile>
     ProfileProtoBuilder::CreateSampledProto() {
+#ifndef STANDALONE_BUILD
+  builder_.AddCurrentMappings();
+#endif
   builder_.Finalize();
   return unique_ptr<perftools::profiles::Profile>(builder_.Consume());
 }
 
 unique_ptr<perftools::profiles::Profile>
     ProfileProtoBuilder::CreateUnsampledProto() {
+#ifndef STANDALONE_BUILD
+  builder_.AddCurrentMappings();
+#endif
   UnsampleMetrics();
   builder_.Finalize();
   return unique_ptr<perftools::profiles::Profile>(builder_.Consume());
