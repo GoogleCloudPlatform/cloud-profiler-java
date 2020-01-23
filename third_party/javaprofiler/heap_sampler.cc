@@ -310,7 +310,7 @@ void HeapMonitor::Disable() {
   jvmti_.store(nullptr);
 
   // Notify the agent thread that we are done.
-  google::javaprofiler::HeapMonitor::GetInstance()->NotifyGCWaitingThread();
+  google::javaprofiler::HeapMonitor::GetInstance()->ShutdownGCWaitingThread();
 
 #else
   // Do nothing: we never enabled ourselves.
@@ -349,18 +349,21 @@ std::unique_ptr<perftools::profiles::Profile> HeapMonitor::EmptyHeapProfile(
       ->CreateProto();
 }
 
-void HeapMonitor::NotifyGCWaitingThreadInternal() {
+void HeapMonitor::NotifyGCWaitingThreadInternal(GcEvent event) {
   std::unique_lock<std::mutex> lock(gc_waiting_mutex_);
-  gc_notified_ = true;
+  gc_notify_events_.push_back(event);
   gc_waiting_cv_.notify_all();
 }
 
-void HeapMonitor::WaitForGC() {
+HeapMonitor::GcEvent HeapMonitor::WaitForGC() {
   std::unique_lock<std::mutex> lock(gc_waiting_mutex_);
-  gc_notified_ = false;
 
   // If we are woken up without having been notified, just go back to sleep.
-  gc_waiting_cv_.wait(lock, [this] { return gc_notified_; } );
+  gc_waiting_cv_.wait(lock, [this] { return !gc_notify_events_.empty(); } );
+
+  GcEvent result = gc_notify_events_.front();
+  gc_notify_events_.pop_front();
+  return result;
 }
 
 void HeapMonitor::GCWaitingThread(jvmtiEnv* jvmti_env, JNIEnv* jni_env,
@@ -370,10 +373,10 @@ void HeapMonitor::GCWaitingThread(jvmtiEnv* jvmti_env, JNIEnv* jni_env,
 
 void HeapMonitor::GCWaitingThreadRun(JNIEnv* jni_env) {
   while (true) {
-    WaitForGC();
+    GcEvent event = WaitForGC();
 
     // Was the heap monitor disabled?
-    if (!Enabled()) {
+    if (event == GcEvent::SHUTDOWN) {
       break;
     }
 
