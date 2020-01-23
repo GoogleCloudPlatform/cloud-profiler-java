@@ -21,6 +21,7 @@
 #include <jvmti.h>
 
 #include <condition_variable>  // NOLINT
+#include <list>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <vector>
@@ -169,7 +170,11 @@ class HeapMonitor {
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
   static void NotifyGCWaitingThread() {
-    GetInstance()->NotifyGCWaitingThreadInternal();
+    GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::GC_FINISHED);
+  }
+
+  static void ShutdownGCWaitingThread() {
+    GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::SHUTDOWN);
   }
 
   // Not copyable or movable.
@@ -177,7 +182,7 @@ class HeapMonitor {
   HeapMonitor &operator=(const HeapMonitor &) = delete;
 
  private:
-  HeapMonitor() : gc_notified_(false), storage_(jvmti_.load()) {}
+  HeapMonitor() : storage_(jvmti_.load()) {}
 
   // We construct the heap_monitor at the first call to GetInstance, so ensure
   // Enable was called at least once before to initialize jvmti_.
@@ -188,11 +193,17 @@ class HeapMonitor {
 
   static bool Supported(jvmtiEnv* jvmti);
 
+  enum class GcEvent {
+    NO_EVENT,
+    GC_FINISHED,
+    SHUTDOWN
+  };
+
   bool CreateGCWaitingThread(jvmtiEnv* jvmti, JNIEnv* jni);
   static void GCWaitingThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg);
   void GCWaitingThreadRun(JNIEnv* jni_env);
-  void WaitForGC();
-  void NotifyGCWaitingThreadInternal();
+  GcEvent WaitForGC();
+  void NotifyGCWaitingThreadInternal(GcEvent event);
 
   void CompactData(JNIEnv* jni_env);
 
@@ -202,7 +213,7 @@ class HeapMonitor {
   static std::atomic<jvmtiEnv *> jvmti_;
   static std::atomic<int> sampling_interval_;
 
-  bool gc_notified_;
+  std::list<GcEvent> gc_notify_events_;
   std::condition_variable gc_waiting_cv_;
   std::mutex gc_waiting_mutex_;
   HeapEventStorage storage_;
