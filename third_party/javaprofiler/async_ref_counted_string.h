@@ -46,12 +46,12 @@ namespace javaprofiler {
 class AsyncRefCountedString {
  public:
   AsyncRefCountedString() : ptr_(nullptr) {}
-  explicit AsyncRefCountedString(const string &str);
+  explicit AsyncRefCountedString(const std::string &str);
   AsyncRefCountedString(const AsyncRefCountedString &other);
 
   ~AsyncRefCountedString();
 
-  AsyncRefCountedString &operator=(const string &str);
+  AsyncRefCountedString &operator=(const std::string &str);
   AsyncRefCountedString &operator=(const AsyncRefCountedString &other);
   AsyncRefCountedString &operator=(AsyncRefCountedString &&other);
   // Async-signal-safe version of operator=(const AsyncRefCountedString &other).
@@ -82,7 +82,7 @@ class AsyncRefCountedString {
   // Returns nullptr when it does not refer to any string.
   // The returned string pointer is valid as long as the AsyncRefCountedString
   // instance stay unchanged and it is async-signal-safe.
-  const string *Get() const;
+  const std::string *Get() const;
 
   // Returns the hash value. As a specific string only has one internal copy,
   // the stored string address is directly used as the hash value.
@@ -103,7 +103,7 @@ class AsyncRefCountedString {
  private:
   // The value of ptr_ requires to be changed atomically so that
   // its value will not get corrupted upon interrupts.
-  std::atomic<std::pair<const string, std::atomic<int32_t>> *> ptr_;
+  std::atomic<std::pair<const std::string, std::atomic<int32_t>> *> ptr_;
 };
 
 }  // namespace javaprofiler

@@ -31,18 +31,18 @@ class NativeProcessInfo {
  public:
   // procmaps_filename contains the path of a file describing the memory
   // regions in the current process, in /proc/<pid>/maps format.
-  explicit NativeProcessInfo(const string &procmaps_filename);
+  explicit NativeProcessInfo(const std::string &procmaps_filename);
 
   struct Mapping {
     uint64 start, limit;
-    string name;
+    std::string name;
   };
 
   void Refresh();
   const std::vector<Mapping> &Mappings() const { return mappings_; }
 
  private:
-  const string procmaps_filename_;
+  const std::string procmaps_filename_;
   std::vector<Mapping> mappings_;
   DISALLOW_COPY_AND_ASSIGN(NativeProcessInfo);
 };

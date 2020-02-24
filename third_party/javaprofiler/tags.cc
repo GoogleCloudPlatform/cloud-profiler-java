@@ -31,15 +31,15 @@ std::mutex mutex;
 const Tags *empty_tags = nullptr;
 const AsyncRefCountedString *empty_async_string = nullptr;
 // Stores all the keys.
-std::vector<string> *keys = nullptr;
+std::vector<std::string> *keys = nullptr;
 // Maps key to its id. The index of a key stored in keys (called id or key_id)
 // is used to retrieve a key or value quickly as it is very friendly to vectors.
-std::unordered_map<string, int32_t> *key_to_id = nullptr;
+std::unordered_map<std::string, int32_t> *key_to_id = nullptr;
 
 // Returns the id of the key if the key has been registered. Otherwise, it tries
 // to add the key and returns its id upon success or returns -1 if there is no
 // extra space.
-int32_t RegisterKey(const string &key) {
+int32_t RegisterKey(const std::string &key) {
   std::lock_guard<std::mutex> lock(mutex);
   const auto &target = key_to_id->find(key);
   if (target != key_to_id->end()) {
@@ -65,7 +65,7 @@ const char kAttrKey[] = "attr";
 
 // Returns the id of the key if the key has been registered; otherwise, returns
 // -1.
-int32_t Tags::GetIdByKey(const string &key) {
+int32_t Tags::GetIdByKey(const std::string &key) {
   std::lock_guard<std::mutex> lock(mutex);
   auto target = key_to_id->find(key);
   if (target == key_to_id->end()) {
@@ -80,7 +80,7 @@ void Tags::AsyncSafeCopy(const Tags &from) {
   }
 }
 
-bool Tags::Set(const string &key, const AsyncRefCountedString &value) {
+bool Tags::Set(const std::string &key, const AsyncRefCountedString &value) {
   // All values are stored in the vector "values_" and "key_id" (resolved by
   // "key") is used to locate the right position.
   int32_t key_id = RegisterKey(key);
@@ -122,7 +122,7 @@ uint64 Tags::Hash() const {
   return h;
 }
 
-const AsyncRefCountedString &Tags::Get(const string &key) const {
+const AsyncRefCountedString &Tags::Get(const std::string &key) const {
   int32_t key_id = GetIdByKey(key);
   if (key_id >= 0) {
     return values_[key_id];
@@ -130,9 +130,11 @@ const AsyncRefCountedString &Tags::Get(const string &key) const {
   return *empty_async_string;
 }
 
-std::vector<std::pair<string, AsyncRefCountedString>> Tags::GetAll() const {
+std::vector<std::pair<std::string, AsyncRefCountedString>> Tags::GetAll()
+    const {
   std::lock_guard<std::mutex> lock(mutex);
-  std::vector<std::pair<string, AsyncRefCountedString>> all_pairs(keys->size());
+  std::vector<std::pair<std::string, AsyncRefCountedString>> all_pairs(
+      keys->size());
   for (int i = 0; i < keys->size(); i++) {
     all_pairs[i].first = (*keys)[i];
     all_pairs[i].second = values_[i];
@@ -147,7 +149,7 @@ void Tags::SetAttribute(int64 value) {
 }
 
 int64 Tags::GetAttribute() const {
-  const string *value = Get(kAttrKey).Get();
+  const std::string *value = Get(kAttrKey).Get();
   if (value == nullptr) {
     return 0;
   }
@@ -164,8 +166,8 @@ bool Tags::Init() {
       return false;
     }
     empty_async_string = new AsyncRefCountedString();
-    keys = new std::vector<string>();
-    key_to_id = new std::unordered_map<string, int32_t>();
+    keys = new std::vector<std::string>();
+    key_to_id = new std::unordered_map<std::string, int32_t>();
     empty_tags = new Tags();
   }
   // Register the key "Accessors::kAttrKey" to support Accessors::SetAttribute()

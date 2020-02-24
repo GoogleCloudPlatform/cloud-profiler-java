@@ -35,8 +35,7 @@ static jvmtiError Deallocate(jvmtiEnv* jvmti, unsigned char* mem) {
   return JVMTI_ERROR_NONE;
 }
 
-static void CreateJvmtiString(jvmtiEnv* jvmti,
-                              const string& name,
+static void CreateJvmtiString(jvmtiEnv* jvmti, const std::string& name,
                               char** name_str) {
   unsigned char* name_str_u;
   jvmti->Allocate(name.size() + 1, &name_str_u);

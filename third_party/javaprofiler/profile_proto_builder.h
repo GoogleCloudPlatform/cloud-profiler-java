@@ -68,16 +68,16 @@ class LocationBuilder {
   // Return an existing or new location matching the given parameters,
   // modifying the profile as needed to add new function and location
   // information.
-  perftools::profiles::Location *LocationFor(const string &class_name,
-                                             const string &function_name,
-                                             const string &file_name,
+  perftools::profiles::Location *LocationFor(const std::string &class_name,
+                                             const std::string &function_name,
+                                             const std::string &file_name,
                                              int line_number);
 
  private:
   struct LocationInfo {
-    string class_name;
-    string function_name;
-    string file_name;
+    std::string class_name;
+    std::string function_name;
+    std::string file_name;
     int line_number;
   };
 
@@ -105,7 +105,7 @@ class ProfileFrameCache {
   virtual perftools::profiles::Location *GetLocation(
       const JVMPI_CallFrame &jvm_frame, LocationBuilder *location_builder) = 0;
 
-  virtual string GetFunctionName(const JVMPI_CallFrame &jvm_frame) = 0;
+  virtual std::string GetFunctionName(const JVMPI_CallFrame &jvm_frame) = 0;
 
   virtual ~ProfileFrameCache() {}
 };
@@ -128,7 +128,8 @@ class ProfileProtoBuilder {
 
   // Add a "fake" trace with a single frame. Used to represent JVM
   // tasks such as JIT compilation and GC.
-  void AddArtificialTrace(const string& name, int count, int sampling_rate);
+  void AddArtificialTrace(const std::string &name, int count,
+                          int sampling_rate);
 
   // Build the proto. Calling any other method on the class after calling
   // this has undefined behavior.
@@ -161,11 +162,11 @@ class ProfileProtoBuilder {
 
  protected:
   struct SampleType {
-    SampleType(const string &type_in, const string &unit_in)
+    SampleType(const std::string &type_in, const std::string &unit_in)
         : type(type_in), unit(unit_in) {}
 
-    string type;
-    string unit;
+    std::string type;
+    std::string unit;
   };
 
   // Create the profile proto builder, if native_cache is nullptr, then no
@@ -204,7 +205,7 @@ class ProfileProtoBuilder {
     }
 
     // Notify the state that we are visiting a native frame.
-    void NativeFrame(const string &function_name) {
+    void NativeFrame(const std::string &function_name) {
       if (StartsWith(function_name, "JavaCalls::call_helper")) {
         in_jni_helpers_ = true;
       }
@@ -223,7 +224,7 @@ class ProfileProtoBuilder {
     // TODO: Support a "complete detail" mode to override this.
     bool in_jni_helpers_ = false;
 
-    static bool StartsWith(const string &s, const string &prefix) {
+    static bool StartsWith(const std::string &s, const std::string &prefix) {
       return s.find(prefix) == 0;
     }
   };
