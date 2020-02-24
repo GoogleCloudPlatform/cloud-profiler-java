@@ -34,16 +34,16 @@ class Tags {
   // Returns the value (in AsyncRefCountedString reference) indexed by "key". Be
   // cautious that the referenced AsyncRefCountedString may change if modifiers
   // (e.g., Set(), Clear()) are invoked later.
-  const AsyncRefCountedString &Get(const string &key) const;
+  const AsyncRefCountedString &Get(const std::string &key) const;
   // Sets the value indexed by "key" to "value". It returns true on success;
   // otherwise returns false. The failure usually comes from that "key" does not
   // exist in the key list while there is no space to accommodate this new
   // "key".
-  bool Set(const string &key, const AsyncRefCountedString &value);
+  bool Set(const std::string &key, const AsyncRefCountedString &value);
   // Resets all values to nullptr.
   void ClearAll();
   // Returns all the key-value pairs stored in this Tags.
-  std::vector<std::pair<string, AsyncRefCountedString>> GetAll() const;
+  std::vector<std::pair<std::string, AsyncRefCountedString>> GetAll() const;
 
   // Legacy interfaces. The attribute value is stored internally indexed by a
   // special key (kAttrKey).
@@ -80,7 +80,7 @@ class Tags {
 
  private:
   // // Returns the id of "key" if "key" is present; otherwise, returns -1.
-  static int32_t GetIdByKey(const string &key);
+  static int32_t GetIdByKey(const std::string &key);
 
   AsyncRefCountedString values_[kMaxNumTags];
 

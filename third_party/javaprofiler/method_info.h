@@ -33,10 +33,11 @@ namespace javaprofiler {
 class MethodInfo {
  public:
   // Constructor providing all the information regarding a method.
-  MethodInfo(const string &method_name,
-             const string &class_name,
-             const string &file_name) :
-    method_name_(method_name), class_name_(class_name), file_name_(file_name) {}
+  MethodInfo(const std::string &method_name, const std::string &class_name,
+             const std::string &file_name)
+      : method_name_(method_name),
+        class_name_(class_name),
+        file_name_(file_name) {}
 
   // An invalid location Id.
   static const int64 kInvalidLocationId = 0;
@@ -50,22 +51,16 @@ class MethodInfo {
     locations_[bci] = location_id;
   }
 
-  const string &MethodName() const {
-    return method_name_;
-  }
+  const std::string &MethodName() const { return method_name_; }
 
-  const string &ClassName() const {
-    return class_name_;
-  }
+  const std::string &ClassName() const { return class_name_; }
 
-  const string &FileName() const {
-    return file_name_;
-  }
+  const std::string &FileName() const { return file_name_; }
 
  private:
-  string method_name_;
-  string class_name_;
-  string file_name_;
+  std::string method_name_;
+  std::string class_name_;
+  std::string file_name_;
 
   // Cache of jlocation results.
   std::unordered_map<int, int64> locations_;

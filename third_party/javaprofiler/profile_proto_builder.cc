@@ -62,8 +62,8 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 }
 
-void ProfileProtoBuilder::AddArtificialTrace(const string& name, int count,
-    int sampling_rate) {
+void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
+                                             int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
       name, name, "", -1);
 
@@ -216,10 +216,10 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
     return it->second.get();
   }
 
-  string file_name;
-  string class_name;
-  string method_name;
-  string signature;
+  std::string file_name;
+  std::string class_name;
+  std::string method_name;
+  std::string signature;
 
   // Ignore lineno since we pass nullptr anyway.
   JVMPI_CallFrame jvm_frame = { 0, method_id };
@@ -227,7 +227,7 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
                         &class_name, &method_name, &signature, nullptr);
 
   FixMethodParameters(&signature);
-  string full_method_name = class_name + "." + method_name + signature;
+  std::string full_method_name = class_name + "." + method_name + signature;
 
   std::unique_ptr<MethodInfo> unique_method(
       new MethodInfo(full_method_name, class_name, file_name));
@@ -248,7 +248,7 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
     return;
   }
 
-  string function_name = native_cache_->GetFunctionName(jvm_frame);
+  std::string function_name = native_cache_->GetFunctionName(jvm_frame);
   perftools::profiles::Location *location =
     native_cache_->GetLocation(jvm_frame,
                                &location_builder_);
@@ -282,7 +282,7 @@ size_t LocationBuilder::LocationInfoHash::operator()(
 
   unsigned int h = 1;
 
-  hash<string> hash_string;
+  hash<std::string> hash_string;
   hash<int> hash_int;
 
   h = 31U * h + hash_string(info.class_name);
@@ -302,10 +302,8 @@ bool LocationBuilder::LocationInfoEquals::operator()(
 }
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
-      const string &class_name,
-      const string &function_name,
-      const string &file_name,
-      int line_number) {
+    const std::string &class_name, const std::string &function_name,
+    const std::string &file_name, int line_number) {
   auto profile = builder_->mutable_profile();
 
   LocationInfo info{ class_name, function_name, file_name, line_number };
@@ -322,7 +320,7 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   auto line = location->add_line();
 
-  string simplified_name = function_name;
+  std::string simplified_name = function_name;
   SimplifyFunctionName(&simplified_name);
   auto function_id = builder_->FunctionId(
       simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);

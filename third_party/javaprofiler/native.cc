@@ -30,7 +30,7 @@
 namespace google {
 namespace javaprofiler {
 
-NativeProcessInfo::NativeProcessInfo(const string &procmaps_filename)
+NativeProcessInfo::NativeProcessInfo(const std::string &procmaps_filename)
     : procmaps_filename_(procmaps_filename) {
   Refresh();
 }
@@ -77,7 +77,7 @@ void NativeProcessInfo::Refresh() {
     const char *filename = &line[filename_index];
     size_t filename_len = strcspn(filename, " \t\n");
     mappings_.emplace_back(
-        Mapping{start, limit, string(filename, filename_len)});
+        Mapping{start, limit, std::string(filename, filename_len)});
   }
   fclose(f);
 }

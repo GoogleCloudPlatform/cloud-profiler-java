@@ -38,9 +38,9 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location);
 // When unknown, it fills the parameters with: UnknownFile, UnknownClass,
 // UnknownMethod, "", and -1.
 bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
-                           const JVMPI_CallFrame &frame, string *file_name,
-                           string *class_name, string *method_name,
-                           string *signature, int *line_number);
+                           const JVMPI_CallFrame &frame, std::string *file_name,
+                           std::string *class_name, std::string *method_name,
+                           std::string *signature, int *line_number);
 
 // Fill the file_name, class_name, method_name, and line_number parameters using
 // the information provided by the frame and using the JVMTI environment.
@@ -49,9 +49,9 @@ bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
 // When unknown, it fills the parameters with: UnknownFile, UnknownClass,
 // UnknownMethod, "", and -1.
 bool GetStackFrameElements(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
-                           jclass declaring_class, string *file_name,
-                           string *class_name, string *method_name,
-                           string *signature, int *line_number);
+                           jclass declaring_class, std::string *file_name,
+                           std::string *class_name, std::string *method_name,
+                           std::string *signature, int *line_number);
 
 }  // namespace javaprofiler
 }  // namespace google
