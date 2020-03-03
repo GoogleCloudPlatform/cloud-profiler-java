@@ -127,11 +127,6 @@ void ProfileProtoBuilder::UpdateSampleValues(
 }
 
 void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, int64 metric) {
-  InitSampleValues(sample, 1, metric);
-}
-
-void ProfileProtoBuilder::InitSampleValues(
     perftools::profiles::Sample *sample, int64 count, int64 metric) {
   sample->add_value(count);
   sample->add_value(metric);

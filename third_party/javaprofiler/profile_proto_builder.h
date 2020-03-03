@@ -231,7 +231,6 @@ class ProfileProtoBuilder {
 
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
-  void InitSampleValues(perftools::profiles::Sample *sample, int64 metric);
   void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
                         int64 metric);
   void UpdateSampleValues(perftools::profiles::Sample *sample, int64 count,
