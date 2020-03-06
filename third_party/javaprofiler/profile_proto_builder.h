@@ -21,10 +21,10 @@
 #include <link.h>
 
 #include <cmath>
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "perftools/profiles/proto/builder.h"
 #include "third_party/javaprofiler/method_info.h"
@@ -38,23 +38,31 @@ struct ProfileStackTrace {
   jint metric_value;
 };
 
-// Store proto sample objects for specific stack traces.
+// Store proto sample objects for specific stack traces and label values.
 class TraceSamples {
  public:
-  perftools::profiles::Sample *SampleFor(const JVMPI_CallTrace &trace) const;
-  void Add(const JVMPI_CallTrace &trace, perftools::profiles::Sample *sample);
+  perftools::profiles::Sample *SampleFor(
+      const JVMPI_CallTrace *trace, const std::list<int64> &label_values) const;
+  void Add(const JVMPI_CallTrace *trace, const std::list<int64> &label_values,
+           perftools::profiles::Sample *sample);
 
  private:
+  struct TraceAndValues {
+    const JVMPI_CallTrace *trace;
+    // Values for each label type in ProfileProtoBuilder::label_types_.
+    const std::list<int64> label_values;
+  };
+
   struct TraceHash {
-    size_t operator()(const JVMPI_CallTrace *trace) const;
+    size_t operator()(const TraceAndValues &trace_values) const;
   };
 
   struct TraceEquals {
-    bool operator()(const JVMPI_CallTrace *trace1,
-                    const JVMPI_CallTrace *trace2) const;
+    bool operator()(const TraceAndValues &trace_values1,
+                    const TraceAndValues &trace_values2) const;
   };
 
-  std::unordered_map<const JVMPI_CallTrace *, perftools::profiles::Sample *,
+  std::unordered_map<TraceAndValues, perftools::profiles::Sample *,
       TraceHash, TraceEquals> traces_;
 };
 
@@ -126,6 +134,20 @@ class ProfileProtoBuilder {
                  const int32 *counts,
                  int num_traces);
 
+  // Add traces to the proto, and append traces[i].metric_value as the label
+  // value corresponding to the last label_type. The traces array must not be
+  // deleted before calling CreateProto.
+  void AddTracesAppendingMetricAsLabel(const ProfileStackTrace *traces,
+                                       int num_traces);
+
+  // Add traces to the proto, where each trace has a defined count of
+  // occurrences, and append traces[i].metric_value as the label
+  // value corresponding to the last label_type. The traces array must not be
+  // deleted before calling CreateProto.
+  void AddTracesAppendingMetricAsLabel(const ProfileStackTrace *traces,
+                                       const int32 *counts,
+                                       int num_traces);
+
   // Add a "fake" trace with a single frame. Used to represent JVM
   // tasks such as JIT compilation and GC.
   void AddArtificialTrace(const std::string &name, int count,
@@ -175,7 +197,8 @@ class ProfileProtoBuilder {
   ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
                       ProfileFrameCache *native_cache, int64 sampling_rate,
                       const SampleType &count_type,
-                      const SampleType &metric_type);
+                      const SampleType &metric_type,
+                      const std::list<SampleType> &label_types);
 
   // An implementation must decide how many frames to skip in a trace.
   virtual int SkipTopNativeFrames(const JVMPI_CallTrace &trace) = 0;
@@ -232,10 +255,11 @@ class ProfileProtoBuilder {
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
   void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
-                        int64 metric);
+                        int64 metric, const std::list<int64> &label_values);
   void UpdateSampleValues(perftools::profiles::Sample *sample, int64 count,
                           int64 size);
-  void AddTrace(const ProfileStackTrace &trace, int32 count);
+  void AddTrace(const ProfileStackTrace &trace, int32 count,
+                bool append_metric_value_as_label);
   void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
                    perftools::profiles::Profile *profile,
                    perftools::profiles::Sample *sample,
@@ -268,6 +292,7 @@ class ProfileProtoBuilder {
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;
+  const std::list<SampleType> label_types_;
 };
 
 // Computes the ratio to use to scale heap data to unsample it.
@@ -286,7 +311,8 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("samples", "count"),
-            ProfileProtoBuilder::SampleType("cpu", "nanoseconds")) {
+            ProfileProtoBuilder::SampleType("cpu", "nanoseconds"),
+            std::list<ProfileProtoBuilder::SampleType>()) {
     builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
@@ -306,7 +332,10 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("inuse_objects", "count"),
-            ProfileProtoBuilder::SampleType("inuse_space", "bytes")) {}
+            ProfileProtoBuilder::SampleType("inuse_space", "bytes"),
+            std::list<ProfileProtoBuilder::SampleType>({
+                ProfileProtoBuilder::SampleType("bytes", "bytes")
+            })) {}
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateUnsampledProto();
@@ -362,7 +391,8 @@ class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("contentions", "count"),
-            ProfileProtoBuilder::SampleType("delay", "microseconds")) {
+            ProfileProtoBuilder::SampleType("delay", "microseconds"),
+            std::list<ProfileProtoBuilder::SampleType>()) {
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 
