@@ -81,7 +81,7 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # parallel builds, see
 # https://github.com/openssl/openssl/issues/5762#issuecomment-376622684.
 RUN mkdir /tmp/openssl && cd /tmp/openssl && \
-    curl -sL https://www.openssl.org/source/openssl-1.0.2o.tar.gz | \
+    curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_0_2t.tar.gz | \
         tar xzv --strip=1 && \
     ./config no-shared -fPIC --openssldir=/usr/local/ssl && \
     make && make install_sw && \
