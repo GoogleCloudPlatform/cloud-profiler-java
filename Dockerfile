@@ -38,8 +38,6 @@ RUN apt-get update && apt-get -y -q install \
   curl \
   g++ \
   git \
-  libcurl4-openssl-dev \
-  libssl-dev \
   libtool \
   make \
   openjdk-11-jdk-headless \
@@ -47,13 +45,24 @@ RUN apt-get update && apt-get -y -q install \
   unzip \
   zlib1g-dev
 
+# openssl
+# This openssl (compiled with -fPIC) is used to statically link into the agent
+# shared library.
+ENV PKG_CONFIG_PATH=/usr/local/ssl/lib/pkgconfig
+RUN mkdir /tmp/openssl && cd /tmp/openssl && \
+    curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.tar.gz | \
+        tar xzv --strip=1 && \
+    ./config no-shared -fPIC --openssldir=/usr/local/ssl --prefix=/usr/local/ssl && \
+    make && make install_sw && \
+    cd ~ && rm -rf /tmp/openssl
+
 # curl
-RUN git clone --depth=1 -b curl-7_55_1 https://github.com/curl/curl.git /tmp/curl && \
+RUN git clone --depth=1 -b curl-7_66_0 https://github.com/curl/curl.git /tmp/curl && \
     cd /tmp/curl && \
     ./buildconf && \
     ./configure --disable-ldap --disable-shared --without-libssh2 \
                 --without-librtmp --without-libidn --enable-static \
-                --with-pic --with-ssl && \
+                --with-pic --with-ssl=/usr/local/ssl/ && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/curl
 
@@ -72,34 +81,19 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/glog
 
-# openssl
-# This openssl (compiled with -fPIC) is used to statically link into the agent
-# shared library.  We still install libssl-dev above since getting libcurl to
-# link with the custom version is tricky, see
-# http://askubuntu.com/questions/475670/how-to-build-curl-with-the-latest-openssl.
-# Also, intentionally not using -j as OpenSSL < 1.1.0 not quite supporting the
-# parallel builds, see
-# https://github.com/openssl/openssl/issues/5762#issuecomment-376622684.
-RUN mkdir /tmp/openssl && cd /tmp/openssl && \
-    curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_0_2t.tar.gz | \
-        tar xzv --strip=1 && \
-    ./config no-shared -fPIC --openssldir=/usr/local/ssl && \
-    make && make install_sw && \
-    cd ~ && rm -rf /tmp/openssl
-
 # gRPC & protobuf
 # Use the protobuf version from gRPC for everything to avoid conflicting
 # versions to be linked in. Disable OpenSSL embedding: when it's on, the build
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
-RUN git clone --depth=1 --recursive -b v1.25.0 https://github.com/grpc/grpc.git /tmp/grpc && \
+RUN git clone --depth=1 --recursive -b v1.28.1 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
     cd third_party/protobuf && \
     ./autogen.sh && \
     ./configure --with-pic CXXFLAGS="$(pkg-config --cflags protobuf)" LIBS="$(pkg-config --libs protobuf)" LDFLAGS="-Wl,--no-as-needed" && \
     make -j && make install && ldconfig && \
     cd ../.. && \
-    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-Wl,--no-as-needed" make -j CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
-    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-Wl,--no-as-needed" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
+    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make -j CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
+    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
     rm -rf /tmp/grpc
