@@ -88,7 +88,7 @@ std::string GceMetadataRequest(HTTPRequest* req, const std::string& path) {
 }
 
 const char* Getenv(const std::string& var) {
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17)
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17) || ALPINE == 1
   return secure_getenv(var.c_str());
 #else
   return __secure_getenv(var.c_str());

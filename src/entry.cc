@@ -26,7 +26,8 @@
 
 DEFINE_bool(cprof_cpu_use_per_thread_timers, false,
             "when true, use per-thread CLOCK_THREAD_CPUTIME_ID timers; "
-            "only profiles Java threads, non-Java threads will be missed");
+            "only profiles Java threads, non-Java threads will be missed. "
+            "This flag is ignored on Alpine.");
 DEFINE_bool(cprof_force_debug_non_safepoints, true,
             "when true, force DebugNonSafepoints flag by subscribing to the"
             "code generation events. This improves the accuracy of profiles,"
@@ -292,7 +293,16 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   // The process exit will free the memory. See comments to the variable on why.
   // Initialize before registering the JVMTI callbacks to avoid the unlikely
   // race of getting thread events before the thread table is born.
+#ifdef ALPINE
+  // musl does not support SIGEV_THREAD_ID. Disable per thread timers.
+  if (FLAGS_cprof_cpu_use_per_thread_timers) {
+    LOG(WARNING) << "Per thread timers not available in Alpine. "
+                 << "Ignoring '-cprof_cpu_use_per_thread_timers' flag.";
+  }
+  threads = new ThreadTable(false);
+#else
   threads = new ThreadTable(FLAGS_cprof_cpu_use_per_thread_timers);
+#endif
 
   if (!RegisterJvmti(jvmti)) {
     LOG(ERROR) << "Failed to enable JVMTI events.  Continuing...";
@@ -304,21 +314,19 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
 
   google::javaprofiler::Asgct::SetAsgct(
       google::javaprofiler::Accessors::GetJvmFunction<
-      google::javaprofiler::ASGCTType>("AsyncGetCallTrace"));
+          google::javaprofiler::ASGCTType>("AsyncGetCallTrace"));
 
   worker = new Worker(jvmti, threads);
   return 0;
 }
 
-void JNICALL Agent_OnUnload(JavaVM *vm) {
-  IMPLICITLY_USE(vm);
-}
+void JNICALL Agent_OnUnload(JavaVM *vm) { IMPLICITLY_USE(vm); }
 
 }  // namespace profiler
 }  // namespace cloud
 
-AGENTEXPORT jint JNICALL
-Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
+AGENTEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options,
+                                      void *reserved) {
   return cloud::profiler::Agent_OnLoad(vm, options, reserved);
 }
 

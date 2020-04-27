@@ -22,8 +22,14 @@ set -o nounset
 # Command line arguments: [-d]
 #   -d: specify the temporary directory for the build.
 
-while getopts ":d:" opt; do
+ALPINE_BUILD="0"
+DOCKERFILE="Dockerfile"
+FILE_SUFFIX=""
+while getopts ":ad:" opt; do
   case $opt in
+  a)
+      ALPINE_BUILD="1"
+      ;;
   d)
       BUILD_TEMP_DIR=$OPTARG
       ;;
@@ -57,8 +63,14 @@ trap "{ echo 'FAILED: see ${LOG_FILE} for details' ; exit 1; }" ERR
 
 mkdir -p "${BUILD_TEMP_DIR}"
 
-PrintMessage "Building the builder Docker container..."
-docker build -t cprof-agent-builder . >> "${LOG_FILE}" 2>&1
+if [[ "${ALPINE_BUILD}" = "1" ]]; then
+    PrintMessage "Building the builder Alpine Docker container..."
+    DOCKERFILE="Dockerfile.alpine"
+    FILE_SUFFIX="_alpine"
+else
+    PrintMessage "Building the builder Docker container..."
+fi
+    docker build -f "${DOCKERFILE}" -t cprof-agent-builder . >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent code..."
 mkdir -p "${BUILD_TEMP_DIR}"/build
@@ -72,12 +84,12 @@ docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
     >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent binaries..."
-tar zcf "${BUILD_TEMP_DIR}"/profiler_java_agent.tar.gz \
+tar zcf "${BUILD_TEMP_DIR}"/profiler_java_agent${FILE_SUFFIX}.tar.gz \
     -C "${BUILD_TEMP_DIR}"/build/.out \
     NOTICES profiler_java_agent.so \
     >> "${LOG_FILE}" 2>&1
 
-PrintMessage "Agent built and stored locally in: ${BUILD_TEMP_DIR}/profiler_java_agent.tar.gz"
+PrintMessage "Agent built and stored locally in: ${BUILD_TEMP_DIR}/profiler_java_agent${FILE_SUFFIX}.tar.gz"
 
 trap - EXIT
 PrintMessage "SUCCESS"
