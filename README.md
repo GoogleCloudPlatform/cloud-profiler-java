@@ -27,3 +27,15 @@ commands below.
  $ cd cloud-profiler-java
  $ ./build.sh
 ```
+
+## To build for Alpine.
+
+**Per thread timers are not available on Alpine.** Since SIGEV_THREAD_ID is not
+supported by `timer_create` on Alpine, per thread timers are not implemented and
+the flag `-cprof_cpu_use_per_thread_timers` is ignored on this platform.
+
+```shell
+$ git clone https://github.com/GoogleCloudPlatform/cloud-profiler-java.git
+$ cd cloud-profiler-java
+$ ./build.sh -a
+```
