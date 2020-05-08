@@ -1,7 +1,7 @@
-# Stackdriver Profiler Java Agent
+# Google Cloud Profiler Profiler Java Agent
 
-This repository contains source code for the [Stackdriver
-Profiler](https://cloud.google.com/profiler/) Java agent.
+This repository contains source code for the
+[Google Cloud Profiler Profiler](https://cloud.google.com/profiler/) Java agent.
 
 ## Installation
 
@@ -12,9 +12,9 @@ wget -q -O- https://storage.googleapis.com/cloud-profiler/java/latest/profiler_j
 | sudo tar xzv -C /opt/cprof
 ```
 
-See the [Stackdriver Profiler Java profiling
-doc](https://cloud.google.com/profiler/docs/profiling-java) for detailed and
-most up-to-date guide on installing and using the agent.
+See the
+[Google Cloud Profiler Profiler Java profiling doc](https://cloud.google.com/profiler/docs/profiling-java)
+for detailed and most up-to-date guide on installing and using the agent.
 
 ## Build from Source
 
