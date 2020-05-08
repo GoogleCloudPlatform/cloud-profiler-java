@@ -268,7 +268,7 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
 
   ParseArguments(options);  // Initializes logger -- do not log before this call
 
-  LOG(INFO) << "Stackdriver Profiler Java agent version: "
+  LOG(INFO) << "Google Cloud Profiler Java agent version: "
             << CLOUD_PROFILER_AGENT_VERSION;
   LOG(INFO) << "Profiler agent loaded";
   google::javaprofiler::AttributeTable::Init();
