@@ -286,6 +286,11 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
   }
 
   std::string function_name = native_cache_->GetFunctionName(jvm_frame);
+
+  if (SkipFrame(function_name)) {
+    return;
+  }
+
   perftools::profiles::Location *location =
     native_cache_->GetLocation(jvm_frame,
                                &location_builder_);
@@ -455,14 +460,6 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
   // Java-only stackframe gatherer.
   return std::unique_ptr<ProfileProtoBuilder>(
       new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
-}
-
-std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForNativeHeap(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-    ProfileFrameCache *cache) {
-  assert(cache != nullptr);
-  return std::unique_ptr<ProfileProtoBuilder>(new NativeHeapProfileProtoBuilder(
-      jni_env, jvmti_env, sampling_rate, cache));
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(

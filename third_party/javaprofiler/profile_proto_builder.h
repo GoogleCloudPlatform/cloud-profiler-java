@@ -158,17 +158,12 @@ class ProfileProtoBuilder {
   virtual std::unique_ptr<perftools::profiles::Profile> CreateProto() = 0;
 
   // Create a heap profile.
-  // jvmti_env can be null as well but then all calls to AddTraces will return
+  // jvmti_env can be null but then all calls to AddTraces will return
   // unknown.
-  // ForHeap/ForNativeHeap is the only case where we accept a null cache since
-  // the heap profiles can be using JVMTI's GetStackTrace and remain in pure
-  // Java land frames. Other ForX methods will fail an assertion when attempting
-  // a nullptr cache.
+  // Accepts a null cache since the heap profiles can be using JVMTI's
+  // GetStackTrace and remain in pure Java land frames. Other ForX methods
+  // will fail an assertion when attempting a nullptr cache.
   static std::unique_ptr<ProfileProtoBuilder> ForHeap(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-      ProfileFrameCache *cache = nullptr);
-
-  static std::unique_ptr<ProfileProtoBuilder> ForNativeHeap(
       JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
       ProfileFrameCache *cache = nullptr);
 
@@ -199,6 +194,10 @@ class ProfileProtoBuilder {
                       const SampleType &count_type,
                       const SampleType &metric_type,
                       const std::list<SampleType> &label_types);
+
+  virtual bool SkipFrame(const std::string &function_name) const {
+    return false;
+  }
 
   // An implementation must decide how many frames to skip in a trace.
   virtual int SkipTopNativeFrames(const JVMPI_CallTrace &trace) = 0;
@@ -357,30 +356,6 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
     // All are native is weird for Java heap samples but do nothing in this
     // case.
     return 0;
-  }
-};
-
-class NativeHeapProfileProtoBuilder : public HeapProfileProtoBuilder {
- public:
-  NativeHeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                                int64 sampling_rate, ProfileFrameCache *cache)
-      : HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache) {}
-
- protected:
-  // In cases of long native frames, we really only want to skip the
-  // frames_to_skip first frames, which would be something akin to:
-  //   absl::base_internal::MallocHook::InvokeNewHookSlow
-  //   absl::base_internal::MallocHook::InvokeNewHook
-  //   calloc
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override {
-    // If frames_to_skip changes, change the number of frames checked against
-    // kNativeFrameLineNum below to check the correct number of frames.
-    const int frames_to_skip = 3;
-    return (trace.num_frames >= frames_to_skip
-            && trace.frames[0].lineno == kNativeFrameLineNum
-            && trace.frames[1].lineno == kNativeFrameLineNum
-            && trace.frames[2].lineno == kNativeFrameLineNum)
-        ? frames_to_skip : 0;
   }
 };
 
