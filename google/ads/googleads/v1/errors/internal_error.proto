@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -43,12 +42,14 @@ message InternalErrorEnum {
     // Google Ads API encountered unexpected internal error.
     INTERNAL_ERROR = 2;
 
-    // The intended error code doesn't exist in any API version. This will be
-    // fixed by adding a new error code as soon as possible.
+    // The intended error code doesn't exist in specified API version. It will
+    // be released in a future API version.
     ERROR_CODE_NOT_PUBLISHED = 3;
 
     // Google Ads API encountered an unexpected transient error. The user
     // should retry their request in these cases.
     TRANSIENT_ERROR = 4;
   }
+
+
 }

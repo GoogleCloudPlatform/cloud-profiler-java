@@ -1,0 +1,47 @@
+type: com.google.api.codegen.ConfigProto
+config_schema_version: 2.0.0
+# The settings of generated code in a specific language.
+language_settings:
+  java:
+    package_name: com.google.cloud.documentai.v1beta2
+  python:
+    package_name: google.cloud.documentai_v1beta2.gapic
+  go:
+    package_name: cloud.google.com/go/documentai/apiv1beta2
+  csharp:
+    package_name: Google.Cloud.DocumentAi.V1beta2
+  ruby:
+    package_name: Google::Cloud::DocumentAi::V1beta2
+  php:
+    package_name: Google\Cloud\DocumentAi\V1beta2
+  nodejs:
+    package_name: documentai.v1beta2
+# A list of API interface configurations.
+interfaces:
+# The fully qualified name of the API interface.
+- name: google.cloud.documentai.v1beta2.DocumentUnderstandingService
+  # A list of resource collection configurations.
+  # Consists of a name_pattern and an entity_name.
+  # The name_pattern is a pattern to describe the names of the resources of this
+  # collection, using the platform's conventions for URI patterns. A generator
+  # may use this to generate methods to compose and decompose such names. The
+  # pattern should use named placeholders as in `shelves/{shelf}/books/{book}`;
+  # those will be taken as hints for the parameter names of the generated
+  # methods. If empty, no name methods are generated.
+  # The entity_name is the name to be used as a basis for generated methods and
+  # classes.
+
+  # A list of method configurations.
+  # Common properties:
+  #
+  #   name - The simple name of the method.
+  #
+  #   retry_codes_name - Specifies the configuration for retryable codes. The
+  #   name must be defined in interfaces.retry_codes_def.
+
+
+  methods:
+  - name: BatchProcessDocuments
+    retry_codes_name: idempotent
+  - name: ProcessDocument
+    retry_codes_name: idempotent

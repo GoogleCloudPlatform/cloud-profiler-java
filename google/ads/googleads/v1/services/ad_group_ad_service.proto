@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -20,8 +19,10 @@ package google.ads.googleads.v1.services;
 import "google/ads/googleads/v1/common/policy.proto";
 import "google/ads/googleads/v1/resources/ad_group_ad.proto";
 import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
-import "google/protobuf/wrappers.proto";
 import "google/rpc/status.proto";
 
 option csharp_namespace = "Google.Ads.GoogleAds.V1.Services";
@@ -37,39 +38,44 @@ option ruby_package = "Google::Ads::GoogleAds::V1::Services";
 
 // Service to manage ads in an ad group.
 service AdGroupAdService {
+  option (google.api.default_host) = "googleads.googleapis.com";
+
   // Returns the requested ad in full detail.
-  rpc GetAdGroupAd(GetAdGroupAdRequest)
-      returns (google.ads.googleads.v1.resources.AdGroupAd) {
+  rpc GetAdGroupAd(GetAdGroupAdRequest) returns (google.ads.googleads.v1.resources.AdGroupAd) {
     option (google.api.http) = {
       get: "/v1/{resource_name=customers/*/adGroupAds/*}"
     };
+    option (google.api.method_signature) = "resource_name";
   }
 
   // Creates, updates, or removes ads. Operation statuses are returned.
-  rpc MutateAdGroupAds(MutateAdGroupAdsRequest)
-      returns (MutateAdGroupAdsResponse) {
+  rpc MutateAdGroupAds(MutateAdGroupAdsRequest) returns (MutateAdGroupAdsResponse) {
     option (google.api.http) = {
       post: "/v1/customers/{customer_id=*}/adGroupAds:mutate"
       body: "*"
     };
+    option (google.api.method_signature) = "customer_id,operations";
   }
 }
 
-// Request message for
-// [AdGroupAdService.GetAdGroupAd][google.ads.googleads.v1.services.AdGroupAdService.GetAdGroupAd].
+// Request message for [AdGroupAdService.GetAdGroupAd][google.ads.googleads.v1.services.AdGroupAdService.GetAdGroupAd].
 message GetAdGroupAdRequest {
-  // The resource name of the ad to fetch.
-  string resource_name = 1;
+  // Required. The resource name of the ad to fetch.
+  string resource_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/AdGroupAd"
+    }
+  ];
 }
 
-// Request message for
-// [AdGroupAdService.MutateAdGroupAds][google.ads.googleads.v1.services.AdGroupAdService.MutateAdGroupAds].
+// Request message for [AdGroupAdService.MutateAdGroupAds][google.ads.googleads.v1.services.AdGroupAdService.MutateAdGroupAds].
 message MutateAdGroupAdsRequest {
-  // The ID of the customer whose ads are being modified.
-  string customer_id = 1;
+  // Required. The ID of the customer whose ads are being modified.
+  string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of operations to perform on individual ads.
-  repeated AdGroupAdOperation operations = 2;
+  // Required. The list of operations to perform on individual ads.
+  repeated AdGroupAdOperation operations = 2 [(google.api.field_behavior) = REQUIRED];
 
   // If true, successful operations will be carried out and invalid
   // operations will return errors. If false, all operations will be carried
@@ -88,8 +94,7 @@ message AdGroupAdOperation {
   google.protobuf.FieldMask update_mask = 4;
 
   // Configuration for how policies are validated.
-  google.ads.googleads.v1.common.PolicyValidationParameter
-      policy_validation_parameter = 5;
+  google.ads.googleads.v1.common.PolicyValidationParameter policy_validation_parameter = 5;
 
   // The mutate operation.
   oneof operation {

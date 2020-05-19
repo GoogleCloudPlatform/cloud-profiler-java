@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,17 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.securitycenter.v1;
 
+import public "google/cloud/securitycenter/v1/run_asset_discovery_response.proto";
+
 import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/cloud/securitycenter/v1/asset.proto";
 import "google/cloud/securitycenter/v1/finding.proto";
+import "google/cloud/securitycenter/v1/notification_config.proto";
 import "google/cloud/securitycenter/v1/organization_settings.proto";
-import "google/cloud/securitycenter/v1/run_asset_discovery_response.proto";
 import "google/cloud/securitycenter/v1/security_marks.proto";
 import "google/cloud/securitycenter/v1/source.proto";
 import "google/iam/v1/iam_policy.proto";
@@ -42,12 +46,17 @@ option ruby_package = "Google::Cloud::SecurityCenter::V1";
 
 // V1 APIs for Security Center service.
 service SecurityCenter {
+  option (google.api.default_host) = "securitycenter.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // Creates a source.
   rpc CreateSource(CreateSourceRequest) returns (Source) {
     option (google.api.http) = {
       post: "/v1/{parent=organizations/*}/sources"
       body: "source"
     };
+    option (google.api.method_signature) = "parent,source";
   }
 
   // Creates a finding. The corresponding source must exist for finding creation
@@ -57,6 +66,28 @@ service SecurityCenter {
       post: "/v1/{parent=organizations/*/sources/*}/findings"
       body: "finding"
     };
+    option (google.api.method_signature) = "parent,finding_id,finding";
+  }
+
+  // Creates a notification config.
+  rpc CreateNotificationConfig(CreateNotificationConfigRequest)
+      returns (NotificationConfig) {
+    option (google.api.http) = {
+      post: "/v1/{parent=organizations/*}/notificationConfigs"
+      body: "notification_config"
+    };
+    option (google.api.method_signature) =
+        "parent,config_id,notification_config";
+    option (google.api.method_signature) = "parent,notification_config";
+  }
+
+  // Deletes a notification config.
+  rpc DeleteNotificationConfig(DeleteNotificationConfigRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/{name=organizations/*/notificationConfigs/*}"
+    };
+    option (google.api.method_signature) = "name";
   }
 
   // Gets the access control policy on the specified Source.
@@ -66,6 +97,16 @@ service SecurityCenter {
       post: "/v1/{resource=organizations/*/sources/*}:getIamPolicy"
       body: "*"
     };
+    option (google.api.method_signature) = "resource";
+  }
+
+  // Gets a notification config.
+  rpc GetNotificationConfig(GetNotificationConfigRequest)
+      returns (NotificationConfig) {
+    option (google.api.http) = {
+      get: "/v1/{name=organizations/*/notificationConfigs/*}"
+    };
+    option (google.api.method_signature) = "name";
   }
 
   // Gets the settings for an organization.
@@ -74,6 +115,7 @@ service SecurityCenter {
     option (google.api.http) = {
       get: "/v1/{name=organizations/*/organizationSettings}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Gets a source.
@@ -81,6 +123,7 @@ service SecurityCenter {
     option (google.api.http) = {
       get: "/v1/{name=organizations/*/sources/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Filters an organization's assets and  groups them by their specified
@@ -96,12 +139,13 @@ service SecurityCenter {
   // specified properties.
   //
   // To group across all sources provide a `-` as the source id.
-  // Example: /v1/organizations/123/sources/-/findings
+  // Example: /v1/organizations/{organization_id}/sources/-/findings
   rpc GroupFindings(GroupFindingsRequest) returns (GroupFindingsResponse) {
     option (google.api.http) = {
       post: "/v1/{parent=organizations/*/sources/*}/findings:group"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,group_by";
   }
 
   // Lists an organization's assets.
@@ -114,11 +158,20 @@ service SecurityCenter {
   // Lists an organization or source's findings.
   //
   // To list across all sources provide a `-` as the source id.
-  // Example: /v1/organizations/123/sources/-/findings
+  // Example: /v1/organizations/{organization_id}/sources/-/findings
   rpc ListFindings(ListFindingsRequest) returns (ListFindingsResponse) {
     option (google.api.http) = {
       get: "/v1/{parent=organizations/*/sources/*}/findings"
     };
+  }
+
+  // Lists notification configs.
+  rpc ListNotificationConfigs(ListNotificationConfigsRequest)
+      returns (ListNotificationConfigsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=organizations/*}/notificationConfigs"
+    };
+    option (google.api.method_signature) = "parent";
   }
 
   // Lists all sources belonging to an organization.
@@ -126,6 +179,7 @@ service SecurityCenter {
     option (google.api.http) = {
       get: "/v1/{parent=organizations/*}/sources"
     };
+    option (google.api.method_signature) = "parent";
   }
 
   // Runs asset discovery. The discovery is tracked with a long-running
@@ -140,6 +194,11 @@ service SecurityCenter {
       post: "/v1/{parent=organizations/*}/assets:runDiscovery"
       body: "*"
     };
+    option (google.api.method_signature) = "parent";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.cloud.securitycenter.v1.RunAssetDiscoveryResponse"
+      metadata_type: "google.protobuf.Empty"
+    };
   }
 
   // Updates the state of a finding.
@@ -148,6 +207,7 @@ service SecurityCenter {
       post: "/v1/{name=organizations/*/sources/*/findings/*}:setState"
       body: "*"
     };
+    option (google.api.method_signature) = "name,state,start_time";
   }
 
   // Sets the access control policy on the specified Source.
@@ -157,6 +217,7 @@ service SecurityCenter {
       post: "/v1/{resource=organizations/*/sources/*}:setIamPolicy"
       body: "*"
     };
+    option (google.api.method_signature) = "resource,policy";
   }
 
   // Returns the permissions that a caller has on the specified source.
@@ -166,6 +227,7 @@ service SecurityCenter {
       post: "/v1/{resource=organizations/*/sources/*}:testIamPermissions"
       body: "*"
     };
+    option (google.api.method_signature) = "resource,permissions";
   }
 
   // Creates or updates a finding. The corresponding source must exist for a
@@ -175,6 +237,19 @@ service SecurityCenter {
       patch: "/v1/{finding.name=organizations/*/sources/*/findings/*}"
       body: "finding"
     };
+    option (google.api.method_signature) = "finding";
+  }
+
+  //
+  // Updates a notification config.
+  rpc UpdateNotificationConfig(UpdateNotificationConfigRequest)
+      returns (NotificationConfig) {
+    option (google.api.http) = {
+      patch: "/v1/{notification_config.name=organizations/*/notificationConfigs/*}"
+      body: "notification_config"
+    };
+    option (google.api.method_signature) = "notification_config";
+    option (google.api.method_signature) = "notification_config,update_mask";
   }
 
   // Updates an organization's settings.
@@ -184,6 +259,7 @@ service SecurityCenter {
       patch: "/v1/{organization_settings.name=organizations/*/organizationSettings}"
       body: "organization_settings"
     };
+    option (google.api.method_signature) = "organization_settings";
   }
 
   // Updates a source.
@@ -192,6 +268,7 @@ service SecurityCenter {
       patch: "/v1/{source.name=organizations/*/sources/*}"
       body: "source"
     };
+    option (google.api.method_signature) = "source";
   }
 
   // Updates security marks.
@@ -204,55 +281,129 @@ service SecurityCenter {
         body: "security_marks"
       }
     };
+    option (google.api.method_signature) = "security_marks";
   }
 }
 
 // Request message for creating a finding.
 message CreateFindingRequest {
-  // Resource name of the new finding's parent. Its format should be
+  // Required. Resource name of the new finding's parent. Its format should be
   // "organizations/[organization_id]/sources/[source_id]".
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/Source"
+    }
+  ];
 
-  // Unique identifier provided by the client within the parent scope.
+  // Required. Unique identifier provided by the client within the parent scope.
   // It must be alphanumeric and less than or equal to 32 characters and
   // greater than 0 characters in length.
-  string finding_id = 2;
+  string finding_id = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The Finding being created. The name and security_marks will be ignored as
-  // they are both output only fields on this resource.
-  Finding finding = 3;
+  // Required. The Finding being created. The name and security_marks will be
+  // ignored as they are both output only fields on this resource.
+  Finding finding = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Request message for creating a notification config.
+message CreateNotificationConfigRequest {
+  // Required. Resource name of the new notification config's parent. Its format
+  // is "organizations/[organization_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
+
+  // Required.
+  // Unique identifier provided by the client within the parent scope.
+  // It must be between 1 and 128 characters, and contains alphanumeric
+  // characters, underscores or hyphens only.
+  string config_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The notification config being created. The name and the service
+  // account will be ignored as they are both output only fields on this
+  // resource.
+  NotificationConfig notification_config = 3
+      [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for creating a source.
 message CreateSourceRequest {
-  // Resource name of the new source's parent. Its format should be
+  // Required. Resource name of the new source's parent. Its format should be
   // "organizations/[organization_id]".
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
 
-  // The Source being created, only the display_name and description will be
-  // used. All other fields will be ignored.
-  Source source = 2;
+  // Required. The Source being created, only the display_name and description
+  // will be used. All other fields will be ignored.
+  Source source = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Request message for deleting a notification config.
+message DeleteNotificationConfigRequest {
+  // Required. Name of the notification config to delete. Its format is
+  // "organizations/[organization_id]/notificationConfigs/[config_id]".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/NotificationConfig"
+    }
+  ];
+}
+
+// Request message for getting a notification config.
+message GetNotificationConfigRequest {
+  // Required. Name of the notification config to get. Its format is
+  // "organizations/[organization_id]/notificationConfigs/[config_id]".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/NotificationConfig"
+    }
+  ];
 }
 
 // Request message for getting organization settings.
 message GetOrganizationSettingsRequest {
-  // Name of the organization to get organization settings for. Its format is
-  // "organizations/[organization_id]/organizationSettings".
-  string name = 1;
+  // Required. Name of the organization to get organization settings for. Its
+  // format is "organizations/[organization_id]/organizationSettings".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/OrganizationSettings"
+    }
+  ];
 }
 
 // Request message for getting a source.
 message GetSourceRequest {
-  // Relative resource name of the source. Its format is
+  // Required. Relative resource name of the source. Its format is
   // "organizations/[organization_id]/source/[source_id]".
-  string name = 1;
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/Source"
+    }
+  ];
 }
 
 // Request message for grouping by assets.
 message GroupAssetsRequest {
-  // Name of the organization to groupBy. Its format is
+  // Required. Name of the organization to groupBy. Its format is
   // "organizations/[organization_id]".
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
 
   // Expression that defines the filter to apply across assets.
   // The expression is a list of zero or more restrictions combined via logical
@@ -281,36 +432,56 @@ message GroupAssetsRequest {
   // * boolean literals `true` and `false` without quotes.
   //
   // The following field and operator combinations are supported:
-  // name | '='
-  // update_time | '>', '<', '>=', '<=', '='
-  // create_time | '>', '<', '>=', '<=', '='
-  // iam_policy.policy_blob | '=', ':'
-  // resource_properties | '=', ':', '>', '<', '>=', '<='
-  // security_marks | '=', ':'
-  // security_center_properties.resource_name | '=', ':'
-  // security_center_properties.resource_type | '=', ':'
-  // security_center_properties.resource_parent | '=', ':'
-  // security_center_properties.resource_project | '=', ':'
-  // security_center_properties.resource_owners | '=', ':'
+  //
+  // * name: `=`
+  // * update_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "update_time = \"2019-06-10T16:07:18-07:00\""
+  //     "update_time = 1560208038000"
+  //
+  // * create_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "create_time = \"2019-06-10T16:07:18-07:00\""
+  //     "create_time = 1560208038000"
+  //
+  // * iam_policy.policy_blob: `=`, `:`
+  // * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+  // * security_marks.marks: `=`, `:`
+  // * security_center_properties.resource_name: `=`, `:`
+  // * security_center_properties.resource_display_name: `=`, `:`
+  // * security_center_properties.resource_type: `=`, `:`
+  // * security_center_properties.resource_parent: `=`, `:`
+  // * security_center_properties.resource_parent_display_name: `=`, `:`
+  // * security_center_properties.resource_project: `=`, `:`
+  // * security_center_properties.resource_project_display_name: `=`, `:`
+  // * security_center_properties.resource_owners: `=`, `:`
   //
   // For example, `resource_properties.size = 100` is a valid filter string.
   string filter = 2;
 
-  // Expression that defines what assets fields to use for grouping. The string
-  // value should follow SQL syntax: comma separated list of fields. For
-  // example:
+  // Required. Expression that defines what assets fields to use for grouping.
+  // The string value should follow SQL syntax: comma separated list of fields.
+  // For example:
   // "security_center_properties.resource_project,security_center_properties.project".
   //
   // The following fields are supported when compare_duration is not set:
   //
   // * security_center_properties.resource_project
+  // * security_center_properties.resource_project_display_name
   // * security_center_properties.resource_type
   // * security_center_properties.resource_parent
+  // * security_center_properties.resource_parent_display_name
   //
   // The following fields are supported when compare_duration is set:
   //
   // * security_center_properties.resource_type
-  string group_by = 3;
+  // * security_center_properties.resource_project_display_name
+  // * security_center_properties.resource_parent_display_name
+  string group_by = 3 [(google.api.field_behavior) = REQUIRED];
 
   // When compare_duration is set, the GroupResult's "state_change" property is
   // updated to indicate whether the asset was added, removed, or remained
@@ -355,8 +526,6 @@ message GroupAssetsRequest {
   // The maximum number of results to return in a single response. Default is
   // 10, minimum is 1, maximum is 1000.
   int32 page_size = 8;
-
-  reserved 6;
 }
 
 // Response message for grouping by assets.
@@ -379,11 +548,16 @@ message GroupAssetsResponse {
 
 // Request message for grouping by findings.
 message GroupFindingsRequest {
-  // Name of the source to groupBy. Its format is
+  // Required. Name of the source to groupBy. Its format is
   // "organizations/[organization_id]/sources/[source_id]". To groupBy across
   // all sources provide a source_id of `-`. For example:
-  // organizations/123/sources/-
-  string parent = 1;
+  // organizations/{organization_id}/sources/-
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/Source"
+    }
+  ];
 
   // Expression that defines the filter to apply across findings.
   // The expression is a list of one or more restrictions combined via logical
@@ -410,22 +584,29 @@ message GroupFindingsRequest {
   // * boolean literals `true` and `false` without quotes.
   //
   // The following field and operator combinations are supported:
-  // name | `=`
-  // parent | '=', ':'
-  // resource_name | '=', ':'
-  // state | '=', ':'
-  // category | '=', ':'
-  // external_uri | '=', ':'
-  // event_time | `>`, `<`, `>=`, `<=`
-  // security_marks | '=', ':'
-  // source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+  //
+  // * name: `=`
+  // * parent: `=`, `:`
+  // * resource_name: `=`, `:`
+  // * state: `=`, `:`
+  // * category: `=`, `:`
+  // * external_uri: `=`, `:`
+  // * event_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "event_time = \"2019-06-10T16:07:18-07:00\""
+  //     "event_time = 1560208038000"
+  //
+  // * security_marks.marks: `=`, `:`
+  // * source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
   //
   // For example, `source_properties.size = 100` is a valid filter string.
   string filter = 2;
 
-  // Expression that defines what assets fields to use for grouping (including
-  // `state_change`). The string value should follow SQL syntax: comma separated
-  // list of fields. For example: "parent,resource_name".
+  // Required. Expression that defines what assets fields to use for grouping
+  // (including `state_change`). The string value should follow SQL syntax:
+  // comma separated list of fields. For example: "parent,resource_name".
   //
   // The following fields are supported:
   //
@@ -437,7 +618,7 @@ message GroupFindingsRequest {
   // The following fields are supported when compare_duration is set:
   //
   // * state_change
-  string group_by = 3;
+  string group_by = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Time used as a reference point when filtering findings. The filter is
   // limited to findings existing at the supplied time and their values are
@@ -458,12 +639,18 @@ message GroupFindingsRequest {
   //
   // Possible "state_change" values when compare_duration is specified:
   //
-  // * "CHANGED":   indicates that the finding was present at the start of
-  //                  compare_duration, but changed its state at read_time.
-  // * "UNCHANGED": indicates that the finding was present at the start of
-  //                  compare_duration and did not change state at read_time.
-  // * "ADDED":     indicates that the finding was not present at the start
-  //                  of compare_duration, but was present at read_time.
+  // * "CHANGED":   indicates that the finding was present and matched the given
+  //                  filter at the start of compare_duration, but changed its
+  //                  state at read_time.
+  // * "UNCHANGED": indicates that the finding was present and matched the given
+  //                  filter at the start of compare_duration and did not change
+  //                  state at read_time.
+  // * "ADDED":     indicates that the finding did not match the given filter or
+  //                  was not present at the start of compare_duration, but was
+  //                  present at read_time.
+  // * "REMOVED":   indicates that the finding was present and matched the
+  //                  filter at the start of compare_duration, but did not match
+  //                  the filter at read_time.
   //
   // If compare_duration is not specified, then the only possible state_change
   // is "UNUSED",  which will be the state_change set for all findings present
@@ -481,8 +668,6 @@ message GroupFindingsRequest {
   // The maximum number of results to return in a single response. Default is
   // 10, minimum is 1, maximum is 1000.
   int32 page_size = 8;
-
-  reserved 6;
 }
 
 // Response message for group by findings.
@@ -512,11 +697,47 @@ message GroupResult {
   int64 count = 2;
 }
 
+// Request message for listing notification configs.
+message ListNotificationConfigsRequest {
+  // Required. Name of the organization to list notification configs.
+  // Its format is "organizations/[organization_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
+
+  // The value returned by the last `ListNotificationConfigsResponse`; indicates
+  // that this is a continuation of a prior `ListNotificationConfigs` call, and
+  // that the system should return the next page of data.
+  string page_token = 2;
+
+  // The maximum number of results to return in a single response. Default is
+  // 10, minimum is 1, maximum is 1000.
+  int32 page_size = 3;
+}
+
+// Response message for listing notification configs.
+message ListNotificationConfigsResponse {
+  // Notification configs belonging to the requested parent.
+  repeated NotificationConfig notification_configs = 1;
+
+  // Token to retrieve the next page of results, or empty if there are no more
+  // results.
+  string next_page_token = 2;
+}
+
 // Request message for listing sources.
 message ListSourcesRequest {
-  // Resource name of the parent of sources to list. Its format should be
-  // "organizations/[organization_id]".
-  string parent = 1;
+  // Required. Resource name of the parent of sources to list. Its format should
+  // be "organizations/[organization_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
 
   // The value returned by the last `ListSourcesResponse`; indicates
   // that this is a continuation of a prior `ListSources` call, and
@@ -540,9 +761,14 @@ message ListSourcesResponse {
 
 // Request message for listing assets.
 message ListAssetsRequest {
-  // Name of the organization assets should belong to. Its format is
+  // Required. Name of the organization assets should belong to. Its format is
   // "organizations/[organization_id]".
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
 
   // Expression that defines the filter to apply across assets.
   // The expression is a list of zero or more restrictions combined via logical
@@ -571,16 +797,33 @@ message ListAssetsRequest {
   // * boolean literals `true` and `false` without quotes.
   //
   // The following are the allowed field and operator combinations:
-  // name | `=`
-  // update_time | `>`, `<`, `>=`, `<=`
-  // iam_policy.policy_blob | '=', ':'
-  // resource_properties | '=', ':', `>`, `<`, `>=`, `<=`
-  // security_marks | '=', ':'
-  // security_center_properties.resource_name | '=', ':'
-  // security_center_properties.resource_type | '=', ':'
-  // security_center_properties.resource_parent | '=', ':'
-  // security_center_properties.resource_project | '=', ':'
-  // security_center_properties.resource_owners | '=', ':'
+  //
+  // * name: `=`
+  // * update_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "update_time = \"2019-06-10T16:07:18-07:00\""
+  //     "update_time = 1560208038000"
+  //
+  // * create_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "create_time = \"2019-06-10T16:07:18-07:00\""
+  //     "create_time = 1560208038000"
+  //
+  // * iam_policy.policy_blob: `=`, `:`
+  // * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+  // * security_marks.marks: `=`, `:`
+  // * security_center_properties.resource_name: `=`, `:`
+  // * security_center_properties.resource_display_name: `=`, `:`
+  // * security_center_properties.resource_type: `=`, `:`
+  // * security_center_properties.resource_parent: `=`, `:`
+  // * security_center_properties.resource_parent_display_name: `=`, `:`
+  // * security_center_properties.resource_project: `=`, `:`
+  // * security_center_properties.resource_project_display_name: `=`, `:`
+  // * security_center_properties.resource_owners: `=`, `:`
   //
   // For example, `resource_properties.size = 100` is a valid filter string.
   string filter = 2;
@@ -598,10 +841,13 @@ message ListAssetsRequest {
   // name
   // update_time
   // resource_properties
-  // security_marks
+  // security_marks.marks
   // security_center_properties.resource_name
+  // security_center_properties.resource_display_name
   // security_center_properties.resource_parent
+  // security_center_properties.resource_parent_display_name
   // security_center_properties.resource_project
+  // security_center_properties.resource_project_display_name
   // security_center_properties.resource_type
   string order_by = 3;
 
@@ -637,12 +883,10 @@ message ListAssetsRequest {
   // read_time.
   google.protobuf.Duration compare_duration = 5;
 
-  // Optional.
-  //
-  // A field mask to specify the ListAssetsResult fields to be listed in the
-  // response.
-  // An empty field mask will list all fields.
-  google.protobuf.FieldMask field_mask = 7;
+  // Optional. A field mask to specify the ListAssetsResult fields to be listed
+  // in the response. An empty field mask will list all fields.
+  google.protobuf.FieldMask field_mask = 7
+      [(google.api.field_behavior) = OPTIONAL];
 
   // The value returned by the last `ListAssetsResponse`; indicates
   // that this is a continuation of a prior `ListAssets` call, and
@@ -652,8 +896,6 @@ message ListAssetsRequest {
   // The maximum number of results to return in a single response. Default is
   // 10, minimum is 1, maximum is 1000.
   int32 page_size = 9;
-
-  reserved 6;
 }
 
 // Response message for listing assets.
@@ -703,11 +945,16 @@ message ListAssetsResponse {
 
 // Request message for listing findings.
 message ListFindingsRequest {
-  // Name of the source the findings belong to. Its format is
+  // Required. Name of the source the findings belong to. Its format is
   // "organizations/[organization_id]/sources/[source_id]". To list across all
   // sources provide a source_id of `-`. For example:
-  // organizations/123/sources/-
-  string parent = 1;
+  // organizations/{organization_id}/sources/-
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/Source"
+    }
+  ];
 
   // Expression that defines the filter to apply across findings.
   // The expression is a list of one or more restrictions combined via logical
@@ -734,15 +981,22 @@ message ListFindingsRequest {
   // * boolean literals `true` and `false` without quotes.
   //
   // The following field and operator combinations are supported:
-  // name | `=`
-  // parent | '=', ':'
-  // resource_name | '=', ':'
-  // state | '=', ':'
-  // category | '=', ':'
-  // external_uri | '=', ':'
-  // event_time | `>`, `<`, `>=`, `<=`
-  // security_marks | '=', ':'
-  // source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+  //
+  // name: `=`
+  // parent: `=`, `:`
+  // resource_name: `=`, `:`
+  // state: `=`, `:`
+  // category: `=`, `:`
+  // external_uri: `=`, `:`
+  // event_time: `=`, `>`, `<`, `>=`, `<=`
+  //
+  //   Usage: This should be milliseconds since epoch or an RFC3339 string.
+  //   Examples:
+  //     "event_time = \"2019-06-10T16:07:18-07:00\""
+  //     "event_time = 1560208038000"
+  //
+  // security_marks.marks: `=`, `:`
+  // source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
   //
   // For example, `source_properties.size = 100` is a valid filter string.
   string filter = 2;
@@ -764,7 +1018,7 @@ message ListFindingsRequest {
   // resource_name
   // event_time
   // source_properties
-  // security_marks
+  // security_marks.marks
   string order_by = 3;
 
   // Time used as a reference point when filtering findings. The filter is
@@ -787,23 +1041,28 @@ message ListFindingsRequest {
   //
   // Possible "state_change" values when compare_duration is specified:
   //
-  // * "CHANGED":   indicates that the finding was present at the start of
-  //                  compare_duration, but changed its state at read_time.
-  // * "UNCHANGED": indicates that the finding was present at the start of
-  //                  compare_duration and did not change state at read_time.
-  // * "ADDED":     indicates that the finding was not present at the start
-  //                  of compare_duration, but was present at read_time.
+  // * "CHANGED":   indicates that the finding was present and matched the given
+  //                  filter at the start of compare_duration, but changed its
+  //                  state at read_time.
+  // * "UNCHANGED": indicates that the finding was present and matched the given
+  //                  filter at the start of compare_duration and did not change
+  //                  state at read_time.
+  // * "ADDED":     indicates that the finding did not match the given filter or
+  //                  was not present at the start of compare_duration, but was
+  //                  present at read_time.
+  // * "REMOVED":   indicates that the finding was present and matched the
+  //                  filter at the start of compare_duration, but did not match
+  //                  the filter at read_time.
   //
   // If compare_duration is not specified, then the only possible state_change
   // is "UNUSED", which will be the state_change set for all findings present at
   // read_time.
   google.protobuf.Duration compare_duration = 5;
 
-  // Optional.
-  //
-  // A field mask to specify the Finding fields to be listed in the response.
-  // An empty field mask will list all fields.
-  google.protobuf.FieldMask field_mask = 7;
+  // Optional. A field mask to specify the Finding fields to be listed in the
+  // response. An empty field mask will list all fields.
+  google.protobuf.FieldMask field_mask = 7
+      [(google.api.field_behavior) = OPTIONAL];
 
   // The value returned by the last `ListFindingsResponse`; indicates
   // that this is a continuation of a prior `ListFindings` call, and
@@ -813,14 +1072,32 @@ message ListFindingsRequest {
   // The maximum number of results to return in a single response. Default is
   // 10, minimum is 1, maximum is 1000.
   int32 page_size = 9;
-
-  reserved 6;
 }
 
 // Response message for listing findings.
 message ListFindingsResponse {
   // Result containing the Finding and its StateChange.
   message ListFindingsResult {
+    // Information related to the Google Cloud Platform (GCP) resource that is
+    // associated with this finding.
+    message Resource {
+      // The full resource name of the resource. See:
+      // https://cloud.google.com/apis/design/resource_names#full_resource_name
+      string name = 1;
+
+      // The full resource name of project that the resource belongs to.
+      string project_name = 2;
+
+      // The human readable name of project that the resource belongs to.
+      string project_display_name = 3;
+
+      // The full resource name of resource's parent.
+      string parent_name = 4;
+
+      // The human readable name of resource's parent.
+      string parent_display_name = 5;
+    }
+
     // The change in state of the finding.
     //
     // When querying across two points in time this describes
@@ -854,6 +1131,9 @@ message ListFindingsResponse {
 
     // State change of the finding between the points in time.
     StateChange state_change = 2;
+
+    // Output only. Resource that is associated with this finding.
+    Resource resource = 3;
   }
 
   // Findings matching the list request.
@@ -872,35 +1152,46 @@ message ListFindingsResponse {
 
 // Request message for updating a finding's state.
 message SetFindingStateRequest {
-  // The relative resource name of the finding. See:
+  // Required. The relative resource name of the finding. See:
   // https://cloud.google.com/apis/design/resource_names#relative_resource_name
   // Example:
-  // "organizations/123/sources/456/finding/789".
-  string name = 1;
+  // "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/Finding"
+    }
+  ];
 
-  // The desired State of the finding.
-  Finding.State state = 2;
+  // Required. The desired State of the finding.
+  Finding.State state = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The time at which the updated state takes effect.
-  google.protobuf.Timestamp start_time = 3;
+  // Required. The time at which the updated state takes effect.
+  google.protobuf.Timestamp start_time = 3
+      [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for running asset discovery for an organization.
 message RunAssetDiscoveryRequest {
-  // Name of the organization to run asset discovery for. Its format is
-  // "organizations/[organization_id]".
-  string parent = 1;
+  // Required. Name of the organization to run asset discovery for. Its format
+  // is "organizations/[organization_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Organization"
+    }
+  ];
 }
 
 // Request message for updating or creating a finding.
 message UpdateFindingRequest {
-  // The finding resource to update or create if it does not already exist.
-  // parent, security_marks, and update_time will be ignored.
+  // Required. The finding resource to update or create if it does not already
+  // exist. parent, security_marks, and update_time will be ignored.
   //
   // In the case of creation, the finding id portion of the name must be
   // alphanumeric and less than or equal to 32 characters and greater than 0
   // characters in length.
-  Finding finding = 1;
+  Finding finding = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The FieldMask to use when updating the finding resource. This field should
   // not be specified when creating a finding.
@@ -912,10 +1203,23 @@ message UpdateFindingRequest {
   google.protobuf.FieldMask update_mask = 2;
 }
 
+// Request message for updating a notification config.
+message UpdateNotificationConfigRequest {
+  // Required. The notification config to update.
+  NotificationConfig notification_config = 1
+      [(google.api.field_behavior) = REQUIRED];
+
+  // The FieldMask to use when updating the notification config.
+  //
+  // If empty all mutable fields will be updated.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
 // Request message for updating an organization's settings.
 message UpdateOrganizationSettingsRequest {
-  // The organization settings resource to update.
-  OrganizationSettings organization_settings = 1;
+  // Required. The organization settings resource to update.
+  OrganizationSettings organization_settings = 1
+      [(google.api.field_behavior) = REQUIRED];
 
   // The FieldMask to use when updating the settings resource.
   //
@@ -925,8 +1229,8 @@ message UpdateOrganizationSettingsRequest {
 
 // Request message for updating a source.
 message UpdateSourceRequest {
-  // The source resource to update.
-  Source source = 1;
+  // Required. The source resource to update.
+  Source source = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The FieldMask to use when updating the source resource.
   //
@@ -936,8 +1240,8 @@ message UpdateSourceRequest {
 
 // Request message for updating a SecurityMarks resource.
 message UpdateSecurityMarksRequest {
-  // The security marks resource to update.
-  SecurityMarks security_marks = 1;
+  // Required. The security marks resource to update.
+  SecurityMarks security_marks = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The FieldMask to use when updating the security marks resource.
   //

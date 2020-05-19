@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -164,11 +163,20 @@ message ClassificationEvaluationMetrics {
     // only list of [annotation_spec_display_name-s][] is populated.
     repeated string annotation_spec_id = 1;
 
+    // Output only. Display name of the annotation specs used in the confusion
+    // matrix, as they were at the moment of the evaluation. For Tables
+    // CLASSIFICATION
+    //
+    // [prediction_type-s][google.cloud.automl.v1beta1.TablesModelMetadata.prediction_type],
+    // distinct values of the target column at the moment of the model
+    // evaluation are populated here.
+    repeated string display_name = 3;
+
     // Output only. Rows in the confusion matrix. The number of rows is equal to
     // the size of `annotation_spec_id`.
-    // `row[i].value[j]` is the number of examples that have ground truth of the
-    // `annotation_spec_id[i]` and are predicted as `annotation_spec_id[j]` by
-    // the model being evaluated.
+    // `row[i].example_count[j]` is the number of examples that have ground
+    // truth of the `annotation_spec_id[i]` and are predicted as
+    // `annotation_spec_id[j]` by the model being evaluated.
     repeated Row row = 2;
   }
 
