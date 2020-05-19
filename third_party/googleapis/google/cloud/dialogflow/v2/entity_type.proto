@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,17 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.dialogflow.v2;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
-import "google/api/client.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Dialogflow.V2";
@@ -45,11 +46,11 @@ option objc_class_prefix = "DF";
 //     data types such as date, time, currency, and so on. A system entity is
 //     represented by the `EntityType` type.
 //
-// *   **Developer** - entities that are defined by you that represent
+// *   **Custom** - entities that are defined by you that represent
 //     actionable data that is meaningful to your application. For example,
 //     you could define a `pizza.sauce` entity for red or white pizza sauce,
 //     a `pizza.cheese` entity for the different types of cheese on a pizza,
-//     a `pizza.topping` entity for different toppings, and so on. A developer
+//     a `pizza.topping` entity for different toppings, and so on. A custom
 //     entity is represented by the `EntityType` type.
 //
 // *   **User** - entities that are built for an individual user such as
@@ -70,6 +71,8 @@ service EntityTypes {
     option (google.api.http) = {
       get: "/v2/{parent=projects/*/agent}/entityTypes"
     };
+    option (google.api.method_signature) = "parent";
+    option (google.api.method_signature) = "parent,language_code";
   }
 
   // Retrieves the specified entity type.
@@ -77,6 +80,8 @@ service EntityTypes {
     option (google.api.http) = {
       get: "/v2/{name=projects/*/agent/entityTypes/*}"
     };
+    option (google.api.method_signature) = "name";
+    option (google.api.method_signature) = "name,language_code";
   }
 
   // Creates an entity type in the specified agent.
@@ -85,6 +90,8 @@ service EntityTypes {
       post: "/v2/{parent=projects/*/agent}/entityTypes"
       body: "entity_type"
     };
+    option (google.api.method_signature) = "parent,entity_type";
+    option (google.api.method_signature) = "parent,entity_type,language_code";
   }
 
   // Updates the specified entity type.
@@ -93,6 +100,8 @@ service EntityTypes {
       patch: "/v2/{entity_type.name=projects/*/agent/entityTypes/*}"
       body: "entity_type"
     };
+    option (google.api.method_signature) = "entity_type";
+    option (google.api.method_signature) = "entity_type,language_code";
   }
 
   // Deletes the specified entity type.
@@ -100,6 +109,7 @@ service EntityTypes {
     option (google.api.http) = {
       delete: "/v2/{name=projects/*/agent/entityTypes/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Updates/Creates multiple entity types in the specified agent.
@@ -109,6 +119,10 @@ service EntityTypes {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/agent}/entityTypes:batchUpdate"
       body: "*"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "google.cloud.dialogflow.v2.BatchUpdateEntityTypesResponse"
+      metadata_type: "google.protobuf.Struct"
     };
   }
 
@@ -120,6 +134,11 @@ service EntityTypes {
       post: "/v2/{parent=projects/*/agent}/entityTypes:batchDelete"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,entity_type_names";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.protobuf.Struct"
+    };
   }
 
   // Creates multiple new entities in the specified entity type.
@@ -130,11 +149,18 @@ service EntityTypes {
       post: "/v2/{parent=projects/*/agent/entityTypes/*}/entities:batchCreate"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,entities";
+    option (google.api.method_signature) = "parent,entities,language_code";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.protobuf.Struct"
+    };
   }
 
   // Updates or creates multiple entities in the specified entity type. This
   // method does not affect entities in the entity type that aren't explicitly
   // specified in the request.
+  //
   //
   // Operation <response: [google.protobuf.Empty][google.protobuf.Empty]>
   rpc BatchUpdateEntities(BatchUpdateEntitiesRequest) returns (google.longrunning.Operation) {
@@ -142,15 +168,28 @@ service EntityTypes {
       post: "/v2/{parent=projects/*/agent/entityTypes/*}/entities:batchUpdate"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,entities";
+    option (google.api.method_signature) = "parent,entities,language_code";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.protobuf.Struct"
+    };
   }
 
   // Deletes entities in the specified entity type.
+  //
   //
   // Operation <response: [google.protobuf.Empty][google.protobuf.Empty]>
   rpc BatchDeleteEntities(BatchDeleteEntitiesRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/agent/entityTypes/*}/entities:batchDelete"
       body: "*"
+    };
+    option (google.api.method_signature) = "parent,entity_values";
+    option (google.api.method_signature) = "parent,entity_values,language_code";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.protobuf.Struct"
     };
   }
 }
@@ -159,6 +198,11 @@ service EntityTypes {
 // Entity types serve as a tool for extracting parameter values from natural
 // language queries.
 message EntityType {
+  option (google.api.resource) = {
+    type: "dialogflow.googleapis.com/EntityType"
+    pattern: "projects/{project}/agent/entityTypes/{entity_type}"
+  };
+
   // An **entity entry** for an associated entity type.
   message Entity {
     // Required. The primary value associated with this entity entry.
@@ -167,13 +211,13 @@ message EntityType {
     //
     // For `KIND_MAP` entity types:
     //
-    // *   A canonical value to be used in place of synonyms.
+    // *   A reference value to be used in place of synonyms.
     //
     // For `KIND_LIST` entity types:
     //
     // *   A string that can contain references to other entity types (with or
     //     without aliases).
-    string value = 1;
+    string value = 1 [(google.api.field_behavior) = REQUIRED];
 
     // Required. A collection of value synonyms. For example, if the entity type
     // is *vegetable*, and `value` is *scallions*, a synonym could be *green
@@ -182,7 +226,7 @@ message EntityType {
     // For `KIND_LIST` entity types:
     //
     // *   This collection must contain exactly one synonym equal to `value`.
-    repeated string synonyms = 2;
+    repeated string synonyms = 2 [(google.api.field_behavior) = REQUIRED];
   }
 
   // Represents kinds of entities.
@@ -190,14 +234,18 @@ message EntityType {
     // Not specified. This value should be never used.
     KIND_UNSPECIFIED = 0;
 
-    // Map entity types allow mapping of a group of synonyms to a canonical
+    // Map entity types allow mapping of a group of synonyms to a reference
     // value.
     KIND_MAP = 1;
 
-    // List entity types contain a set of entries that do not map to canonical
+    // List entity types contain a set of entries that do not map to reference
     // values. However, list entity types can contain references to other entity
     // types (with or without aliases).
     KIND_LIST = 2;
+
+    // Regexp entity types allow to specify regular expressions in entries
+    // values.
+    KIND_REGEXP = 3;
   }
 
   // Represents different entity type expansion modes. Automated expansion
@@ -219,39 +267,46 @@ message EntityType {
   string name = 1;
 
   // Required. The name of the entity type.
-  string display_name = 2;
+  string display_name = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Indicates the kind of entity type.
-  Kind kind = 3;
+  Kind kind = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Optional. Indicates whether the entity type can be automatically
   // expanded.
-  AutoExpansionMode auto_expansion_mode = 4;
+  AutoExpansionMode auto_expansion_mode = 4 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The collection of entity entries associated with the entity type.
-  repeated Entity entities = 6;
+  repeated Entity entities = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Enables fuzzy entity extraction during classification.
+  bool enable_fuzzy_extraction = 7 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.ListEntityTypes][google.cloud.dialogflow.v2.EntityTypes.ListEntityTypes].
 message ListEntityTypesRequest {
   // Required. The agent to list all entity types from.
   // Format: `projects/<Project ID>/agent`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
-  // Optional. The language to list entity synonyms for. If not specified,
-  // the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 2;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The maximum number of items to return in a single page. By
   // default 100 and at most 1000.
-  int32 page_size = 3;
+  int32 page_size = 3 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The next_page_token value returned from a previous list request.
-  string page_token = 4;
+  string page_token = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The response message for [EntityTypes.ListEntityTypes][google.cloud.dialogflow.v2.EntityTypes.ListEntityTypes].
@@ -269,66 +324,83 @@ message ListEntityTypesResponse {
 message GetEntityTypeRequest {
   // Required. The name of the entity type.
   // Format: `projects/<Project ID>/agent/entityTypes/<EntityType ID>`.
-  string name = 1;
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
-  // Optional. The language to retrieve entity synonyms for. If not specified,
-  // the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 2;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.CreateEntityType][google.cloud.dialogflow.v2.EntityTypes.CreateEntityType].
 message CreateEntityTypeRequest {
   // Required. The agent to create a entity type for.
   // Format: `projects/<Project ID>/agent`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
   // Required. The entity type to create.
-  EntityType entity_type = 2;
+  EntityType entity_type = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. The language of entity synonyms defined in `entity_type`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 3;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.UpdateEntityType][google.cloud.dialogflow.v2.EntityTypes.UpdateEntityType].
 message UpdateEntityTypeRequest {
   // Required. The entity type to update.
-  EntityType entity_type = 1;
+  EntityType entity_type = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. The language of entity synonyms defined in `entity_type`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 2;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The mask to control which fields get updated.
-  google.protobuf.FieldMask update_mask = 3;
+  google.protobuf.FieldMask update_mask = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.DeleteEntityType][google.cloud.dialogflow.v2.EntityTypes.DeleteEntityType].
 message DeleteEntityTypeRequest {
   // Required. The name of the entity type to delete.
   // Format: `projects/<Project ID>/agent/entityTypes/<EntityType ID>`.
-  string name = 1;
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 }
 
 // The request message for [EntityTypes.BatchUpdateEntityTypes][google.cloud.dialogflow.v2.EntityTypes.BatchUpdateEntityTypes].
 message BatchUpdateEntityTypesRequest {
   // Required. The name of the agent to update or create entity types in.
   // Format: `projects/<Project ID>/agent`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
-  // Required. The source of the entity type batch.
+  // The source of the entity type batch.
   //
   // For each entity type in the batch:
   //
@@ -345,16 +417,15 @@ message BatchUpdateEntityTypesRequest {
     EntityTypeBatch entity_type_batch_inline = 3;
   }
 
-  // Optional. The language of entity synonyms defined in `entity_types`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 4;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 4 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The mask to control which fields get updated.
-  google.protobuf.FieldMask update_mask = 5;
+  google.protobuf.FieldMask update_mask = 5 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The response message for [EntityTypes.BatchUpdateEntityTypes][google.cloud.dialogflow.v2.EntityTypes.BatchUpdateEntityTypes].
@@ -367,70 +438,87 @@ message BatchUpdateEntityTypesResponse {
 message BatchDeleteEntityTypesRequest {
   // Required. The name of the agent to delete all entities types for. Format:
   // `projects/<Project ID>/agent`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
   // Required. The names entity types to delete. All names must point to the
   // same agent as `parent`.
-  repeated string entity_type_names = 2;
+  repeated string entity_type_names = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The request message for [EntityTypes.BatchCreateEntities][google.cloud.dialogflow.v2.EntityTypes.BatchCreateEntities].
 message BatchCreateEntitiesRequest {
   // Required. The name of the entity type to create entities in. Format:
   // `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
   // Required. The entities to create.
-  repeated EntityType.Entity entities = 2;
+  repeated EntityType.Entity entities = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. The language of entity synonyms defined in `entities`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 3;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.BatchUpdateEntities][google.cloud.dialogflow.v2.EntityTypes.BatchUpdateEntities].
 message BatchUpdateEntitiesRequest {
   // Required. The name of the entity type to update or create entities in.
   // Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
   // Required. The entities to update or create.
-  repeated EntityType.Entity entities = 2;
+  repeated EntityType.Entity entities = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. The language of entity synonyms defined in `entities`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 3;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 3 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The mask to control which fields get updated.
-  google.protobuf.FieldMask update_mask = 4;
+  google.protobuf.FieldMask update_mask = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [EntityTypes.BatchDeleteEntities][google.cloud.dialogflow.v2.EntityTypes.BatchDeleteEntities].
 message BatchDeleteEntitiesRequest {
   // Required. The name of the entity type to delete entries for. Format:
   // `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
-  string parent = 1;
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/EntityType"
+    }
+  ];
 
-  // Required. The canonical `values` of the entities to delete. Note that
+  // Required. The reference `values` of the entities to delete. Note that
   // these are not fully-qualified names, i.e. they don't start with
   // `projects/<Project ID>`.
-  repeated string entity_values = 2;
+  repeated string entity_values = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. The language of entity synonyms defined in `entities`. If not
-  // specified, the agent's default language is used.
-  // [Many
-  // languages](https://cloud.google.com/dialogflow/docs/reference/language)
-  // are supported. Note: languages must be enabled in the agent before they can
-  // be used.
-  string language_code = 3;
+  // Optional. The language used to access language-specific data.
+  // If not specified, the agent's default language is used.
+  // For more information, see
+  // [Multilingual intent and entity
+  // data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+  string language_code = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // This message is a wrapper around a collection of entity types.

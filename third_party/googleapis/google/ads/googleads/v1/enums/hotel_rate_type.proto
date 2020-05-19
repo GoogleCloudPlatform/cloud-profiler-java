@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -48,9 +47,9 @@ message HotelRateTypeEnum {
 
     // A membership program rate is available and satisfies basic requirements
     // like having a public rate available. UI treatment will strikethrough the
-    // public rate and indicate that a discount is available to the user. See
+    // public rate and indicate that a discount is available to the user. For
+    // more on Qualified Rates, visit
     // https://developers.google.com/hotels/hotel-ads/dev-guide/qualified-rates
-    // for more information.
     QUALIFIED_RATE = 4;
 
     // Rates available to users that satisfy some eligibility criteria. e.g.

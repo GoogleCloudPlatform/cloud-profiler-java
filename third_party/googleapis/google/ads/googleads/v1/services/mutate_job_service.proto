@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -20,6 +19,9 @@ package google.ads.googleads.v1.services;
 import "google/ads/googleads/v1/resources/mutate_job.proto";
 import "google/ads/googleads/v1/services/google_ads_service.proto";
 import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
 import "google/rpc/status.proto";
 
@@ -36,30 +38,32 @@ option ruby_package = "Google::Ads::GoogleAds::V1::Services";
 
 // Service to manage mutate jobs.
 service MutateJobService {
+  option (google.api.default_host) = "googleads.googleapis.com";
+
   // Creates a mutate job.
-  rpc CreateMutateJob(CreateMutateJobRequest)
-      returns (CreateMutateJobResponse) {
+  rpc CreateMutateJob(CreateMutateJobRequest) returns (CreateMutateJobResponse) {
     option (google.api.http) = {
       post: "/v1/customers/{customer_id=*}/mutateJobs:create"
       body: "*"
     };
+    option (google.api.method_signature) = "customer_id";
   }
 
   // Returns the mutate job.
-  rpc GetMutateJob(GetMutateJobRequest)
-      returns (google.ads.googleads.v1.resources.MutateJob) {
+  rpc GetMutateJob(GetMutateJobRequest) returns (google.ads.googleads.v1.resources.MutateJob) {
     option (google.api.http) = {
       get: "/v1/{resource_name=customers/*/mutateJobs/*}"
     };
+    option (google.api.method_signature) = "resource_name";
   }
 
   // Returns the results of the mutate job. The job must be done.
   // Supports standard list paging.
-  rpc ListMutateJobResults(ListMutateJobResultsRequest)
-      returns (ListMutateJobResultsResponse) {
+  rpc ListMutateJobResults(ListMutateJobResultsRequest) returns (ListMutateJobResultsResponse) {
     option (google.api.http) = {
       get: "/v1/{resource_name=customers/*/mutateJobs/*}:listResults"
     };
+    option (google.api.method_signature) = "resource_name";
   }
 
   // Runs the mutate job.
@@ -72,22 +76,28 @@ service MutateJobService {
       post: "/v1/{resource_name=customers/*/mutateJobs/*}:run"
       body: "*"
     };
+    option (google.api.method_signature) = "resource_name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.ads.googleads.v1.resources.MutateJob.MutateJobMetadata"
+    };
   }
 
   // Add operations to the mutate job.
-  rpc AddMutateJobOperations(AddMutateJobOperationsRequest)
-      returns (AddMutateJobOperationsResponse) {
+  rpc AddMutateJobOperations(AddMutateJobOperationsRequest) returns (AddMutateJobOperationsResponse) {
     option (google.api.http) = {
       post: "/v1/{resource_name=customers/*/mutateJobs/*}:addOperations"
       body: "*"
     };
+    option (google.api.method_signature) = "resource_name,sequence_token,mutate_operations";
+    option (google.api.method_signature) = "resource_name,mutate_operations";
   }
 }
 
 // Request message for [MutateJobService.CreateMutateJobRequest][]
 message CreateMutateJobRequest {
-  // The ID of the customer for which to create a mutate job.
-  string customer_id = 1;
+  // Required. The ID of the customer for which to create a mutate job.
+  string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Response message for [MutateJobService.CreateMutateJobResponse][]
@@ -96,25 +106,37 @@ message CreateMutateJobResponse {
   string resource_name = 1;
 }
 
-// Request message for
-// [MutateJobService.GetMutateJob][google.ads.googleads.v1.services.MutateJobService.GetMutateJob]
+// Request message for [MutateJobService.GetMutateJob][google.ads.googleads.v1.services.MutateJobService.GetMutateJob]
 message GetMutateJobRequest {
-  // The resource name of the MutateJob to get.
-  string resource_name = 1;
+  // Required. The resource name of the MutateJob to get.
+  string resource_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/MutateJob"
+    }
+  ];
 }
 
-// Request message for
-// [MutateJobService.RunMutateJob][google.ads.googleads.v1.services.MutateJobService.RunMutateJob]
+// Request message for [MutateJobService.RunMutateJob][google.ads.googleads.v1.services.MutateJobService.RunMutateJob]
 message RunMutateJobRequest {
-  // The resource name of the MutateJob to run.
-  string resource_name = 1;
+  // Required. The resource name of the MutateJob to run.
+  string resource_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/MutateJob"
+    }
+  ];
 }
 
-// Request message for
-// [MutateJobService.AddMutateJobOperations][google.ads.googleads.v1.services.MutateJobService.AddMutateJobOperations]
+// Request message for [MutateJobService.AddMutateJobOperations][google.ads.googleads.v1.services.MutateJobService.AddMutateJobOperations]
 message AddMutateJobOperationsRequest {
-  // The resource name of the MutateJob.
-  string resource_name = 1;
+  // Required. The resource name of the MutateJob.
+  string resource_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/MutateJob"
+    }
+  ];
 
   // A token used to enforce sequencing.
   //
@@ -124,7 +146,7 @@ message AddMutateJobOperationsRequest {
   // response.
   string sequence_token = 2;
 
-  // The list of mutates being added.
+  // Required. The list of mutates being added.
   //
   // Operations can use negative integers as temp ids to signify dependencies
   // between entities created in this MutateJob. For example, a customer with
@@ -133,11 +155,10 @@ message AddMutateJobOperationsRequest {
   // explicitly set to "customers/1234/campaigns/-1", and creating an ad group
   // in the second operation with the campaign field also set to
   // "customers/1234/campaigns/-1".
-  repeated MutateOperation mutate_operations = 3;
+  repeated MutateOperation mutate_operations = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
-// Response message for
-// [MutateJobService.AddMutateJobOperations][google.ads.googleads.v1.services.MutateJobService.AddMutateJobOperations]
+// Response message for [MutateJobService.AddMutateJobOperations][google.ads.googleads.v1.services.MutateJobService.AddMutateJobOperations]
 message AddMutateJobOperationsResponse {
   // The total number of operations added so far for this job.
   int64 total_operations = 1;
@@ -148,11 +169,15 @@ message AddMutateJobOperationsResponse {
   string next_sequence_token = 2;
 }
 
-// Request message for
-// [MutateJobService.ListMutateJobResults][google.ads.googleads.v1.services.MutateJobService.ListMutateJobResults].
+// Request message for [MutateJobService.ListMutateJobResults][google.ads.googleads.v1.services.MutateJobService.ListMutateJobResults].
 message ListMutateJobResultsRequest {
-  // The resource name of the MutateJob whose results are being listed.
-  string resource_name = 1;
+  // Required. The resource name of the MutateJob whose results are being listed.
+  string resource_name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/MutateJob"
+    }
+  ];
 
   // Token of the page to retrieve. If not specified, the first
   // page of results will be returned. Use the value obtained from
@@ -166,8 +191,7 @@ message ListMutateJobResultsRequest {
   int32 page_size = 3;
 }
 
-// Response message for
-// [MutateJobService.ListMutateJobResults][google.ads.googleads.v1.services.MutateJobService.ListMutateJobResults].
+// Response message for [MutateJobService.ListMutateJobResults][google.ads.googleads.v1.services.MutateJobService.ListMutateJobResults].
 message ListMutateJobResultsResponse {
   // The list of rows that matched the query.
   repeated MutateJobResult results = 1;

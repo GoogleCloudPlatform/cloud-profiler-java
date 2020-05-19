@@ -1,3 +1,5 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
 # This is an API workspace, having public visibility by default makes perfect sense.
 package(default_visibility = ["//visibility:public"])
 
@@ -83,5 +85,25 @@ cc_proto_library(
 
 cc_proto_library(
     name = "status_cc_proto",
+    deps = [":status_proto"],
+)
+
+##############################################################################
+# Python
+##############################################################################
+load("@com_google_googleapis_imports//:imports.bzl", "py_proto_library")
+
+py_proto_library(
+    name = "code_py_proto",
+    deps = [":code_proto"],
+)
+
+py_proto_library(
+    name = "error_details_py_proto",
+    deps = [":error_details_proto"],
+)
+
+py_proto_library(
+    name = "status_py_proto",
     deps = [":status_proto"],
 )

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -28,7 +27,6 @@ option java_outer_classname = "QueryProto";
 option java_package = "com.google.firestore.v1";
 option objc_class_prefix = "GCFS";
 option php_namespace = "Google\\Cloud\\Firestore\\V1";
-
 
 // A Firestore query.
 message StructuredQuery {
@@ -103,6 +101,14 @@ message StructuredQuery {
 
       // Contains. Requires that the field is an array.
       ARRAY_CONTAINS = 7;
+
+      // In. Requires that `value` is a non-empty ArrayValue with at most 10
+      // values.
+      IN = 8;
+
+      // Contains any. Requires that the field is an array and
+      // `value` is a non-empty ArrayValue with at most 10 values.
+      ARRAY_CONTAINS_ANY = 9;
     }
 
     // The field to filter by.
@@ -115,6 +121,15 @@ message StructuredQuery {
     Value value = 3;
   }
 
+  // The projection of document's fields to return.
+  message Projection {
+    // The fields to return.
+    //
+    // If empty, all fields are returned. To only return the name
+    // of the document, use `['__name__']`.
+    repeated FieldReference fields = 2;
+  }
+
   // A filter with a single operand.
   message UnaryFilter {
     // A unary operator.
@@ -125,7 +140,7 @@ message StructuredQuery {
       // Test if a field is equal to NaN.
       IS_NAN = 2;
 
-      // Test if an exprestion evaluates to Null.
+      // Test if an expression evaluates to Null.
       IS_NULL = 3;
     }
 
@@ -151,15 +166,6 @@ message StructuredQuery {
 
     // The direction to order by. Defaults to `ASCENDING`.
     Direction direction = 2;
-  }
-
-  // The projection of document's fields to return.
-  message Projection {
-    // The fields to return.
-    //
-    // If empty, all fields are returned. To only return the name
-    // of the document, use `['__name__']`.
-    repeated FieldReference fields = 2;
   }
 
   // A sort direction.

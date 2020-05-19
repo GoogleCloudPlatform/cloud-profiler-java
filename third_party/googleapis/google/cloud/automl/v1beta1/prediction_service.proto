@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,19 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.automl.v1beta1;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/cloud/automl/v1beta1/annotation_payload.proto";
 import "google/cloud/automl/v1beta1/data_items.proto";
 import "google/cloud/automl/v1beta1/io.proto";
 import "google/cloud/automl/v1beta1/operations.proto";
 import "google/longrunning/operations.proto";
-import "google/api/client.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/cloud/automl/v1beta1;automl";
 option java_multiple_files = true;
@@ -57,11 +58,14 @@ service PredictionService {
   //            up to 5MB. Not available for FORECASTING
   //
   // [prediction_type][google.cloud.automl.v1beta1.TablesModelMetadata.prediction_type].
+  // * Text Sentiment - TextSnippet, content up 500 characters, UTF-8
+  //                     encoded.
   rpc Predict(PredictRequest) returns (PredictResponse) {
     option (google.api.http) = {
       post: "/v1beta1/{name=projects/*/locations/*/models/*}:predict"
       body: "*"
     };
+    option (google.api.method_signature) = "name,payload,params";
   }
 
   // Perform a batch prediction. Unlike the online [Predict][google.cloud.automl.v1beta1.PredictionService.Predict], batch
@@ -71,27 +75,37 @@ service PredictionService {
   // method. Once the operation is done, [BatchPredictResult][google.cloud.automl.v1beta1.BatchPredictResult] is returned in
   // the [response][google.longrunning.Operation.response] field.
   // Available for following ML problems:
+  // * Image Classification
+  // * Image Object Detection
   // * Video Classification
-  // * Video Object Tracking
-  // * Text Extraction
+  // * Video Object Tracking * Text Extraction
   // * Tables
   rpc BatchPredict(BatchPredictRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v1beta1/{name=projects/*/locations/*/models/*}:batchPredict"
       body: "*"
     };
+    option (google.api.method_signature) = "name,input_config,output_config,params";
+    option (google.longrunning.operation_info) = {
+      response_type: "BatchPredictResult"
+      metadata_type: "OperationMetadata"
+    };
   }
 }
 
 // Request message for [PredictionService.Predict][google.cloud.automl.v1beta1.PredictionService.Predict].
 message PredictRequest {
-  // Name of the model requested to serve the prediction.
-  string name = 1;
+  // Required. Name of the model requested to serve the prediction.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "automl.googleapis.com/Model"
+    }
+  ];
 
-  // Required.
-  // Payload to perform a prediction on. The payload must match the
+  // Required. Payload to perform a prediction on. The payload must match the
   // problem type that the model was trained to solve.
-  ExamplePayload payload = 2;
+  ExamplePayload payload = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Additional domain-specific parameters, any string must be up to 25000
   // characters long.
@@ -101,13 +115,17 @@ message PredictRequest {
   //    `score_threshold` - (float) A value from 0.0 to 1.0. When the model
   //     makes predictions for an image, it will only produce results that have
   //     at least this confidence score. The default is 0.5.
+  //
+  //  *  For Image Object Detection:
+  //    `score_threshold` - (float) When Model detects objects on the image,
+  //        it will only produce bounding boxes which have at least this
+  //        confidence score. Value in 0 to 1 range, default is 0.5.
+  //    `max_bounding_box_count` - (int64) No more than this number of bounding
+  //        boxes will be returned in the response. Default is 100, the
+  //        requested value may be limited by server.
   // *  For Tables:
-  //    `feature_importance` - (boolean) Whether
-  //
-  // [feature_importance][[google.cloud.automl.v1beta1.TablesModelColumnInfo.feature_importance]
-  //        should be populated in the returned
-  //
-  // [TablesAnnotation(-s)][[google.cloud.automl.v1beta1.TablesAnnotation].
+  //    feature_imp<span>ortan</span>ce - (boolean) Whether feature importance
+  //        should be populated in the returned TablesAnnotation.
   //        The default is false.
   map<string, string> params = 3;
 }
@@ -117,6 +135,13 @@ message PredictResponse {
   // Prediction result.
   // Translation and Text Sentiment will return precisely one payload.
   repeated AnnotationPayload payload = 1;
+
+  // The preprocessed example that AutoML actually makes prediction on.
+  // Empty if AutoML does not preprocess the input example.
+  // * For Text Extraction:
+  //   If the input is a .pdf file, the OCR'ed text will be provided in
+  //   [document_text][google.cloud.automl.v1beta1.Document.document_text].
+  ExamplePayload preprocessed_input = 3;
 
   // Additional domain-specific prediction response metadata.
   //
@@ -138,20 +163,47 @@ message PredictResponse {
 
 // Request message for [PredictionService.BatchPredict][google.cloud.automl.v1beta1.PredictionService.BatchPredict].
 message BatchPredictRequest {
-  // Name of the model requested to serve the batch prediction.
-  string name = 1;
+  // Required. Name of the model requested to serve the batch prediction.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "automl.googleapis.com/Model"
+    }
+  ];
 
   // Required. The input configuration for batch prediction.
-  BatchPredictInputConfig input_config = 3;
+  BatchPredictInputConfig input_config = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The Configuration specifying where output predictions should
   // be written.
-  BatchPredictOutputConfig output_config = 4;
+  BatchPredictOutputConfig output_config = 4 [(google.api.field_behavior) = REQUIRED];
 
-  // Additional domain-specific parameters for the predictions, any string must
+  // Required. Additional domain-specific parameters for the predictions, any string must
   // be up to 25000 characters long.
   //
+  // *  For Text Classification:
+  //
+  //    `score_threshold` - (float) A value from 0.0 to 1.0. When the model
+  //         makes predictions for a text snippet, it will only produce results
+  //         that have at least this confidence score. The default is 0.5.
+  //
+  // *  For Image Classification:
+  //
+  //    `score_threshold` - (float) A value from 0.0 to 1.0. When the model
+  //         makes predictions for an image, it will only produce results that
+  //         have at least this confidence score. The default is 0.5.
+  //
+  // *  For Image Object Detection:
+  //
+  //    `score_threshold` - (float) When Model detects objects on the image,
+  //        it will only produce bounding boxes which have at least this
+  //        confidence score. Value in 0 to 1 range, default is 0.5.
+  //    `max_bounding_box_count` - (int64) No more than this number of bounding
+  //        boxes will be produced per image. Default is 100, the
+  //        requested value may be limited by server.
+  //
   // *  For Video Classification :
+  //
   //    `score_threshold` - (float) A value from 0.0 to 1.0. When the model
   //        makes predictions for a video, it will only produce results that
   //        have at least this confidence score. The default is 0.5.
@@ -179,7 +231,14 @@ message BatchPredictRequest {
   //        metrics provided to describe that quality. The default is
   //        "false".
   //
+  // *  For Tables:
+  //
+  //    feature_imp<span>ortan</span>ce - (boolean) Whether feature importance
+  //        should be populated in the returned TablesAnnotations. The
+  //        default is false.
+  //
   // *  For Video Object Tracking:
+  //
   //    `score_threshold` - (float) When Model detects objects on video frames,
   //        it will only produce bounding boxes which have at least this
   //        confidence score. Value in 0 to 1 range, default is 0.5.
@@ -189,13 +248,21 @@ message BatchPredictRequest {
   //    `min_bounding_box_size` - (float) Only bounding boxes with shortest edge
   //      at least that long as a relative value of video frame size will be
   //      returned. Value in 0 to 1 range. Default is 0.
-  //
-  map<string, string> params = 5;
+  map<string, string> params = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Result of the Batch Predict. This message is returned in
 // [response][google.longrunning.Operation.response] of the operation returned
 // by the [PredictionService.BatchPredict][google.cloud.automl.v1beta1.PredictionService.BatchPredict].
 message BatchPredictResult {
-
+  // Additional domain-specific prediction response metadata.
+  //
+  // *  For Image Object Detection:
+  //  `max_bounding_box_count` - (int64) At most that many bounding boxes per
+  //      image could have been returned.
+  //
+  // *  For Video Object Tracking:
+  //  `max_bounding_box_count` - (int64) At most that many bounding boxes per
+  //      frame could have been returned.
+  map<string, string> metadata = 1;
 }

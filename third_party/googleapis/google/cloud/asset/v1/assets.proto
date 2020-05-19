@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,18 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.asset.v1;
 
 import "google/api/annotations.proto";
+import "google/api/resource.proto";
+import "google/cloud/orgpolicy/v1/orgpolicy.proto";
 import "google/iam/v1/policy.proto";
+import "google/identity/accesscontextmanager/v1/access_level.proto";
+import "google/identity/accesscontextmanager/v1/access_policy.proto";
+import "google/identity/accesscontextmanager/v1/service_perimeter.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
+option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Asset.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/asset/v1;asset";
 option java_multiple_files = true;
@@ -30,73 +35,122 @@ option java_outer_classname = "AssetProto";
 option java_package = "com.google.cloud.asset.v1";
 option php_namespace = "Google\\Cloud\\Asset\\V1";
 
-
-// Temporal asset. In addition to the asset, the temporal asset includes the
-// status of the asset and valid from and to time of it.
+// An asset in Google Cloud and its temporal metadata, including the time window
+// when it was observed and its status during that window.
 message TemporalAsset {
   // The time window when the asset data and state was observed.
   TimeWindow window = 1;
 
-  // If the asset is deleted or not.
+  // Whether the asset has been deleted or not.
   bool deleted = 2;
 
-  // Asset.
+  // An asset in Google Cloud.
   Asset asset = 3;
 }
 
-// A time window of (start_time, end_time].
+// A time window specified by its "start_time" and "end_time".
 message TimeWindow {
   // Start time of the time window (exclusive).
   google.protobuf.Timestamp start_time = 1;
 
-  // End time of the time window (inclusive).
-  // Current timestamp if not specified.
+  // End time of the time window (inclusive). If not specified, the current
+  // timestamp is used instead.
   google.protobuf.Timestamp end_time = 2;
 }
 
-// Cloud asset. This includes all Google Cloud Platform resources,
-// Cloud IAM policies, and other non-GCP assets.
+// An asset in Google Cloud. An asset can be any resource in the Google Cloud
+// [resource
+// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
+// a resource outside the Google Cloud resource hierarchy (such as Google
+// Kubernetes Engine clusters and objects), or a Cloud IAM policy.
 message Asset {
+  option (google.api.resource) = {
+    type: "cloudasset.googleapis.com/Asset"
+    pattern: "*"
+  };
+
   // The full name of the asset. For example:
-  // `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
+  // "//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1"
+  //
   // See [Resource
-  // Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+  // names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
   // for more information.
   string name = 1;
 
-  // Type of the asset. Example: "compute.googleapis.com/Disk".
+  // The type of the asset. For example: "compute.googleapis.com/Disk"
+  //
+  // See [Supported asset
+  // types](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
+  // for more information.
   string asset_type = 2;
 
-  // Representation of the resource.
+  // A representation of the resource.
   Resource resource = 3;
 
-  // Representation of the actual Cloud IAM policy set on a cloud resource. For
-  // each resource, there must be at most one Cloud IAM policy set on it.
+  // A representation of the Cloud IAM policy set on a Google Cloud resource.
+  // There can be a maximum of one Cloud IAM policy set on any given resource.
+  // In addition, Cloud IAM policies inherit their granted access scope from any
+  // policies set on parent resources in the resource hierarchy. Therefore, the
+  // effectively policy is the union of both the policy set on this resource
+  // and each policy set on all of the resource's ancestry resource levels in
+  // the hierarchy. See
+  // [this topic](https://cloud.google.com/iam/docs/policies#inheritance) for
+  // more information.
   google.iam.v1.Policy iam_policy = 4;
+
+  // A representation of an [organization
+  // policy](https://cloud.google.com/resource-manager/docs/organization-policy/overview#organization_policy).
+  // There can be more than one organization policy with different constraints
+  // set on a given resource.
+  repeated google.cloud.orgpolicy.v1.Policy org_policy = 6;
+
+  // A representation of an [access
+  // policy](https://cloud.google.com/access-context-manager/docs/overview#access-policies).
+  oneof access_context_policy {
+    google.identity.accesscontextmanager.v1.AccessPolicy access_policy = 7;
+
+    google.identity.accesscontextmanager.v1.AccessLevel access_level = 8;
+
+    google.identity.accesscontextmanager.v1.ServicePerimeter service_perimeter =
+        9;
+  }
+
+  // The ancestry path of an asset in Google Cloud [resource
+  // hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
+  // represented as a list of relative resource names. An ancestry path starts
+  // with the closest ancestor in the hierarchy and ends at root. If the asset
+  // is a project, folder, or organization, the ancestry path starts from the
+  // asset itself.
+  //
+  // For example: `["projects/123456789", "folders/5432", "organizations/1234"]`
+  repeated string ancestors = 10;
 }
 
-// Representation of a cloud resource.
+// A representation of a Google Cloud resource.
 message Resource {
-  // The API version. Example: "v1".
+  // The API version. For example: "v1"
   string version = 1;
 
   // The URL of the discovery document containing the resource's JSON schema.
   // For example:
-  // `"https://www.googleapis.com/discovery/v1/apis/compute/v1/rest"`.
-  // It will be left unspecified for resources without a discovery-based API,
-  // such as Cloud Bigtable.
+  // "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest"
+  //
+  // This value is unspecified for resources that do not have an API based on a
+  // discovery document, such as Cloud Bigtable.
   string discovery_document_uri = 2;
 
-  // The JSON schema name listed in the discovery document.
-  // Example: "Project". It will be left unspecified for resources (such as
-  // Cloud Bigtable) without a discovery-based API.
+  // The JSON schema name listed in the discovery document. For example:
+  // "Project"
+  //
+  // This value is unspecified for resources that do not have an API based on a
+  // discovery document, such as Cloud Bigtable.
   string discovery_name = 3;
 
-  // The REST URL for accessing the resource. An HTTP GET operation using this
-  // URL returns the resource itself.
-  // Example:
-  // `https://cloudresourcemanager.googleapis.com/v1/projects/my-project-123`.
-  // It will be left unspecified for resources without a REST API.
+  // The REST URL for accessing the resource. An HTTP `GET` request using this
+  // URL returns the resource itself. For example:
+  // "https://cloudresourcemanager.googleapis.com/v1/projects/my-project-123"
+  //
+  // This value is unspecified for resources without a REST API.
   string resource_url = 4;
 
   // The full name of the immediate parent of this resource. See
@@ -104,15 +158,175 @@ message Resource {
   // Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
   // for more information.
   //
-  // For GCP assets, it is the parent resource defined in the [Cloud IAM policy
+  // For Google Cloud assets, this value is the parent resource defined in the
+  // [Cloud IAM policy
   // hierarchy](https://cloud.google.com/iam/docs/overview#policy_hierarchy).
   // For example:
-  // `"//cloudresourcemanager.googleapis.com/projects/my_project_123"`.
+  // "//cloudresourcemanager.googleapis.com/projects/my_project_123"
   //
-  // For third-party assets, it is up to the users to define.
+  // For third-party assets, this field may be set differently.
   string parent = 5;
 
-  // The content of the resource, in which some sensitive fields are scrubbed
-  // away and may not be present.
+  // The content of the resource, in which some sensitive fields are removed
+  // and may not be present.
   google.protobuf.Struct data = 6;
+
+  // The location of the resource in Google Cloud, such as its zone and region.
+  // For more information, see https://cloud.google.com/about/locations/.
+  string location = 8;
+}
+
+// A result of Resource Search, containing information of a cloud resoure.
+message ResourceSearchResult {
+  // The full resource name of this resource. Example:
+  // "//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1".
+  // See [Cloud Asset Inventory Resource Name
+  // Format](https://cloud.google.com/asset-inventory/docs/resource-name-format)
+  // for more information.
+  //
+  // To search against the `name`:
+  //
+  // * use a field query. Example: `name : "instance1"`
+  // * use a free text query. Example: `"instance1"`
+  string name = 1;
+
+  // The type of this resource. Example: "compute.googleapis.com/Disk".
+  //
+  // To search against the `asset_type`:
+  //
+  // * specify the `asset_type` field in your search request.
+  string asset_type = 2;
+
+  // The project that this resource belongs to, in the form of
+  // projects/{PROJECT_NUMBER}.
+  //
+  // To search against the `project`:
+  //
+  // * specify the `scope` field as this project in your search request.
+  string project = 3;
+
+  // The display name of this resource.
+  //
+  // To search against the `display_name`:
+  //
+  // * use a field query. Example: `displayName : "My Instance"`
+  // * use a free text query. Example: `"My Instance"`
+  string display_name = 4;
+
+  // One or more paragraphs of text description of this resource. Maximum length
+  // could be up to 1M bytes.
+  //
+  // To search against the `description`:
+  //
+  // * use a field query. Example: `description : "*important instance*"`
+  // * use a free text query. Example: `"*important instance*"`
+  string description = 5;
+
+  // Location can be "global", regional like "us-east1", or zonal like
+  // "us-west1-b".
+  //
+  // To search against the `location`:
+  //
+  // * use a field query. Example: `location : "us-west*"`
+  // * use a free text query. Example: `"us-west*"`
+  string location = 6;
+
+  // Labels associated with this resource. See [Labelling and grouping GCP
+  // resources](https://cloud.google.com/blog/products/gcp/labelling-and-grouping-your-google-cloud-platform-resources)
+  // for more information.
+  //
+  // To search against the `labels`:
+  //
+  // * use a field query, as following:
+  //     - query on any label's key or value. Example: `labels : "prod"`
+  //     - query by a given label. Example: `labels.env : "prod"`
+  //     - query by a given label'sexistence. Example: `labels.env : *`
+  // * use a free text query. Example: `"prod"`
+  map<string, string> labels = 7;
+
+  // Network tags associated with this resource. Like labels, network tags are a
+  // type of annotations used to group GCP resources. See [Labelling GCP
+  // resources](https://cloud.google.com/blog/products/gcp/labelling-and-grouping-your-google-cloud-platform-resources)
+  // for more information.
+  //
+  // To search against the `network_tags`:
+  //
+  // * use a field query. Example: `networkTags : "internal"`
+  // * use a free text query. Example: `"internal"`
+  repeated string network_tags = 8;
+
+  // The additional attributes of this resource. The attributes may vary from
+  // one resource type to another. Examples: "projectId" for Project,
+  // "dnsName" for DNS ManagedZone.
+  //
+  // To search against the `additional_attributes`:
+  //
+  // * use a free text query to match the attributes values. Example: to search
+  //   additional_attributes = { dnsName: "foobar" }, you can issue a query
+  //   `"foobar"`.
+  google.protobuf.Struct additional_attributes = 9;
+}
+
+// A result of IAM Policy search, containing information of an IAM policy.
+message IamPolicySearchResult {
+  // Explanation about the IAM policy search result.
+  message Explanation {
+    // IAM permissions
+    message Permissions {
+      // A list of permissions. A sample permission string: "compute.disk.get".
+      repeated string permissions = 1;
+    }
+
+    // The map from roles to their included permissions that match the
+    // permission query (i.e., a query containing `policy.role.permissions:`).
+    // Example: if query `policy.role.permissions : "compute.disk.get"`
+    // matches a policy binding that contains owner role, the
+    // matched_permissions will be {"roles/owner": ["compute.disk.get"]}. The
+    // roles can also be found in the returned `policy` bindings. Note that the
+    // map is populated only for requests with permission queries.
+    map<string, Permissions> matched_permissions = 1;
+  }
+
+  // The full resource name of the resource associated with this IAM policy.
+  // Example:
+  // "//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1".
+  // See [Cloud Asset Inventory Resource Name
+  // Format](https://cloud.google.com/asset-inventory/docs/resource-name-format)
+  // for more information.
+  //
+  // To search against the `resource`:
+  //
+  // * use a field query. Example: `resource : "organizations/123"`
+  string resource = 1;
+
+  // The project that the associated GCP resource belongs to, in the form of
+  // projects/{PROJECT_NUMBER}. If an IAM policy is set on a resource (like VM
+  // instance, Cloud Storage bucket), the project field will indicate the
+  // project that contains the resource. If an IAM policy is set on a folder or
+  // orgnization, the project field will be empty.
+  //
+  // To search against the `project`:
+  //
+  // * specify the `scope` field as this project in your search request.
+  string project = 2;
+
+  // The IAM policy directly set on the given resource. Note that the original
+  // IAM policy can contain multiple bindings. This only contains the bindings
+  // that match the given query. For queries that don't contain a constrain on
+  // policies (e.g., an empty query), this contains all the bindings.
+  //
+  // To search against the `policy` bindings:
+  //
+  // * use a field query, as following:
+  //     - query by the policy contained members. Example:
+  //       `policy : "amy@gmail.com"`
+  //     - query by the policy contained roles. Example:
+  //       `policy : "roles/compute.admin"`
+  //     - query by the policy contained roles' implied permissions. Example:
+  //       `policy.role.permissions : "compute.instances.create"`
+  google.iam.v1.Policy policy = 3;
+
+  // Explanation about the IAM policy search result. It contains additional
+  // information to explain why the search result matches the query.
+  Explanation explanation = 4;
 }

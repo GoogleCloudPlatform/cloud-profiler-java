@@ -1,0 +1,91 @@
+{
+  "methodConfig": [
+    {
+      "name": [
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "ListDatabases"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "GetDatabase"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "UpdateDatabaseDdl"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "DropDatabase"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "GetDatabaseDdl"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "GetIamPolicy"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "GetBackup"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "UpdateBackup"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "DeleteBackup"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "ListBackups"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "RestoreDatabase"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "ListDatabaseOperations"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "ListBackupOperations"
+        }
+      ],
+      "timeout": "3600s",
+      "retryPolicy": {
+        "initialBackoff": "1s",
+        "maxBackoff": "32s",
+        "backoffMultiplier": 1.3,
+        "retryableStatusCodes": [
+          "UNAVAILABLE",
+          "DEADLINE_EXCEEDED"
+        ]
+      }
+    },
+    {
+      "name": [
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "CreateDatabase"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "SetIamPolicy"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "TestIamPermissions"
+        },
+        {
+          "service": "google.spanner.admin.database.v1.DatabaseAdmin",
+          "method": "CreateBackup"
+        }
+      ],
+      "timeout": "3600s"
+    }
+  ]
+}

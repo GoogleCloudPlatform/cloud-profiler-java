@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -344,4 +343,15 @@ message SitelinkFeedItem {
   // Final URL suffix to be appended to landing page URLs served with
   // parallel tracking.
   google.protobuf.StringValue final_url_suffix = 8;
+}
+
+// Represents a hotel callout extension.
+message HotelCalloutFeedItem {
+  // The callout text.
+  // The length of this string should be between 1 and 25, inclusive.
+  google.protobuf.StringValue text = 1;
+
+  // The language of the hotel callout text.
+  // IETF BCP 47 compliant language code.
+  google.protobuf.StringValue language_code = 2;
 }

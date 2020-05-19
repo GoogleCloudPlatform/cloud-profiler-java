@@ -1,0 +1,29 @@
+type: com.google.api.codegen.ConfigProto
+config_schema_version: 2.0.0
+# The settings of generated code in a specific language.
+language_settings:
+  java:
+    package_name: com.google.cloud.bigquery.reservation.v1beta1
+  python:
+    package_name: google.cloud.bigquery.reservation_v1beta1.gapic
+  go:
+    package_name: cloud.google.com/go/bigquery/reservation/apiv1beta1
+  csharp:
+    package_name: Google.Cloud.Bigquery.Reservation.V1beta1
+  ruby:
+    package_name: Google::Cloud::Bigquery::Reservation::V1beta1
+  php:
+    package_name: Google\Cloud\Bigquery\Reservation\V1beta1
+  nodejs:
+    package_name: reservation.v1beta1
+# A list of API interface configurations.
+interfaces:
+# The fully qualified name of the API interface.
+- name: google.cloud.bigquery.reservation.v1beta1.ReservationService
+  methods:
+  - name: DeleteReservation
+    retry_codes_name: idempotent
+  - name: DeleteCapacityCommitment
+    retry_codes_name: idempotent
+  - name: DeleteAssignment
+    retry_codes_name: idempotent

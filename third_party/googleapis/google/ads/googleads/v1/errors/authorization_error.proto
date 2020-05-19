@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -41,10 +40,9 @@ message AuthorizationErrorEnum {
     UNKNOWN = 1;
 
     // User doesn't have permission to access customer. Note: If you're
-    // accessing a client customer, the manager's customer id must be set in the
-    // 'login-customer-id' header. See
-    // https://developers.google.com/google-ads/api/docs/concepts/
-    // call-structure#login-customer-id
+    // accessing a client customer, the manager's customer ID must be set in the
+    // `login-customer-id` header. Learn more at
+    // https://developers.google.com/google-ads/api/docs/concepts/call-structure#cid
     USER_PERMISSION_DENIED = 2;
 
     // The developer token is not whitelisted.
@@ -78,4 +76,6 @@ message AuthorizationErrorEnum {
     // only be used with test accounts.
     DEVELOPER_TOKEN_NOT_APPROVED = 10;
   }
+
+
 }

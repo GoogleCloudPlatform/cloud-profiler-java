@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -22,6 +21,7 @@ import "google/cloud/automl/v1beta1/column_spec.proto";
 import "google/cloud/automl/v1beta1/data_items.proto";
 import "google/cloud/automl/v1beta1/data_stats.proto";
 import "google/cloud/automl/v1beta1/ranges.proto";
+import "google/cloud/automl/v1beta1/regression.proto";
 import "google/cloud/automl/v1beta1/temporal.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -42,9 +42,12 @@ message TablesDatasetMetadata {
   // training & prediction target.
   // This column must be non-nullable and have one of following data types
   // (otherwise model creation will error):
+  //
   // * CATEGORY
+  //
   // * FLOAT64
-  // Furthermore, if the type is CATEGORY , then only up to
+  //
+  // If the type is CATEGORY , only up to
   // 100 unique values may exist in that column across all rows.
   //
   // NOTE: Updates of this field will instantly affect any other users
@@ -89,16 +92,30 @@ message TablesDatasetMetadata {
   // for the timestamp at which these stats were last updated.
   map<string, CorrelationStats> target_column_correlations = 6;
 
-  // The most recent timestamp when target_column_correlations field and all
-  // descendant ColumnSpec.data_stats and ColumnSpec.top_correlated_columns
-  // fields were last (re-)generated. Any changes that happened to the dataset
-  // afterwards are not reflected in these fields values. The regeneration
-  // happens in the background on a best effort basis.
+  // Output only. The most recent timestamp when target_column_correlations
+  // field and all descendant ColumnSpec.data_stats and
+  // ColumnSpec.top_correlated_columns fields were last (re-)generated. Any
+  // changes that happened to the dataset afterwards are not reflected in these
+  // fields values. The regeneration happens in the background on a best effort
+  // basis.
   google.protobuf.Timestamp stats_update_time = 7;
 }
 
 // Model metadata specific to AutoML Tables.
 message TablesModelMetadata {
+  // Additional optimization objective configuration. Required for
+  // `MAXIMIZE_PRECISION_AT_RECALL` and `MAXIMIZE_RECALL_AT_PRECISION`,
+  // otherwise unused.
+  oneof additional_optimization_objective_config {
+    // Required when optimization_objective is "MAXIMIZE_PRECISION_AT_RECALL".
+    // Must be between 0 and 1, inclusive.
+    float optimization_objective_recall_value = 17;
+
+    // Required when optimization_objective is "MAXIMIZE_RECALL_AT_PRECISION".
+    // Must be between 0 and 1, inclusive.
+    float optimization_objective_precision_value = 18;
+  }
+
   // Column spec of the dataset's primary table's column the model is
   // predicting. Snapshotted when model creation started.
   // Only 3 fields are used:
@@ -122,12 +139,16 @@ message TablesModelMetadata {
   //
   // [ml_use_column][google.cloud.automl.v1beta1.TablesDatasetMetadata.ml_use_column_spec_id]
   // must never be included here.
+  //
   // Only 3 fields are used:
-  // name - May be set on CreateModel, if set only the columns specified are
-  //        used, otherwise all primary table's columns (except the ones listed
-  //        above) are used for the training and prediction input.
-  // display_name - Output only.
-  // data_type - Output only.
+  //
+  // * name - May be set on CreateModel, if set only the columns specified are
+  //   used, otherwise all primary table's columns (except the ones listed
+  //   above) are used for the training and prediction input.
+  //
+  // * display_name - Output only.
+  //
+  // * data_type - Output only.
   repeated ColumnSpec input_feature_column_specs = 3;
 
   // Objective function the model is optimizing towards. The training process
@@ -155,24 +176,7 @@ message TablesModelMetadata {
   //   "MINIMIZE_RMSE" (default) - Minimize root-mean-squared error (RMSE).
   //   "MINIMIZE_MAE" - Minimize mean-absolute error (MAE).
   //   "MINIMIZE_RMSLE" - Minimize root-mean-squared log error (RMSLE).
-  //
-  // FORECASTING:
-  //   "MINIMIZE_RMSE" (default) - Minimize root-mean-squared error (RMSE).
-  //   "MINIMIZE_MAE" - Minimize mean-absolute error (MAE).
   string optimization_objective = 4;
-
-  // Additional optimization objective configuration. Required for
-  // `MAXIMIZE_PRECISION_AT_RECALL` and `MAXIMIZE_RECALL_AT_PRECISION`,
-  // otherwise unused.
-  oneof additional_optimization_objective_config {
-    // Required when optimization_objective is "MAXIMIZE_PRECISION_AT_RECALL".
-    // Must be between 0 and 1, inclusive.
-    float optimization_objective_recall_value = 17;
-
-    // Required when optimization_objective is "MAXIMIZE_RECALL_AT_PRECISION".
-    // Must be between 0 and 1, inclusive.
-    float optimization_objective_precision_value = 18;
-  }
 
   // Output only. Auxiliary information for each of the
   // input_feature_column_specs with respect to this particular model.
@@ -226,9 +230,11 @@ message TablesAnnotation {
   //
   // [target_column][google.cloud.automl.v1beta1.TablesModelMetadata.target_column_spec].
   // The value depends on the column's DataType:
-  // CATEGORY - the predicted (with the above confidence `score`) CATEGORY
-  //            value.
-  // FLOAT64 - the predicted (with above `prediction_interval`) FLOAT64 value.
+  //
+  // * CATEGORY - the predicted (with the above confidence `score`) CATEGORY
+  //   value.
+  //
+  // * FLOAT64 - the predicted (with above `prediction_interval`) FLOAT64 value.
   google.protobuf.Value value = 2;
 
   // Output only. Auxiliary information for each of the model's
@@ -243,6 +249,15 @@ message TablesAnnotation {
   // [column_display_name][google.cloud.automl.v1beta1.TablesModelColumnInfo.column_display_name]
   // would be populated, then this whole field is not.
   repeated TablesModelColumnInfo tables_model_column_info = 3;
+
+  // Output only. Stores the prediction score for the baseline example, which
+  // is defined as the example with all values set to their baseline values.
+  // This is used as part of the Sampled Shapley explanation of the model's
+  // prediction. This field is populated only when feature importance is
+  // requested. For regression models, this holds the baseline prediction for
+  // the baseline example. For classification models, this holds the baseline
+  // prediction for the baseline example for the argmax class.
+  float baseline_score = 5;
 }
 
 // An information specific to given column and Tables Model, in context
@@ -256,9 +271,7 @@ message TablesModelColumnInfo {
   // its ColumnSpec).
   string column_display_name = 2;
 
-  // Output only.
-  //
-  // When given as part of a Model (always populated):
+  // Output only. When given as part of a Model (always populated):
   // Measurement of how much model predictions correctness on the TEST data
   // depend on values in this column. A value between 0 and 1, higher means
   // higher influence. These values are normalized - for all input feature
@@ -271,8 +284,9 @@ message TablesModelColumnInfo {
   // [feature_importance][google.cloud.automl.v1beta1.PredictRequest.params]
   // param is set):
   // Measurement of how impactful for the prediction returned for the given row
-  // the value in this column was. A value between 0 and 1, higher means larger
-  // impact. These values are normalized - for all input feature columns of a
-  // single predicted row they add to 1.
+  // the value in this column was. Specifically, the feature importance
+  // specifies the marginal contribution that the feature made to the prediction
+  // score compared to the baseline score. These values are computed using the
+  // Sampled Shapley method.
   float feature_importance = 3;
 }

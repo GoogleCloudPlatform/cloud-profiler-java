@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -76,6 +75,10 @@ message AuthorizationErrorEnum {
     // The developer token is not approved. Non-approved developer tokens can
     // only be used with test accounts.
     DEVELOPER_TOKEN_NOT_APPROVED = 10;
+
+    // The login customer specified does not have access to the account
+    // specified, so the request is invalid.
+    INVALID_LOGIN_CUSTOMER_ID_SERVING_CUSTOMER_ID_COMBINATION = 11;
   }
 
 
