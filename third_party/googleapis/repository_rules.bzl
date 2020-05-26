@@ -11,7 +11,7 @@ def {rule_name}(**kwargs):
 {rule_name} = {native_rule_name}
 """
     enabled_rule_script = """
-load("{file_label}", _{rule_name} = "{rule_name}")
+load("{file_label}", _{rule_name} = "{loaded_rule_name}")
 """
     elabled_rule_scrip_alias = """
 {rule_name} = _{rule_name}
@@ -19,11 +19,18 @@ load("{file_label}", _{rule_name} = "{rule_name}")
     load_rules = []  # load() must go before everythin else in .bzl files since Bazel 0.25.0
     rules = []
 
-    for rule_name, value in ctx.attr.rules.items():
+    for rule_name, value_and_name in ctx.attr.rules.items():
+        value = value_and_name[0]
+        loaded_rule_name = value_and_name[1] if value_and_name[1] else rule_name
+
         if not value:
             rules.append(disabled_rule_script.format(rule_name = rule_name))
         elif value.startswith("@"):
-            load_rules.append(enabled_rule_script.format(file_label = value, rule_name = rule_name))
+            load_rules.append(enabled_rule_script.format(
+                file_label = value,
+                rule_name = rule_name,
+                loaded_rule_name = loaded_rule_name,
+            ))
             rules.append(elabled_rule_scrip_alias.format(rule_name = rule_name))
         elif value.startswith("native."):
             rules.append(
@@ -38,7 +45,7 @@ load("{file_label}", _{rule_name} = "{rule_name}")
 switched_rules = repository_rule(
     implementation = _switched_rules_impl,
     attrs = {
-        "rules": attr.string_dict(
+        "rules": attr.string_list_dict(
             allow_empty = True,
             mandatory = False,
             default = {},
@@ -92,12 +99,13 @@ def switched_rules_by_language(
             this rule. False by default.
         java (bool): Enable Java specific rules. False by default.
         go (bool): Enable Go specific rules. False by default.
-        cc (bool): Enable C++ specific rules. False by default. Partially implemented.
+        cc (bool): Enable C++ specific rules. False by default. Partially implemented (no GAPIC
+            support).
         php (bool): Enable PHP specific rules. False by default.
         nodejs (bool): Enable Node.js specific rules. False by default.
-        ruby (bool): Enable Ruby specific rules. False by default. Not implemented yet.
-        python (bool): Enable Python-specific rules. False by default. Not implemented yet.
-        csharp (bool): Enable C# specific rules. False by default. Not implemented yet.
+        ruby (bool): Enable Ruby specific rules. False by default.
+        python (bool): Enable Python-specific rules. False by default.
+        csharp (bool): Enable C# specific rules. False by default.
         rules_override (dict): Custom rule overrides (for advanced usage).
     """
 
@@ -107,6 +115,10 @@ def switched_rules_by_language(
     # Common
     #
     rules["proto_library_with_info"] = _switch(
+        gapic,
+        "@com_google_api_codegen//rules_gapic:gapic.bzl",
+    )
+    rules["moved_proto_library"] = _switch(
         gapic,
         "@com_google_api_codegen//rules_gapic:gapic.bzl",
     )
@@ -130,13 +142,43 @@ def switched_rules_by_language(
         java and grpc and gapic,
         "@com_google_api_codegen//rules_gapic/java:java_gapic.bzl",
     )
+    rules["java_gapic_test"] = _switch(
+        java and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/java:java_gapic.bzl",
+    )
     rules["java_gapic_assembly_gradle_pkg"] = _switch(
         java and grpc and gapic,
         "@com_google_api_codegen//rules_gapic/java:java_gapic_pkg.bzl",
     )
-    rules["java_test"] = _switch(
-        java and grpc and gapic,
-        "native.java_test",
+
+    #
+    # Python
+    #
+    rules["py_proto_library"] = _switch(
+        python,
+        "@com_github_grpc_grpc//bazel:python_rules.bzl",
+    )
+    rules["py_grpc_library"] = _switch(
+        python and grpc,
+        "@com_github_grpc_grpc//bazel:python_rules.bzl",
+    )
+    rules["py_gapic_library"] = _switch(
+        python and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/python:py_gapic.bzl",
+    )
+    rules["py_gapic_assembly_pkg"] = _switch(
+        python and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/python:py_gapic_pkg.bzl",
+    )
+    rules["py_gapic_library2"] = _switch(
+        python and grpc and gapic,
+        "@gapic_generator_python//rules_python_gapic:py_gapic.bzl",
+        "py_gapic_library",
+    )
+    rules["py_gapic_assembly_pkg2"] = _switch(
+        python and grpc and gapic,
+        "@gapic_generator_python//rules_python_gapic:py_gapic_pkg.bzl",
+        "py_gapic_assembly_pkg",
     )
 
     #
@@ -156,11 +198,11 @@ def switched_rules_by_language(
     )
     rules["go_gapic_library"] = _switch(
         go and grpc and gapic,
-        "@com_google_api_codegen//rules_gapic/go:go_gapic.bzl",
+        "@com_googleapis_gapic_generator_go//rules_go_gapic:go_gapic.bzl",
     )
     rules["go_gapic_assembly_pkg"] = _switch(
         go and grpc and gapic,
-        "@com_google_api_codegen//rules_gapic/go:go_gapic_pkg.bzl",
+        "@com_googleapis_gapic_generator_go//rules_go_gapic:go_gapic_pkg.bzl",
     )
 
     #
@@ -174,10 +216,7 @@ def switched_rules_by_language(
         cc and grpc,
         "@com_github_grpc_grpc//bazel:cc_grpc_library.bzl",
     )
-    rules["cc_gapic_library"] = _switch(
-        cc and grpc and gapic,
-        "@com_google_gapic_generator_cpp//rules_gapic/cpp:cc_gapic.bzl",
-    )
+    rules["cc_gapic_library"] = _switch(False)
 
     #
     # PHP
@@ -211,6 +250,46 @@ def switched_rules_by_language(
         "@com_google_api_codegen//rules_gapic/nodejs:nodejs_gapic_pkg.bzl",
     )
 
+    #
+    # Ruby
+    #
+    rules["ruby_proto_library"] = _switch(
+        ruby,
+        "@com_google_api_codegen//rules_gapic/ruby:ruby_gapic.bzl",
+    )
+    rules["ruby_grpc_library"] = _switch(
+        ruby and grpc,
+        "@com_google_api_codegen//rules_gapic/ruby:ruby_gapic.bzl",
+    )
+    rules["ruby_gapic_library"] = _switch(
+        ruby and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/ruby:ruby_gapic.bzl",
+    )
+    rules["ruby_gapic_assembly_pkg"] = _switch(
+        ruby and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/ruby:ruby_gapic_pkg.bzl",
+    )
+
+    #
+    # C#
+    #
+    rules["csharp_proto_library"] = _switch(
+        csharp,
+        "@com_google_api_codegen//rules_gapic/csharp:csharp_gapic.bzl",
+    )
+    rules["csharp_grpc_library"] = _switch(
+        csharp and grpc,
+        "@com_google_api_codegen//rules_gapic/csharp:csharp_gapic.bzl",
+    )
+    rules["csharp_gapic_library"] = _switch(
+        csharp and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/csharp:csharp_gapic.bzl",
+    )
+    rules["csharp_gapic_assembly_pkg"] = _switch(
+        csharp and grpc and gapic,
+        "@com_google_api_codegen//rules_gapic/csharp:csharp_gapic_pkg.bzl",
+    )
+
     rules.update(rules_override)
 
     switched_rules(
@@ -218,5 +297,8 @@ def switched_rules_by_language(
         rules = rules,
     )
 
-def _switch(enabled, enabled_value):
-    return enabled_value if enabled else ""
+def _switch(enabled, enabled_value = "", actual_name = ""):
+    if enabled:
+        return [enabled_value, actual_name]
+    else:
+        return ["", actual_name]

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.dialogflow.v2beta1;
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/cloud/dialogflow/v2beta1/gcs.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -70,9 +71,6 @@ service Documents {
   //
   // Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
   // only use `projects.knowledgeBases.documents`.
-  //
-  // Operation <response: [Document][google.cloud.dialogflow.v2beta1.Document],
-  //            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2beta1.KnowledgeOperationMetadata]>
   rpc CreateDocument(CreateDocumentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{parent=projects/*/knowledgeBases/*}/documents"
@@ -82,15 +80,16 @@ service Documents {
         body: "document"
       }
     };
+    option (google.longrunning.operation_info) = {
+      response_type: "Document"
+      metadata_type: "KnowledgeOperationMetadata"
+    };
   }
 
   // Deletes the specified document.
   //
   // Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
   // only use `projects.knowledgeBases.documents`.
-  //
-  // Operation <response: [google.protobuf.Empty][google.protobuf.Empty],
-  //            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2beta1.KnowledgeOperationMetadata]>
   rpc DeleteDocument(DeleteDocumentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       delete: "/v2beta1/{name=projects/*/knowledgeBases/*/documents/*}"
@@ -98,15 +97,16 @@ service Documents {
         delete: "/v2beta1/{name=projects/*/agent/knowledgeBases/*/documents/*}"
       }
     };
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "KnowledgeOperationMetadata"
+    };
   }
 
   // Updates the specified document.
   //
   // Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
   // only use `projects.knowledgeBases.documents`.
-  //
-  // Operation <response: [Document][google.cloud.dialogflow.v2beta1.Document],
-  //            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2beta1.KnowledgeOperationMetadata]>
   rpc UpdateDocument(UpdateDocumentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       patch: "/v2beta1/{document.name=projects/*/knowledgeBases/*/documents/*}"
@@ -115,6 +115,10 @@ service Documents {
         patch: "/v2beta1/{document.name=projects/*/agent/knowledgeBases/*/documents/*}"
         body: "document"
       }
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "Document"
+      metadata_type: "KnowledgeOperationMetadata"
     };
   }
 
@@ -125,9 +129,6 @@ service Documents {
   //
   // Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
   // only use `projects.knowledgeBases.documents`.
-  //
-  // Operation <response: [Document][google.cloud.dialogflow.v2beta1.Document],
-  //            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2beta1.KnowledgeOperationMetadata]>
   rpc ReloadDocument(ReloadDocumentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{name=projects/*/knowledgeBases/*/documents/*}:reload"
@@ -136,6 +137,10 @@ service Documents {
         post: "/v2beta1/{name=projects/*/agent/knowledgeBases/*/documents/*}:reload"
         body: "*"
       }
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "Document"
+      metadata_type: "KnowledgeOperationMetadata"
     };
   }
 }
@@ -293,4 +298,13 @@ message ReloadDocumentRequest {
   // Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
   // ID>/documents/<Document ID>`
   string name = 1;
+
+  // The source for document reloading.
+  // Optional. If provided, the service will load the contents from the source
+  // and update document in the knowledge base.
+  oneof source {
+    // Optional. The path for a Cloud Storage source file for reloading document content.
+    // If not provided, the Document's existing source will be reloaded.
+    GcsSource gcs_source = 3;
+  }
 }

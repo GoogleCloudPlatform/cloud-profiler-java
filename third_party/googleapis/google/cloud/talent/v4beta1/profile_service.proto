@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -19,12 +18,17 @@ package google.cloud.talent.v4beta1;
 
 import "google/api/annotations.proto";
 import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/cloud/talent/v4beta1/common.proto";
 import "google/cloud/talent/v4beta1/filters.proto";
 import "google/cloud/talent/v4beta1/histogram.proto";
 import "google/cloud/talent/v4beta1/profile.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "google/rpc/status.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/cloud/talent/v4beta1;talent";
 option java_multiple_files = true;
@@ -45,6 +49,7 @@ service ProfileService {
     option (google.api.http) = {
       get: "/v4beta1/{parent=projects/*/tenants/*}/profiles"
     };
+    option (google.api.method_signature) = "parent";
   }
 
   // Creates and returns a new profile.
@@ -53,6 +58,7 @@ service ProfileService {
       post: "/v4beta1/{parent=projects/*/tenants/*}/profiles"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,profile";
   }
 
   // Gets the specified profile.
@@ -60,6 +66,7 @@ service ProfileService {
     option (google.api.http) = {
       get: "/v4beta1/{name=projects/*/tenants/*/profiles/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Updates the specified profile and returns the updated result.
@@ -68,6 +75,7 @@ service ProfileService {
       patch: "/v4beta1/{profile.name=projects/*/tenants/*/profiles/*}"
       body: "*"
     };
+    option (google.api.method_signature) = "profile";
   }
 
   // Deletes the specified profile.
@@ -77,6 +85,7 @@ service ProfileService {
     option (google.api.http) = {
       delete: "/v4beta1/{name=projects/*/tenants/*/profiles/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Searches for profiles within a tenant.
@@ -84,9 +93,7 @@ service ProfileService {
   // For example, search by raw queries "software engineer in Mountain View" or
   // search by structured filters (location filter, education filter, etc.).
   //
-  // See
-  // [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest]
-  // for more information.
+  // See [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest] for more information.
   rpc SearchProfiles(SearchProfilesRequest) returns (SearchProfilesResponse) {
     option (google.api.http) = {
       post: "/v4beta1/{parent=projects/*/tenants/*}:search"
@@ -97,28 +104,49 @@ service ProfileService {
 
 // List profiles request.
 message ListProfilesRequest {
-  // Required. The resource name of the tenant under which the profile is
-  // created.
+  // Required. The resource name of the tenant under which the profile is created.
   //
-  // The format is "projects/{project_id}/tenants/{tenant_id}", for example,
-  // "projects/api-test-project/tenants/foo".
-  string parent = 1;
+  // The format is "projects/{project_id}/tenants/{tenant_id}". For example,
+  // "projects/foo/tenants/bar".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "jobs.googleapis.com/Profile"
+    }
+  ];
 
-  // Optional. The token that specifies the current offset (that is, starting
-  // result).
+  // The filter string specifies the profiles to be enumerated.
   //
-  // Please set the value to
-  // [ListProfilesResponse.next_page_token][google.cloud.talent.v4beta1.ListProfilesResponse.next_page_token]
-  // to continue the list.
+  // Supported operator: =, AND
+  //
+  // The field(s) eligible for filtering are:
+  //
+  // * `externalId`
+  // * `groupId`
+  //
+  // externalId and groupId cannot be specified at the same time. If both
+  // externalId and groupId are provided, the API will return a bad request
+  // error.
+  //
+  // Sample Query:
+  //
+  // * externalId = "externalId-1"
+  // * groupId = "groupId-1"
+  string filter = 5;
+
+  // The token that specifies the current offset (that is, starting result).
+  //
+  // Please set the value to [ListProfilesResponse.next_page_token][google.cloud.talent.v4beta1.ListProfilesResponse.next_page_token] to
+  // continue the list.
   string page_token = 2;
 
-  // Optional. The maximum number of profiles to be returned, at most 100.
+  // The maximum number of profiles to be returned, at most 100.
   //
   // Default is 100 unless a positive number smaller than 100 is specified.
   int32 page_size = 3;
 
-  // Optional. A field mask to specify the profile fields to be listed in
-  // response. All fields are listed if it is unset.
+  // A field mask to specify the profile fields to be listed in response.
+  // All fields are listed if it is unset.
   //
   // Valid values are:
   //
@@ -140,12 +168,17 @@ message ListProfilesResponse {
 message CreateProfileRequest {
   // Required. The name of the tenant this profile belongs to.
   //
-  // The format is "projects/{project_id}/tenants/{tenant_id}", for example,
-  // "projects/api-test-project/tenants/foo".
-  string parent = 1;
+  // The format is "projects/{project_id}/tenants/{tenant_id}". For example,
+  // "projects/foo/tenants/bar".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "jobs.googleapis.com/Tenant"
+    }
+  ];
 
   // Required. The profile to be created.
-  Profile profile = 2;
+  Profile profile = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Get profile request.
@@ -153,45 +186,24 @@ message GetProfileRequest {
   // Required. Resource name of the profile to get.
   //
   // The format is
-  // "projects/{project_id}/tenants/{tenant_id}/profiles/{profile_id}",
-  // for example, "projects/api-test-project/tenants/foo/profiles/bar".
-  string name = 1;
+  // "projects/{project_id}/tenants/{tenant_id}/profiles/{profile_id}". For
+  // example, "projects/foo/tenants/bar/profiles/baz".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "jobs.googleapis.com/Profile"
+    }
+  ];
 }
 
 // Update profile request
 message UpdateProfileRequest {
   // Required. Profile to be updated.
-  Profile profile = 1;
+  Profile profile = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. A field mask to specify the profile fields to update.
+  // A field mask to specify the profile fields to update.
   //
   // A full update is performed if it is unset.
-  //
-  // Valid values are:
-  //
-  // * external_id
-  // * source
-  // * uri
-  // * is_hirable
-  // * create_time
-  // * update_time
-  // * resume
-  // * person_names
-  // * addresses
-  // * email_addresses
-  // * phone_numbers
-  // * personal_uris
-  // * additional_contact_info
-  // * employment_records
-  // * education_records
-  // * skills
-  // * projects
-  // * publications
-  // * patents
-  // * certifications
-  // * recruiting_notes
-  // * custom_attributes
-  // * group_id
   google.protobuf.FieldMask update_mask = 2;
 }
 
@@ -200,47 +212,54 @@ message DeleteProfileRequest {
   // Required. Resource name of the profile to be deleted.
   //
   // The format is
-  // "projects/{project_id}/tenants/{tenant_id}/profiles/{profile_id}",
-  // for example, "projects/api-test-project/tenants/foo/profiles/bar".
-  string name = 1;
+  // "projects/{project_id}/tenants/{tenant_id}/profiles/{profile_id}". For
+  // example, "projects/foo/tenants/bar/profiles/baz".
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "jobs.googleapis.com/Profile"
+    }
+  ];
 }
 
 // The request body of the `SearchProfiles` call.
 message SearchProfilesRequest {
   // Required. The resource name of the tenant to search within.
   //
-  // The format is "projects/{project_id}/tenants/{tenant_id}", for example,
-  // "projects/api-test-project/tenants/foo".
-  string parent = 1;
+  // The format is "projects/{project_id}/tenants/{tenant_id}". For example,
+  // "projects/foo/tenants/bar".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "jobs.googleapis.com/Tenant"
+    }
+  ];
 
-  // Required. The meta information collected about the profile search user.
-  // This is used to improve the search quality of the service. These values are
-  // provided by users, and must be precise and consistent.
-  RequestMetadata request_metadata = 2;
+  // Required. The meta information collected about the profile search user. This is used
+  // to improve the search quality of the service. These values are provided by
+  // users, and must be precise and consistent.
+  RequestMetadata request_metadata = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. Search query to execute. See
-  // [ProfileQuery][google.cloud.talent.v4beta1.ProfileQuery] for more details.
+  // Search query to execute. See [ProfileQuery][google.cloud.talent.v4beta1.ProfileQuery] for more details.
   ProfileQuery profile_query = 3;
 
-  // Optional. A limit on the number of profiles returned in the search results.
+  // A limit on the number of profiles returned in the search results.
   // A value above the default value 10 can increase search response time.
   //
   // The maximum value allowed is 100. Otherwise an error is thrown.
   int32 page_size = 4;
 
-  // Optional. The pageToken, similar to offset enables users of the API to
-  // paginate through the search results. To retrieve the first page of results,
-  // set the pageToken to empty. The search response includes a
-  // [nextPageToken][google.cloud.talent.v4beta1.SearchProfilesResponse.next_page_token]
-  // field that can be used to populate the pageToken field for the next page of
-  // results. Using pageToken instead of offset increases the performance of the
-  // API, especially compared to larger offset values.
+  // The pageToken, similar to offset enables users of the API to paginate
+  // through the search results. To retrieve the first page of results, set the
+  // pageToken to empty. The search response includes a
+  // [nextPageToken][google.cloud.talent.v4beta1.SearchProfilesResponse.next_page_token] field that can be
+  // used to populate the pageToken field for the next page of results. Using
+  // pageToken instead of offset increases the performance of the API,
+  // especially compared to larger offset values.
   string page_token = 5;
 
-  // Optional. An integer that specifies the current offset (that is, starting
-  // result) in search results. This field is only considered if
-  // [page_token][google.cloud.talent.v4beta1.SearchProfilesRequest.page_token]
-  // is unset.
+  // An integer that specifies the current offset (that is, starting result) in
+  // search results. This field is only considered if [page_token][google.cloud.talent.v4beta1.SearchProfilesRequest.page_token] is unset.
   //
   // The maximum allowed value is 5000. Otherwise an error is thrown.
   //
@@ -249,54 +268,42 @@ message SearchProfilesRequest {
   // pageSize = 10 and offset = 10 means to search from the second page.
   int32 offset = 6;
 
-  // Optional. This flag controls the spell-check feature. If `false`, the
+  // This flag controls the spell-check feature. If `false`, the
   // service attempts to correct a misspelled query.
   //
   // For example, "enginee" is corrected to "engineer".
   bool disable_spell_check = 7;
 
-  // Optional. The criteria that determines how search results are sorted.
+  // The criteria that determines how search results are sorted.
   // Defaults is "relevance desc" if no value is specified.
   //
   // Supported options are:
   //
   // * "relevance desc": By descending relevance, as determined by the API
   //    algorithms.
-  // * "update_time desc": Sort by
-  // [Profile.update_time][google.cloud.talent.v4beta1.Profile.update_time] in
-  // descending order
+  // * "update_date desc": Sort by [Profile.update_time][google.cloud.talent.v4beta1.Profile.update_time] in descending order
   //   (recently updated profiles first).
-  // * "create_time desc": Sort by
-  // [Profile.create_time][google.cloud.talent.v4beta1.Profile.create_time] in
-  // descending order
+  // * "create_date desc": Sort by [Profile.create_time][google.cloud.talent.v4beta1.Profile.create_time] in descending order
   //   (recently created profiles first).
-  // * "first_name": Sort by
-  // [PersonName.PersonStructuredName.given_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.given_name]
-  // in
+  // * "first_name": Sort by [PersonName.PersonStructuredName.given_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.given_name] in
   //   ascending order.
-  // * "first_name desc": Sort by
-  // [PersonName.PersonStructuredName.given_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.given_name]
+  // * "first_name desc": Sort by [PersonName.PersonStructuredName.given_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.given_name]
   //   in descending order.
-  // * "last_name": Sort by
-  // [PersonName.PersonStructuredName.family_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.family_name]
-  // in
+  // * "last_name": Sort by [PersonName.PersonStructuredName.family_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.family_name] in
   //   ascending order.
-  // * "last_name desc": Sort by
-  // [PersonName.PersonStructuredName.family_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.family_name]
+  // * "last_name desc": Sort by [PersonName.PersonStructuredName.family_name][google.cloud.talent.v4beta1.PersonName.PersonStructuredName.family_name]
   //   in ascending order.
   string order_by = 8;
 
-  // Optional. When sort by field is based on alphabetical order, sort values
-  // case sensitively (based on ASCII) when the value is set to true. Default
-  // value is case in-sensitive sort (false).
+  // When sort by field is based on alphabetical order, sort values case
+  // sensitively (based on ASCII) when the value is set to true. Default value
+  // is case in-sensitive sort (false).
   bool case_sensitive_sort = 9;
 
-  // Optional. A list of expressions specifies histogram requests against
-  // matching profiles for
-  // [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest].
+  // A list of expressions specifies histogram requests against matching
+  // profiles for [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest].
   //
-  // The expression syntax looks like a function definition with optional
-  // parameters.
+  // The expression syntax looks like a function definition with parameters.
   //
   // Function syntax: function_name(histogram_facet[, list of buckets])
   //
@@ -346,19 +353,13 @@ message SearchProfilesRequest {
   // * experience_in_months: experience in months. 0 means 0 month to 1 month
   // (exclusive).
   // * application_date: The application date specifies application start dates.
-  // See
-  // [ApplicationDateFilter][google.cloud.talent.v4beta1.ApplicationDateFilter]
-  // for more details.
+  // See [ApplicationDateFilter][google.cloud.talent.v4beta1.ApplicationDateFilter] for more details.
   // * application_outcome_notes: The application outcome reason specifies the
   // reasons behind the outcome of the job application.
-  // See
-  // [ApplicationOutcomeNotesFilter][google.cloud.talent.v4beta1.ApplicationOutcomeNotesFilter]
-  // for more details.
+  // See [ApplicationOutcomeNotesFilter][google.cloud.talent.v4beta1.ApplicationOutcomeNotesFilter] for more details.
   // * application_job_title: The application job title specifies the job
   // applied for in the application.
-  // See
-  // [ApplicationJobFilter][google.cloud.talent.v4beta1.ApplicationJobFilter]
-  // for more details.
+  // See [ApplicationJobFilter][google.cloud.talent.v4beta1.ApplicationJobFilter] for more details.
   // * hirable_status: Hirable status specifies the profile's hirable status.
   // * string_custom_attribute: String custom attributes. Values can be accessed
   // via square bracket notation like string_custom_attribute["key1"].
@@ -375,33 +376,42 @@ message SearchProfilesRequest {
   // [bucket(MIN, 0, "negative"), bucket(0, MAX, "non-negative")])
   repeated HistogramQuery histogram_queries = 10;
 
-  // Optional. An id that uniquely identifies the result set of a
-  // [SearchProfiles][] call.  The id should be retrieved from the
-  // [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse]
-  // message returned from a previous invocation of [SearchProfiles][].
+  // An id that uniquely identifies the result set of a
+  // [SearchProfiles][google.cloud.talent.v4beta1.ProfileService.SearchProfiles] call. The id should be
+  // retrieved from the
+  // [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse] message returned from a previous
+  // invocation of [SearchProfiles][google.cloud.talent.v4beta1.ProfileService.SearchProfiles].
   //
   // A result set is an ordered list of search results.
   //
   // If this field is not set, a new result set is computed based on the
-  // [profile_query][google.cloud.talent.v4beta1.SearchProfilesRequest.profile_query].
-  // A new
-  // [result_set_id][google.cloud.talent.v4beta1.SearchProfilesRequest.result_set_id]
-  // is returned as a handle to access this result set.
+  // [profile_query][google.cloud.talent.v4beta1.SearchProfilesRequest.profile_query].  A new [result_set_id][google.cloud.talent.v4beta1.SearchProfilesRequest.result_set_id] is returned as a handle to
+  // access this result set.
   //
   // If this field is set, the service will ignore the resource and
-  // [profile_query][google.cloud.talent.v4beta1.SearchProfilesRequest.profile_query]
-  // values, and simply retrieve a page of results from the corresponding result
-  // set.  In this case, one and only one of [page_token] or [offset] must be
-  // set.
+  // [profile_query][google.cloud.talent.v4beta1.SearchProfilesRequest.profile_query] values, and simply retrieve a page of results from the
+  // corresponding result set.  In this case, one and only one of [page_token][google.cloud.talent.v4beta1.SearchProfilesRequest.page_token]
+  // or [offset][google.cloud.talent.v4beta1.SearchProfilesRequest.offset] must be set.
   //
-  // A typical use case is to invoke
-  // [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest]
-  // without this field, then use the resulting
-  // [result_set_id][google.cloud.talent.v4beta1.SearchProfilesRequest.result_set_id]
-  // in
-  // [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse]
-  // to page through the results.
+  // A typical use case is to invoke [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest] without this
+  // field, then use the resulting [result_set_id][google.cloud.talent.v4beta1.SearchProfilesRequest.result_set_id] in
+  // [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse] to page through the results.
   string result_set_id = 12;
+
+  // This flag is used to indicate whether the service will attempt to
+  // understand synonyms and terms related to the search query or treat the
+  // query "as is" when it generates a set of results. By default this flag is
+  // set to false, thus allowing expanded results to also be returned. For
+  // example a search for "software engineer" might also return candidates who
+  // have experience in jobs similar to software engineer positions. By setting
+  // this flag to true, the service will only attempt to deliver candidates has
+  // software engineer in his/her global fields by treating "software engineer"
+  // as a keyword.
+  //
+  // It is recommended to provide a feature in the UI (such as a checkbox) to
+  // allow recruiters to set this flag to true if they intend to search for
+  // longer boolean strings.
+  bool strict_keywords_search = 13;
 }
 
 // Response of SearchProfiles method.
@@ -426,32 +436,26 @@ message SearchProfilesResponse {
   // [SearchProfilesRequest.histogram_queries][google.cloud.talent.v4beta1.SearchProfilesRequest.histogram_queries].
   repeated HistogramQueryResult histogram_query_results = 5;
 
-  // The profile entities that match the specified
-  // [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest].
+  // The profile entities that match the specified [SearchProfilesRequest][google.cloud.talent.v4beta1.SearchProfilesRequest].
   repeated SummarizedProfile summarized_profiles = 6;
 
   // An id that uniquely identifies the result set of a
-  // [SearchProfiles][google.cloud.talent.v4beta1.ProfileService.SearchProfiles]
-  // call for consistent results.
+  // [SearchProfiles][google.cloud.talent.v4beta1.ProfileService.SearchProfiles] call for consistent
+  // results.
   string result_set_id = 7;
 }
 
-// Output only.
-//
-// Profile entry with metadata inside
-// [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse].
+// Profile entry with metadata inside [SearchProfilesResponse][google.cloud.talent.v4beta1.SearchProfilesResponse].
 message SummarizedProfile {
-  // A list of profiles that are linked by
-  // [Profile.group_id][google.cloud.talent.v4beta1.Profile.group_id].
+  // A list of profiles that are linked by [Profile.group_id][google.cloud.talent.v4beta1.Profile.group_id].
   repeated Profile profiles = 1;
 
   // A profile summary shows the profile summary and how the profile matches the
   // search query.
   //
-  // In profile summary, the profiles with the same
-  // [Profile.group_id][google.cloud.talent.v4beta1.Profile.group_id] are merged
-  // together. Among profiles, same education/employment records may be slightly
-  // different but they are merged into one with best efforts.
+  // In profile summary, the profiles with the same [Profile.group_id][google.cloud.talent.v4beta1.Profile.group_id] are
+  // merged together. Among profiles, same education/employment records may be
+  // slightly different but they are merged into one with best efforts.
   //
   // For example, in one profile the school name is "UC Berkeley" and the field
   // study is "Computer Science" and in another one the school name is

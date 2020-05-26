@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -19,8 +18,8 @@ package google.ads.googleads.v1.common;
 
 import "google/ads/googleads/v1/enums/tracking_code_page_format.proto";
 import "google/ads/googleads/v1/enums/tracking_code_type.proto";
-import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
 
 option csharp_namespace = "Google.Ads.GoogleAds.V1.Common";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v1/common;common";
@@ -40,8 +39,7 @@ message TagSnippet {
 
   // The format of the web page where the tracking tag and snippet will be
   // installed, e.g. HTML.
-  google.ads.googleads.v1.enums.TrackingCodePageFormatEnum
-      .TrackingCodePageFormat page_format = 2;
+  google.ads.googleads.v1.enums.TrackingCodePageFormatEnum.TrackingCodePageFormat page_format = 2;
 
   // The site tag that adds visitors to your basic remarketing lists and sets
   // new cookies on your domain.

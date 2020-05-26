@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,19 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
 package google.cloud.dialogflow.v2beta1;
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
 import "google/cloud/dialogflow/v2beta1/agent.proto";
 import "google/cloud/dialogflow/v2beta1/audio_config.proto";
 import "google/cloud/dialogflow/v2beta1/context.proto";
 import "google/cloud/dialogflow/v2beta1/intent.proto";
 import "google/cloud/dialogflow/v2beta1/session_entity_type.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/rpc/status.proto";
 import "google/type/latlng.proto";
@@ -36,6 +38,11 @@ option java_multiple_files = true;
 option java_outer_classname = "SessionProto";
 option java_package = "com.google.cloud.dialogflow.v2beta1";
 option objc_class_prefix = "DF";
+option (google.api.resource_definition) = {
+  type: "dialogflow.googleapis.com/Session"
+  pattern: "projects/{project}/locations/{location}/agent/sessions/{session}"
+  pattern: "projects/{project}/agent/sessions/{session}"
+};
 
 // A session represents an interaction with a user. You retrieve user input
 // and pass it to the [DetectIntent][google.cloud.dialogflow.v2beta1.Sessions.DetectIntent] (or
@@ -59,6 +66,14 @@ service Sessions {
         post: "/v2beta1/{session=projects/*/agent/environments/*/users/*/sessions/*}:detectIntent"
         body: "*"
       }
+      additional_bindings {
+        post: "/v2beta1/{session=projects/*/locations/*/agent/sessions/*}:detectIntent"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/v2beta1/{session=projects/*/locations/*/agent/environments/*/users/*/sessions/*}:detectIntent"
+        body: "*"
+      }
     };
   }
 
@@ -80,9 +95,11 @@ message DetectIntentRequest {
   // `User Id`. They can be a random number or some type of user and session
   // identifiers (preferably hashed). The length of the `Session ID` and
   // `User ID` must not exceed 36 characters.
-  string session = 1;
+  string session = 1 [(google.api.resource_reference) = {
+                        type: "dialogflow.googleapis.com/Session"
+                      }];
 
-  // Optional. The parameters of this query.
+  // The parameters of this query.
   QueryParameters query_params = 2;
 
   // Required. The input specification. It can be set to:
@@ -95,12 +112,20 @@ message DetectIntentRequest {
   // 3.  an event that specifies which intent to trigger.
   QueryInput query_input = 3;
 
-  // Optional. Instructs the speech synthesizer how to generate the output
+  // Instructs the speech synthesizer how to generate the output
   // audio. If this field is not set and agent-level speech synthesizer is not
   // configured, no output audio is generated.
   OutputAudioConfig output_audio_config = 4;
 
-  // Optional. The natural language speech audio to be processed. This field
+  // Mask for [output_audio_config][google.cloud.dialogflow.v2beta1.DetectIntentRequest.output_audio_config] indicating which settings in this
+  // request-level config should override speech synthesizer settings defined at
+  // agent-level.
+  //
+  // If unspecified or empty, [output_audio_config][google.cloud.dialogflow.v2beta1.DetectIntentRequest.output_audio_config] replaces the agent-level
+  // config in its entirety.
+  google.protobuf.FieldMask output_audio_config_mask = 7;
+
+  // The natural language speech audio to be processed. This field
   // should be populated iff `query_input` is set to an input audio config.
   // A single request can contain up to 1 minute of speech audio data.
   bytes input_audio = 5;
@@ -143,42 +168,61 @@ message DetectIntentResponse {
 
 // Represents the parameters of the conversational query.
 message QueryParameters {
-  // Optional. The time zone of this conversational query from the
+  // The time zone of this conversational query from the
   // [time zone database](https://www.iana.org/time-zones), e.g.,
   // America/New_York, Europe/Paris. If not provided, the time zone specified in
   // agent settings is used.
   string time_zone = 1;
 
-  // Optional. The geo location of this conversational query.
+  // The geo location of this conversational query.
   google.type.LatLng geo_location = 2;
 
-  // Optional. The collection of contexts to be activated before this query is
+  // The collection of contexts to be activated before this query is
   // executed.
   repeated Context contexts = 3;
 
-  // Optional. Specifies whether to delete all contexts in the current session
+  // Specifies whether to delete all contexts in the current session
   // before the new ones are activated.
   bool reset_contexts = 4;
 
-  // Optional. Additional session entity types to replace or extend developer
+  // Additional session entity types to replace or extend developer
   // entity types with. The entity synonyms apply to all languages and persist
   // for the session of this query.
   repeated SessionEntityType session_entity_types = 5;
 
-  // Optional. This field can be used to pass custom data into the webhook
-  // associated with the agent. Arbitrary JSON objects are supported.
+  // This field can be used to pass custom data to your webhook.
+  // Arbitrary JSON objects are supported.
+  // If supplied, the value is used to populate the
+  // `WebhookRequest.original_detect_intent_request.payload`
+  // field sent to your webhook.
   google.protobuf.Struct payload = 6;
 
-  // Optional. KnowledgeBases to get alternative results from. If not set, the
+  // KnowledgeBases to get alternative results from. If not set, the
   // KnowledgeBases enabled in the agent (through UI) will be used.
   // Format:  `projects/<Project ID>/knowledgeBases/<Knowledge Base ID>`.
   repeated string knowledge_base_names = 12;
 
-  // Optional. Configures the type of sentiment analysis to perform. If not
+  // Configures the type of sentiment analysis to perform. If not
   // provided, sentiment analysis is not performed.
   // Note: Sentiment Analysis is only currently available for Enterprise Edition
   // agents.
   SentimentAnalysisRequestConfig sentiment_analysis_request_config = 10;
+
+  // For mega agent query, directly specify which sub agents to query.
+  // If any specified sub agent is not linked to the mega agent, an error will
+  // be returned. If empty, Dialogflow will decide which sub agents to query.
+  // If specified for a non-mega-agent query, will be silently ignored.
+  repeated SubAgent sub_agents = 13;
+
+  // This field can be used to pass HTTP headers for a webhook
+  // call. These headers will be sent to webhook alone with the headers that
+  // have been configured through Dialogflow web console. The headers defined
+  // within this field will overwrite the headers configured through Dialogflow
+  // console if there is a conflict. Header names are case-insensitive.
+  // Google's specified headers are not allowed. Including: "Host",
+  // "Content-Length", "Connection", "From", "User-Agent", "Accept-Encoding",
+  // "If-Modified-Since", "If-None-Match", "X-Forwarded-For", etc.
+  map<string, string> webhook_headers = 14;
 }
 
 // Represents the query input. It can contain either:
@@ -237,6 +281,20 @@ message QueryResult {
   string action = 3;
 
   // The collection of extracted parameters.
+  //
+  // Depending on your protocol or client library language, this is a
+  // map, associative array, symbol table, dictionary, or JSON object
+  // composed of a collection of (MapKey, MapValue) pairs:
+  //
+  // -   MapKey type: string
+  // -   MapKey value: parameter name
+  // -   MapValue type:
+  //     -   If parameter's entity type is a composite entity: map
+  //     -   Else: string or number, depending on parameter value type
+  // -   MapValue value:
+  //     -   If parameter's entity type is a composite entity:
+  //         map from composite entity property names to property values
+  //     -   Else: parameter value
   google.protobuf.Struct parameters = 4;
 
   // This field is set to:
@@ -270,7 +328,7 @@ message QueryResult {
 
   // The intent that matched the conversational query. Some, not
   // all fields are filled in this message, including but not limited to:
-  // `name`, `display_name` and `webhook_state`.
+  // `name`, `display_name`, `end_interaction` and `is_fallback`.
   Intent intent = 11;
 
   // The intent detection confidence. Values range from 0.0
@@ -283,9 +341,13 @@ message QueryResult {
   // the greatest `knowledgeAnswers.match_confidence` value in the list.
   float intent_detection_confidence = 12;
 
-  // The free-form diagnostic info. For example, this field could contain
-  // webhook call latency. The string keys of the Struct's fields map can change
-  // without notice.
+  // Free-form diagnostic information for the associated detect intent request.
+  // The fields of this data can change without notice, so you should not write
+  // code that depends on its structure.
+  // The data may contain:
+  //
+  // - webhook call latency
+  // - webhook errors
   google.protobuf.Struct diagnostic_info = 14;
 
   // The sentiment analysis result, which depends on the
@@ -320,7 +382,9 @@ message KnowledgeAnswers {
     // Indicates which Knowledge Document this answer was extracted from.
     // Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     // ID>/documents/<Document ID>`.
-    string source = 1;
+    string source = 1 [(google.api.resource_reference) = {
+                         type: "dialogflow.googleapis.com/Document"
+                       }];
 
     // The corresponding FAQ question if the answer was extracted from a FAQ
     // Document, empty otherwise.
@@ -354,16 +418,35 @@ message KnowledgeAnswers {
 }
 
 // The top-level message sent by the client to the
-// `StreamingDetectIntent` method.
+// [Sessions.StreamingDetectIntent][google.cloud.dialogflow.v2beta1.Sessions.StreamingDetectIntent] method.
 //
 // Multiple request messages should be sent in order:
 //
-// 1.  The first message must contain `session`, `query_input` plus optionally
-//     `query_params`. If the client wants to receive an audio response, it
-//     should also contain `output_audio_config`. The message must not contain
-//     `input_audio`.
-// 2.  If `query_input` was set to a streaming input audio config,
-//     all subsequent messages must contain `input_audio`. Otherwise, finish the request stream.
+// 1.  The first message must contain
+// [session][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.session],
+//     [query_input][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.query_input] plus optionally
+//     [query_params][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.query_params]. If the client
+//     wants to receive an audio response, it should also contain
+//     [output_audio_config][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.output_audio_config].
+//     The message must not contain
+//     [input_audio][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.input_audio].
+// 2.  If [query_input][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.query_input] was set to
+//     [query_input.audio_config][google.cloud.dialogflow.v2beta1.InputAudioConfig], all subsequent
+//     messages must contain
+//     [input_audio][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.input_audio] to continue with
+//     Speech recognition.
+//     If you decide to rather detect an intent from text input after you
+//     already started Speech recognition, please send a message with
+//     [query_input.text][google.cloud.dialogflow.v2beta1.QueryInput.text].
+//
+//     However, note that:
+//
+//     * Dialogflow will bill you for the audio duration so far.
+//     * Dialogflow discards all Speech recognition results in favor of the
+//       input text.
+//     * Dialogflow will use the language code from the first message.
+//
+// After you sent all input, you must half-close or abort the request stream.
 message StreamingDetectIntentRequest {
   // Required. The name of the session the query is sent to.
   // Format of the session name:
@@ -377,7 +460,7 @@ message StreamingDetectIntentRequest {
   // `User ID` must not exceed 36 characters.
   string session = 1;
 
-  // Optional. The parameters of this query.
+  // The parameters of this query.
   QueryParameters query_params = 2;
 
   // Required. The input specification. It can be set to:
@@ -391,7 +474,7 @@ message StreamingDetectIntentRequest {
   QueryInput query_input = 3;
 
   // DEPRECATED. Please use [InputAudioConfig.single_utterance][google.cloud.dialogflow.v2beta1.InputAudioConfig.single_utterance] instead.
-  // Optional. If `false` (default), recognition does not cease until the
+  // If `false` (default), recognition does not cease until the
   // client closes the stream.
   // If `true`, the recognizer will detect a single spoken utterance in input
   // audio. Recognition ceases when it detects the audio's voice has
@@ -401,12 +484,20 @@ message StreamingDetectIntentRequest {
   // This setting is ignored when `query_input` is a piece of text or an event.
   bool single_utterance = 4;
 
-  // Optional. Instructs the speech synthesizer how to generate the output
+  // Instructs the speech synthesizer how to generate the output
   // audio. If this field is not set and agent-level speech synthesizer is not
   // configured, no output audio is generated.
   OutputAudioConfig output_audio_config = 5;
 
-  // Optional. The input audio content to be recognized. Must be sent if
+  // Mask for [output_audio_config][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.output_audio_config] indicating which settings in this
+  // request-level config should override speech synthesizer settings defined at
+  // agent-level.
+  //
+  // If unspecified or empty, [output_audio_config][google.cloud.dialogflow.v2beta1.StreamingDetectIntentRequest.output_audio_config] replaces the agent-level
+  // config in its entirety.
+  google.protobuf.FieldMask output_audio_config_mask = 7;
+
+  // The input audio content to be recognized. Must be sent if
   // `query_input` was set to a streaming input audio config. The complete audio
   // over all streaming messages must not exceed 1 minute.
   bytes input_audio = 6;
@@ -581,7 +672,21 @@ message EventInput {
   // Required. The unique identifier of the event.
   string name = 1;
 
-  // Optional. The collection of parameters associated with the event.
+  // The collection of parameters associated with the event.
+  //
+  // Depending on your protocol or client library language, this is a
+  // map, associative array, symbol table, dictionary, or JSON object
+  // composed of a collection of (MapKey, MapValue) pairs:
+  //
+  // -   MapKey type: string
+  // -   MapKey value: parameter name
+  // -   MapValue type:
+  //     -   If parameter's entity type is a composite entity: map
+  //     -   Else: string or number, depending on parameter value type
+  // -   MapValue value:
+  //     -   If parameter's entity type is a composite entity:
+  //         map from composite entity property names to property values
+  //     -   Else: parameter value
   google.protobuf.Struct parameters = 2;
 
   // Required. The language of this query. See [Language
@@ -593,7 +698,7 @@ message EventInput {
 
 // Configures the types of sentiment analysis to perform.
 message SentimentAnalysisRequestConfig {
-  // Optional. Instructs the service to perform sentiment analysis on
+  // Instructs the service to perform sentiment analysis on
   // `query_text`. If not provided, sentiment analysis is not performed on
   // `query_text`.
   bool analyze_query_text_sentiment = 1;
