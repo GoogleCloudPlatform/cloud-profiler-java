@@ -41,7 +41,6 @@ RUN apt-get update && apt-get -y -q install \
   libtool \
   make \
   openjdk-11-jdk-headless \
-  python \
   unzip \
   zlib1g-dev
 

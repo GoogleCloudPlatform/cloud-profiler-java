@@ -15,7 +15,7 @@
 #
 # Base image
 #
-FROM alpine:latest
+FROM alpine:3.11
 
 #
 # Dependencies
@@ -35,7 +35,6 @@ RUN apk --no-cache add \
   linux-headers \
   make \
   nghttp2-static \
-  python \
   unzip \
   zlib-dev
 
