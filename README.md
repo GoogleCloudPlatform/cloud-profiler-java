@@ -1,7 +1,7 @@
-# Stackdriver Profiler Java Agent
+# Google Cloud Profiler Profiler Java Agent
 
-This repository contains source code for the [Stackdriver
-Profiler](https://cloud.google.com/profiler/) Java agent.
+This repository contains source code for the
+[Google Cloud Profiler Profiler](https://cloud.google.com/profiler/) Java agent.
 
 ## Installation
 
@@ -12,9 +12,9 @@ wget -q -O- https://storage.googleapis.com/cloud-profiler/java/latest/profiler_j
 | sudo tar xzv -C /opt/cprof
 ```
 
-See the [Stackdriver Profiler Java profiling
-doc](https://cloud.google.com/profiler/docs/profiling-java) for detailed and
-most up-to-date guide on installing and using the agent.
+See the
+[Google Cloud Profiler Profiler Java profiling doc](https://cloud.google.com/profiler/docs/profiling-java)
+for detailed and most up-to-date guide on installing and using the agent.
 
 ## Build from Source
 
@@ -26,4 +26,16 @@ commands below.
  $ git clone https://github.com/GoogleCloudPlatform/cloud-profiler-java.git
  $ cd cloud-profiler-java
  $ ./build.sh
+```
+
+## To build for Alpine.
+
+**Per thread timers are not available on Alpine.** Since SIGEV_THREAD_ID is not
+supported by `timer_create` on Alpine, per thread timers are not implemented and
+the flag `-cprof_cpu_use_per_thread_timers` is ignored on this platform.
+
+```shell
+$ git clone https://github.com/GoogleCloudPlatform/cloud-profiler-java.git
+$ cd cloud-profiler-java
+$ ./build.sh -a
 ```

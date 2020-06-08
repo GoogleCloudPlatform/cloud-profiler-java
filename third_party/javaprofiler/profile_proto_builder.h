@@ -21,10 +21,10 @@
 #include <link.h>
 
 #include <cmath>
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "perftools/profiles/proto/builder.h"
 #include "third_party/javaprofiler/method_info.h"
@@ -38,23 +38,31 @@ struct ProfileStackTrace {
   jint metric_value;
 };
 
-// Store proto sample objects for specific stack traces.
+// Store proto sample objects for specific stack traces and label values.
 class TraceSamples {
  public:
-  perftools::profiles::Sample *SampleFor(const JVMPI_CallTrace &trace) const;
-  void Add(const JVMPI_CallTrace &trace, perftools::profiles::Sample *sample);
+  perftools::profiles::Sample *SampleFor(
+      const JVMPI_CallTrace *trace, const std::list<int64> &label_values) const;
+  void Add(const JVMPI_CallTrace *trace, const std::list<int64> &label_values,
+           perftools::profiles::Sample *sample);
 
  private:
+  struct TraceAndValues {
+    const JVMPI_CallTrace *trace;
+    // Values for each label type in ProfileProtoBuilder::label_types_.
+    const std::list<int64> label_values;
+  };
+
   struct TraceHash {
-    size_t operator()(const JVMPI_CallTrace *trace) const;
+    size_t operator()(const TraceAndValues &trace_values) const;
   };
 
   struct TraceEquals {
-    bool operator()(const JVMPI_CallTrace *trace1,
-                    const JVMPI_CallTrace *trace2) const;
+    bool operator()(const TraceAndValues &trace_values1,
+                    const TraceAndValues &trace_values2) const;
   };
 
-  std::unordered_map<const JVMPI_CallTrace *, perftools::profiles::Sample *,
+  std::unordered_map<TraceAndValues, perftools::profiles::Sample *,
       TraceHash, TraceEquals> traces_;
 };
 
@@ -68,16 +76,16 @@ class LocationBuilder {
   // Return an existing or new location matching the given parameters,
   // modifying the profile as needed to add new function and location
   // information.
-  perftools::profiles::Location *LocationFor(const string &class_name,
-                                             const string &function_name,
-                                             const string &file_name,
+  perftools::profiles::Location *LocationFor(const std::string &class_name,
+                                             const std::string &function_name,
+                                             const std::string &file_name,
                                              int line_number);
 
  private:
   struct LocationInfo {
-    string class_name;
-    string function_name;
-    string file_name;
+    std::string class_name;
+    std::string function_name;
+    std::string file_name;
     int line_number;
   };
 
@@ -105,7 +113,7 @@ class ProfileFrameCache {
   virtual perftools::profiles::Location *GetLocation(
       const JVMPI_CallFrame &jvm_frame, LocationBuilder *location_builder) = 0;
 
-  virtual string GetFunctionName(const JVMPI_CallFrame &jvm_frame) = 0;
+  virtual std::string GetFunctionName(const JVMPI_CallFrame &jvm_frame) = 0;
 
   virtual ~ProfileFrameCache() {}
 };
@@ -126,26 +134,36 @@ class ProfileProtoBuilder {
                  const int32 *counts,
                  int num_traces);
 
+  // Add traces to the proto, and append traces[i].metric_value as the label
+  // value corresponding to the last label_type. The traces array must not be
+  // deleted before calling CreateProto.
+  void AddTracesAppendingMetricAsLabel(const ProfileStackTrace *traces,
+                                       int num_traces);
+
+  // Add traces to the proto, where each trace has a defined count of
+  // occurrences, and append traces[i].metric_value as the label
+  // value corresponding to the last label_type. The traces array must not be
+  // deleted before calling CreateProto.
+  void AddTracesAppendingMetricAsLabel(const ProfileStackTrace *traces,
+                                       const int32 *counts,
+                                       int num_traces);
+
   // Add a "fake" trace with a single frame. Used to represent JVM
   // tasks such as JIT compilation and GC.
-  void AddArtificialTrace(const string& name, int count, int sampling_rate);
+  void AddArtificialTrace(const std::string &name, int count,
+                          int sampling_rate);
 
   // Build the proto. Calling any other method on the class after calling
   // this has undefined behavior.
   virtual std::unique_ptr<perftools::profiles::Profile> CreateProto() = 0;
 
   // Create a heap profile.
-  // jvmti_env can be null as well but then all calls to AddTraces will return
+  // jvmti_env can be null but then all calls to AddTraces will return
   // unknown.
-  // ForHeap/ForNativeHeap is the only case where we accept a null cache since
-  // the heap profiles can be using JVMTI's GetStackTrace and remain in pure
-  // Java land frames. Other ForX methods will fail an assertion when attempting
-  // a nullptr cache.
+  // Accepts a null cache since the heap profiles can be using JVMTI's
+  // GetStackTrace and remain in pure Java land frames. Other ForX methods
+  // will fail an assertion when attempting a nullptr cache.
   static std::unique_ptr<ProfileProtoBuilder> ForHeap(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-      ProfileFrameCache *cache = nullptr);
-
-  static std::unique_ptr<ProfileProtoBuilder> ForNativeHeap(
       JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
       ProfileFrameCache *cache = nullptr);
 
@@ -161,11 +179,11 @@ class ProfileProtoBuilder {
 
  protected:
   struct SampleType {
-    SampleType(const string &type_in, const string &unit_in)
+    SampleType(const std::string &type_in, const std::string &unit_in)
         : type(type_in), unit(unit_in) {}
 
-    string type;
-    string unit;
+    std::string type;
+    std::string unit;
   };
 
   // Create the profile proto builder, if native_cache is nullptr, then no
@@ -174,7 +192,12 @@ class ProfileProtoBuilder {
   ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
                       ProfileFrameCache *native_cache, int64 sampling_rate,
                       const SampleType &count_type,
-                      const SampleType &metric_type);
+                      const SampleType &metric_type,
+                      const std::list<SampleType> &label_types);
+
+  virtual bool SkipFrame(const std::string &function_name) const {
+    return false;
+  }
 
   // An implementation must decide how many frames to skip in a trace.
   virtual int SkipTopNativeFrames(const JVMPI_CallTrace &trace) = 0;
@@ -204,7 +227,7 @@ class ProfileProtoBuilder {
     }
 
     // Notify the state that we are visiting a native frame.
-    void NativeFrame(const string &function_name) {
+    void NativeFrame(const std::string &function_name) {
       if (StartsWith(function_name, "JavaCalls::call_helper")) {
         in_jni_helpers_ = true;
       }
@@ -223,19 +246,19 @@ class ProfileProtoBuilder {
     // TODO: Support a "complete detail" mode to override this.
     bool in_jni_helpers_ = false;
 
-    static bool StartsWith(const string &s, const string &prefix) {
+    static bool StartsWith(const std::string &s, const std::string &prefix) {
       return s.find(prefix) == 0;
     }
   };
 
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
-  void InitSampleValues(perftools::profiles::Sample *sample, int64 metric);
   void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
-                        int64 metric);
+                        int64 metric, const std::list<int64> &label_values);
   void UpdateSampleValues(perftools::profiles::Sample *sample, int64 count,
                           int64 size);
-  void AddTrace(const ProfileStackTrace &trace, int32 count);
+  void AddTrace(const ProfileStackTrace &trace, int32 count,
+                bool append_metric_value_as_label);
   void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
                    perftools::profiles::Profile *profile,
                    perftools::profiles::Sample *sample,
@@ -268,6 +291,7 @@ class ProfileProtoBuilder {
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;
+  const std::list<SampleType> label_types_;
 };
 
 // Computes the ratio to use to scale heap data to unsample it.
@@ -286,7 +310,8 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("samples", "count"),
-            ProfileProtoBuilder::SampleType("cpu", "nanoseconds")) {
+            ProfileProtoBuilder::SampleType("cpu", "nanoseconds"),
+            std::list<ProfileProtoBuilder::SampleType>()) {
     builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
@@ -306,7 +331,10 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("inuse_objects", "count"),
-            ProfileProtoBuilder::SampleType("inuse_space", "bytes")) {}
+            ProfileProtoBuilder::SampleType("inuse_space", "bytes"),
+            std::list<ProfileProtoBuilder::SampleType>({
+                ProfileProtoBuilder::SampleType("bytes", "bytes")
+            })) {}
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateUnsampledProto();
@@ -331,30 +359,6 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
   }
 };
 
-class NativeHeapProfileProtoBuilder : public HeapProfileProtoBuilder {
- public:
-  NativeHeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                                int64 sampling_rate, ProfileFrameCache *cache)
-      : HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache) {}
-
- protected:
-  // In cases of long native frames, we really only want to skip the
-  // frames_to_skip first frames, which would be something akin to:
-  //   absl::base_internal::MallocHook::InvokeNewHookSlow
-  //   absl::base_internal::MallocHook::InvokeNewHook
-  //   calloc
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override {
-    // If frames_to_skip changes, change the number of frames checked against
-    // kNativeFrameLineNum below to check the correct number of frames.
-    const int frames_to_skip = 3;
-    return (trace.num_frames >= frames_to_skip
-            && trace.frames[0].lineno == kNativeFrameLineNum
-            && trace.frames[1].lineno == kNativeFrameLineNum
-            && trace.frames[2].lineno == kNativeFrameLineNum)
-        ? frames_to_skip : 0;
-  }
-};
-
 class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
@@ -362,7 +366,8 @@ class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("contentions", "count"),
-            ProfileProtoBuilder::SampleType("delay", "microseconds")) {
+            ProfileProtoBuilder::SampleType("delay", "microseconds"),
+            std::list<ProfileProtoBuilder::SampleType>()) {
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 

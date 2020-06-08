@@ -174,6 +174,21 @@ GRPC_LIBS= \
   $(LIB_ROOT_PATH)/lib/libgrpc.a \
   $(LIB_ROOT_PATH)/lib/libgpr.a \
 
+# Detect if running on Alpine and modify various flags
+ifeq ("$(wildcard /etc/alpine-release)","/etc/alpine-release")
+  # musl only supports global dynamic tls model, and is documented as
+  # async-signal-safe. See
+  # https://wiki.musl-libc.org/design-concepts.html#Thread-local-storage
+  # This selects global-dynamic TLS model in
+  # third_party/javaprofiler/accessors.h
+  CFLAGS += -DALPINE
+
+  LIBS1 += /usr/lib/libexecinfo.a
+
+  # libgcc is not installed by default on Alpine.
+  LDFLAGS += -static-libgcc
+endif
+
 all: \
 	$(TARGET_AGENT) \
 	$(TARGET_NOTICES) \

@@ -23,11 +23,12 @@ namespace google {
 namespace javaprofiler {
 namespace {
 
-using StringRefCountTable = std::unordered_map<string, std::atomic<int32_t>>;
+using StringRefCountTable =
+    std::unordered_map<std::string, std::atomic<int32_t>>;
 using StringRefCount = StringRefCountTable::value_type;
 
 // Maps string to its reference count.
-std::unordered_map<string, std::atomic<int32_t>> *string_table = nullptr;
+std::unordered_map<std::string, std::atomic<int32_t>> *string_table = nullptr;
 // All accesses to string_table should be protected by string_table_mutex.
 std::mutex string_table_mutex;
 
@@ -47,7 +48,7 @@ std::mutex string_table_mutex;
 // Resolves the StringRefCount of a given string, increments the reference count
 // and returns the pointer of StringRefCount. It returns nullptr if the internal
 // string table is not initialized.
-StringRefCount *AcquireByString(const string &str) {
+StringRefCount *AcquireByString(const std::string &str) {
   std::lock_guard<std::mutex> lock(string_table_mutex);
   if (string_table == nullptr) {
     return nullptr;
@@ -114,7 +115,7 @@ void Release(StringRefCount *str_ref_cnt) {
 
 }  // namespace
 
-AsyncRefCountedString::AsyncRefCountedString(const string &str)
+AsyncRefCountedString::AsyncRefCountedString(const std::string &str)
     : AsyncRefCountedString() {
   Release(ptr_.exchange(AcquireByString(str)));
 }
@@ -128,7 +129,8 @@ AsyncRefCountedString::~AsyncRefCountedString() {
   Release(ptr_.exchange(nullptr));
 }
 
-AsyncRefCountedString &AsyncRefCountedString::operator=(const string &str) {
+AsyncRefCountedString &AsyncRefCountedString::operator=(
+    const std::string &str) {
   Release(ptr_.exchange(AcquireByString(str)));
   return *this;
 }
@@ -160,7 +162,7 @@ void AsyncRefCountedString::AsyncSafeReset() {
   assert(AsyncSafeRelease(ptr_.exchange(nullptr)));
 }
 
-const string *AsyncRefCountedString::Get() const {
+const std::string *AsyncRefCountedString::Get() const {
   StringRefCount *str_ref_cnt = ptr_.load();
   if (str_ref_cnt == nullptr) {
     return nullptr;
@@ -172,7 +174,7 @@ const string *AsyncRefCountedString::Get() const {
 bool AsyncRefCountedString::Init() {
   std::lock_guard<std::mutex> lock(string_table_mutex);
   if (string_table == nullptr) {
-    string_table = new std::unordered_map<string, std::atomic<int32_t>>();
+    string_table = new std::unordered_map<std::string, std::atomic<int32_t>>();
     return true;
   }
   return false;

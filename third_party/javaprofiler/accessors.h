@@ -80,15 +80,19 @@ class Accessors {
   }
 
  private:
-  // This is dangerous. TLS accesses are by default not async safe, as
-  // they can call malloc for lazy initialization. The initial-exec
-  // TLS mode avoids this potential allocation, with the limitation
-  // that there is a fixed amount of space to hold all TLS variables
-  // referenced in the module. This should be OK for the cloud
-  // profiler agent, which is relatively small. We do provide a way
-  // to override the TLS model for compilation environments where the
-  // TLS access is async-safe.
-#ifdef JAVAPROFILER_GLOBAL_DYNAMIC_TLS
+  // This is subtle and potentially dangerous, read this carefully.
+  //
+  // In glibc, TLS access is not signal-async-safe, as they can call malloc for
+  // lazy initialization. The initial-exec TLS mode avoids this potential
+  // allocation, with the limitation that there is a fixed amount of space to
+  // hold all TLS variables referenced in the module. This should be OK for the
+  // cloud profiler agent, which is relatively small.
+  //
+  // In environments where the TLS access is async-signal-safe, the
+  // global-dynamic TLS model can be used. For example, it is async-signal-safe
+  // in musl / Alpine, see
+  // https://wiki.musl-libc.org/design-concepts.html#Thread-local-storage.
+#if defined(JAVAPROFILER_GLOBAL_DYNAMIC_TLS) || defined(ALPINE)
   static __thread JNIEnv *env_ __attribute__((tls_model("global-dynamic")));
   static __thread int64 attr_ __attribute__((tls_model("global-dynamic")));
   static __thread Tags *tags_ __attribute__((tls_model("global-dynamic")));

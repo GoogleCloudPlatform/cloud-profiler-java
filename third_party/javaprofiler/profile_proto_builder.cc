@@ -24,16 +24,17 @@ namespace javaprofiler {
 const int kCount = 0;
 const int kMetric = 1;
 
-ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                                         ProfileFrameCache *native_cache,
-                                         int64 sampling_rate,
-                                         const SampleType &count_type,
-                                         const SampleType &metric_type)
+ProfileProtoBuilder::ProfileProtoBuilder(
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+    ProfileFrameCache *native_cache, int64 sampling_rate,
+    const SampleType &count_type, const SampleType &metric_type,
+    const std::list<SampleType> &label_types)
     : sampling_rate_(sampling_rate),
       jni_env_(jni_env),
       jvmti_env_(jvmti_env),
       native_cache_(native_cache),
-      location_builder_(&builder_) {
+      location_builder_(&builder_),
+      label_types_(label_types) {
   AddSampleType(count_type);
   AddSampleType(metric_type);
   SetPeriodType(metric_type);
@@ -46,7 +47,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 
   for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], 1);
+    AddTrace(traces[i], 1, false);
   }
 }
 
@@ -58,12 +59,34 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 
   for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], counts[i]);
+    AddTrace(traces[i], counts[i], false);
   }
 }
 
-void ProfileProtoBuilder::AddArtificialTrace(const string& name, int count,
-    int sampling_rate) {
+void ProfileProtoBuilder::AddTracesAppendingMetricAsLabel(
+    const ProfileStackTrace *traces, int num_traces) {
+  if (native_cache_) {
+    native_cache_->ProcessTraces(traces, num_traces);
+  }
+
+  for (int i = 0; i < num_traces; ++i) {
+    AddTrace(traces[i], 1, true);
+  }
+}
+
+void ProfileProtoBuilder::AddTracesAppendingMetricAsLabel(
+    const ProfileStackTrace *traces, const int32 *counts, int num_traces) {
+  if (native_cache_) {
+    native_cache_->ProcessTraces(traces, num_traces);
+  }
+
+  for (int i = 0; i < num_traces; ++i) {
+    AddTrace(traces[i], counts[i], true);
+  }
+}
+
+void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
+                                             int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
       name, name, "", -1);
 
@@ -71,7 +94,8 @@ void ProfileProtoBuilder::AddArtificialTrace(const string& name, int count,
   auto sample = profile->add_sample();
   sample->add_location_id(location->id());
   // Move count * sampling rate to 64-bit.
-  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate);
+  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate,
+                   std::list<int64>());
 }
 
 void ProfileProtoBuilder::UnsampleMetrics() {
@@ -91,12 +115,18 @@ void ProfileProtoBuilder::UnsampleMetrics() {
 
 unique_ptr<perftools::profiles::Profile>
     ProfileProtoBuilder::CreateSampledProto() {
+#ifndef STANDALONE_BUILD
+  builder_.AddCurrentMappings();
+#endif
   builder_.Finalize();
   return unique_ptr<perftools::profiles::Profile>(builder_.Consume());
 }
 
 unique_ptr<perftools::profiles::Profile>
     ProfileProtoBuilder::CreateUnsampledProto() {
+#ifndef STANDALONE_BUILD
+  builder_.AddCurrentMappings();
+#endif
   UnsampleMetrics();
   builder_.Finalize();
   return unique_ptr<perftools::profiles::Profile>(builder_.Consume());
@@ -121,19 +151,32 @@ void ProfileProtoBuilder::UpdateSampleValues(
 }
 
 void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, int64 metric) {
-  InitSampleValues(sample, 1, metric);
-}
-
-void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, int64 count, int64 metric) {
+    perftools::profiles::Sample *sample, int64 count, int64 metric,
+    const std::list<int64> &label_values) {
   sample->add_value(count);
   sample->add_value(metric);
+
+  DCHECK (label_values.size() == label_types_.size())
+    << "Number of label values != number of label types";
+  auto it_value = label_values.begin();
+  auto it_type = label_types_.begin();
+  for (; it_value != label_values.end() && it_type != label_types_.end();
+    ++it_value, ++it_type) {
+    auto label = sample->add_label();
+    label->set_key(builder_.StringId(it_type->type.c_str()));
+    label->set_num(*it_value);
+    label->set_num_unit(builder_.StringId(it_type->unit.c_str()));
+  }
 }
 
 void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &trace,
-                                   int32 count) {
-  auto sample = trace_samples_.SampleFor(*trace.trace);
+                                   int32 count,
+                                   bool append_metric_value_as_label) {
+  std::list<int64> label_values;
+  if (append_metric_value_as_label) {
+    label_values.push_back(trace.metric_value);
+  }
+  auto sample = trace_samples_.SampleFor(trace.trace, label_values);
 
   if (sample != nullptr) {
     UpdateSampleValues(sample, count, trace.metric_value);
@@ -143,9 +186,9 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &trace,
   auto profile = builder_.mutable_profile();
   sample = profile->add_sample();
 
-  trace_samples_.Add(*trace.trace, sample);
+  trace_samples_.Add(trace.trace, label_values, sample);
 
-  InitSampleValues(sample, count, trace.metric_value);
+  InitSampleValues(sample, count, trace.metric_value, label_values);
 
   int first_frame = SkipTopNativeFrames(*trace.trace);
 
@@ -210,10 +253,10 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
     return it->second.get();
   }
 
-  string file_name;
-  string class_name;
-  string method_name;
-  string signature;
+  std::string file_name;
+  std::string class_name;
+  std::string method_name;
+  std::string signature;
 
   // Ignore lineno since we pass nullptr anyway.
   JVMPI_CallFrame jvm_frame = { 0, method_id };
@@ -221,7 +264,7 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
                         &class_name, &method_name, &signature, nullptr);
 
   FixMethodParameters(&signature);
-  string full_method_name = class_name + "." + method_name + signature;
+  std::string full_method_name = class_name + "." + method_name + signature;
 
   std::unique_ptr<MethodInfo> unique_method(
       new MethodInfo(full_method_name, class_name, file_name));
@@ -242,7 +285,12 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
     return;
   }
 
-  string function_name = native_cache_->GetFunctionName(jvm_frame);
+  std::string function_name = native_cache_->GetFunctionName(jvm_frame);
+
+  if (SkipFrame(function_name)) {
+    return;
+  }
+
   perftools::profiles::Location *location =
     native_cache_->GetLocation(jvm_frame,
                                &location_builder_);
@@ -276,7 +324,7 @@ size_t LocationBuilder::LocationInfoHash::operator()(
 
   unsigned int h = 1;
 
-  hash<string> hash_string;
+  hash<std::string> hash_string;
   hash<int> hash_int;
 
   h = 31U * h + hash_string(info.class_name);
@@ -296,10 +344,8 @@ bool LocationBuilder::LocationInfoEquals::operator()(
 }
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
-      const string &class_name,
-      const string &function_name,
-      const string &file_name,
-      int line_number) {
+    const std::string &class_name, const std::string &function_name,
+    const std::string &file_name, int line_number) {
   auto profile = builder_->mutable_profile();
 
   LocationInfo info{ class_name, function_name, file_name, line_number };
@@ -316,7 +362,7 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   auto line = location->add_line();
 
-  string simplified_name = function_name;
+  std::string simplified_name = function_name;
   SimplifyFunctionName(&simplified_name);
   auto function_id = builder_->FunctionId(
       simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);
@@ -327,8 +373,10 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
   return location;
 }
 
-size_t TraceSamples::TraceHash::operator()(const JVMPI_CallTrace *trace) const {
+size_t TraceSamples::TraceHash::operator()(const TraceAndValues &trace_values)
+    const {
   unsigned int h = 1;
+  const JVMPI_CallTrace *trace = trace_values.trace;
   for (int f = 0; f < trace->num_frames; f++) {
     {
       int len = sizeof(jint);
@@ -345,11 +393,19 @@ size_t TraceSamples::TraceHash::operator()(const JVMPI_CallTrace *trace) const {
       }
     }
   }
+  for (auto value : trace_values.label_values) {
+    h = 31U * h + static_cast<unsigned int>(value);
+  }
   return h;
 }
 
-bool TraceSamples::TraceEquals::operator()(
-    const JVMPI_CallTrace *trace1, const JVMPI_CallTrace *trace2) const {
+bool TraceSamples::TraceEquals::operator()(const TraceAndValues &trace_values1,
+    const TraceAndValues &trace_values2) const {
+  if (trace_values1.label_values != trace_values2.label_values) {
+    return false;
+  }
+  const JVMPI_CallTrace *trace1 = trace_values1.trace;
+  const JVMPI_CallTrace *trace2 = trace_values2.trace;
   if (trace1->num_frames != trace2->num_frames) {
     return false;
   }
@@ -368,8 +424,8 @@ bool TraceSamples::TraceEquals::operator()(
 }
 
 perftools::profiles::Sample *TraceSamples::SampleFor(
-    const JVMPI_CallTrace &trace) const {
-  auto found = traces_.find(&trace);
+    const JVMPI_CallTrace *trace, const std::list<int64> &label_values) const {
+  auto found = traces_.find({trace, label_values});
   if (found == traces_.end()) {
     return nullptr;
   }
@@ -377,9 +433,10 @@ perftools::profiles::Sample *TraceSamples::SampleFor(
   return found->second;
 }
 
-void TraceSamples::Add(const JVMPI_CallTrace &trace,
+void TraceSamples::Add(const JVMPI_CallTrace *trace,
+                       const std::list<int64> &label_values,
                        perftools::profiles::Sample *sample) {
-  traces_[&trace] = sample;
+  traces_[{trace, label_values}] = sample;
 }
 
 double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
@@ -403,14 +460,6 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
   // Java-only stackframe gatherer.
   return std::unique_ptr<ProfileProtoBuilder>(
       new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
-}
-
-std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForNativeHeap(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-    ProfileFrameCache *cache) {
-  assert(cache != nullptr);
-  return std::unique_ptr<ProfileProtoBuilder>(new NativeHeapProfileProtoBuilder(
-      jni_env, jvmti_env, sampling_rate, cache));
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(

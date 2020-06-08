@@ -20,8 +20,8 @@ namespace javaprofiler {
 ASGCTType Asgct::asgct_;
 
 std::mutex *AttributeTable::mutex_;
-std::unordered_map<string, int> *AttributeTable::string_map_;
-std::vector<string> *AttributeTable::strings_;
+std::unordered_map<std::string, int> *AttributeTable::string_map_;
+std::vector<std::string> *AttributeTable::strings_;
 
 bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
   uint64 hash_val = CalculateHash(attr, trace->num_frames, &trace->frames[0]);

@@ -59,8 +59,8 @@ class AttributeTable {
  public:
   static void Init() {
     mutex_ = new (std::mutex);
-    string_map_ = new (std::unordered_map<string, int>);
-    strings_ = new (std::vector<string>);
+    string_map_ = new (std::unordered_map<std::string, int>);
+    strings_ = new (std::vector<std::string>);
     strings_->push_back("");
   }
 
@@ -81,9 +81,9 @@ class AttributeTable {
     return ret;
   }
 
-  static std::vector<string> GetStrings() {
+  static std::vector<std::string> GetStrings() {
     if (mutex_ == nullptr) {
-      return std::vector<string>();
+      return std::vector<std::string>();
     }
     std::lock_guard<std::mutex> lock(*mutex_);
     return *strings_;
@@ -91,8 +91,8 @@ class AttributeTable {
 
  private:
   static std::mutex *mutex_;
-  static std::unordered_map<string, int> *string_map_;
-  static std::vector<string> *strings_;
+  static std::unordered_map<std::string, int> *string_map_;
+  static std::vector<std::string> *strings_;
 
   DISALLOW_IMPLICIT_CONSTRUCTORS(AttributeTable);
 };
