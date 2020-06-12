@@ -13,7 +13,7 @@ wget -q -O- https://storage.googleapis.com/cloud-profiler/java/latest/profiler_j
 ```
 
 See the
-[Google Cloud Profiler Profiler Java profiling doc](https://cloud.google.com/profiler/docs/profiling-java)
+[Google Cloud Profiler Java profiling doc](https://cloud.google.com/profiler/docs/profiling-java)
 for detailed and most up-to-date guide on installing and using the agent.
 
 ## Build from Source
@@ -29,6 +29,8 @@ commands below.
 ```
 
 ## To build for Alpine.
+
+**Only Alpine versions 3.11 and later are currently supported.**
 
 **Per thread timers are not available on Alpine.** Since SIGEV_THREAD_ID is not
 supported by `timer_create` on Alpine, per thread timers are not implemented and
