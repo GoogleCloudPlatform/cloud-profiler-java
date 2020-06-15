@@ -42,6 +42,7 @@ syntax = "proto3";
 
 package perftools.profiles;
 
+option szl_api_version = 2;
 option java_package = "com.google.perftools.profiles";
 option java_outer_classname = "ProfileProto";
 
