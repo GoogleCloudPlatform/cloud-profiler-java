@@ -62,6 +62,7 @@ java_gapic_library(
     name = "functions_java_gapic",
     src = ":functions_proto_with_info",
     gapic_yaml = "functions_gapic.yaml",
+    grpc_service_config = "functions_grpc_service_config.json",
     package = "google.cloud.functions.v1beta2",
     service_yaml = "cloudfunctions_v1beta2.yaml",
     test_deps = [
@@ -124,7 +125,6 @@ go_gapic_library(
         "//google/longrunning:longrunning_go_gapic",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:any_go_proto",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
@@ -190,6 +190,7 @@ py_gapic_library(
     name = "functions_py_gapic",
     src = ":functions_proto_with_info",
     gapic_yaml = "functions_gapic.yaml",
+    grpc_service_config = "functions_grpc_service_config.json",
     package = "google.cloud.functions.v1beta2",
     service_yaml = "cloudfunctions_v1beta2.yaml",
     deps = [
@@ -234,6 +235,7 @@ php_gapic_library(
     name = "functions_php_gapic",
     src = ":functions_proto_with_info",
     gapic_yaml = "functions_gapic.yaml",
+    grpc_service_config = "functions_grpc_service_config.json",
     package = "google.cloud.functions.v1beta2",
     service_yaml = "cloudfunctions_v1beta2.yaml",
     deps = [
@@ -264,7 +266,7 @@ load(
 nodejs_gapic_library(
     name = "functions_nodejs_gapic",
     src = ":functions_proto_with_info",
-    gapic_yaml = "functions_gapic.yaml",
+    grpc_service_config = "functions_grpc_service_config.json",
     package = "google.cloud.functions.v1beta2",
     service_yaml = "cloudfunctions_v1beta2.yaml",
     deps = [],
