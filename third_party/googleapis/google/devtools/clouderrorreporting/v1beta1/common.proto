@@ -27,6 +27,7 @@ option java_multiple_files = true;
 option java_outer_classname = "CommonProto";
 option java_package = "com.google.devtools.clouderrorreporting.v1beta1";
 option php_namespace = "Google\\Cloud\\ErrorReporting\\V1beta1";
+option ruby_package = "Google::Cloud::ErrorReporting::V1beta1";
 
 // Description of a group of similar error events.
 message ErrorGroup {
@@ -50,7 +51,7 @@ message ErrorGroup {
 // Information related to tracking the progress on resolving the error.
 message TrackingIssue {
   // A URL pointing to a related entry in an issue tracking system.
-  // Example: https://github.com/user/project/issues/4
+  // Example: `https://github.com/user/project/issues/4`
   string url = 1;
 }
 

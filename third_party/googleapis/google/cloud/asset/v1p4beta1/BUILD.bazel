@@ -61,6 +61,7 @@ java_gapic_library(
     name = "asset_java_gapic",
     src = ":asset_proto_with_info",
     gapic_yaml = "cloudasset_gapic.yaml",
+    grpc_service_config = "cloudasset_grpc_service_config.json",
     package = "google.cloud.asset.v1p4beta1",
     service_yaml = "cloudasset_v1p4beta1.yaml",
     test_deps = [
@@ -128,7 +129,6 @@ go_gapic_library(
         "//google/longrunning:longrunning_go_gapic",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
 )
@@ -192,6 +192,7 @@ py_gapic_library(
     name = "asset_py_gapic",
     src = ":asset_proto_with_info",
     gapic_yaml = "cloudasset_gapic.yaml",
+    grpc_service_config = "cloudasset_grpc_service_config.json",
     package = "google.cloud.asset.v1p4beta1",
     service_yaml = "cloudasset_v1p4beta1.yaml",
     deps = [
@@ -236,6 +237,7 @@ php_gapic_library(
     name = "asset_php_gapic",
     src = ":asset_proto_with_info",
     gapic_yaml = "cloudasset_gapic.yaml",
+    grpc_service_config = "cloudasset_grpc_service_config.json",
     package = "google.cloud.asset.v1p4beta1",
     service_yaml = "cloudasset_v1p4beta1.yaml",
     deps = [
@@ -266,7 +268,7 @@ load(
 nodejs_gapic_library(
     name = "asset_nodejs_gapic",
     src = ":asset_proto_with_info",
-    gapic_yaml = "cloudasset_gapic.yaml",
+    grpc_service_config = "cloudasset_grpc_service_config.json",
     package = "google.cloud.asset.v1p4beta1",
     service_yaml = "cloudasset_v1p4beta1.yaml",
     deps = [],

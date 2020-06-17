@@ -41,23 +41,43 @@ interfaces:
     initial_retry_delay_millis: 100
     retry_delay_multiplier: 1.3
     max_retry_delay_millis: 60000
-    initial_rpc_timeout_millis: 10000
+    initial_rpc_timeout_millis: 30000
     rpc_timeout_multiplier: 1
-    max_rpc_timeout_millis: 10000
+    max_rpc_timeout_millis: 30000
     total_timeout_millis: 300000
   methods:
   - name: CreateCluster
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 900000
   - name: UpdateCluster
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 900000
   - name: DeleteCluster
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 900000
   - name: GetCluster
     retry_codes_name: idempotent
   - name: ListClusters
     retry_codes_name: idempotent
   - name: DiagnoseCluster
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 30000
 - name: google.cloud.dataproc.v1.JobController
   retry_codes_def:
   - name: idempotent
@@ -100,6 +120,15 @@ interfaces:
   - name: non_idempotent
     retry_codes:
     - UNAVAILABLE
+  retry_params_def:
+  - name: default
+    initial_retry_delay_millis: 100
+    retry_delay_multiplier: 1.3
+    max_retry_delay_millis: 60000
+    initial_rpc_timeout_millis: 30000
+    rpc_timeout_multiplier: 1
+    max_rpc_timeout_millis: 30000
+    total_timeout_millis: 900000
   methods:
   - name: CreateWorkflowTemplate
     retry_codes_name: non_idempotent
@@ -107,8 +136,18 @@ interfaces:
     retry_codes_name: idempotent
   - name: InstantiateWorkflowTemplate
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 43200000
   - name: InstantiateInlineWorkflowTemplate
     retry_codes_name: non_idempotent
+    long_running:
+      initial_poll_delay_millis: 1000
+      poll_delay_multiplier: 2
+      max_poll_delay_millis: 10000
+      total_poll_timeout_millis: 43200000
   - name: UpdateWorkflowTemplate
     retry_codes_name: non_idempotent
   - name: ListWorkflowTemplates
