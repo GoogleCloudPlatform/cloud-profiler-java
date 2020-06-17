@@ -60,6 +60,7 @@ java_gapic_library(
     name = "memcache_java_gapic",
     src = ":memcache_proto_with_info",
     gapic_yaml = "memcache_gapic.yaml",
+    grpc_service_config = "memcache_grpc_service_config.json",
     package = "google.cloud.memcache.v1beta2",
     service_yaml = "memcache_v1beta2.yaml",
     test_deps = [
@@ -122,7 +123,6 @@ go_gapic_library(
         "//google/longrunning:longrunning_go_gapic",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
     ],
 )
 
@@ -185,6 +185,7 @@ py_gapic_library(
     name = "memcache_py_gapic",
     src = ":memcache_proto_with_info",
     gapic_yaml = "memcache_gapic.yaml",
+    grpc_service_config = "memcache_grpc_service_config.json",
     package = "google.cloud.memcache.v1beta2",
     service_yaml = "memcache_v1beta2.yaml",
     deps = [
@@ -229,6 +230,7 @@ php_gapic_library(
     name = "memcache_php_gapic",
     src = ":memcache_proto_with_info",
     gapic_yaml = "memcache_gapic.yaml",
+    grpc_service_config = "memcache_grpc_service_config.json",
     package = "google.cloud.memcache.v1beta2",
     service_yaml = "memcache_v1beta2.yaml",
     deps = [
@@ -259,7 +261,7 @@ load(
 nodejs_gapic_library(
     name = "memcache_nodejs_gapic",
     src = ":memcache_proto_with_info",
-    gapic_yaml = "memcache_gapic.yaml",
+    grpc_service_config = "memcache_grpc_service_config.json",
     package = "google.cloud.memcache.v1beta2",
     service_yaml = "memcache_v1beta2.yaml",
     deps = [],
