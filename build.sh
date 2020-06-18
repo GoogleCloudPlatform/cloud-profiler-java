@@ -21,17 +21,22 @@ set -o nounset
 #
 # Command line arguments: [-d]
 #   -d: specify the temporary directory for the build.
+#   -v: the version for this build of the agent.
 
 ALPINE_BUILD="0"
 DOCKERFILE="Dockerfile"
 FILE_SUFFIX=""
-while getopts ":ad:" opt; do
+while getopts ":ad:v:" opt; do
   case $opt in
   a)
       ALPINE_BUILD="1"
+      FILE_SUFFIX="_alpine"
       ;;
   d)
       BUILD_TEMP_DIR=$OPTARG
+      ;;
+  v)
+      VERSION=$OPTARG
       ;;
   :)
       echo "Missing option argument for -$OPTARG" >&2;
@@ -43,6 +48,10 @@ while getopts ":ad:" opt; do
       ;;
   esac
 done
+
+if [[ -z "${VERSION-}" ]]; then
+  VERSION="github${FILE_SUFFIX}:$(git rev-parse HEAD || echo "unknown")"
+fi
 
 if [[ -z "${BUILD_TEMP_DIR-}" ]]; then
   RUN_ID="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
@@ -66,7 +75,6 @@ mkdir -p "${BUILD_TEMP_DIR}"
 if [[ "${ALPINE_BUILD}" = "1" ]]; then
     PrintMessage "Building the builder Alpine Docker container..."
     DOCKERFILE="Dockerfile.alpine"
-    FILE_SUFFIX="_alpine"
 else
     PrintMessage "Building the builder Docker container..."
 fi
@@ -80,7 +88,8 @@ PrintMessage "Building the agent..."
 docker run -ti -v "${BUILD_TEMP_DIR}/build":/root/build \
     cprof-agent-builder bash \
     -c \
-    "cd ~/build && tar xvf src.tar && make -f Makefile all" \
+    "cd ~/build && tar xvf src.tar && make -f Makefile all \
+       AGENT_VERSION=${VERSION}" \
     >> "${LOG_FILE}" 2>&1
 
 PrintMessage "Packaging the agent binaries..."
