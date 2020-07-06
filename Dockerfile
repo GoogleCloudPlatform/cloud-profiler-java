@@ -56,7 +56,7 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
     cd ~ && rm -rf /tmp/openssl
 
 # curl
-RUN git clone --depth=1 -b curl-7_66_0 https://github.com/curl/curl.git /tmp/curl && \
+RUN git clone --depth=1 -b curl-7_69_1 https://github.com/curl/curl.git /tmp/curl && \
     cd /tmp/curl && \
     ./buildconf && \
     ./configure --disable-ldap --disable-shared --without-libssh2 \
