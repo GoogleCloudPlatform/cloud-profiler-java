@@ -1,5 +1,6 @@
 VERS_1.0 {
   global:
+    google_find_phdr;
     Agent_OnLoad;
     Agent_OnUnload;
     Java_org_apache_beam_runners_dataflow_worker_profiler_Profiler_disable;
