@@ -24,8 +24,8 @@ namespace cloud {
 namespace profiler {
 
 using google::javaprofiler::Clock;
-using google::javaprofiler::kNanosPerSecond;
 using google::javaprofiler::kNanosPerMilli;
+using google::javaprofiler::kNanosPerSecond;
 
 inline struct timespec TimeAdd(const struct timespec t1,
                                const struct timespec t2) {
@@ -44,9 +44,7 @@ inline int64_t TimeSpecToNanos(const struct timespec &ts) {
   return google::javaprofiler::TimeSpecToNanos(ts);
 }
 
-inline Clock *DefaultClock() {
-  return google::javaprofiler::DefaultClock();
-}
+inline Clock *DefaultClock() { return google::javaprofiler::DefaultClock(); }
 
 }  // namespace profiler
 }  // namespace cloud

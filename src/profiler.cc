@@ -135,7 +135,8 @@ void Profiler::Handle(int signum, siginfo_t *info, void *context) {
     // counter in such case to provide at least some clue into where the time is
     // being spent. The alternative would be to mark such samples as erroneous
     // but it appears even having just the shared object name is more useful.
-    uint64_t pc = static_cast<ucontext_t*>(context)->uc_mcontext.gregs[REG_RIP];
+    uint64_t pc =
+        static_cast<ucontext_t *>(context)->uc_mcontext.gregs[REG_RIP];
     trace.frames[0] =
         JVMPI_CallFrame{kNativeFrameLineNum, reinterpret_cast<jmethodID>(pc)};
     ++trace.num_frames;

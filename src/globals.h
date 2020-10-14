@@ -55,17 +55,17 @@ namespace profiler {
 // easier to just re-use the constants this way to keep the code easy to read.
 //
 // Remove this when porting is done.
+using google::javaprofiler::kDeopt;
+using google::javaprofiler::kGcActive;
 using google::javaprofiler::kNativeStackTrace;
 using google::javaprofiler::kNoClassLoad;
-using google::javaprofiler::kGcActive;
-using google::javaprofiler::kUnknownNotJava;
-using google::javaprofiler::kNotWalkableFrameNotJava;
-using google::javaprofiler::kUnknownJava;
 using google::javaprofiler::kNotWalkableFrameJava;
-using google::javaprofiler::kUnknownState;
-using google::javaprofiler::kThreadExit;
-using google::javaprofiler::kDeopt;
+using google::javaprofiler::kNotWalkableFrameNotJava;
 using google::javaprofiler::kSafepoint;
+using google::javaprofiler::kThreadExit;
+using google::javaprofiler::kUnknownJava;
+using google::javaprofiler::kUnknownNotJava;
+using google::javaprofiler::kUnknownState;
 
 using google::javaprofiler::kCallTraceErrorLineNum;
 using google::javaprofiler::kMaxFramesToCapture;
@@ -76,7 +76,7 @@ using google::javaprofiler::JVMPI_CallFrame;
 using google::javaprofiler::JVMPI_CallTrace;
 
 // Gets us around -Wunused-parameter
-#define IMPLICITLY_USE(x) (void) x;
+#define IMPLICITLY_USE(x) (void)x;
 
 #define AGENTEXPORT __attribute__((visibility("default"))) JNIEXPORT
 

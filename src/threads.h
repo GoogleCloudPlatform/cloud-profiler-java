@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_THREADS_H_
 
 #include <time.h>
+
 #include <mutex>  // NOLINT(build/c++11)
 #include <utility>
 
