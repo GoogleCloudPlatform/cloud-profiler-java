@@ -73,8 +73,9 @@ RUN git clone --depth=1 -b v2.1.2 https://github.com/gflags/gflags.git /tmp/gfla
 
 # google-glog
 RUN mkdir /tmp/glog && cd /tmp/glog && \
-    curl -sL https://github.com/google/glog/archive/v0.3.5.tar.gz | \
-        tar xzv --strip=1 && LDFLAGS="-lexecinfo" ./configure --with-pic --enable-static && \
+    curl -sL https://github.com/google/glog/archive/v0.4.0.tar.gz | \
+        tar xzv --strip=1 && ./autogen.sh && \
+        LDFLAGS="-lexecinfo" ./configure --with-pic --enable-static && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/glog
 
