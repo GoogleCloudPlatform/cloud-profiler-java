@@ -28,7 +28,7 @@ commands below.
  $ ./build.sh
 ```
 
-## To build for Alpine.
+## To build for Alpine
 
 **Only Alpine versions 3.11 and later are currently supported.**
 
@@ -39,5 +39,16 @@ the flag `-cprof_cpu_use_per_thread_timers` is ignored on this platform.
 ```shell
 $ git clone https://github.com/GoogleCloudPlatform/cloud-profiler-java.git
 $ cd cloud-profiler-java
-$ ./build.sh -a
+$ ./build.sh -m alpine
+```
+
+## To build for ARM64
+
+**Support for ARM64 is provided for testing purposes only.** The following
+commands must be run on an ARM64 machine. Cross compilation is not supported.
+
+```shell
+$ git clone https://github.com/GoogleCloudPlatform/cloud-profiler-java.git
+$ cd cloud-profiler-java
+$ ./build.sh -m arm64
 ```

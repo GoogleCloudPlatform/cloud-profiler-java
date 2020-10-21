@@ -14,9 +14,11 @@
 
 CC = g++
 
+# Determine the machine type.
+machine_type := $(shell uname -m)
+
 # -fpermissive used to bypass <:: errors from gcc 4.7
 CFLAGS = \
-	-m64 \
 	-std=c++11 \
 	-fpermissive \
 	-fPIC \
@@ -31,13 +33,23 @@ CFLAGS = \
 	-D_GNU_SOURCE \
 	-DENABLE_HEAP_SAMPLING
 
+ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
+  # Building on an ARM64 machine.
+	CFLAGS += \
+		-march=native \
+		-mtune=native \
+		-mcpu=native
+	JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-arm64
+else
+	CFLAGS += -m64
+	JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64
+endif
 ifneq ($(AGENT_VERSION),)
   CFLAGS += -DCLOUD_PROFILER_AGENT_VERSION=\"$(AGENT_VERSION)\"
 endif
 
 SRC_ROOT_PATH=.
 
-JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64
 PROTOC ?= /usr/local/bin/protoc
 PROTOC_GEN_GRPC ?= /usr/local/bin/grpc_cpp_plugin
 
