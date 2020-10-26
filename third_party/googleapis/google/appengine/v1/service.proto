@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,6 +63,11 @@ message TrafficSplit {
     // Diversion based on applying the modulus operation to a fingerprint
     // of the IP address.
     IP = 2;
+
+    // Diversion based on weighted random assignment. An incoming request is
+    // randomly routed to a version in the traffic split, with probability
+    // proportional to the version's traffic share.
+    RANDOM = 3;
   }
 
   // Mechanism used to determine which version a request is sent to.

@@ -63,6 +63,7 @@ java_gapic_library(
     name = "billing_java_gapic",
     src = ":billing_proto_with_info",
     gapic_yaml = "cloud_billing_gapic.yaml",
+    grpc_service_config = "cloud_billing_grpc_service_config.json",
     package = "google.cloud.billing.v1",
     service_yaml = "cloudbilling.yaml",
     test_deps = [
@@ -191,6 +192,7 @@ py_gapic_library(
     name = "billing_py_gapic",
     src = ":billing_proto_with_info",
     gapic_yaml = "cloud_billing_gapic.yaml",
+    grpc_service_config = "cloud_billing_grpc_service_config.json",
     package = "google.cloud.billing.v1",
     service_yaml = "cloudbilling.yaml",
     deps = [
@@ -235,6 +237,7 @@ php_gapic_library(
     name = "billing_php_gapic",
     src = ":billing_proto_with_info",
     gapic_yaml = "cloud_billing_gapic.yaml",
+    grpc_service_config = "cloud_billing_grpc_service_config.json",
     package = "google.cloud.billing.v1",
     service_yaml = "cloudbilling.yaml",
     deps = [
@@ -264,6 +267,7 @@ load(
 
 nodejs_gapic_library(
     name = "billing_nodejs_gapic",
+    package_name = "@google-cloud/billing",
     src = ":billing_proto_with_info",
     grpc_service_config = "cloud_billing_grpc_service_config.json",
     package = "google.cloud.billing.v1",
@@ -347,10 +351,9 @@ csharp_grpc_library(
 
 csharp_gapic_library(
     name = "billing_csharp_gapic",
-    src = ":billing_proto_with_info",
-    gapic_yaml = "cloud_billing_gapic.yaml",
-    package = "google.cloud.billing.v1",
-    service_yaml = "cloudbilling.yaml",
+    srcs = [":billing_proto_with_info"],
+    grpc_service_config = "cloud_billing_grpc_service_config.json",
+    common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     deps = [
         ":billing_csharp_grpc",
         ":billing_csharp_proto",

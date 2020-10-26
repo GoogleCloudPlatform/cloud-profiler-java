@@ -65,6 +65,7 @@ java_gapic_library(
     name = "database_java_gapic",
     src = ":database_proto_with_info",
     gapic_yaml = "spanner_admin_database_gapic.yaml",
+    grpc_service_config = "spanner_admin_database_grpc_service_config.json",
     package = "google.spanner.admin.database.v1",
     service_yaml = "spanner_admin_database.yaml",
     test_deps = [
@@ -128,7 +129,7 @@ go_gapic_library(
     deps = [
         ":database_go_proto",
         "//google/iam/v1:iam_go_proto",
-        "//google/longrunning:longrunning_go_gapic",
+        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
     ],
@@ -196,6 +197,7 @@ py_gapic_library(
     name = "database_py_gapic",
     src = ":database_proto_with_info",
     gapic_yaml = "spanner_admin_database_gapic.yaml",
+    grpc_service_config = "spanner_admin_database_grpc_service_config.json",
     package = "google.spanner.admin.database.v1",
     service_yaml = "spanner_admin_database.yaml",
     deps = [
@@ -240,6 +242,7 @@ php_gapic_library(
     name = "database_php_gapic",
     src = ":database_proto_with_info",
     gapic_yaml = "spanner_admin_database_gapic.yaml",
+    grpc_service_config = "spanner_admin_database_grpc_service_config.json",
     package = "google.spanner.admin.database.v1",
     service_yaml = "spanner_admin_database.yaml",
     deps = [
@@ -352,10 +355,9 @@ csharp_grpc_library(
 
 csharp_gapic_library(
     name = "database_csharp_gapic",
-    src = ":database_proto_with_info",
-    gapic_yaml = "spanner_admin_database_gapic.yaml",
-    package = "google.spanner.admin.database.v1",
-    service_yaml = "spanner_admin_database.yaml",
+    srcs = [":database_proto_with_info"],
+    grpc_service_config = "spanner_admin_database_grpc_service_config.json",
+    common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     deps = [
         ":database_csharp_grpc",
         ":database_csharp_proto",

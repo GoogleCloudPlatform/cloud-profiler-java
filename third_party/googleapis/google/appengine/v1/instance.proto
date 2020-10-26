@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package google.appengine.v1;
 
-import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/appengine/v1;appengine";
 option java_multiple_files = true;
@@ -117,4 +117,10 @@ message Instance {
   //
   // @OutputOnly
   bool vm_debug_enabled = 15;
+
+  // The IP address of this instance. Only applicable for instances in App
+  // Engine flexible environment.
+  //
+  // @OutputOnly
+  string vm_ip = 16;
 }

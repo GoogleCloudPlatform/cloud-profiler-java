@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package google.privacy.dlp.v2;
 
-import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
@@ -29,6 +28,7 @@ import "google/rpc/status.proto";
 import "google/type/date.proto";
 import "google/type/dayofweek.proto";
 import "google/type/timeofday.proto";
+import "google/api/annotations.proto";
 
 option csharp_namespace = "Google.Cloud.Dlp.V2";
 option go_package = "google.golang.org/genproto/googleapis/privacy/dlp/v2;dlp";
@@ -37,6 +37,11 @@ option java_outer_classname = "DlpProto";
 option java_package = "com.google.privacy.dlp.v2";
 option php_namespace = "Google\\Cloud\\Dlp\\V2";
 option ruby_package = "Google::Cloud::Dlp::V2";
+option (google.api.resource_definition) = {
+  type: "dlp.googleapis.com/DlpContent"
+  pattern: "projects/{project}/dlpContent"
+  pattern: "projects/{project}/locations/{location}/dlpContent"
+};
 option (google.api.resource_definition) = {
   type: "dlp.googleapis.com/OrganizationLocation"
   pattern: "organizations/{organization}/locations/{location}"
@@ -808,6 +813,12 @@ message ByteContentItem {
 
     // avro
     AVRO = 11;
+
+    // csv
+    CSV = 12;
+
+    // tsv
+    TSV = 13;
   }
 
   // The type of data stored in the bytes string. Default will be TEXT_UTF8.
@@ -873,8 +884,8 @@ message Finding {
   };
 
   // Resource name in format
-  // projects/{project}/locations/{location}/findings/{finding}
-  // Populated only when viewing persisted findings.
+  // projects/{project}/locations/{location}/findings/{finding} Populated only
+  // when viewing persisted findings.
   string name = 14;
 
   // The content that was found. Even if the content is not textual, it
@@ -1143,11 +1154,25 @@ message RedactImageRequest {
     Color redaction_color = 3;
   }
 
-  // The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}.
+  // Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [(google.api.resource_reference) = {
-    type: "cloudresourcemanager.googleapis.com/Project"
-  }];
+                       child_type: "dlp.googleapis.com/DlpContent"
+                     }];
 
   // Deprecated. This field has no effect.
   string location_id = 8;
@@ -1194,11 +1219,25 @@ message RedactImageResponse {
 
 // Request to de-identify a list of items.
 message DeidentifyContentRequest {
-  // The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}.
+  // Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [(google.api.resource_reference) = {
-    type: "cloudresourcemanager.googleapis.com/Project"
-  }];
+                       child_type: "dlp.googleapis.com/DlpContent"
+                     }];
 
   // Configuration for the de-identification of the content item.
   // Items specified here will override the template referenced by the
@@ -1242,11 +1281,26 @@ message DeidentifyContentResponse {
 
 // Request to re-identify an item.
 message ReidentifyContentRequest {
-  // Required. The parent resource name.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "dlp.googleapis.com/DlpContent"
     }
   ];
 
@@ -1277,10 +1331,11 @@ message ReidentifyContentRequest {
 
   // Template to use. References an instance of `DeidentifyTemplate`.
   // Any configuration directly specified in `reidentify_config` or
-  // `inspect_config` will override those set in the template. Singular fields
-  // that are set in this request will replace their corresponding fields in the
-  // template. Repeated fields are appended. Singular sub-messages and groups
-  // are recursively merged.
+  // `inspect_config` will override those set in the template. The
+  // `DeidentifyTemplate` used must include only reversible transformations.
+  // Singular fields that are set in this request will replace their
+  // corresponding fields in the template. Repeated fields are appended.
+  // Singular sub-messages and groups are recursively merged.
   string reidentify_template_name = 6;
 
   // Deprecated. This field has no effect.
@@ -1298,11 +1353,25 @@ message ReidentifyContentResponse {
 
 // Request to search for potentially sensitive info in a ContentItem.
 message InspectContentRequest {
-  // The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}
+  // Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [(google.api.resource_reference) = {
-    type: "cloudresourcemanager.googleapis.com/Project"
-  }];
+                       child_type: "dlp.googleapis.com/DlpContent"
+                     }];
 
   // Configuration for the inspector. What specified here will override
   // the template referenced by the inspect_template_name argument.
@@ -1432,7 +1501,7 @@ message InspectDataSourceDetails {
   Result result = 3;
 }
 
-// Statistics related to processing hybrid inspect requests.s
+// Statistics related to processing hybrid inspect requests.
 message HybridInspectStatistics {
   // The number of hybrid inspection requests processed within this job.
   int64 processed_count = 1;
@@ -1467,8 +1536,13 @@ message InfoTypeDescription {
 
 // Request for the list of infoTypes.
 message ListInfoTypesRequest {
-  // The parent resource name, for example locations/{location_id}
+  // The parent resource name.
+  //
+  // The format of this value is as follows:
+  //
+  //     locations/<var>LOCATION_ID</var>
   string parent = 4;
+
   // BCP-47 language code for localized infoType friendly
   // names. If omitted, or if localized strings are not available,
   // en-US strings will be returned.
@@ -1553,11 +1627,10 @@ message StatisticalTable {
   BigQueryTable table = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Quasi-identifier columns.
-  repeated QuasiIdentifierField quasi_ids = 1
-      [(google.api.field_behavior) = REQUIRED];
+  repeated QuasiIdentifierField quasi_ids = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. The relative frequency column must contain a floating-point
-  // number between 0 and 1 (inclusive). Null values are assumed to be zero.
+  // Required. The relative frequency column must contain a floating-point number
+  // between 0 and 1 (inclusive). Null values are assumed to be zero.
   FieldId relative_frequency = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -1670,16 +1743,15 @@ message PrivacyMetric {
       BigQueryTable table = 3 [(google.api.field_behavior) = REQUIRED];
 
       // Required. Quasi-identifier columns.
-      repeated QuasiIdField quasi_ids = 1
-          [(google.api.field_behavior) = REQUIRED];
+      repeated QuasiIdField quasi_ids = 1 [(google.api.field_behavior) = REQUIRED];
 
-      // Required. The relative frequency column must contain a floating-point
-      // number between 0 and 1 (inclusive). Null values are assumed to be zero.
+      // Required. The relative frequency column must contain a floating-point number
+      // between 0 and 1 (inclusive). Null values are assumed to be zero.
       FieldId relative_frequency = 2 [(google.api.field_behavior) = REQUIRED];
     }
 
-    // Required. Fields considered to be quasi-identifiers. No two columns can
-    // have the same tag.
+    // Required. Fields considered to be quasi-identifiers. No two columns can have the
+    // same tag.
     repeated TaggedField quasi_ids = 1 [(google.api.field_behavior) = REQUIRED];
 
     // ISO 3166-1 alpha-2 region code to use in the statistical modeling.
@@ -1698,8 +1770,8 @@ message PrivacyMetric {
   // Similarly to the k-map metric, we cannot compute δ-presence exactly without
   // knowing the attack dataset, so we use a statistical model instead.
   message DeltaPresenceEstimationConfig {
-    // Required. Fields considered to be quasi-identifiers. No two fields can
-    // have the same tag.
+    // Required. Fields considered to be quasi-identifiers. No two fields can have the
+    // same tag.
     repeated QuasiId quasi_ids = 1 [(google.api.field_behavior) = REQUIRED];
 
     // ISO 3166-1 alpha-2 region code to use in the statistical modeling.
@@ -1772,8 +1844,7 @@ message AnalyzeDataSourceRiskDetails {
     }
 
     // Histogram of value frequencies in the column.
-    repeated CategoricalStatsHistogramBucket value_frequency_histogram_buckets =
-        5;
+    repeated CategoricalStatsHistogramBucket value_frequency_histogram_buckets = 5;
   }
 
   // Result of the k-anonymity computation.
@@ -1853,8 +1924,7 @@ message AnalyzeDataSourceRiskDetails {
     }
 
     // Histogram of l-diversity equivalence class sensitive value frequencies.
-    repeated LDiversityHistogramBucket
-        sensitive_value_frequency_histogram_buckets = 5;
+    repeated LDiversityHistogramBucket sensitive_value_frequency_histogram_buckets = 5;
   }
 
   // Result of the reidentifiability analysis. Note that these results are an
@@ -1963,6 +2033,12 @@ message AnalyzeDataSourceRiskDetails {
     repeated DeltaPresenceEstimationHistogramBucket delta_presence_estimation_histogram = 1;
   }
 
+  // Risk analysis options.
+  message RequestedRiskAnalysisOptions {
+    // The job config for the risk job.
+    RiskAnalysisJobConfig job_config = 1;
+  }
+
   // Privacy metric to compute.
   PrivacyMetric requested_privacy_metric = 1;
 
@@ -1989,6 +2065,9 @@ message AnalyzeDataSourceRiskDetails {
     // Delta-presence result
     DeltaPresenceEstimationResult delta_presence_estimation_result = 9;
   }
+
+  // The configuration used for this job.
+  RequestedRiskAnalysisOptions requested_options = 10;
 }
 
 // A value of a field, including its frequency.
@@ -2268,12 +2347,16 @@ message ReplaceValueConfig {
 }
 
 // Replace each matching finding with the name of the info_type.
-message ReplaceWithInfoTypeConfig {}
+message ReplaceWithInfoTypeConfig {
+
+}
 
 // Redact a given value. For example, if used with an `InfoTypeTransformation`
 // transforming PHONE_NUMBER, and input 'My phone number is 206-555-0123', the
 // output would be 'My phone number is '.
-message RedactConfig {}
+message RedactConfig {
+
+}
 
 // Characters to skip when doing deidentification of a value. These will be left
 // alone and skipped.
@@ -2357,18 +2440,18 @@ message CharacterMaskConfig {
 //
 // See https://cloud.google.com/dlp/docs/concepts-bucketing to learn more.
 message FixedSizeBucketingConfig {
-  // Required. Lower bound value of buckets. All values less than `lower_bound`
-  // are grouped together into a single bucket; for example if `lower_bound` =
-  // 10, then all values less than 10 are replaced with the value “-10”.
+  // Required. Lower bound value of buckets. All values less than `lower_bound` are
+  // grouped together into a single bucket; for example if `lower_bound` = 10,
+  // then all values less than 10 are replaced with the value "-10".
   Value lower_bound = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. Upper bound value of buckets. All values greater than upper_bound
-  // are grouped together into a single bucket; for example if `upper_bound` =
-  // 89, then all values greater than 89 are replaced with the value “89+”.
+  // Required. Upper bound value of buckets. All values greater than upper_bound are
+  // grouped together into a single bucket; for example if `upper_bound` = 89,
+  // then all values greater than 89 are replaced with the value "89+".
   Value upper_bound = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. Size of each bucket (except for minimum and maximum buckets). So
-  // if `lower_bound` = 10, `upper_bound` = 89, and `bucket_size` = 10, then the
+  // Required. Size of each bucket (except for minimum and maximum buckets). So if
+  // `lower_bound` = 10, `upper_bound` = 89, and `bucket_size` = 10, then the
   // following buckets would be used: -10, 10-20, 20-30, 30-40, 40-50, 50-60,
   // 60-70, 70-80, 80-89, 89+. Precision up to 2 decimals works.
   double bucket_size = 3 [(google.api.field_behavior) = REQUIRED];
@@ -2393,9 +2476,8 @@ message BucketingConfig {
     // Upper bound of the range, exclusive; type must match min.
     Value max = 2;
 
-    // Replacement value for this bucket. If not provided
-    // the default behavior will be to hyphenate the min-max range.
-    Value replacement_value = 3;
+    // Required. Replacement value for this bucket.
+    Value replacement_value = 3 [(google.api.field_behavior) = REQUIRED];
   }
 
   // Set of buckets. Ranges must be non-overlapping.
@@ -2473,6 +2555,9 @@ message CryptoReplaceFfxFpeConfig {
     // Number of characters must be in the range [2, 95].
     // This must be encoded as ASCII.
     // The order of characters does not matter.
+    // The full list of allowed characters is:
+    // <code>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+    // ~`!@#$%^&*()_-+={[}]|\:;"'<,>.?/</code>
     string custom_alphabet = 5;
 
     // The native way to select the alphabet. Must be in the range [2, 95].
@@ -2562,15 +2647,14 @@ message KmsWrappedCryptoKey {
 // same context. See https://cloud.google.com/dlp/docs/concepts-date-shifting
 // to learn more.
 message DateShiftConfig {
-  // Required. Range of shift in days. Actual shift will be selected at random
-  // within this range (inclusive ends). Negative means shift to earlier in
-  // time. Must not be more than 365250 days (1000 years) each direction.
+  // Required. Range of shift in days. Actual shift will be selected at random within this
+  // range (inclusive ends). Negative means shift to earlier in time. Must not
+  // be more than 365250 days (1000 years) each direction.
   //
   // For example, 3 means shift date to at most 3 days into the future.
   int32 upper_bound_days = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. For example, -5 means shift date to at most 5 days back in the
-  // past.
+  // Required. For example, -5 means shift date to at most 5 days back in the past.
   int32 lower_bound_days = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Points to the field that contains the context, for example, an entity id.
@@ -3058,8 +3142,26 @@ message Action {
 
 // Request message for CreateInspectTemplate.
 message CreateInspectTemplateRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location-id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3072,7 +3174,7 @@ message CreateInspectTemplateRequest {
 
   // The template id can contain uppercase and lowercase letters,
   // numbers, and hyphens; that is, it must match the regular
-  // expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+  // expression: `[a-zA-Z\d-_]+`. The maximum length is 100
   // characters. Can be empty to allow the system to generate one.
   string template_id = 3;
 
@@ -3082,8 +3184,8 @@ message CreateInspectTemplateRequest {
 
 // Request message for UpdateInspectTemplate.
 message UpdateInspectTemplateRequest {
-  // Required. Resource name of organization and inspectTemplate to be updated,
-  // for example `organizations/433245324/inspectTemplates/432452342` or
+  // Required. Resource name of organization and inspectTemplate to be updated, for
+  // example `organizations/433245324/inspectTemplates/432452342` or
   // projects/project-id/inspectTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3101,8 +3203,8 @@ message UpdateInspectTemplateRequest {
 
 // Request message for GetInspectTemplate.
 message GetInspectTemplateRequest {
-  // Required. Resource name of the organization and inspectTemplate to be read,
-  // for example `organizations/433245324/inspectTemplates/432452342` or
+  // Required. Resource name of the organization and inspectTemplate to be read, for
+  // example `organizations/433245324/inspectTemplates/432452342` or
   // projects/project-id/inspectTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3114,8 +3216,26 @@ message GetInspectTemplateRequest {
 
 // Request message for ListInspectTemplates.
 message ListInspectTemplatesRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3162,9 +3282,9 @@ message ListInspectTemplatesResponse {
 
 // Request message for DeleteInspectTemplate.
 message DeleteInspectTemplateRequest {
-  // Required. Resource name of the organization and inspectTemplate to be
-  // deleted, for example `organizations/433245324/inspectTemplates/432452342`
-  // or projects/project-id/inspectTemplates/432452342.
+  // Required. Resource name of the organization and inspectTemplate to be deleted, for
+  // example `organizations/433245324/inspectTemplates/432452342` or
+  // projects/project-id/inspectTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3175,12 +3295,26 @@ message DeleteInspectTemplateRequest {
 
 // Request message for CreateJobTrigger.
 message CreateJobTriggerRequest {
-  // Required. The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "dlp.googleapis.com/JobTrigger"
     }
   ];
 
@@ -3189,7 +3323,7 @@ message CreateJobTriggerRequest {
 
   // The trigger id can contain uppercase and lowercase letters,
   // numbers, and hyphens; that is, it must match the regular
-  // expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+  // expression: `[a-zA-Z\d-_]+`. The maximum length is 100
   // characters. Can be empty to allow the system to generate one.
   string trigger_id = 3;
 
@@ -3203,7 +3337,9 @@ message ActivateJobTriggerRequest {
   // `projects/dlp-test-project/jobTriggers/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/JobTrigger" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/JobTrigger"
+    }
   ];
 }
 
@@ -3213,7 +3349,9 @@ message UpdateJobTriggerRequest {
   // `projects/dlp-test-project/jobTriggers/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/JobTrigger" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/JobTrigger"
+    }
   ];
 
   // New JobTrigger value.
@@ -3229,7 +3367,9 @@ message GetJobTriggerRequest {
   // `projects/dlp-test-project/jobTriggers/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/JobTrigger" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/JobTrigger"
+    }
   ];
 }
 
@@ -3237,12 +3377,26 @@ message GetJobTriggerRequest {
 // jobs such as calculating risk metrics or inspecting Google Cloud
 // Storage.
 message CreateDlpJobRequest {
-  // Required. The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "dlp.googleapis.com/DlpJob"
     }
   ];
 
@@ -3257,7 +3411,7 @@ message CreateDlpJobRequest {
 
   // The job id can contain uppercase and lowercase letters,
   // numbers, and hyphens; that is, it must match the regular
-  // expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+  // expression: `[a-zA-Z\d-_]+`. The maximum length is 100
   // characters. Can be empty to allow the system to generate one.
   string job_id = 4;
 
@@ -3267,12 +3421,26 @@ message CreateDlpJobRequest {
 
 // Request message for ListJobTriggers.
 message ListJobTriggersRequest {
-  // Required. The parent resource name, for example `projects/my-project-id`
-  // or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "dlp.googleapis.com/JobTrigger"
     }
   ];
 
@@ -3347,7 +3515,9 @@ message DeleteJobTriggerRequest {
   // `projects/dlp-test-project/jobTriggers/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/JobTrigger" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/JobTrigger"
+    }
   ];
 }
 
@@ -3443,18 +3613,34 @@ message GetDlpJobRequest {
   // Required. The name of the DlpJob resource.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/DlpJob" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/DlpJob"
+    }
   ];
 }
 
 // The request message for listing DLP jobs.
 message ListDlpJobsRequest {
-  // Required. The parent resource name, for example projects/my-project-id
-  // or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on whether you have [specified a
+  // processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 4 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "dlp.googleapis.com/DlpJob"
     }
   ];
 
@@ -3530,7 +3716,9 @@ message CancelDlpJobRequest {
   // Required. The name of the DlpJob resource to be cancelled.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/DlpJob" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/DlpJob"
+    }
   ];
 }
 
@@ -3539,7 +3727,9 @@ message FinishDlpJobRequest {
   // Required. The name of the DlpJob resource to be cancelled.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/DlpJob" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/DlpJob"
+    }
   ];
 }
 
@@ -3548,14 +3738,34 @@ message DeleteDlpJobRequest {
   // Required. The name of the DlpJob resource to be deleted.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/DlpJob" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/DlpJob"
+    }
   ];
 }
 
 // Request message for CreateDeidentifyTemplate.
 message CreateDeidentifyTemplateRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3564,12 +3774,11 @@ message CreateDeidentifyTemplateRequest {
   ];
 
   // Required. The DeidentifyTemplate to create.
-  DeidentifyTemplate deidentify_template = 2
-      [(google.api.field_behavior) = REQUIRED];
+  DeidentifyTemplate deidentify_template = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The template id can contain uppercase and lowercase letters,
   // numbers, and hyphens; that is, it must match the regular
-  // expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+  // expression: `[a-zA-Z\d-_]+`. The maximum length is 100
   // characters. Can be empty to allow the system to generate one.
   string template_id = 3;
 
@@ -3579,9 +3788,8 @@ message CreateDeidentifyTemplateRequest {
 
 // Request message for UpdateDeidentifyTemplate.
 message UpdateDeidentifyTemplateRequest {
-  // Required. Resource name of organization and deidentify template to be
-  // updated, for example
-  // `organizations/433245324/deidentifyTemplates/432452342` or
+  // Required. Resource name of organization and deidentify template to be updated, for
+  // example `organizations/433245324/deidentifyTemplates/432452342` or
   // projects/project-id/deidentifyTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3599,9 +3807,9 @@ message UpdateDeidentifyTemplateRequest {
 
 // Request message for GetDeidentifyTemplate.
 message GetDeidentifyTemplateRequest {
-  // Required. Resource name of the organization and deidentify template to be
-  // read, for example `organizations/433245324/deidentifyTemplates/432452342`
-  // or projects/project-id/deidentifyTemplates/432452342.
+  // Required. Resource name of the organization and deidentify template to be read, for
+  // example `organizations/433245324/deidentifyTemplates/432452342` or
+  // projects/project-id/deidentifyTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3612,8 +3820,26 @@ message GetDeidentifyTemplateRequest {
 
 // Request message for ListDeidentifyTemplates.
 message ListDeidentifyTemplatesRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3661,9 +3887,8 @@ message ListDeidentifyTemplatesResponse {
 
 // Request message for DeleteDeidentifyTemplate.
 message DeleteDeidentifyTemplateRequest {
-  // Required. Resource name of the organization and deidentify template to be
-  // deleted, for example
-  // `organizations/433245324/deidentifyTemplates/432452342` or
+  // Required. Resource name of the organization and deidentify template to be deleted,
+  // for example `organizations/433245324/deidentifyTemplates/432452342` or
   // projects/project-id/deidentifyTemplates/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3790,8 +4015,26 @@ message StoredInfoType {
 
 // Request message for CreateStoredInfoType.
 message CreateStoredInfoTypeRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location_id}
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3804,7 +4047,7 @@ message CreateStoredInfoTypeRequest {
 
   // The storedInfoType ID can contain uppercase and lowercase letters,
   // numbers, and hyphens; that is, it must match the regular
-  // expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+  // expression: `[a-zA-Z\d-_]+`. The maximum length is 100
   // characters. Can be empty to allow the system to generate one.
   string stored_info_type_id = 3;
 
@@ -3835,8 +4078,8 @@ message UpdateStoredInfoTypeRequest {
 
 // Request message for GetStoredInfoType.
 message GetStoredInfoTypeRequest {
-  // Required. Resource name of the organization and storedInfoType to be read,
-  // for example `organizations/433245324/storedInfoTypes/432452342` or
+  // Required. Resource name of the organization and storedInfoType to be read, for
+  // example `organizations/433245324/storedInfoTypes/432452342` or
   // projects/project-id/storedInfoTypes/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3848,8 +4091,26 @@ message GetStoredInfoTypeRequest {
 
 // Request message for ListStoredInfoTypes.
 message ListStoredInfoTypesRequest {
-  // Required. The parent resource name, for example projects/my-project-id or
-  // organizations/my-org-id or projects/my-project-id/locations/{location_id}.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization) and whether you have [specified a processing
+  // location](https://cloud.google.com/dlp/docs/specifying-location):
+  //
+  // + Projects scope, location specified:<br/>
+  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Projects scope, no location specified (defaults to global):<br/>
+  //   `projects/`<var>PROJECT_ID</var>
+  // + Organizations scope, location specified:<br/>
+  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // + Organizations scope, no location specified (defaults to global):<br/>
+  //   `organizations/`<var>ORG_ID</var>
+  //
+  // The following example `parent` string specifies a parent project with the
+  // identifier `example-project`, and specifies the `europe-west3` location
+  // for processing data:
+  //
+  //     parent=projects/example-project/locations/europe-west3
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -3897,8 +4158,8 @@ message ListStoredInfoTypesResponse {
 
 // Request message for DeleteStoredInfoType.
 message DeleteStoredInfoTypeRequest {
-  // Required. Resource name of the organization and storedInfoType to be
-  // deleted, for example `organizations/433245324/storedInfoTypes/432452342` or
+  // Required. Resource name of the organization and storedInfoType to be deleted, for
+  // example `organizations/433245324/storedInfoTypes/432452342` or
   // projects/project-id/storedInfoTypes/432452342.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -3910,11 +4171,13 @@ message DeleteStoredInfoTypeRequest {
 
 // Request to search for potentially sensitive info in a custom location.
 message HybridInspectJobTriggerRequest {
-  // Required. Resource name of the trigger to execute a hybrid inspect on, for
-  // example `projects/dlp-test-project/jobTriggers/53234423`.
+  // Required. Resource name of the trigger to execute a hybrid inspect on, for example
+  // `projects/dlp-test-project/jobTriggers/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/JobTrigger" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/JobTrigger"
+    }
   ];
 
   // The item to inspect.
@@ -3923,11 +4186,13 @@ message HybridInspectJobTriggerRequest {
 
 // Request to search for potentially sensitive info in a custom location.
 message HybridInspectDlpJobRequest {
-  // Required. Resource name of the job to execute a hybrid inspect on, for
-  // example `projects/dlp-test-project/dlpJob/53234423`.
+  // Required. Resource name of the job to execute a hybrid inspect on, for example
+  // `projects/dlp-test-project/dlpJob/53234423`.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "dlp.googleapis.com/DlpJob" }
+    (google.api.resource_reference) = {
+      type: "dlp.googleapis.com/DlpJob"
+    }
   ];
 
   // The item to inspect.
@@ -4064,7 +4329,7 @@ enum MetadataType {
   // Unused
   METADATATYPE_UNSPECIFIED = 0;
 
-  // General file metadata provided by GCS.
+  // General file metadata provided by Cloud Storage.
   STORAGE_METADATA = 2;
 }
 
