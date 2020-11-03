@@ -91,7 +91,7 @@ bool HTTPRequest::DoRequest(const std::string& url) {
 size_t HTTPRequest::ResponseCallback(void* contents, size_t size, size_t nmemb,
                                      std::string* resp) {
   size_t real_size = size * nmemb;
-  resp->append(static_cast<char *>(contents), real_size);
+  resp->append(static_cast<char*>(contents), real_size);
   return real_size;
 }
 
