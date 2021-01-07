@@ -1,7 +1,7 @@
-# Google Cloud Profiler Profiler Java Agent
+# Google Cloud Profiler Java Agent
 
 This repository contains source code for the
-[Google Cloud Profiler Profiler](https://cloud.google.com/profiler/) Java agent.
+[Google Cloud Profiler](https://cloud.google.com/profiler/) Java agent.
 
 ## Installation
 
