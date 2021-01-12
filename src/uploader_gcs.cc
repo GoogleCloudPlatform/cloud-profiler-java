@@ -18,6 +18,7 @@
 #include <string>
 
 #include "src/http.h"
+#include "third_party/absl/flags/flag.h"
 
 DEFINE_int32(cprof_gcs_upload_timeout_sec, 10,
              "Google Cloud Storage profile upload timeout in seconds");
@@ -42,7 +43,7 @@ bool GcsUploader::Upload(const std::string &profile_type,
   uploadReq.AddAuthBearerHeader(access_token);
   uploadReq.AddContentTypeHeader("application/octet-stream");
   uploadReq.AddHeader("Content-Length", std::to_string(profile.size()));
-  uploadReq.SetTimeout(FLAGS_cprof_gcs_upload_timeout_sec);
+  uploadReq.SetTimeout(absl::GetFlag(FLAGS_cprof_gcs_upload_timeout_sec));
 
   std::string url =
       std::string(kGcsHost) + "/" + ProfilePath(prefix_, profile_type);

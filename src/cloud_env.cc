@@ -21,6 +21,7 @@
 #include "src/clock.h"
 #include "src/http.h"
 #include "src/string.h"
+#include "third_party/absl/flags/flag.h"
 
 DEFINE_int32(cprof_gce_metadata_server_retry_count, 3,
              "Number of retries to Google Compute Engine metadata host");
@@ -55,10 +56,13 @@ std::string GceMetadataRequest(HTTPRequest* req, const std::string& path) {
   req->AddHeader("Metadata-Flavor", "Google");
   req->SetTimeout(2);  // seconds
 
-  std::string url = FLAGS_cprof_gce_metadata_server_address + path, resp;
+  std::string url =
+                  absl::GetFlag(FLAGS_cprof_gce_metadata_server_address) + path,
+              resp;
 
-  int retry_sleep_sec = FLAGS_cprof_gce_metadata_server_retry_sleep_sec;
-  int retry_count = FLAGS_cprof_gce_metadata_server_retry_count;
+  int retry_sleep_sec =
+      absl::GetFlag(FLAGS_cprof_gce_metadata_server_retry_sleep_sec);
+  int retry_count = absl::GetFlag(FLAGS_cprof_gce_metadata_server_retry_count);
   struct timespec retry_ts = NanosToTimeSpec(kNanosPerSecond * retry_sleep_sec);
 
   for (int i = 0; i <= retry_count; i++) {
@@ -98,9 +102,9 @@ const char* Getenv(const std::string& var) {
 }  // namespace
 
 CloudEnv::CloudEnv() {
-  if (!FLAGS_cprof_service.empty()) {
+  if (!absl::GetFlag(FLAGS_cprof_service).empty()) {
     service_ = FLAGS_cprof_service;
-  } else if (!FLAGS_cprof_target.empty()) {
+  } else if (!absl::GetFlag(FLAGS_cprof_target).empty()) {
     service_ = FLAGS_cprof_target;
   } else {
     for (const std::string& env_var : {"GAE_SERVICE", "K_SERVICE"}) {
@@ -112,7 +116,7 @@ CloudEnv::CloudEnv() {
     }
   }
 
-  if (!FLAGS_cprof_service_version.empty()) {
+  if (!absl::GetFlag(FLAGS_cprof_service_version).empty()) {
     service_version_ = FLAGS_cprof_service_version;
   } else {
     for (const std::string& env_var : {"GAE_VERSION", "K_REVISION"}) {
@@ -124,7 +128,7 @@ CloudEnv::CloudEnv() {
     }
   }
 
-  if (!FLAGS_cprof_project_id.empty()) {
+  if (!absl::GetFlag(FLAGS_cprof_project_id).empty()) {
     project_id_ = FLAGS_cprof_project_id;
     LOG(INFO) << "Using project ID '" << project_id_ << "' from flags";
   } else {
@@ -138,7 +142,7 @@ CloudEnv::CloudEnv() {
     }
   }
 
-  if (!FLAGS_cprof_zone_name.empty()) {
+  if (!absl::GetFlag(FLAGS_cprof_zone_name).empty()) {
     zone_name_ = FLAGS_cprof_zone_name;
     LOG(INFO) << "Using zone name '" << zone_name_ << "' from flags";
   }
@@ -196,7 +200,7 @@ std::string CloudEnv::Oauth2AccessToken() {
 }
 
 std::string CloudEnv::Oauth2AccessToken(HTTPRequest* req) {
-  if (!FLAGS_cprof_access_token_test_only.empty()) {
+  if (!absl::GetFlag(FLAGS_cprof_access_token_test_only).empty()) {
     LOG(WARNING) << "Using access token from flags, test-only";
     return FLAGS_cprof_access_token_test_only;
   }

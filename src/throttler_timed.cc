@@ -18,6 +18,7 @@
 
 #include "src/uploader_file.h"
 #include "src/uploader_gcs.h"
+#include "third_party/absl/flags/flag.h"
 
 DEFINE_int32(cprof_interval_sec, cloud::profiler::kProfileWaitSeconds, "");
 DEFINE_int32(cprof_duration_sec, cloud::profiler::kProfileDurationSeconds, "");
@@ -35,7 +36,8 @@ const int64_t kRandomRange = 100000;
 // Gets the sampling configuration from the flags.
 int64_t GetConfiguration(int64_t* duration_cpu_ns, int64_t* duration_wall_ns,
                          bool* enable_heap) {
-  int64_t duration_ns = FLAGS_cprof_duration_sec * kNanosPerSecond;
+  int64_t duration_ns =
+      absl::GetFlag(FLAGS_cprof_duration_sec) * kNanosPerSecond;
 
   *duration_cpu_ns = 0;
   *duration_wall_ns = 0;
@@ -57,7 +59,7 @@ int64_t GetConfiguration(int64_t* duration_cpu_ns, int64_t* duration_wall_ns,
                << ", profiling disabled";
   }
 
-  return FLAGS_cprof_interval_sec * kNanosPerSecond;
+  return absl::GetFlag(FLAGS_cprof_interval_sec) * kNanosPerSecond;
 }
 
 bool StartsWith(const std::string& s, const std::string& prefix) {
@@ -101,15 +103,16 @@ TimedThrottler::TimedThrottler(std::unique_ptr<ProfileUploader> uploader,
   LOG(INFO) << "sampling duration: cpu=" << duration_cpu_ns_ / kNanosPerSecond
             << "s, wall=" << duration_wall_ns_ / kNanosPerSecond;
   LOG(INFO) << "sampling interval: " << interval_ns_ / kNanosPerSecond << "s";
-  LOG(INFO) << "sampling delay: " << FLAGS_cprof_delay_sec << "s";
+  LOG(INFO) << "sampling delay: " << absl::GetFlag(FLAGS_cprof_delay_sec)
+            << "s";
   LOG(INFO) << "heap sampling enabled: " << enable_heap_;
 
   struct timespec now = clock_->Now();
 
   next_interval_ = now;
-  if (FLAGS_cprof_delay_sec != 0) {
+  if (absl::GetFlag(FLAGS_cprof_delay_sec) != 0) {
     struct timespec delay_ts =
-        NanosToTimeSpec(FLAGS_cprof_delay_sec * kNanosPerSecond);
+        NanosToTimeSpec(absl::GetFlag(FLAGS_cprof_delay_sec) * kNanosPerSecond);
     next_interval_ = TimeAdd(next_interval_, delay_ts);
   }
 
@@ -137,7 +140,8 @@ bool TimedThrottler::WaitNext() {
 
   cur_.pop_back();
   if (cur_.empty()) {
-    if (FLAGS_cprof_max_count > 0 && profile_count_ >= FLAGS_cprof_max_count) {
+    if (absl::GetFlag(FLAGS_cprof_max_count) > 0 &&
+        profile_count_ >= absl::GetFlag(FLAGS_cprof_max_count)) {
       LOG(INFO) << "Reached maximum number of profiles to collect";
       return false;
     }

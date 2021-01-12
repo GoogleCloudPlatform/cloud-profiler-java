@@ -25,6 +25,7 @@
 #include "src/clock.h"
 #include "src/globals.h"
 #include "src/proto.h"
+#include "third_party/absl/flags/flag.h"
 #include "third_party/javaprofiler/accessors.h"
 
 DEFINE_int32(cprof_wall_num_threads_cutoff, 4096,
@@ -104,7 +105,7 @@ void Profiler::Handle(int signum, siginfo_t *info, void *context) {
   // Skip top two frames, which include this function and the signal
   // handler.
   const int kFramesToSkip = 2;
-  if (FLAGS_cprof_record_native_stack &&
+  if (absl::GetFlag(FLAGS_cprof_record_native_stack) &&
       (kMaxFramesToCapture + kFramesToSkip - trace.num_frames > 0)) {
     void *raw_callstack[kMaxFramesToCapture + kFramesToSkip];
     int stack_len =
@@ -191,7 +192,7 @@ void Profiler::Reset() {
   }
   unknown_stack_count_ = 0;
 
-  if (FLAGS_cprof_record_native_stack) {
+  if (absl::GetFlag(FLAGS_cprof_record_native_stack)) {
     // When native stack collection requested, gather a single backtrace before
     // setting up the signal handler, to avoid running internal initialization
     // within backtrace from the signal handler.
@@ -261,9 +262,10 @@ void CPUProfiler::Stop() {
 WallProfiler::WallProfiler(jvmtiEnv *jvmti, ThreadTable *threads,
                            int64_t duration_nanos, int64_t period_nanos)
     : Profiler(jvmti, threads, duration_nanos,
-               EffectivePeriodNanos(period_nanos, threads->Size(),
-                                    FLAGS_cprof_wall_max_threads_per_sec,
-                                    duration_nanos)) {}
+               EffectivePeriodNanos(
+                   period_nanos, threads->Size(),
+                   absl::GetFlag(FLAGS_cprof_wall_max_threads_per_sec),
+                   duration_nanos)) {}
 
 int64_t WallProfiler::EffectivePeriodNanos(int64_t period_nanos,
                                            int64_t num_threads,
@@ -310,10 +312,11 @@ bool WallProfiler::Collect() {
     }
     clock->SleepUntil(next);
     std::vector<pid_t> threads = threads_->Threads();
-    if (threads.size() > FLAGS_cprof_wall_num_threads_cutoff) {
+    if (threads.size() > absl::GetFlag(FLAGS_cprof_wall_num_threads_cutoff)) {
       LOG(WARNING) << "Aborting wall profiling due to too many threads. "
                    << "Got " << threads.size() << " threads. "
-                   << "Want up to " << FLAGS_cprof_wall_num_threads_cutoff;
+                   << "Want up to "
+                   << absl::GetFlag(FLAGS_cprof_wall_num_threads_cutoff);
       return false;  // Too many threads, abort
     }
     count += threads.size();
