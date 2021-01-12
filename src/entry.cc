@@ -19,7 +19,6 @@
 #include "src/globals.h"
 #include "src/string.h"
 #include "src/worker.h"
-#include "third_party/absl/flags/flag.h"
 #include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/heap_sampler.h"
@@ -121,9 +120,9 @@ void JNICALL OnVMInit(jvmtiEnv *jvmti, JNIEnv *jni_env, jthread thread) {
     CreateJMethodIDsForClass(jvmti, klass);
   }
 
-  if (absl::GetFlag(FLAGS_cprof_enable_heap_sampling)) {
+  if (FLAGS_cprof_enable_heap_sampling) {
     google::javaprofiler::HeapMonitor::Enable(
-        jvmti, jni_env, absl::GetFlag(FLAGS_cprof_heap_sampling_interval));
+        jvmti, jni_env, FLAGS_cprof_heap_sampling_interval);
   }
 
   worker->Start(jni_env);
@@ -167,7 +166,7 @@ static bool PrepareJvmti(JavaVM *vm, jvmtiEnv *jvmti) {
   caps.can_get_line_numbers = 1;
   caps.can_get_bytecodes = 1;
   caps.can_get_constant_pool = 1;
-  if (absl::GetFlag(FLAGS_cprof_force_debug_non_safepoints)) {
+  if (FLAGS_cprof_force_debug_non_safepoints) {
     caps.can_generate_compiled_method_load_events = 1;
   }
 
@@ -218,7 +217,7 @@ static bool RegisterJvmti(jvmtiEnv *jvmti) {
       JVMTI_EVENT_VM_DEATH,   JVMTI_EVENT_VM_INIT,
   };
 
-  if (absl::GetFlag(FLAGS_cprof_force_debug_non_safepoints)) {
+  if (FLAGS_cprof_force_debug_non_safepoints) {
     callbacks.CompiledMethodLoad = &OnCompiledMethodLoad;
     events.push_back(JVMTI_EVENT_COMPILED_METHOD_LOAD);
   }
@@ -302,8 +301,7 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   }
   threads = new ThreadTable(false);
 #else
-  threads =
-      new ThreadTable(absl::GetFlag(FLAGS_cprof_cpu_use_per_thread_timers));
+  threads = new ThreadTable(FLAGS_cprof_cpu_use_per_thread_timers);
 #endif
 
   if (!RegisterJvmti(jvmti)) {

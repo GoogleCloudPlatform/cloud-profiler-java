@@ -18,7 +18,6 @@
 #include "src/profiler.h"
 #include "src/throttler_api.h"
 #include "src/throttler_timed.h"
-#include "third_party/absl/flags/flag.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 
 DEFINE_bool(cprof_enabled, true,
@@ -47,7 +46,7 @@ void Worker::Start(JNIEnv *jni) {
 
   // Initialize the throttler here rather in the constructor, since the
   // constructor is invoked too early, before the heap profiler is initialized.
-  throttler_ = absl::GetFlag(FLAGS_cprof_profile_filename).empty()
+  throttler_ = FLAGS_cprof_profile_filename.empty()
                    ? std::unique_ptr<Throttler>(new APIThrottler(jni))
                    : std::unique_ptr<Throttler>(
                          new TimedThrottler(FLAGS_cprof_profile_filename));
@@ -60,7 +59,7 @@ void Worker::Start(JNIEnv *jni) {
     return;
   }
 
-  enabled_ = absl::GetFlag(FLAGS_cprof_enabled);
+  enabled_ = FLAGS_cprof_enabled;
 }
 
 void Worker::Stop() {
@@ -138,16 +137,14 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
     std::string profile;
     std::string pt = w->throttler_->ProfileType();
     if (pt == kTypeCPU) {
-      CPUProfiler p(
-          w->jvmti_, w->threads_, w->throttler_->DurationNanos(),
-          absl::GetFlag(FLAGS_cprof_cpu_sampling_period_msec) * kNanosPerMilli);
+      CPUProfiler p(w->jvmti_, w->threads_, w->throttler_->DurationNanos(),
+                    FLAGS_cprof_cpu_sampling_period_msec * kNanosPerMilli);
       profile = Collect(&p, jni_env, &n);
     } else if (pt == kTypeWall) {
       // Note that the requested sampling period for the wall profiling may be
       // increased if the number of live threads is too large.
       WallProfiler p(w->jvmti_, w->threads_, w->throttler_->DurationNanos(),
-                     absl::GetFlag(FLAGS_cprof_wall_sampling_period_msec) *
-                         kNanosPerMilli);
+                     FLAGS_cprof_wall_sampling_period_msec * kNanosPerMilli);
       profile = Collect(&p, jni_env, &n);
     } else if (pt == kTypeHeap) {
       if (!google::javaprofiler::HeapMonitor::Enabled()) {

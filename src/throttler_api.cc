@@ -32,7 +32,6 @@
 #include "grpcpp/create_channel.h"
 #include "grpcpp/security/credentials.h"
 #include "grpcpp/support/channel_arguments.h"
-#include "third_party/absl/flags/flag.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 
 // API curated profiling configuration.
@@ -102,7 +101,7 @@ grpc_ssl_roots_override_result OverrideSSLRoots(char** pem_root_certs) {
 std::unique_ptr<api::grpc::ProfilerService::StubInterface>
 NewProfilerServiceStub(const std::string& addr) {
   std::shared_ptr<grpc::ChannelCredentials> creds;
-  if (absl::GetFlag(FLAGS_cprof_use_insecure_creds_for_testing)) {
+  if (FLAGS_cprof_use_insecure_creds_for_testing) {
     creds = grpc::InsecureChannelCredentials();
   } else {
     grpc_set_ssl_roots_override_callback(&OverrideSSLRoots);
