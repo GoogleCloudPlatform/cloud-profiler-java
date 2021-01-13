@@ -80,6 +80,7 @@ PROFILE_PROTO_SOURCES = \
 
 PROFILER_API_SOURCES = \
 	$(GENFILES_PATH)/google/api/annotations.pb.cc \
+	$(GENFILES_PATH)/google/api/client.pb.cc \
 	$(GENFILES_PATH)/google/api/http.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.grpc.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.pb.cc \
@@ -227,6 +228,10 @@ $(GENFILES_PATH)/%profiler.grpc.pb.h $(GENFILES_PATH)/%profiler.grpc.pb.cc : thi
 			--plugin=protoc-gen-grpc=$(PROTOC_GEN_GRPC) --grpc_out=services_namespace=grpc:$(GENFILES_PATH) $<
 
 $(GENFILES_PATH)/%annotations.pb.h $(GENFILES_PATH)/%annotations.pb.cc : third_party/googleapis/%annotations.proto
+	mkdir -p $(dir $@)
+	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
+
+$(GENFILES_PATH)/%client.pb.h $(GENFILES_PATH)/%client.pb.cc : third_party/googleapis/%client.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
 
