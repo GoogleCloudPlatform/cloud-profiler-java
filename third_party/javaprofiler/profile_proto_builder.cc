@@ -20,21 +20,27 @@ using std::unique_ptr;
 
 namespace google {
 namespace javaprofiler {
+namespace {
+// Hashes a string using an initial hash value of h.
+size_t HashString(const std::string &str, size_t h) {
+  hash<std::string> hash_string;
+  return 31U * h + hash_string(str);
+}
 
 const int kCount = 0;
 const int kMetric = 1;
+}  // namespace
 
-ProfileProtoBuilder::ProfileProtoBuilder(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-    ProfileFrameCache *native_cache, int64 sampling_rate,
-    const SampleType &count_type, const SampleType &metric_type,
-    const std::list<SampleType> &label_types)
+ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+                                         ProfileFrameCache *native_cache,
+                                         int64 sampling_rate,
+                                         const SampleType &count_type,
+                                         const SampleType &metric_type)
     : sampling_rate_(sampling_rate),
       jni_env_(jni_env),
       jvmti_env_(jvmti_env),
       native_cache_(native_cache),
-      location_builder_(&builder_),
-      label_types_(label_types) {
+      location_builder_(&builder_) {
   AddSampleType(count_type);
   AddSampleType(metric_type);
   SetPeriodType(metric_type);
@@ -47,7 +53,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 
   for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], 1, false);
+    AddTrace(traces[i], 1);
   }
 }
 
@@ -59,29 +65,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 
   for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], counts[i], false);
-  }
-}
-
-void ProfileProtoBuilder::AddTracesAppendingMetricAsLabel(
-    const ProfileStackTrace *traces, int num_traces) {
-  if (native_cache_) {
-    native_cache_->ProcessTraces(traces, num_traces);
-  }
-
-  for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], 1, true);
-  }
-}
-
-void ProfileProtoBuilder::AddTracesAppendingMetricAsLabel(
-    const ProfileStackTrace *traces, const int32 *counts, int num_traces) {
-  if (native_cache_) {
-    native_cache_->ProcessTraces(traces, num_traces);
-  }
-
-  for (int i = 0; i < num_traces; ++i) {
-    AddTrace(traces[i], counts[i], true);
+    AddTrace(traces[i], counts[i]);
   }
 }
 
@@ -94,8 +78,7 @@ void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
   auto sample = profile->add_sample();
   sample->add_location_id(location->id());
   // Move count * sampling rate to 64-bit.
-  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate,
-                   std::list<int64>());
+  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate);
 }
 
 void ProfileProtoBuilder::UnsampleMetrics() {
@@ -150,52 +133,55 @@ void ProfileProtoBuilder::UpdateSampleValues(
   sample->set_value(kMetric, sample->value(kMetric) + size);
 }
 
-void ProfileProtoBuilder::InitSampleValues(
-    perftools::profiles::Sample *sample, int64 count, int64 metric,
-    const std::list<int64> &label_values) {
+void ProfileProtoBuilder::InitSampleValues(perftools::profiles::Sample *sample,
+                                           int64 count, int64 metric) {
   sample->add_value(count);
   sample->add_value(metric);
+}
 
-  DCHECK (label_values.size() == label_types_.size())
-    << "Number of label values != number of label types";
-  auto it_value = label_values.begin();
-  auto it_type = label_types_.begin();
-  for (; it_value != label_values.end() && it_type != label_types_.end();
-    ++it_value, ++it_type) {
-    auto label = sample->add_label();
-    label->set_key(builder_.StringId(it_type->type.c_str()));
-    label->set_num(*it_value);
-    label->set_num_unit(builder_.StringId(it_type->unit.c_str()));
+void ProfileProtoBuilder::AddLabels(const TraceAndLabels &trace_and_labels,
+                                    perftools::profiles::Sample *sample) {
+  for (const auto &label : trace_and_labels.labels) {
+    auto new_label = sample->add_label();
+    new_label->set_key(builder_.StringId(label.key.c_str()));
+
+    if (label.is_string_label) {
+      new_label->set_str(builder_.StringId(label.str_label.c_str()));
+    } else {
+      new_label->set_num(label.num_label.value);
+      // Note that if the unit is not defined in the label, it will be empty and
+      // thus end up being a 0 as, by definition, "" has 0 as a string Id.
+      new_label->set_num_unit(builder_.StringId(label.num_label.unit.c_str()));
+    }
   }
 }
 
-void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &trace,
-                                   int32 count,
-                                   bool append_metric_value_as_label) {
-  std::list<int64> label_values;
-  if (append_metric_value_as_label) {
-    label_values.push_back(trace.metric_value);
-  }
-  auto sample = trace_samples_.SampleFor(trace.trace, label_values);
+void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
+                                   int32 count) {
+  const TraceAndLabels &trace_and_labels = profile_trace.trace_and_labels;
+  auto sample = trace_samples_.SampleFor(trace_and_labels);
+  jint metric_value = profile_trace.metric_value;
 
   if (sample != nullptr) {
-    UpdateSampleValues(sample, count, trace.metric_value);
+    UpdateSampleValues(sample, count, metric_value);
     return;
   }
 
   auto profile = builder_.mutable_profile();
   sample = profile->add_sample();
+  trace_samples_.Add(trace_and_labels, sample);
 
-  trace_samples_.Add(trace.trace, label_values, sample);
+  AddLabels(trace_and_labels, sample);
 
-  InitSampleValues(sample, count, trace.metric_value, label_values);
+  InitSampleValues(sample, count, metric_value);
 
-  int first_frame = SkipTopNativeFrames(*trace.trace);
+  const JVMPI_CallTrace *trace = trace_and_labels.trace;
+  int first_frame = SkipTopNativeFrames(*trace);
 
   StackState stack_state;
 
-  for (int i = first_frame; i < trace.trace->num_frames; ++i) {
-    auto &jvm_frame = trace.trace->frames[i];
+  for (int i = first_frame; i < trace->num_frames; ++i) {
+    auto &jvm_frame = trace->frames[i];
 
     if (jvm_frame.lineno == kNativeFrameLineNum) {
       AddNativeInfo(jvm_frame, profile, sample, &stack_state);
@@ -373,37 +359,74 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
   return location;
 }
 
-size_t TraceSamples::TraceHash::operator()(const TraceAndValues &trace_values)
-    const {
-  unsigned int h = 1;
+bool SampleLabel::operator==(const SampleLabel &other) const {
+  if (other.key != key) {
+    return false;
+  }
+
+  if (other.is_string_label != is_string_label) {
+    return false;
+  }
+
+  if (other.is_string_label) {
+    return other.str_label == str_label;
+  }
+  return other.num_label == num_label;
+}
+
+size_t SampleLabel::Hash(size_t current_hash_value) const {
+  size_t result = HashString(key, current_hash_value);
+
+  result = 31U * result + (is_string_label ? 1 : 0);
+
+  if (is_string_label) {
+    return HashString(str_label, result);
+  } else {
+    return num_label.Hash(result);
+  }
+}
+
+size_t NumLabelValue::Hash(size_t current_hash_value) const {
+  hash<int> hash_int;
+  current_hash_value = 31U * current_hash_value + hash_int(value);
+  return HashString(unit, current_hash_value);
+}
+
+size_t TraceSamples::TraceHash::operator()(
+    const TraceAndLabels &trace_values) const {
+  unsigned int hash = 1;
   const JVMPI_CallTrace *trace = trace_values.trace;
   for (int f = 0; f < trace->num_frames; f++) {
     {
       int len = sizeof(jint);
       char *arr = reinterpret_cast<char *>(&trace->frames[f].lineno);
       for (int i = 0; i < len; i++) {
-        h = 31U * h + arr[i];
+        hash = 31U * hash + arr[i];
       }
     }
     {
       int len = sizeof(jmethodID);
       char *arr = reinterpret_cast<char *>(&trace->frames[f].method_id);
       for (int i = 0; i < len; i++) {
-        h = 31U * h + arr[i];
+        hash = 31U * hash + arr[i];
       }
     }
   }
-  for (auto value : trace_values.label_values) {
-    h = 31U * h + static_cast<unsigned int>(value);
+
+  for (const SampleLabel &label : trace_values.labels) {
+    hash = label.Hash(hash);
   }
-  return h;
+
+  return hash;
 }
 
-bool TraceSamples::TraceEquals::operator()(const TraceAndValues &trace_values1,
-    const TraceAndValues &trace_values2) const {
-  if (trace_values1.label_values != trace_values2.label_values) {
+bool TraceSamples::TraceEquals::operator()(
+    const TraceAndLabels &trace_values1,
+    const TraceAndLabels &trace_values2) const {
+  if (trace_values1.labels != trace_values2.labels) {
     return false;
   }
+
   const JVMPI_CallTrace *trace1 = trace_values1.trace;
   const JVMPI_CallTrace *trace2 = trace_values2.trace;
   if (trace1->num_frames != trace2->num_frames) {
@@ -424,19 +447,17 @@ bool TraceSamples::TraceEquals::operator()(const TraceAndValues &trace_values1,
 }
 
 perftools::profiles::Sample *TraceSamples::SampleFor(
-    const JVMPI_CallTrace *trace, const std::list<int64> &label_values) const {
-  auto found = traces_.find({trace, label_values});
+    const TraceAndLabels &trace) const {
+  auto found = traces_.find(trace);
   if (found == traces_.end()) {
     return nullptr;
   }
-
   return found->second;
 }
 
-void TraceSamples::Add(const JVMPI_CallTrace *trace,
-                       const std::list<int64> &label_values,
+void TraceSamples::Add(const TraceAndLabels &trace,
                        perftools::profiles::Sample *sample) {
-  traces_[{trace, label_values}] = sample;
+  traces_[trace] = sample;
 }
 
 double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {

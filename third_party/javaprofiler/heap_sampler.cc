@@ -145,10 +145,12 @@ std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::ConvertToProto(
     auto *frames = object->Frames();
     *call_target = {nullptr, static_cast<int>(frames->size()), frames->data()};
     *trace_target = {call_target, object->Size()};
+
+    // Add the size as a label to help post-processing filtering.
+    trace_target->trace_and_labels.AddLabel("bytes", object->Size(), "bytes");
   }
 
-  builder->AddTracesAppendingMetricAsLabel(stack_trace_data.get(),
-                                           objects_size);
+  builder->AddTraces(stack_trace_data.get(), objects_size);
 
   return builder->CreateProto();
 }
