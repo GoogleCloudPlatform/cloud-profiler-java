@@ -216,7 +216,7 @@ $(TARGET_AGENT): $(SOURCES) $(HEADERS)
 
 $(TARGET_NOTICES): $(JAVA_AGENT_PATH)/NOTICES
 	mkdir -p $(dir $@)
-	cp -f $< $@
+	cp -fp $< $@
 
 $(GENFILES_PATH)/%profiler.pb.h $(GENFILES_PATH)/%profiler.pb.cc : third_party/googleapis/%profiler.proto
 	mkdir -p $(dir $@)
