@@ -18,6 +18,7 @@
 #include <stddef.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -69,13 +70,13 @@ class Builder {
 
   // Adds a string to the profile string table if not already present.
   // Returns a unique integer id for this string.
-  int64 StringId(const char *str);
+  int64_t StringId(const char *str);
 
   // Adds a function with these attributes to the profile function
   // table, if not already present. Returns a unique integer id for
   // this function.
-  uint64 FunctionId(const char *name, const char *system_name,
-                    const char *file, int64 start_line);
+  uint64_t FunctionId(const char *name, const char *system_name,
+                      const char *file, int64_t start_line);
 
   // Adds mappings for the currently running binary to the profile.
   void AddCurrentMappings();
