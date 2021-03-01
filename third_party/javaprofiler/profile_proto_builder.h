@@ -249,8 +249,8 @@ class ProfileProtoBuilder {
                                                      ProfileFrameCache *cache);
 
   static std::unique_ptr<ProfileProtoBuilder> ForContention(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-      ProfileFrameCache *cache);
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 duration_ns,
+      int64 sampling_rate, ProfileFrameCache *cache);
 
  protected:
   struct SampleType {
@@ -433,11 +433,13 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
 class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                                int64 sampling_rate, ProfileFrameCache *cache)
+                                int64 duration_nanos, int64 sampling_rate,
+                                ProfileFrameCache *cache)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("contentions", "count"),
             ProfileProtoBuilder::SampleType("delay", "microseconds")) {
+    builder_.mutable_profile()->set_duration_nanos(duration_nanos);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
 

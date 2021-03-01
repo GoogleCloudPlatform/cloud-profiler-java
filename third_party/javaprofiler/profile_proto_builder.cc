@@ -495,11 +495,11 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
     JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-    ProfileFrameCache *cache) {
+    int64 duration_nanos, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "Contention profiles may have native frames, cache must be provided";
   return std::unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(
-      jni_env, jvmti_env, sampling_rate, cache));
+      jni_env, jvmti_env, sampling_rate, duration_nanos, cache));
 }
 
 }  // namespace javaprofiler
