@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ option ruby_package = "Google::Ads::GoogleAds::V4::Services";
 // Service to manage ad group bid modifiers.
 service AdGroupBidModifierService {
   option (google.api.default_host) = "googleads.googleapis.com";
+  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/adwords";
 
   // Returns the requested ad group bid modifier in full detail.
   rpc GetAdGroupBidModifier(GetAdGroupBidModifierRequest) returns (google.ads.googleads.v4.resources.AdGroupBidModifier) {

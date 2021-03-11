@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ option ruby_package = "Google::Ads::GoogleAds::V4::Services";
 // Service to manage keyword plans.
 service KeywordPlanService {
   option (google.api.default_host) = "googleads.googleapis.com";
+  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/adwords";
 
   // Returns the requested plan in full detail.
   rpc GetKeywordPlan(GetKeywordPlanRequest) returns (google.ads.googleads.v4.resources.KeywordPlan) {
@@ -141,7 +142,9 @@ message KeywordPlanOperation {
     // expected in this format:
     //
     // `customers/{customer_id}/keywordPlans/{keyword_plan_id}`
-    string remove = 3;
+    string remove = 3 [(google.api.resource_reference) = {
+                         type: "googleads.googleapis.com/KeywordPlan"
+                       }];
   }
 }
 
@@ -166,7 +169,12 @@ message MutateKeywordPlansResult {
 // Request message for [KeywordPlanService.GenerateForecastCurve][google.ads.googleads.v4.services.KeywordPlanService.GenerateForecastCurve].
 message GenerateForecastCurveRequest {
   // Required. The resource name of the keyword plan to be forecasted.
-  string keyword_plan = 1 [(google.api.field_behavior) = REQUIRED];
+  string keyword_plan = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/KeywordPlan"
+    }
+  ];
 }
 
 // Response message for [KeywordPlanService.GenerateForecastCurve][google.ads.googleads.v4.services.KeywordPlanService.GenerateForecastCurve].
@@ -179,7 +187,12 @@ message GenerateForecastCurveResponse {
 // Request message for [KeywordPlanService.GenerateForecastMetrics][google.ads.googleads.v4.services.KeywordPlanService.GenerateForecastMetrics].
 message GenerateForecastMetricsRequest {
   // Required. The resource name of the keyword plan to be forecasted.
-  string keyword_plan = 1 [(google.api.field_behavior) = REQUIRED];
+  string keyword_plan = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/KeywordPlan"
+    }
+  ];
 }
 
 // Response message for [KeywordPlanService.GenerateForecastMetrics][google.ads.googleads.v4.services.KeywordPlanService.GenerateForecastMetrics].
@@ -276,7 +289,12 @@ message ForecastMetrics {
 message GenerateHistoricalMetricsRequest {
   // Required. The resource name of the keyword plan of which historical metrics are
   // requested.
-  string keyword_plan = 1 [(google.api.field_behavior) = REQUIRED];
+  string keyword_plan = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/KeywordPlan"
+    }
+  ];
 }
 
 // Response message for [KeywordPlanService.GenerateHistoricalMetrics][google.ads.googleads.v4.services.KeywordPlanService.GenerateHistoricalMetrics].

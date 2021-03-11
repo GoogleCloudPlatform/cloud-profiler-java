@@ -60,8 +60,7 @@ service ProductService {
     option (google.api.method_signature) = "name";
   }
 
-  // Updates a [Product][google.cloud.retail.v2.Product]. Non-existing items
-  // will be created.
+  // Updates a [Product][google.cloud.retail.v2.Product].
   rpc UpdateProduct(UpdateProductRequest) returns (Product) {
     option (google.api.http) = {
       patch: "/v2/{product.name=projects/*/locations/*/catalogs/*/branches/*/products/**}"
@@ -101,8 +100,7 @@ service ProductService {
 // Request message for [CreateProduct][] method.
 message CreateProductRequest {
   // Required. The parent catalog resource name, such as
-  //
-  // "projects/*/locations/global/catalogs/default_catalog/branches/default_branch".
+  // `projects/*/locations/global/catalogs/default_catalog/branches/default_branch`.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = { type: "retail.googleapis.com/Branch" }
@@ -133,8 +131,7 @@ message CreateProductRequest {
 message GetProductRequest {
   // Required. Full resource name of [Product][google.cloud.retail.v2.Product],
   // such as
-  //
-  // "projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id".
+  // `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`.
   //
   // If the caller does not have permission to access the
   // [Product][google.cloud.retail.v2.Product], regardless of whether or not it
@@ -174,8 +171,7 @@ message UpdateProductRequest {
 message DeleteProductRequest {
   // Required. Full resource name of [Product][google.cloud.retail.v2.Product],
   // such as
-  //
-  // "projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id".
+  // `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`.
   //
   // If the caller does not have permission to delete the
   // [Product][google.cloud.retail.v2.Product], regardless of whether or not it
@@ -183,13 +179,6 @@ message DeleteProductRequest {
   //
   // If the [Product][google.cloud.retail.v2.Product] to delete does not exist,
   // a NOT_FOUND error is returned.
-  //
-  // The [Product][google.cloud.retail.v2.Product] to delete can neither be a
-  // non-empty [Product.Type.COLLECTION][]
-  // [Product][google.cloud.retail.v2.Product] nor a [Product.Type.PRIMARY][]
-  // [Product][google.cloud.retail.v2.Product] with more than one
-  // [variants][Product.Type.VARIANT]. Otherwise, a FAILED_PRECONDITION error is
-  // returned.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = { type: "retail.googleapis.com/Product" }

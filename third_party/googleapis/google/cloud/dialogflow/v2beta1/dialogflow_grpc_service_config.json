@@ -3,6 +3,9 @@
     {
       "name": [
         {
+          "service": "google.cloud.dialogflow.aam.v2beta1.AamAdminTool"
+        },
+        {
           "service": "google.cloud.dialogflow.aam.v2beta1.AamDatasets"
         },
         {
@@ -13,6 +16,9 @@
         },
         {
           "service": "google.cloud.dialogflow.aam.v2beta1.AamLabels"
+        },
+        {
+          "service": "google.cloud.dialogflow.aam.v2beta1.AamNotices"
         },
         {
           "service": "google.cloud.dialogflow.aam.v2beta1.AamTasks"
@@ -106,6 +112,9 @@
         },
         {
           "service": "google.cloud.dialogflow.v2beta1.InternalDatasetService"
+        },
+        {
+          "service": "google.cloud.dialogflow.v2beta1.IssueModelService"
         },
         {
           "service": "google.cloud.dialogflow.v2beta1.AogService"

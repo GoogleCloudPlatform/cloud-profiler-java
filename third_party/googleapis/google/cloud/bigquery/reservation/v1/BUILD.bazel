@@ -59,11 +59,8 @@ java_grpc_library(
 
 java_gapic_library(
     name = "reservation_java_gapic",
-    src = ":reservation_proto_with_info",
-    gapic_yaml = "bigqueryreservation_gapic.yaml",
+    srcs = [":reservation_proto_with_info"],
     grpc_service_config = "bigqueryreservation_grpc_service_config.json",
-    package = "google.cloud.bigquery.reservation.v1",
-    service_yaml = "bigqueryreservation_v1.yaml",
     test_deps = [
         ":reservation_java_grpc",
     ],
@@ -146,50 +143,17 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "reservation_moved_proto",
-    srcs = [":reservation_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "//google/api:resource_proto",
-        "//google/rpc:status_proto",
-        "@com_google_protobuf//:empty_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:timestamp_proto",
-    ],
-)
-
-py_proto_library(
-    name = "reservation_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":reservation_moved_proto"],
-)
-
-py_grpc_library(
-    name = "reservation_py_grpc",
-    srcs = [":reservation_moved_proto"],
-    deps = [":reservation_py_proto"],
 )
 
 py_gapic_library(
     name = "reservation_py_gapic",
-    src = ":reservation_proto_with_info",
-    gapic_yaml = "bigqueryreservation_gapic.yaml",
+    srcs = [":reservation_proto"],
     grpc_service_config = "bigqueryreservation_grpc_service_config.json",
-    package = "google.cloud.bigquery.reservation.v1",
-    service_yaml = "bigqueryreservation_v1.yaml",
-    deps = [
-        ":reservation_py_grpc",
-        ":reservation_py_proto",
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "python-gapic-name=bigquery_reservation",
     ],
 )
 
@@ -198,8 +162,6 @@ py_gapic_assembly_pkg(
     name = "bigquery-reservation-v1-py",
     deps = [
         ":reservation_py_gapic",
-        ":reservation_py_grpc",
-        ":reservation_py_proto",
     ],
 )
 
@@ -259,8 +221,9 @@ load(
 
 nodejs_gapic_library(
     name = "reservation_nodejs_gapic",
-    src = ":reservation_proto_with_info",
     package_name = "@google-cloud/bigquery-reservation",
+    src = ":reservation_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "bigqueryreservation_grpc_service_config.json",
     package = "google.cloud.bigquery.reservation.v1",
     service_yaml = "bigqueryreservation_v1.yaml",
@@ -281,7 +244,7 @@ nodejs_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_gapic_assembly_pkg",
-    "ruby_gapic_library",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -297,12 +260,19 @@ ruby_grpc_library(
     deps = [":reservation_ruby_proto"],
 )
 
-ruby_gapic_library(
+ruby_cloud_gapic_library(
     name = "reservation_ruby_gapic",
-    src = ":reservation_proto_with_info",
-    gapic_yaml = "bigqueryreservation_gapic.yaml",
-    package = "google.cloud.bigquery.reservation.v1",
-    service_yaml = "bigqueryreservation_v1.yaml",
+    srcs = [":reservation_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-bigquery-reservation-v1",
+        "ruby-cloud-env-prefix=BIGQUERY_RESERVATION",
+        "ruby-cloud-product-url=https://cloud.google.com/bigquery/docs/reference/reservations",
+        "ruby-cloud-api-id=bigqueryreservation.googleapis.com",
+        "ruby-cloud-api-shortname=bigqueryreservation",
+    ],
+    grpc_service_config = "bigqueryreservation_grpc_service_config.json",
+    ruby_cloud_description = "The BigQuery Reservation API provides the mechanisms by which enterprise users can provision and manage dedicated resources such as slots and BigQuery BI Engine memory allocations.",
+    ruby_cloud_title = "BigQuery Reservation V1",
     deps = [
         ":reservation_ruby_grpc",
         ":reservation_ruby_proto",
@@ -344,8 +314,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "reservation_csharp_gapic",
     srcs = [":reservation_proto_with_info"],
-    grpc_service_config = "bigqueryreservation_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "bigqueryreservation_grpc_service_config.json",
     deps = [
         ":reservation_csharp_grpc",
         ":reservation_csharp_proto",

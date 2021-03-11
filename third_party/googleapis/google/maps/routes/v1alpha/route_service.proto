@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ option php_namespace = "Google\\Maps\\Routes\\V1alpha";
 // The Routes Preferred API.
 service RoutesAlpha {
   option (google.api.default_host) = "routespreferred.googleapis.com";
+  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/maps-platform.routespreferred";
 
   // Returns the primary route along with optional alternate routes, given a set
   // of terminal and intermediate waypoints.
@@ -93,13 +94,14 @@ service RoutesAlpha {
   //
   // * Field mask of all available fields (for manual inspection):
   //   `X-Goog-FieldMask: *`
-  // * Field mask of route durations, distances, element status, and element
-  //   indices (an example production setup):
+  // * Field mask of route durations, distances, element status, condition, and
+  //   element indices (an example production setup):
   //   `X-Goog-FieldMask:
-  //   originIndex,destinationIndex,status,distanceMeters,duration`
+  //   originIndex,destinationIndex,status,condition,distanceMeters,duration`
   //
-  // Google discourages the use of the wildcard (`*`) response field mask,
-  // because:
+  // It is critical that you include `status` in your field mask as otherwise
+  // all messages will appear to be OK. Google discourages the use of the
+  // wildcard (`*`) response field mask, because:
   //
   // * Selecting only the fields that you need helps our server save computation
   // cycles, allowing us to return the result to you with a lower latency.

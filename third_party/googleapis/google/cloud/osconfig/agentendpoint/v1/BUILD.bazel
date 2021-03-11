@@ -22,13 +22,16 @@ proto_library(
     name = "agentendpoint_proto",
     srcs = [
         "agentendpoint.proto",
+        "config_common.proto",
         "inventory.proto",
+        "os_policy.proto",
         "patch_jobs.proto",
         "tasks.proto",
     ],
     deps = [
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
+        "//google/api:resource_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -66,11 +69,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "agentendpoint_java_gapic",
-    src = ":agentendpoint_proto_with_info",
+    srcs = [":agentendpoint_proto_with_info"],
     gapic_yaml = "osconfig_gapic.yaml",
     grpc_service_config = "agentendpoint_grpc_service_config.json",
-    package = "google.cloud.osconfig.agentendpoint.v1",
-    service_yaml = "osconfig_v1.yaml",
     test_deps = [
         ":agentendpoint_java_grpc",
     ],
@@ -152,46 +153,14 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "agentendpoint_moved_proto",
-    srcs = [":agentendpoint_proto"],
-    deps = [
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "@com_google_protobuf//:timestamp_proto",
-    ],
-)
-
-py_proto_library(
-    name = "agentendpoint_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":agentendpoint_moved_proto"],
-)
-
-py_grpc_library(
-    name = "agentendpoint_py_grpc",
-    srcs = [":agentendpoint_moved_proto"],
-    deps = [":agentendpoint_py_proto"],
 )
 
 py_gapic_library(
     name = "agentendpoint_py_gapic",
-    src = ":agentendpoint_proto_with_info",
-    gapic_yaml = "osconfig_gapic.yaml",
+    srcs = [":agentendpoint_proto"],
     grpc_service_config = "agentendpoint_grpc_service_config.json",
-    package = "google.cloud.osconfig.agentendpoint.v1",
-    service_yaml = "osconfig_v1.yaml",
-    deps = [
-        ":agentendpoint_py_grpc",
-        ":agentendpoint_py_proto",
-    ],
 )
 
 # Open Source Packages
@@ -199,8 +168,6 @@ py_gapic_assembly_pkg(
     name = "osconfig-agentendpoint-v1-py",
     deps = [
         ":agentendpoint_py_gapic",
-        ":agentendpoint_py_grpc",
-        ":agentendpoint_py_proto",
     ],
 )
 
@@ -261,6 +228,7 @@ load(
 nodejs_gapic_library(
     name = "agentendpoint_nodejs_gapic",
     src = ":agentendpoint_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "agentendpoint_grpc_service_config.json",
     package = "google.cloud.osconfig.agentendpoint.v1",
     service_yaml = "osconfig_v1.yaml",
@@ -345,8 +313,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "agentendpoint_csharp_gapic",
     srcs = [":agentendpoint_proto_with_info"],
-    grpc_service_config = "agentendpoint_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "agentendpoint_grpc_service_config.json",
     deps = [
         ":agentendpoint_csharp_grpc",
         ":agentendpoint_csharp_proto",

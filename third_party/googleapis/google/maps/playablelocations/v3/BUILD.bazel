@@ -64,10 +64,8 @@ java_grpc_library(
 
 java_gapic_library(
     name = "playablelocations_java_gapic",
-    src = ":playablelocations_proto_with_info",
-    gapic_yaml = "playablelocations_gapic.yaml",
-    package = "google.maps.playablelocations.v3",
-    service_yaml = "playablelocations_v3.yaml",
+    srcs = [":playablelocations_proto_with_info"],
+    grpc_service_config = "playablelocations_grpc_service_config.json",
     test_deps = [
         ":playablelocations_java_grpc",
     ],
@@ -204,6 +202,7 @@ load(
 nodejs_gapic_library(
     name = "playablelocations_nodejs_gapic",
     src = ":playablelocations_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "playablelocations_grpc_service_config.json",
     package = "google.maps.playablelocations.v3",
     service_yaml = "playablelocations_v3.yaml",
@@ -287,8 +286,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "playablelocations_csharp_gapic",
     srcs = [":playablelocations_proto_with_info"],
-    grpc_service_config = "playablelocations_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "playablelocations_grpc_service_config.json",
     deps = [
         ":playablelocations_csharp_grpc",
         ":playablelocations_csharp_proto",

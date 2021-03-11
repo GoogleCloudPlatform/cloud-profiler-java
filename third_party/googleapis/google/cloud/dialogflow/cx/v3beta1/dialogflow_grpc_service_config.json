@@ -6,6 +6,9 @@
           "service": "google.cloud.dialogflow.cx.v3beta1.Agents"
         },
         {
+          "service": "google.cloud.dialogflow.cx.v3beta1.Changelogs"
+        },
+        {
           "service": "google.cloud.dialogflow.cx.v3beta1.EntityTypes"
         },
         {
@@ -36,6 +39,9 @@
           "service": "google.cloud.dialogflow.cx.v3beta1.SessionEntityTypes"
         },
         {
+          "service": "google.cloud.dialogflow.cx.v3beta1.TestCases"
+        },
+        {
           "service": "google.cloud.dialogflow.cx.v3beta1.TransitionRouteGroups"
         },
         {
@@ -43,6 +49,12 @@
         },
         {
           "service": "google.cloud.dialogflow.cx.v3beta1.Webhooks"
+        },
+        {
+          "service": "google.cloud.dialogflow.cx.v3beta1.Documents"
+        },
+        {
+          "service": "google.cloud.dialogflow.cx.v3beta1.KnowledgeBases"
         }
       ],
       "timeout": "60s",
