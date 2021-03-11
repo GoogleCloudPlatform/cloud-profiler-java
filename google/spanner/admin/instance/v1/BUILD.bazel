@@ -61,11 +61,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "instance_java_gapic",
-    src = ":instance_proto_with_info",
+    srcs = [":instance_proto_with_info"],
     gapic_yaml = "spanner_admin_instance_gapic.yaml",
     grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
-    package = "google.spanner.admin.instance.v1",
-    service_yaml = "spanner_admin_instance.yaml",
     test_deps = [
         ":instance_java_grpc",
         "//google/iam/v1:iam_java_grpc",
@@ -127,9 +125,9 @@ go_gapic_library(
     deps = [
         ":instance_go_proto",
         "//google/iam/v1:iam_go_proto",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
+        "@com_google_cloud_go//longrunning/autogen:go_default_library",
     ],
 )
 
@@ -155,62 +153,24 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "instance_moved_proto",
-    srcs = [":instance_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "//google/api:resource_proto",
-        "//google/iam/v1:iam_policy_proto",
-        "//google/iam/v1:policy_proto",
-        "//google/longrunning:operations_proto",
-        "@com_google_protobuf//:empty_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:timestamp_proto",
-    ],
-)
-
-py_proto_library(
-    name = "instance_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":instance_moved_proto"],
-)
-
-py_grpc_library(
-    name = "instance_py_grpc",
-    srcs = [":instance_moved_proto"],
-    deps = [":instance_py_proto"],
 )
 
 py_gapic_library(
     name = "instance_py_gapic",
-    src = ":instance_proto_with_info",
-    gapic_yaml = "spanner_admin_instance_gapic.yaml",
+    srcs = [":instance_proto"],
     grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
-    package = "google.spanner.admin.instance.v1",
-    service_yaml = "spanner_admin_instance.yaml",
-    deps = [
-        ":instance_py_grpc",
-        ":instance_py_proto",
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "python-gapic-name=spanner_admin_instance",
     ],
 )
 
-# Open Source Packages
 py_gapic_assembly_pkg(
     name = "admin-instance-v1-py",
     deps = [
         ":instance_py_gapic",
-        ":instance_py_grpc",
-        ":instance_py_proto",
     ],
 )
 
@@ -271,6 +231,7 @@ load(
 nodejs_gapic_library(
     name = "instance_nodejs_gapic",
     src = ":instance_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
     package = "google.spanner.admin.instance.v1",
     service_yaml = "spanner_admin_instance.yaml",
@@ -291,7 +252,7 @@ nodejs_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_gapic_assembly_pkg",
-    "ruby_gapic_library",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -307,12 +268,19 @@ ruby_grpc_library(
     deps = [":instance_ruby_proto"],
 )
 
-ruby_gapic_library(
+ruby_cloud_gapic_library(
     name = "instance_ruby_gapic",
-    src = ":instance_proto_with_info",
-    gapic_yaml = "spanner_admin_instance_gapic.yaml",
-    package = "google.spanner.admin.instance.v1",
-    service_yaml = "spanner_admin_instance.yaml",
+    srcs = [":instance_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-spanner-admin-instance-v1",
+        "ruby-cloud-env-prefix=SPANNER",
+        "ruby-cloud-product-url=https://cloud.google.com/spanner",
+        "ruby-cloud-api-id=spanner.googleapis.com",
+        "ruby-cloud-api-shortname=spanner",
+    ],
+    grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
+    ruby_cloud_description = "Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.",
+    ruby_cloud_title = "Cloud Spanner Instance Admin V1",
     deps = [
         ":instance_ruby_grpc",
         ":instance_ruby_proto",
@@ -354,8 +322,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "instance_csharp_gapic",
     srcs = [":instance_proto_with_info"],
-    grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "spanner_admin_instance_grpc_service_config.json",
     deps = [
         ":instance_csharp_grpc",
         ":instance_csharp_proto",
@@ -378,7 +346,8 @@ csharp_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "cc_grpc_library",
-    "cc_proto_library")
+    "cc_proto_library",
+)
 
 cc_proto_library(
     name = "instance_cc_proto",

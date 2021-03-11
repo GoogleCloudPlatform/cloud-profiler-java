@@ -18,6 +18,7 @@ package google.cloud.aiplatform.v1beta1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/cloud/aiplatform/v1beta1/explanation.proto";
 import "google/cloud/aiplatform/v1beta1/machine_resources.proto";
 import "google/protobuf/timestamp.proto";
@@ -80,6 +81,11 @@ message Endpoint {
 
   // Output only. Timestamp when this Endpoint was last updated.
   google.protobuf.Timestamp update_time = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Customer-managed encryption key spec for an Endpoint. If set, this
+  // Endpoint and all sub-resources of this Endpoint will be secured by
+  // this key.
+  EncryptionSpec encryption_spec = 10;
 }
 
 // A deployment of a Model. Endpoints contain one or more DeployedModels.
@@ -127,14 +133,21 @@ message DeployedModel {
   // [Model.explanation_spec][google.cloud.aiplatform.v1beta1.Model.explanation_spec] is inherited. The corresponding
   // [Model.explanation_spec][google.cloud.aiplatform.v1beta1.Model.explanation_spec] must be populated, otherwise explanation for
   // this Model is not allowed.
-  //
-  // Currently, only AutoML tabular Models support explanation_spec.
   ExplanationSpec explanation_spec = 9;
+
+  // The service account that the DeployedModel's container runs as. Specify the
+  // email address of the service account. If this service account is not
+  // specified, the container runs as a service account that doesn't have access
+  // to the resource project.
+  //
+  // Users deploying the Model must have the `iam.serviceAccounts.actAs`
+  // permission on this service account.
+  string service_account = 11;
 
   // If true, the container of the DeployedModel instances will send `stderr`
   // and `stdout` streams to Stackdriver Logging.
   //
-  // Only supported for custom-trained Models and AutoML Tables Models.
+  // Only supported for custom-trained Models and AutoML Tabular Models.
   bool enable_container_logging = 12;
 
   // These logs are like standard server access logs, containing

@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,13 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 option cc_enable_arenas = true;
+option csharp_namespace = "Google.Cloud.PubSubLite.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/pubsublite/v1;pubsublite";
 option java_multiple_files = true;
 option java_outer_classname = "CommonProto";
 option java_package = "com.google.cloud.pubsublite.proto";
+option php_namespace = "Google\\Cloud\\PubSubLite\\V1";
+option ruby_package = "Google::Cloud::PubSubLite::V1";
 
 // The values associated with a key of an attribute.
 message AttributeValues {
@@ -93,6 +96,11 @@ message Topic {
     }
 
     // The number of partitions in the topic. Must be at least 1.
+    //
+    // Once a topic has been created the number of partitions can be increased
+    // but not decreased. Message ordering is not guaranteed across a topic
+    // resize. For more information see
+    // https://cloud.google.com/pubsub/lite/docs/topics#scaling_capacity
     int64 count = 1;
 
     // The throughput dimension of this topic.

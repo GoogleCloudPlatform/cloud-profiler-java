@@ -64,11 +64,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "servicemanagement_java_gapic",
-    src = ":servicemanagement_proto_with_info",
+    srcs = [":servicemanagement_proto_with_info"],
     gapic_yaml = "servicemanagement_gapic.yaml",
     grpc_service_config = "servicemanagement_grpc_service_config.json",
-    package = "google.api.servicemanagement.v1",
-    service_yaml = "servicemanagement_v1.yaml",
     test_deps = [
         ":servicemanagement_java_grpc",
     ],
@@ -132,9 +130,9 @@ go_gapic_library(
     deps = [
         ":servicemanagement_go_proto",
         "//google/api:serviceconfig_go_proto",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
+        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:any_go_proto",
     ],
 )
@@ -161,55 +159,14 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "servicemanagement_moved_proto",
-    srcs = [":servicemanagement_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:config_change_proto",
-        "//google/api:field_behavior_proto",
-        "//google/api:metric_proto",
-        "//google/api:quota_proto",
-        "//google/api:service_proto",
-        "//google/longrunning:operations_proto",
-        "//google/rpc:status_proto",
-        "@com_google_protobuf//:any_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:timestamp_proto",
-    ],
-)
-
-py_proto_library(
-    name = "servicemanagement_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":servicemanagement_moved_proto"],
-)
-
-py_grpc_library(
-    name = "servicemanagement_py_grpc",
-    srcs = [":servicemanagement_moved_proto"],
-    deps = [":servicemanagement_py_proto"],
 )
 
 py_gapic_library(
     name = "servicemanagement_py_gapic",
-    src = ":servicemanagement_proto_with_info",
-    gapic_yaml = "servicemanagement_gapic.yaml",
+    srcs = [":servicemanagement_proto"],
     grpc_service_config = "servicemanagement_grpc_service_config.json",
-    package = "google.api.servicemanagement.v1",
-    service_yaml = "servicemanagement_v1.yaml",
-    deps = [
-        ":servicemanagement_py_grpc",
-        ":servicemanagement_py_proto",
-    ],
 )
 
 # Open Source Packages
@@ -217,8 +174,6 @@ py_gapic_assembly_pkg(
     name = "api-servicemanagement-v1-py",
     deps = [
         ":servicemanagement_py_gapic",
-        ":servicemanagement_py_grpc",
-        ":servicemanagement_py_proto",
     ],
 )
 
@@ -279,6 +234,7 @@ load(
 nodejs_gapic_library(
     name = "servicemanagement_nodejs_gapic",
     src = ":servicemanagement_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "servicemanagement_grpc_service_config.json",
     package = "google.api.servicemanagement.v1",
     service_yaml = "servicemanagement_v1.yaml",
@@ -299,7 +255,7 @@ nodejs_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_gapic_assembly_pkg",
-    "ruby_gapic_library",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -315,12 +271,18 @@ ruby_grpc_library(
     deps = [":servicemanagement_ruby_proto"],
 )
 
-ruby_gapic_library(
+ruby_cloud_gapic_library(
     name = "servicemanagement_ruby_gapic",
-    src = ":servicemanagement_proto_with_info",
-    gapic_yaml = "servicemanagement_gapic.yaml",
-    package = "google.api.servicemanagement.v1",
-    service_yaml = "servicemanagement_v1.yaml",
+    srcs = [":servicemanagement_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-service_management-v1",
+        "ruby-cloud-env-prefix=SERVICE_MANAGEMENT",
+        "ruby-cloud-product-url=https://cloud.google.com/service-infrastructure/docs/overview/",
+        "ruby-cloud-api-id=servicemanagement.googleapis.com",
+        "ruby-cloud-api-shortname=servicemanagement",
+    ],
+    ruby_cloud_description = "Google Service Management allows service producers to publish their services on Google Cloud Platform so that they can be discovered and used by service consumers.",
+    ruby_cloud_title = "Service Management API V1",
     deps = [
         ":servicemanagement_ruby_grpc",
         ":servicemanagement_ruby_proto",
@@ -362,8 +324,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "servicemanagement_csharp_gapic",
     srcs = [":servicemanagement_proto_with_info"],
-    grpc_service_config = "servicemanagement_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "servicemanagement_grpc_service_config.json",
     deps = [
         ":servicemanagement_csharp_grpc",
         ":servicemanagement_csharp_proto",

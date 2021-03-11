@@ -19,10 +19,12 @@ package google.cloud.aiplatform.v1beta1;
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1beta1/accelerator_type.proto";
+import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/cloud/aiplatform/v1beta1/job_state.proto";
 import "google/cloud/aiplatform/v1beta1/specialist_pool.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
 import "google/type/money.proto";
 import "google/api/annotations.proto";
 
@@ -104,6 +106,10 @@ message DataLabelingJob {
   // Output only. Timestamp when this DataLabelingJob was updated most recently.
   google.protobuf.Timestamp update_time = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Output only. DataLabelingJob errors. It is only populated when job's state is
+  // `JOB_STATE_FAILED` or `JOB_STATE_CANCELLED`.
+  google.rpc.Status error = 22 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // The labels with user-defined metadata to organize your DataLabelingJobs.
   //
   // Label keys and values can be no longer than 64 characters
@@ -121,13 +127,20 @@ message DataLabelingJob {
   // The SpecialistPools' resource names associated with this job.
   repeated string specialist_pools = 16;
 
-  // Paramaters that configure active learning pipeline. Active learning will
+  // Customer-managed encryption key spec for a DataLabelingJob. If set, this
+  // DataLabelingJob will be secured by this key.
+  //
+  // Note: Annotations created in the DataLabelingJob are associated with
+  // the EncryptionSpec of the Dataset they are exported to.
+  EncryptionSpec encryption_spec = 20;
+
+  // Parameters that configure active learning pipeline. Active learning will
   // label the data incrementally via several iterations. For every iteration,
   // it will select a batch of data based on the sampling strategy.
   ActiveLearningConfig active_learning_config = 21;
 }
 
-// Paramaters that configure active learning pipeline. Active learning will
+// Parameters that configure active learning pipeline. Active learning will
 //  label the data incrementally by several iterations. For every iteration, it
 //  will select a batch of data based on the sampling strategy.
 message ActiveLearningConfig {

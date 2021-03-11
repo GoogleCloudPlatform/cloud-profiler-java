@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,6 +57,10 @@ service Sessions {
   // as a result. This method is not idempotent, because it may cause contexts
   // and session entity types to be updated, which in turn might affect
   // results of future queries.
+  //
+  // Note: Always use agent versions for production traffic.
+  // See [Versions and
+  // environments](https://cloud.google.com/dialogflow/es/docs/agents-versions).
   rpc DetectIntent(DetectIntentRequest) returns (DetectIntentResponse) {
     option (google.api.http) = {
       post: "/v2/{session=projects/*/agent/sessions/*}:detectIntent"
@@ -72,6 +76,10 @@ service Sessions {
   // Processes a natural language query in audio format in a streaming fashion
   // and returns structured, actionable data as a result. This method is only
   // available via the gRPC API (not REST).
+  //
+  // Note: Always use agent versions for production traffic.
+  // See [Versions and
+  // environments](https://cloud.google.com/dialogflow/es/docs/agents-versions).
   rpc StreamingDetectIntent(stream StreamingDetectIntentRequest) returns (stream StreamingDetectIntentResponse) {
   }
 }
@@ -82,14 +90,19 @@ message DetectIntentRequest {
   // `projects/<Project ID>/agent/sessions/<Session ID>`, or
   // `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
   // ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
-  // default 'draft' environment. If `User ID` is not specified, we are using
-  // "-". It's up to the API caller to choose an appropriate `Session ID` and
-  // `User Id`. They can be a random number or some type of user and session
+  // default 'draft' environment (`Environment ID` might be referred to as
+  // environment name at some places). If `User ID` is not specified, we are
+  // using "-". It's up to the API caller to choose an appropriate `Session ID`
+  // and `User Id`. They can be a random number or some type of user and session
   // identifiers (preferably hashed). The length of the `Session ID` and
   // `User ID` must not exceed 36 characters.
   //
   // For more information, see the [API interactions
   // guide](https://cloud.google.com/dialogflow/docs/api-overview).
+  //
+  // Note: Always use agent versions for production traffic.
+  // See [Versions and
+  // environments](https://cloud.google.com/dialogflow/es/docs/agents-versions).
   string session = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -192,6 +205,17 @@ message QueryParameters {
   // Configures the type of sentiment analysis to perform. If not
   // provided, sentiment analysis is not performed.
   SentimentAnalysisRequestConfig sentiment_analysis_request_config = 10;
+
+  // This field can be used to pass HTTP headers for a webhook
+  // call. These headers will be sent to webhook along with the headers that
+  // have been configured through the Dialogflow web console. The headers
+  // defined within this field will overwrite the headers configured through the
+  // Dialogflow console if there is a conflict. Header names are
+  // case-insensitive. Google's specified headers are not allowed. Including:
+  // "Host", "Content-Length", "Connection", "From", "User-Agent",
+  // "Accept-Encoding", "If-Modified-Since", "If-None-Match", "X-Forwarded-For",
+  // etc.
+  map<string, string> webhook_headers = 14;
 }
 
 // Represents the query input. It can contain either:
@@ -259,7 +283,8 @@ message QueryResult {
   // -   MapKey value: parameter name
   // -   MapValue type:
   //     -   If parameter's entity type is a composite entity: map
-  //     -   Else: string or number, depending on parameter value type
+  //     -   Else: depending on parameter value type, could be one of string,
+  //         number, boolean, null, list or map
   // -   MapValue value:
   //     -   If parameter's entity type is a composite entity:
   //         map from composite entity property names to property values
@@ -368,6 +393,10 @@ message StreamingDetectIntentRequest {
   //
   // For more information, see the [API interactions
   // guide](https://cloud.google.com/dialogflow/docs/api-overview).
+  //
+  // Note: Always use agent versions for production traffic.
+  // See [Versions and
+  // environments](https://cloud.google.com/dialogflow/es/docs/agents-versions).
   string session = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -575,7 +604,8 @@ message EventInput {
   // -   MapKey value: parameter name
   // -   MapValue type:
   //     -   If parameter's entity type is a composite entity: map
-  //     -   Else: string or number, depending on parameter value type
+  //     -   Else: depending on parameter value type, could be one of string,
+  //         number, boolean, null, list or map
   // -   MapValue value:
   //     -   If parameter's entity type is a composite entity:
   //         map from composite entity property names to property values

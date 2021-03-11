@@ -28,7 +28,6 @@ load(
     "java_gapic_test",
     "java_grpc_library",
     "java_proto_library",
-    "moved_proto_library",
     "nodejs_gapic_assembly_pkg",
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
@@ -38,8 +37,6 @@ load(
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
     "ruby_gapic_assembly_pkg",
     "ruby_gapic_library",
     "ruby_grpc_library",
@@ -55,7 +52,6 @@ proto_library(
         "catalog.proto",
         "catalog_service.proto",
         "common.proto",
-        "export_config.proto",
         "import_config.proto",
         "prediction_service.proto",
         "product.proto",
@@ -102,11 +98,8 @@ java_grpc_library(
 
 java_gapic_library(
     name = "retail_java_gapic",
-    src = ":retail_proto_with_info",
-    gapic_yaml = "retail_gapic.yaml",
+    srcs = [":retail_proto_with_info"],
     grpc_service_config = "retail_grpc_service_config.json",
-    package = "google.cloud.retail.v2beta",
-    service_yaml = "retail_v2beta.yaml",
     test_deps = [
         ":retail_java_grpc",
     ],
@@ -160,9 +153,9 @@ go_gapic_library(
     deps = [
         ":retail_go_proto",
         "//google/api:httpbody_go_proto",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
+        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
         "@io_bazel_rules_go//proto/wkt:struct_go_proto",
     ],
@@ -185,49 +178,10 @@ go_gapic_assembly_pkg(
     ],
 )
 
-moved_proto_library(
-    name = "retail_moved_proto",
-    srcs = [":retail_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "//google/api:httpbody_proto",
-        "//google/api:resource_proto",
-        "//google/longrunning:operations_proto",
-        "//google/rpc:status_proto",
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:empty_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:struct_proto",
-        "@com_google_protobuf//:timestamp_proto",
-        "@com_google_protobuf//:wrappers_proto",
-    ],
-)
-
-py_proto_library(
-    name = "retail_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":retail_moved_proto"],
-)
-
-py_grpc_library(
-    name = "retail_py_grpc",
-    srcs = [":retail_moved_proto"],
-    deps = [":retail_py_proto"],
-)
-
 py_gapic_library(
     name = "retail_py_gapic",
-    src = ":retail_proto_with_info",
-    gapic_yaml = "retail_gapic.yaml",
+    srcs = [":retail_proto"],
     grpc_service_config = "retail_grpc_service_config.json",
-    package = "google.cloud.retail.v2beta",
-    service_yaml = "retail_v2beta.yaml",
-    deps = [
-        ":retail_py_grpc",
-        ":retail_py_proto",
-    ],
 )
 
 # Open Source Packages
@@ -235,8 +189,6 @@ py_gapic_assembly_pkg(
     name = "retail-v2beta-py",
     deps = [
         ":retail_py_gapic",
-        ":retail_py_grpc",
-        ":retail_py_proto",
     ],
 )
 
@@ -277,8 +229,10 @@ php_gapic_assembly_pkg(
 nodejs_gapic_library(
     name = "retail_nodejs_gapic",
     src = ":retail_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "retail_grpc_service_config.json",
     package = "google.cloud.retail.v2beta",
+    package_name = "@google-cloud/retail",
     service_yaml = "retail_v2beta.yaml",
     deps = [],
 )

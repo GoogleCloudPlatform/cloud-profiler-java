@@ -18,6 +18,7 @@ package google.cloud.aiplatform.v1beta1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/cloud/aiplatform/v1beta1/io.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -78,6 +79,10 @@ message Dataset {
   // * "aiplatform.googleapis.com/dataset_metadata_schema": output only, its
   //   value is the [metadata_schema's][google.cloud.aiplatform.v1beta1.Dataset.metadata_schema_uri] title.
   map<string, string> labels = 7;
+
+  // Customer-managed encryption key spec for a Dataset. If set, this Dataset
+  // and all sub-resources of this Dataset will be secured by this key.
+  EncryptionSpec encryption_spec = 11;
 }
 
 // Describes the location from where we import data into a Dataset, together
@@ -116,7 +121,7 @@ message ExportDataConfig {
     // The Google Cloud Storage location where the output is to be written to.
     // In the given directory a new directory will be created with name:
     // `export-data-<dataset-display-name>-<timestamp-of-export-call>` where
-    // timestamp is in YYYYMMDDHHMMSS format. All export
+    // timestamp is in YYYY-MM-DDThh:mm:ss.sssZ ISO-8601 format. All export
     // output will be written into that directory. Inside that directory,
     // annotations with the same schema will be grouped into sub directories
     // which are named with the corresponding annotations' schema title. Inside

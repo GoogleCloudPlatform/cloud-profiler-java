@@ -58,11 +58,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "videointelligence_java_gapic",
-    src = ":videointelligence_proto_with_info",
+    srcs = [":videointelligence_proto_with_info"],
     gapic_yaml = "videointelligence_gapic.yaml",
     grpc_service_config = "videointelligence_grpc_service_config.json",
-    package = "google.cloud.videointelligence.v1p2beta1",
-    service_yaml = "//google/cloud/videointelligence:videointelligence_v1p2beta1.yaml",
     test_deps = [
         ":videointelligence_java_grpc",
     ],
@@ -121,9 +119,9 @@ go_gapic_library(
     service_yaml = "//google/cloud/videointelligence:videointelligence_v1p2beta1.yaml",
     deps = [
         ":videointelligence_go_proto",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
+        "@com_google_cloud_go//longrunning/autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
 )
@@ -150,59 +148,20 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "videointelligence_moved_proto",
-    srcs = [":videointelligence_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "//google/longrunning:operations_proto",
-        "//google/rpc:status_proto",
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:timestamp_proto",
-    ],
-)
-
-py_proto_library(
-    name = "videointelligence_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":videointelligence_moved_proto"],
-)
-
-py_grpc_library(
-    name = "videointelligence_py_grpc",
-    srcs = [":videointelligence_moved_proto"],
-    deps = [":videointelligence_py_proto"],
 )
 
 py_gapic_library(
     name = "videointelligence_py_gapic",
-    src = ":videointelligence_proto_with_info",
-    gapic_yaml = "videointelligence_gapic.yaml",
+    srcs = [":videointelligence_proto"],
     grpc_service_config = "videointelligence_grpc_service_config.json",
-    package = "google.cloud.videointelligence.v1p2beta1",
-    service_yaml = "//google/cloud/videointelligence:videointelligence_v1p2beta1.yaml",
-    deps = [
-        ":videointelligence_py_grpc",
-        ":videointelligence_py_proto",
-    ],
 )
 
-# Open Source Packages
 py_gapic_assembly_pkg(
     name = "videointelligence-v1p2beta1-py",
     deps = [
         ":videointelligence_py_gapic",
-        ":videointelligence_py_grpc",
-        ":videointelligence_py_proto",
     ],
 )
 
@@ -264,6 +223,7 @@ nodejs_gapic_library(
     name = "videointelligence_nodejs_gapic",
     package_name = "@google-cloud/video-intelligence",
     src = ":videointelligence_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "videointelligence_grpc_service_config.json",
     main_service = "videointelligence",
     package = "google.cloud.videointelligence.v1p2beta1",
@@ -285,7 +245,7 @@ nodejs_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_gapic_assembly_pkg",
-    "ruby_gapic_library",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -301,12 +261,19 @@ ruby_grpc_library(
     deps = [":videointelligence_ruby_proto"],
 )
 
-ruby_gapic_library(
+ruby_cloud_gapic_library(
     name = "videointelligence_ruby_gapic",
-    src = ":videointelligence_proto_with_info",
-    gapic_yaml = "videointelligence_gapic.yaml",
-    package = "google.cloud.videointelligence.v1p2beta1",
-    service_yaml = "//google/cloud/videointelligence:videointelligence_v1p2beta1.yaml",
+    srcs = [":videointelligence_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-video_intelligence-v1p2beta1",
+        "ruby-cloud-env-prefix=VIDEO_INTELLIGENCE",
+        "ruby-cloud-product-url=https://cloud.google.com/video-intelligence",
+        "ruby-cloud-api-id=videointelligence.googleapis.com",
+        "ruby-cloud-api-shortname=videointelligence",
+    ],
+    grpc_service_config = "videointelligence_grpc_service_config.json",
+    ruby_cloud_description = "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
+    ruby_cloud_title = "Cloud Video Intelligence V1p2beta1",
     deps = [
         ":videointelligence_ruby_grpc",
         ":videointelligence_ruby_proto",
@@ -348,8 +315,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "videointelligence_csharp_gapic",
     srcs = [":videointelligence_proto_with_info"],
-    grpc_service_config = "videointelligence_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "videointelligence_grpc_service_config.json",
     deps = [
         ":videointelligence_csharp_grpc",
         ":videointelligence_csharp_proto",

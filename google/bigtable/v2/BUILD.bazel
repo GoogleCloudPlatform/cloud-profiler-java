@@ -58,10 +58,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "bigtable_java_gapic",
-    src = ":bigtable_proto_with_info",
+    srcs = [":bigtable_proto_with_info"],
     gapic_yaml = "bigtable_gapic.yaml",
-    package = "google.bigtable.v2",
-    service_yaml = "bigtable_v2.yaml",
+    grpc_service_config = "bigtable_grpc_service_config.json",
     test_deps = [
         ":bigtable_java_grpc",
     ],
@@ -144,57 +143,21 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "moved_proto_library",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
-    "py_grpc_library",
-    "py_proto_library",
-)
-
-moved_proto_library(
-    name = "bigtable_moved_proto",
-    srcs = [":bigtable_proto"],
-    deps = [
-        "//google/api:annotations_proto",
-        "//google/api:client_proto",
-        "//google/api:field_behavior_proto",
-        "//google/api:resource_proto",
-        "//google/rpc:status_proto",
-        "@com_google_protobuf//:wrappers_proto",
-    ],
-)
-
-py_proto_library(
-    name = "bigtable_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
-    deps = [":bigtable_moved_proto"],
-)
-
-py_grpc_library(
-    name = "bigtable_py_grpc",
-    srcs = [":bigtable_moved_proto"],
-    deps = [":bigtable_py_proto"],
 )
 
 py_gapic_library(
     name = "bigtable_py_gapic",
-    src = ":bigtable_proto_with_info",
-    gapic_yaml = "bigtable_gapic.yaml",
-    package = "google.bigtable.v2",
-    service_yaml = "bigtable_v2.yaml",
-    deps = [
-        ":bigtable_py_grpc",
-        ":bigtable_py_proto",
-    ],
+    srcs = [":bigtable_proto"],
+    grpc_service_config = "bigtable_grpc_service_config.json",
+    opt_args = ["python-gapic-namespace=google.cloud"],
 )
 
-# Open Source Packages
 py_gapic_assembly_pkg(
     name = "bigtable-v2-py",
     deps = [
         ":bigtable_py_gapic",
-        ":bigtable_py_grpc",
-        ":bigtable_py_proto",
     ],
 )
 
@@ -255,6 +218,7 @@ nodejs_gapic_library(
     name = "bigtable_nodejs_gapic",
     package_name = "@google-cloud/bigtable",
     src = ":bigtable_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "bigtable_grpc_service_config.json",
     main_service = "bigtable",
     package = "google.bigtable.v2",
@@ -276,7 +240,7 @@ nodejs_gapic_assembly_pkg(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_gapic_assembly_pkg",
-    "ruby_gapic_library",
+    "ruby_cloud_gapic_library",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -292,12 +256,19 @@ ruby_grpc_library(
     deps = [":bigtable_ruby_proto"],
 )
 
-ruby_gapic_library(
+ruby_cloud_gapic_library(
     name = "bigtable_ruby_gapic",
-    src = ":bigtable_proto_with_info",
-    gapic_yaml = "bigtable_gapic.yaml",
-    package = "google.bigtable.v2",
-    service_yaml = "bigtable_v2.yaml",
+    srcs = [":bigtable_proto_with_info"],
+    extra_protoc_parameters = [
+        "ruby-cloud-gem-name=google-cloud-bigtable-v2",
+        "ruby-cloud-env-prefix=BIGTABLE",
+        "ruby-cloud-product-url=https://cloud.google.com/bigtable",
+        "ruby-cloud-api-id=bigtable.googleapis.com",
+        "ruby-cloud-api-shortname=bigtable",
+    ],
+    grpc_service_config = "bigtable_grpc_service_config.json",
+    ruby_cloud_description = "Cloud Bigtable is a fully managed, scalable NoSQL database service for large analytical and operational workloads.",
+    ruby_cloud_title = "Cloud Bigtable V2",
     deps = [
         ":bigtable_ruby_grpc",
         ":bigtable_ruby_proto",
@@ -339,8 +310,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "bigtable_csharp_gapic",
     srcs = [":bigtable_proto_with_info"],
-    grpc_service_config = "bigtable_grpc_service_config.json",
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "bigtable_grpc_service_config.json",
     deps = [
         ":bigtable_csharp_grpc",
         ":bigtable_csharp_proto",
