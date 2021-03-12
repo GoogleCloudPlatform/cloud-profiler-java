@@ -11,7 +11,13 @@
           "method": "ReadModifyWriteRow"
         }
       ],
-      "timeout": "20s"
+      "timeout": "20s",
+      "retryPolicy": {
+        "initialBackoff": "0.010s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 2,
+        "retryableStatusCodes": []
+      }
     },
     {
       "name": [
@@ -20,7 +26,13 @@
           "method": "SampleRowKeys"
         }
       ],
-      "timeout": "60s"
+      "timeout": "60s",
+      "retryPolicy": {
+        "initialBackoff": "0.010s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 2,
+        "retryableStatusCodes": []
+      }
     },
     {
       "name": [
@@ -29,7 +41,13 @@
           "method": "MutateRows"
         }
       ],
-      "timeout": "600s"
+      "timeout": "600s",
+      "retryPolicy": {
+        "initialBackoff": "0.010s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 2,
+        "retryableStatusCodes": []
+      }
     },
     {
       "name": [
@@ -38,7 +56,13 @@
           "method": "ReadRows"
         }
       ],
-      "timeout": "43200s"
+      "timeout": "43200s",
+      "retryPolicy": {
+        "initialBackoff": "0.010s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 2,
+        "retryableStatusCodes": []
+      }
     },
     {
       "name": [

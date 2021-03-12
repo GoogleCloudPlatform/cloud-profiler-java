@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,9 +72,10 @@ message BudgetAmount {
   // Specification for what amount to use as the budget.
   oneof budget_amount {
     // A specified amount to use as the budget.
-    // `currency_code` is optional. If specified, it must match the
-    // currency of the billing account. The `currency_code` is provided on
-    // output.
+    // `currency_code` is optional. If specified when creating a budget, it must
+    // match the currency of the billing account. If specified when updating a
+    // budget, it must match the existing budget currency_code.
+    // The `currency_code` is provided on output.
     google.type.Money specified_amount = 1;
 
     // Use the last period's actual spend as the budget for the present period.
@@ -136,9 +137,12 @@ message AllUpdatesRule {
   // for more details on Pub/Sub roles and permissions.
   string pubsub_topic = 1 [(google.api.field_behavior) = OPTIONAL];
 
-  // Optional. The schema version of the notification sent to `pubsub_topic`.
+  // Optional. Required when
+  // [AllUpdatesRule.pubsub_topic][google.cloud.billing.budgets.v1beta1.AllUpdatesRule.pubsub_topic]
+  // is set. The schema version of the notification sent to
+  // [AllUpdatesRule.pubsub_topic][google.cloud.billing.budgets.v1beta1.AllUpdatesRule.pubsub_topic].
   // Only "1.0" is accepted. It represents the JSON schema as defined in
-  // https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format
+  // https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format.
   string schema_version = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. Targets to send notifications to when a threshold is exceeded.
@@ -153,8 +157,9 @@ message AllUpdatesRule {
       [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. When set to true, disables default notifications sent when a
-  // threshold is exceeded. Recipients are those with Billing Account
-  // Administrators and Billing Account Users IAM roles for the target account.
+  // threshold is exceeded. Default notifications are sent to those with Billing
+  // Account Administrator and Billing Account User IAM roles for the target
+  // account.
   bool disable_default_iam_recipients = 4
       [(google.api.field_behavior) = OPTIONAL];
 }
@@ -173,6 +178,10 @@ message Filter {
     // All types of credit are added to the net cost to determine the spend for
     // threshold calculations.
     EXCLUDE_ALL_CREDITS = 2;
+
+    // Credit types specified in the credit_types field are subtracted from the
+    // gross cost to determine the spend for threshold calculations.
+    INCLUDE_SPECIFIED_CREDITS = 3;
   }
 
   // Optional. A set of projects of the form `projects/{project}`,
@@ -181,6 +190,19 @@ message Filter {
   // the billing account, regardless of which project the usage occurred on.
   // Only zero or one project can be specified currently.
   repeated string projects = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. If
+  // [Filter.credit_types_treatment][google.cloud.billing.budgets.v1beta1.Filter.credit_types_treatment]
+  // is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be
+  // subtracted from gross cost to determine the spend for threshold
+  // calculations.
+  //
+  // If
+  // [Filter.credit_types_treatment][google.cloud.billing.budgets.v1beta1.Filter.credit_types_treatment]
+  // is **not** INCLUDE_SPECIFIED_CREDITS, this field must be empty. See [a list
+  // of acceptable credit type
+  // values](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type).
+  repeated string credit_types = 7 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. If not set, default behavior is `INCLUDE_ALL_CREDITS`.
   CreditTypesTreatment credit_types_treatment = 4

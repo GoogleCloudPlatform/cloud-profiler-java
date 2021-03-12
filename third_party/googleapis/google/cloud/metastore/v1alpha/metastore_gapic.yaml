@@ -4,15 +4,15 @@ language_settings:
   java:
     package_name: com.google.cloud.metastore.v1alpha
   python:
-    package_name: google.cloud.metastore_v1alph.gapic
+    package_name: google.cloud.metastore_v1alpha.gapic
   go:
     package_name: cloud.google.com/go/metastore/apiv1alpha
   csharp:
     package_name: Google.Cloud.Metastore.V1Alpha
   ruby:
-    package_name: Google::Cloud::Metastore::V1alpha
+    package_name: Google::Cloud::Metastore::V1Alpha
   php:
-    package_name: Google\Cloud\Metastore\V1alpha
+    package_name: Google\Cloud\Metastore\V1Alpha
   nodejs:
     package_name: metastore.v1alpha
     domain_layer_location: google-cloud

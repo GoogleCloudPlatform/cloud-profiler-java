@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/analytics/admin/v1alpha;admin";
 option java_multiple_files = true;
@@ -39,8 +40,6 @@ service AnalyticsAdminService {
       "https://www.googleapis.com/auth/analytics.readonly";
 
   // Lookup for a single Account.
-  // Throws "Target not found" if no such account found, or if caller does not
-  // have permissions to access it.
   rpc GetAccount(GetAccountRequest) returns (Account) {
     option (google.api.http) = {
       get: "/v1alpha/{name=accounts/*}"
@@ -102,9 +101,6 @@ service AnalyticsAdminService {
   }
 
   // Lookup for a single "GA4" Property.
-  //
-  // Throws "Target not found" if no such property found, if property is not
-  // of the type "GA4", or if caller does not have permissions to access it.
   rpc GetProperty(GetPropertyRequest) returns (Property) {
     option (google.api.http) = {
       get: "/v1alpha/{name=properties/*}"
@@ -293,9 +289,6 @@ service AnalyticsAdminService {
   }
 
   // Lookup for a single WebDataStream
-  //
-  // Throws "Target not found" if no such web data stream found, or if the
-  // caller does not have permissions to access it.
   rpc GetWebDataStream(GetWebDataStreamRequest) returns (WebDataStream) {
     option (google.api.http) = {
       get: "/v1alpha/{name=properties/*/webDataStreams/*}"
@@ -341,9 +334,6 @@ service AnalyticsAdminService {
   }
 
   // Lookup for a single IosAppDataStream
-  //
-  // Throws "Target not found" if no such iOS app data stream found, or if the
-  // caller does not have permissions to access it.
   rpc GetIosAppDataStream(GetIosAppDataStreamRequest) returns (IosAppDataStream) {
     option (google.api.http) = {
       get: "/v1alpha/{name=properties/*/iosAppDataStreams/*}"
@@ -368,7 +358,15 @@ service AnalyticsAdminService {
     option (google.api.method_signature) = "ios_app_data_stream,update_mask";
   }
 
-  // Creates an iOS app data stream with the specified location and attributes.
+  // Creates an iOS app stream with the specified location and attributes.
+  //
+  // Note that an iOS app stream must be linked to a Firebase app to receive
+  // traffic.
+  //
+  // To create a working app stream, make sure your property is linked to a
+  // Firebase project. Then, use the Firebase API to create a Firebase app,
+  // which will also create an appropriate data stream in Analytics (may take up
+  // to 24 hours).
   rpc CreateIosAppDataStream(CreateIosAppDataStreamRequest) returns (IosAppDataStream) {
     option (google.api.http) = {
       post: "/v1alpha/{parent=properties/*}/iosAppDataStreams"
@@ -389,9 +387,6 @@ service AnalyticsAdminService {
   }
 
   // Lookup for a single AndroidAppDataStream
-  //
-  // Throws "Target not found" if no such android app data stream found, or if
-  // the caller does not have permissions to access it.
   rpc GetAndroidAppDataStream(GetAndroidAppDataStreamRequest) returns (AndroidAppDataStream) {
     option (google.api.http) = {
       get: "/v1alpha/{name=properties/*/androidAppDataStreams/*}"
@@ -416,7 +411,15 @@ service AnalyticsAdminService {
     option (google.api.method_signature) = "android_app_data_stream,update_mask";
   }
 
-  // Creates an android app stream with the specified location and attributes.
+  // Creates an Android app stream with the specified location and attributes.
+  //
+  // Note that an Android app stream must be linked to a Firebase app to receive
+  // traffic.
+  //
+  // To create a working app stream, make sure your property is linked to a
+  // Firebase project. Then, use the Firebase API to create a Firebase app,
+  // which will also create an appropriate data stream in Analytics (may take up
+  // to 24 hours).
   rpc CreateAndroidAppDataStream(CreateAndroidAppDataStreamRequest) returns (AndroidAppDataStream) {
     option (google.api.http) = {
       post: "/v1alpha/{parent=properties/*}/androidAppDataStreams"
@@ -609,8 +612,10 @@ message UpdateAccountRequest {
   // The account's `name` field is used to identify the account.
   Account account = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for ProvisionAccountTicket RPC.
@@ -650,11 +655,13 @@ message ListPropertiesRequest {
   // `firebase_project:`(The id or number of the linked firebase project).
   // Some examples of filters:
   //
+  // ```
   // | Filter                      | Description                               |
   // |-----------------------------|-------------------------------------------|
   // | parent:accounts/123         | The account with account id: 123.         |
   // | firebase_project:project-id | The firebase project with id: project-id. |
   // | firebase_project:123        | The firebase project with number: 123.    |
+  // ```
   string filter = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The maximum number of resources to return. The service may return
@@ -692,8 +699,10 @@ message UpdatePropertyRequest {
   // updated.
   Property property = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for CreateProperty RPC.
@@ -841,8 +850,8 @@ message CreateUserLinkRequest {
     }
   ];
 
-  // Optional. If notify_new_user is set, then email new user that they've been given
-  // permissions on the resource.
+  // Optional. If set, then email the new user notifying them that they've been granted
+  // permissions to the resource.
   bool notify_new_user = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Required. The user link to create.
@@ -855,15 +864,21 @@ message BatchCreateUserLinksRequest {
   // This field is required. The parent field in the CreateUserLinkRequest
   // messages must either be empty or match this field.
   // Example format: accounts/1234
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "analyticsadmin.googleapis.com/UserLink"
+    }
+  ];
 
-  // Optional. If notify_new_users is set, then email new users that they've been given
-  // permissions on the resource.
+  // Optional. If set, then email the new users notifying them that they've been granted
+  // permissions to the resource. Regardless of whether this is set or not,
+  // notify_new_user field inside each individual request is ignored.
   bool notify_new_users = 2 [(google.api.field_behavior) = OPTIONAL];
 
-  // The requests specifying the user links to create.
+  // Required. The requests specifying the user links to create.
   // A maximum of 1000 user links can be created in a batch.
-  repeated CreateUserLinkRequest requests = 3;
+  repeated CreateUserLinkRequest requests = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Response message for BatchCreateUserLinks RPC.
@@ -884,11 +899,16 @@ message BatchUpdateUserLinksRequest {
   // for. The parent field in the UpdateUserLinkRequest messages must either be
   // empty or match this field.
   // Example format: accounts/1234
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "analyticsadmin.googleapis.com/UserLink"
+    }
+  ];
 
-  // The requests specifying the user links to update.
+  // Required. The requests specifying the user links to update.
   // A maximum of 1000 user links can be updated in a batch.
-  repeated UpdateUserLinkRequest requests = 2;
+  repeated UpdateUserLinkRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Response message for BatchUpdateUserLinks RPC.
@@ -914,11 +934,16 @@ message BatchDeleteUserLinksRequest {
   // for. The parent of all values for user link names to delete must match this
   // field.
   // Example format: accounts/1234
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "analyticsadmin.googleapis.com/UserLink"
+    }
+  ];
 
-  // The requests specifying the user links to update.
+  // Required. The requests specifying the user links to update.
   // A maximum of 1000 user links can be updated in a batch.
-  repeated DeleteUserLinkRequest requests = 2;
+  repeated DeleteUserLinkRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for GetWebDataStream RPC.
@@ -953,8 +978,10 @@ message UpdateWebDataStreamRequest {
   // The `name` field is used to identify the web stream to be updated.
   WebDataStream web_data_stream = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for CreateWebDataStream RPC.
@@ -1038,8 +1065,10 @@ message UpdateIosAppDataStreamRequest {
   // The `name` field is used to identify the iOS app stream to be updated.
   IosAppDataStream ios_app_data_stream = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for CreateIosAppDataStream RPC.
@@ -1123,8 +1152,10 @@ message UpdateAndroidAppDataStreamRequest {
   // The `name` field is used to identify the android app stream to be updated.
   AndroidAppDataStream android_app_data_stream = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for CreateAndroidAppDataStream RPC.
@@ -1198,8 +1229,10 @@ message UpdateEnhancedMeasurementSettingsRequest {
   // The `name` field is used to identify the settings to be updated.
   EnhancedMeasurementSettings enhanced_measurement_settings = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for CreateFirebaseLink RPC
@@ -1222,8 +1255,10 @@ message UpdateFirebaseLinkRequest {
   // Required. The Firebase link to update.
   FirebaseLink firebase_link = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for DeleteFirebaseLink RPC
@@ -1248,12 +1283,30 @@ message ListFirebaseLinksRequest {
       child_type: "analyticsadmin.googleapis.com/FirebaseLink"
     }
   ];
+
+  // The maximum number of resources to return. The service may return
+  // fewer than this value, even if there are additional pages.
+  // If unspecified, at most 50 resources will be returned.
+  // The maximum value is 200; (higher values will be coerced to the maximum)
+  int32 page_size = 2;
+
+  // A page token, received from a previous `ListFirebaseLinks` call.
+  // Provide this to retrieve the subsequent page.
+  // When paginating, all other parameters provided to `ListProperties` must
+  // match the call that provided the page token.
+  string page_token = 3;
 }
 
 // Response message for ListFirebaseLinks RPC
 message ListFirebaseLinksResponse {
   // List of FirebaseLinks. This will have at most one value.
   repeated FirebaseLink firebase_links = 1;
+
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  // Currently, Google Analytics supports only one FirebaseLink per property,
+  // so this will never be populated.
+  string next_page_token = 2;
 }
 
 // Request message for GetGlobalSiteTag RPC.
@@ -1289,8 +1342,10 @@ message UpdateGoogleAdsLinkRequest {
   // The GoogleAdsLink to update
   GoogleAdsLink google_ads_link = 1;
 
-  // The list of fields to be updated. Omitted fields will not be updated.
-  google.protobuf.FieldMask update_mask = 2;
+  // Required. The list of fields to be updated. Field names must be in snake case
+  // (e.g., "field_to_update"). Omitted fields will not be updated. To replace
+  // the entire entity, use one path with the string "*" to match all fields.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for DeleteGoogleAdsLink RPC.

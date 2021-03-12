@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ option ruby_package = "Google::Ads::GoogleAds::V5::Services";
 // Service to manage Keyword Plan ad groups.
 service KeywordPlanAdGroupService {
   option (google.api.default_host) = "googleads.googleapis.com";
+  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/adwords";
 
   // Returns the requested Keyword Plan ad group in full detail.
   rpc GetKeywordPlanAdGroup(GetKeywordPlanAdGroupRequest) returns (google.ads.googleads.v5.resources.KeywordPlanAdGroup) {
@@ -108,7 +109,9 @@ message KeywordPlanAdGroupOperation {
     // is expected, in this format:
     //
     // `customers/{customer_id}/keywordPlanAdGroups/{kp_ad_group_id}`
-    string remove = 3;
+    string remove = 3 [(google.api.resource_reference) = {
+                         type: "googleads.googleapis.com/KeywordPlanAdGroup"
+                       }];
   }
 }
 

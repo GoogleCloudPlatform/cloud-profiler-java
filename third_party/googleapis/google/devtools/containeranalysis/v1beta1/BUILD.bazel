@@ -12,6 +12,7 @@ _PROTO_SUBPACKAGE_DEPS = [
     "//google/devtools/containeranalysis/v1beta1/attestation:attestation_proto",
     "//google/devtools/containeranalysis/v1beta1/build:build_proto",
     "//google/devtools/containeranalysis/v1beta1/common:common_proto",
+    "//google/devtools/containeranalysis/v1beta1/cvss:cvss_proto",
     "//google/devtools/containeranalysis/v1beta1/deployment:deployment_proto",
     "//google/devtools/containeranalysis/v1beta1/discovery:discovery_proto",
     "//google/devtools/containeranalysis/v1beta1/grafeas:grafeas_proto",
@@ -45,8 +46,6 @@ proto_library_with_info(
         ":containeranalysis_proto",
     ] + _PROTO_SUBPACKAGE_DEPS,
 )
-
-"//google/devtools/containeranalysis/v1beta1/attestation:_proto"
 
 ##############################################################################
 # Java
@@ -101,9 +100,9 @@ java_grpc_library(
 
 java_gapic_library(
     name = "containeranalysis_java_gapic",
-    src = ":containeranalysis_proto_with_info",
+    srcs = [":containeranalysis_proto_with_info"],
+    grpc_service_config = "containeranalysis_grpc_service_config.json",
     gapic_yaml = "containeranalysis_gapic.yaml",
-    service_yaml = "//google/devtools/containeranalysis:containeranalysis_v1beta1.yaml",
     test_deps = [
         ":containeranalysis_java_grpc",
     ] + _JAVA_GRPC_SUBPACKAGE_DEPS,
@@ -219,6 +218,7 @@ nodejs_gapic_library(
     name = "containeranalysis_nodejs_gapic",
     package_name = "@google-cloud/containeranalysis",
     src = ":containeranalysis_proto_with_info",
+    extra_protoc_parameters = ["metadata"],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     main_service = "containeranalysis",
     package = "google.devtools.containeranalysis.v1beta1",
@@ -231,5 +231,5 @@ nodejs_gapic_assembly_pkg(
     deps = [
         ":containeranalysis_nodejs_gapic",
         ":containeranalysis_proto",
-    ],
+    ] + _PROTO_SUBPACKAGE_DEPS,
 )
