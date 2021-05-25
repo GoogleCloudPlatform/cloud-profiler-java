@@ -18,6 +18,7 @@
 #include "src/profiler.h"
 #include "src/throttler_api.h"
 #include "src/throttler_timed.h"
+#include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 
 DEFINE_bool(cprof_enabled, true,
@@ -32,6 +33,35 @@ DEFINE_int32(cprof_wall_sampling_period_msec, 100,
 
 namespace cloud {
 namespace profiler {
+namespace {
+
+namespace api = google::devtools::cloudprofiler::v2;
+
+std::string JavaVersion(JNIEnv *jni) {
+  const std::string kUnknownVersion = "unknown_version";
+
+  jclass system_class = jni->FindClass("java/lang/System");
+  if (system_class == nullptr) {
+    return kUnknownVersion;
+  }
+  jmethodID get_property_method = jni->GetStaticMethodID(
+      system_class, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+  if (get_property_method == nullptr) {
+    return kUnknownVersion;
+  }
+  jstring jstr = reinterpret_cast<jstring>(jni->CallStaticObjectMethod(
+      system_class, get_property_method, jni->NewStringUTF("java.version")));
+  if (jstr == nullptr) {
+    return kUnknownVersion;
+  }
+  // Copy the returned value and release the memory allocated by JNI.
+  const char *s = jni->GetStringUTFChars(jstr, nullptr);
+  std::string ret = std::string(s);
+  jni->ReleaseStringUTFChars(jstr, s);
+  return ret;
+}
+
+}  // namespace
 
 std::atomic<bool> Worker::enabled_;
 
@@ -44,10 +74,20 @@ void Worker::Start(JNIEnv *jni) {
     return;
   }
 
+  std::string java_version = JavaVersion(jni);
+  LOG(INFO) << "Java version: " << java_version;
+  std::vector<google::devtools::cloudprofiler::v2::ProfileType> types = {
+      api::CPU, api::WALL};
+  if (google::javaprofiler::HeapMonitor::Enabled()) {
+    LOG(INFO) << "Heap allocation sampling supported for this JDK";
+    types.push_back(api::HEAP);
+  }
+
   // Initialize the throttler here rather in the constructor, since the
   // constructor is invoked too early, before the heap profiler is initialized.
   throttler_ = FLAGS_cprof_profile_filename.empty()
-                   ? std::unique_ptr<Throttler>(new APIThrottler(jni))
+                   ? std::unique_ptr<Throttler>(
+                         new APIThrottler(types, "java", java_version))
                    : std::unique_ptr<Throttler>(
                          new TimedThrottler(FLAGS_cprof_profile_filename));
 

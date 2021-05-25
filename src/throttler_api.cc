@@ -32,7 +32,6 @@
 #include "grpcpp/create_channel.h"
 #include "grpcpp/security/credentials.h"
 #include "grpcpp/support/channel_arguments.h"
-#include "third_party/javaprofiler/heap_sampler.h"
 
 // API curated profiling configuration.
 DEFINE_string(cprof_api_address, "cloudprofiler.googleapis.com",
@@ -48,10 +47,9 @@ DEFINE_bool(cprof_use_insecure_creds_for_testing, false,
 
 namespace cloud {
 namespace profiler {
+namespace {
 
 namespace api = google::devtools::cloudprofiler::v2;
-
-namespace {
 
 // Initial value for backoffs where the duration is not server-guided.
 const int64_t kBackoffNanos = 60 * kNanosPerSecond;  // 1 minute
@@ -99,7 +97,7 @@ grpc_ssl_roots_override_result OverrideSSLRoots(char** pem_root_certs) {
 
 // Creates the profiler gRPC API stub. Returns nullptr on error.
 std::unique_ptr<api::grpc::ProfilerService::StubInterface>
-NewProfilerServiceStub(const std::string& addr) {
+NewProfilerServiceStub(const std::string& addr, const std::string& language) {
   std::shared_ptr<grpc::ChannelCredentials> creds;
   if (FLAGS_cprof_use_insecure_creds_for_testing) {
     creds = grpc::InsecureChannelCredentials();
@@ -114,7 +112,8 @@ NewProfilerServiceStub(const std::string& addr) {
 
   grpc::ChannelArguments channel_arguments;
   channel_arguments.SetUserAgentPrefix(
-      "gcloud-java-profiler/" + std::string(CLOUD_PROFILER_AGENT_VERSION));
+      "gcloud-" + language + "-profiler/" +
+      std::string(CLOUD_PROFILER_AGENT_VERSION));
 
   std::shared_ptr<grpc::ChannelInterface> ch =
       grpc::CreateCustomChannel(addr, creds, channel_arguments);
@@ -162,7 +161,7 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
 // Initializes deployment information from environment properties and label
 // string in "name1=val1,name2=val2,..." format. Returns false on error.
 bool InitializeDeployment(CloudEnv* env, const std::string& labels,
-                          api::Deployment* d) {
+                          const std::string& language, api::Deployment* d) {
   std::string project_id = env->ProjectID();
   if (project_id.empty()) {
     LOG(ERROR) << "Project ID is unknown";
@@ -199,7 +198,7 @@ bool InitializeDeployment(CloudEnv* env, const std::string& labels,
     label_kvs[kZoneNameLabel] = zone_name;
   }
 
-  label_kvs[kLanguageLabel] = "java";
+  label_kvs[kLanguageLabel] = language;
   for (const auto& kv : label_kvs) {
     (*d->mutable_labels())[kv.first] = kv.second;
   }
@@ -249,26 +248,29 @@ bool IsValidServiceName(std::string s) {
   return true;
 }
 
-APIThrottler::APIThrottler(JNIEnv* jni)
-    : APIThrottler(DefaultCloudEnv(), DefaultClock(), nullptr, jni) {}
+APIThrottler::APIThrottler(
+    const std::vector<google::devtools::cloudprofiler::v2::ProfileType>& types,
+    const std::string& language, const std::string& language_version)
+    : APIThrottler(types, language, language_version, DefaultCloudEnv(),
+                   DefaultClock(), nullptr) {}
 
 APIThrottler::APIThrottler(
+    const std::vector<google::devtools::cloudprofiler::v2::ProfileType>& types,
+    const std::string& language, const std::string& language_version,
     CloudEnv* env, Clock* clock,
     std::unique_ptr<google::devtools::cloudprofiler::v2::grpc::ProfilerService::
                         StubInterface>
-        stub,
-    JNIEnv* jni)
-    : env_(env),
+        stub)
+    : types_(types),
+      language_(language),
+      language_version_(language_version),
+      env_(env),
       clock_(clock),
       stub_(std::move(stub)),
-      types_({api::CPU, api::WALL}),
-      java_version_(JavaVersion(jni)),
       creation_backoff_envelope_ns_(kBackoffNanos),
       closed_(false) {
   grpc_init();
   gpr_set_log_function(GRPCLog);
-
-  LOG(INFO) << "Java version: " << java_version_;
 
   // Create a random number generator.
   gen_ = std::default_random_engine(clock_->Now().tv_nsec / 1000);
@@ -277,41 +279,8 @@ APIThrottler::APIThrottler(
   if (!stub_) {  // Set in tests
     LOG(INFO) << "Will use profiler service " << FLAGS_cprof_api_address
               << " to create and upload profiles";
-    stub_ = NewProfilerServiceStub(FLAGS_cprof_api_address);
+    stub_ = NewProfilerServiceStub(FLAGS_cprof_api_address, language_);
   }
-
-  if (google::javaprofiler::HeapMonitor::Enabled()) {
-    LOG(INFO) << "Heap allocation sampling supported for this JDK";
-    types_.push_back(api::HEAP);
-  }
-}
-
-std::string APIThrottler::JavaVersion(JNIEnv* jni) {
-  const std::string kUnknownVersion = "unknown_version";
-
-  jclass system_class = jni->FindClass("java/lang/System");
-  if (system_class == nullptr) {
-    return kUnknownVersion;
-  }
-  jmethodID get_property_method = jni->GetStaticMethodID(
-      system_class, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-  if (get_property_method == nullptr) {
-    return kUnknownVersion;
-  }
-  jstring jstr = reinterpret_cast<jstring>(jni->CallStaticObjectMethod(
-      system_class, get_property_method, jni->NewStringUTF("java.version")));
-  if (jstr == nullptr) {
-    return kUnknownVersion;
-  }
-  // Copy the returned value and release the memory allocated by JNI.
-  const char* s = jni->GetStringUTFChars(jstr, nullptr);
-  std::string ret = std::string(s);
-  jni->ReleaseStringUTFChars(jstr, s);
-  return ret;
-}
-
-void APIThrottler::SetProfileTypes(const std::vector<api::ProfileType>& types) {
-  types_ = types;
 }
 
 bool APIThrottler::WaitNext() {
@@ -324,7 +293,7 @@ bool APIThrottler::WaitNext() {
   for (const auto& type : types_) {
     req.add_profile_type(type);
   }
-  if (!InitializeDeployment(env_, FLAGS_cprof_deployment_labels,
+  if (!InitializeDeployment(env_, FLAGS_cprof_deployment_labels, language_,
                             req.mutable_deployment())) {
     LOG(ERROR) << "Failed to initialize deployment, stop profiling";
     return false;
@@ -442,7 +411,7 @@ void APIThrottler::ResetClientContext() {
   ctx_.reset(new grpc::ClientContext());  // NOLINT
   ctx_->AddMetadata("x-goog-api-client",
                     "gccl/" + std::string(CLOUD_PROFILER_AGENT_VERSION) +
-                        " gl-java/" + java_version_);
+                        "gl-" + language_ + "/" + language_version_);
 
   if (closed_) {
     ctx_->TryCancel();

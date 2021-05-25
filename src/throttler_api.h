@@ -39,19 +39,20 @@ namespace profiler {
 // Throttler implementation using the Cloud Profiler API.
 class APIThrottler : public Throttler {
  public:
-  explicit APIThrottler(JNIEnv* jni_env);
+  // Language should be one of "cpp" or "java", and language_version can be
+  // omitted if unknown.
+  explicit APIThrottler(
+      const std::vector<google::devtools::cloudprofiler::v2::ProfileType>&
+          types,
+      const std::string& language, const std::string& language_version = "");
   // Testing-only constructor.
-  APIThrottler(CloudEnv* env, Clock* clock,
+  APIThrottler(const std::vector<
+                   google::devtools::cloudprofiler::v2::ProfileType>& types,
+               const std::string& language, const std::string& language_version,
+               CloudEnv* env, Clock* clock,
                std::unique_ptr<google::devtools::cloudprofiler::v2::grpc::
                                    ProfilerService::StubInterface>
-                   stub,
-               JNIEnv* jni_env);
-
-  // Set the list of supported profile types. The list is used in the profile
-  // creation call to the server to specify the supported types.
-  void SetProfileTypes(
-      const std::vector<google::devtools::cloudprofiler::v2::ProfileType>&
-          types);
+                   stub);
 
   bool WaitNext() override;
   std::string ProfileType() override;
@@ -69,18 +70,16 @@ class APIThrottler : public Throttler {
   // Resets the client gRPC context for the next call.
   void ResetClientContext();
 
-  // Determines and returns Java version.
-  static std::string JavaVersion(JNIEnv* jni_env);
-
  private:
+  const std::vector<google::devtools::cloudprofiler::v2::ProfileType> types_;
+  const std::string language_;
+  const std::string language_version_;
   CloudEnv* env_;
   Clock* clock_;
   std::unique_ptr<
       google::devtools::cloudprofiler::v2::grpc::ProfilerService::StubInterface>
       stub_;
   google::devtools::cloudprofiler::v2::Profile profile_;
-  std::vector<google::devtools::cloudprofiler::v2::ProfileType> types_;
-  const std::string java_version_;
 
   // Profile creation error handling.
   int64_t creation_backoff_envelope_ns_;
