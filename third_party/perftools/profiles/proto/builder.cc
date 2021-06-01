@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <map>
 #include <utility>
 #include <vector>
@@ -48,12 +49,12 @@ Builder::Builder() : profile_(new Profile()) {
   profile_->add_string_table("");
 }
 
-int64 Builder::StringId(const char *str) {
+int64_t Builder::StringId(const char *str) {
   if (str == nullptr || !str[0]) {
     return 0;
   }
 
-  const int64 index = profile_->string_table_size();
+  const int64_t index = profile_->string_table_size();
   const auto inserted = strings_.emplace(str, index);
   if (!inserted.second) {
     // Failed to insert -- use existing id.
@@ -63,16 +64,16 @@ int64 Builder::StringId(const char *str) {
   return index;
 }
 
-uint64 Builder::FunctionId(const char *name, const char *system_name,
-                           const char *file, int64 start_line) {
-  int64 name_index = StringId(name);
-  int64 system_name_index = StringId(system_name);
-  int64 file_index = StringId(file);
+uint64_t Builder::FunctionId(const char *name, const char *system_name,
+                             const char *file, int64_t start_line) {
+  int64_t name_index = StringId(name);
+  int64_t system_name_index = StringId(system_name);
+  int64_t file_index = StringId(file);
 
   auto fn =
       std::make_tuple(name_index, system_name_index, file_index, start_line);
 
-  int64 index = profile_->function_size() + 1;
+  int64_t index = profile_->function_size() + 1;
   const auto inserted = functions_.insert(std::make_pair(fn, index));
   const bool insert_successful = inserted.second;
   if (!insert_successful) {
@@ -137,7 +138,7 @@ bool Builder::CheckValid(const Profile &profile) {
   IndexSet mapping_ids;
   mapping_ids.reserve(profile.mapping_size());
   for (const auto &mapping : profile.mapping()) {
-    const int64 id = mapping.id();
+    const int64_t id = mapping.id();
     if (id != 0) {
       const bool insert_successful = mapping_ids.insert(id).second;
       if (!insert_successful) {
@@ -150,7 +151,7 @@ bool Builder::CheckValid(const Profile &profile) {
   IndexSet function_ids;
   function_ids.reserve(profile.function_size());
   for (const auto &function : profile.function()) {
-    const int64 id = function.id();
+    const int64_t id = function.id();
     if (id != 0) {
       const bool insert_successful = function_ids.insert(id).second;
       if (!insert_successful) {
@@ -163,7 +164,7 @@ bool Builder::CheckValid(const Profile &profile) {
   IndexSet location_ids;
   location_ids.reserve(profile.location_size());
   for (const auto &location : profile.location()) {
-    const int64 id = location.id();
+    const int64_t id = location.id();
     if (id != 0) {
       const bool insert_successful = location_ids.insert(id).second;
       if (!insert_successful) {
@@ -171,13 +172,13 @@ bool Builder::CheckValid(const Profile &profile) {
         return false;
       }
     }
-    const int64 mapping_id = location.mapping_id();
+    const int64_t mapping_id = location.mapping_id();
     if (mapping_id != 0 && mapping_ids.count(mapping_id) == 0) {
       LOG(ERROR) << "Missing mapping " << mapping_id << " from location " << id;
       return false;
     }
     for (const auto &line : location.line()) {
-      int64 function_id = line.function_id();
+      int64_t function_id = line.function_id();
       if (function_id != 0 && function_ids.count(function_id) == 0) {
         LOG(ERROR) << "Missing function " << function_id;
         return false;
@@ -197,7 +198,7 @@ bool Builder::CheckValid(const Profile &profile) {
                  << " values, expecting " << sample_type_len;
       return false;
     }
-    for (uint64 location_id : sample.location_id()) {
+    for (uint64_t location_id : sample.location_id()) {
       if (location_id == 0) {
         LOG(ERROR) << "Sample referencing location_id=0";
         return false;
@@ -210,8 +211,8 @@ bool Builder::CheckValid(const Profile &profile) {
     }
 
     for (const auto &label : sample.label()) {
-      int64 str = label.str();
-      int64 num = label.num();
+      int64_t str = label.str();
+      int64_t num = label.num();
       if (str != 0 && num != 0) {
         LOG(ERROR) << "One of str/num must be unset, got " << str << "," << num;
         return false;
@@ -231,10 +232,10 @@ bool Builder::Finalize() {
     for (auto &sample : *profile_->mutable_sample()) {
       // Copy sample locations into a temp vector, and then clear and
       // repopulate it with the corresponding location IDs.
-      const RepeatedField<uint64> addresses = sample.location_id();
+      const RepeatedField<uint64_t> addresses = sample.location_id();
       sample.clear_location_id();
-      for (uint64 address : addresses) {
-        int64 index = address_to_id.size() + 1;
+      for (uint64_t address : addresses) {
+        int64_t index = address_to_id.size() + 1;
         const auto inserted = address_to_id.emplace(address, index);
         if (inserted.second) {
           auto loc = profile_->add_location();
@@ -248,7 +249,7 @@ bool Builder::Finalize() {
 
   // Look up location address on mapping ranges.
   if (profile_->mapping_size() > 0) {
-    std::map<uint64, std::pair<uint64, uint64> > mapping_map;
+    std::map<uint64_t, std::pair<uint64_t, uint64_t> > mapping_map;
     for (const auto &mapping : profile_->mapping()) {
       mapping_map[mapping.memory_start()] =
           std::make_pair(mapping.memory_limit(), mapping.id());
@@ -262,8 +263,8 @@ bool Builder::Finalize() {
           continue;
         }
         mapping--;
-        uint64 limit = mapping->second.first;
-        uint64 id = mapping->second.second;
+        uint64_t limit = mapping->second.first;
+        uint64_t id = mapping->second.second;
 
         if (loc.address() <= limit) {
           loc.set_mapping_id(id);

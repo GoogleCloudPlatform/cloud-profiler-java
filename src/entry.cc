@@ -60,6 +60,7 @@ static void JNICALL OnThreadEnd(jvmtiEnv *jvmti_env, JNIEnv *jni_env,
   IMPLICITLY_USE(jvmti_env);
   IMPLICITLY_USE(jni_env);
   IMPLICITLY_USE(thread);
+  google::javaprofiler::Accessors::SetCurrentJniEnv(nullptr);
   threads->UnregisterCurrent();
 }
 
