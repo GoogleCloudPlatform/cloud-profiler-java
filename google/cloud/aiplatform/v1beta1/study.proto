@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,50 @@ option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1be
 option java_multiple_files = true;
 option java_outer_classname = "StudyProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+
+// A message representing a Study.
+message Study {
+  option (google.api.resource) = {
+    type: "aiplatform.googleapis.com/Study"
+    pattern: "projects/{project}/locations/{location}/studies/{study}"
+  };
+
+  // Describes the Study state.
+  enum State {
+    // The study state is unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // The study is active.
+    ACTIVE = 1;
+
+    // The study is stopped due to an internal error.
+    INACTIVE = 2;
+
+    // The study is done when the service exhausts the parameter search space
+    // or max_trial_count is reached.
+    COMPLETED = 3;
+  }
+
+  // Output only. The name of a study. The study's globally unique identifier.
+  // Format: `projects/{project}/locations/{location}/studies/{study}`
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Required. Describes the Study, default value is empty string.
+  string display_name = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Configuration of the Study.
+  StudySpec study_spec = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Output only. The detailed state of a Study.
+  State state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Time at which the study was created.
+  google.protobuf.Timestamp create_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. A human readable reason why the Study is inactive.
+  // This should be empty if a study is ACTIVE or COMPLETED.
+  string inactive_reason = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // A message representing a Trial. A Trial contains a unique set of Parameters
 // that has been or will be evaluated, along with the objective metrics got by
@@ -76,6 +120,9 @@ message Trial {
     INFEASIBLE = 5;
   }
 
+  // Output only. Resource name of the Trial assigned by the service.
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // Output only. The identifier of the Trial assigned by the service.
   string id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -88,11 +135,30 @@ message Trial {
   // Output only. The final measurement containing the objective value.
   Measurement final_measurement = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Output only. A list of measurements that are strictly lexicographically
+  // ordered by their induced tuples (steps, elapsed_duration).
+  // These are used for early stopping computations.
+  repeated Measurement measurements = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // Output only. Time when the Trial was started.
   google.protobuf.Timestamp start_time = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Time when the Trial's status changed to `SUCCEEDED` or `INFEASIBLE`.
   google.protobuf.Timestamp end_time = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The identifier of the client that originally requested this Trial.
+  // Each client is identified by a unique client_id. When a client
+  // asks for a suggestion, Vizier will assign it a Trial. The client should
+  // evaluate the Trial, complete it, and report back to Vizier.
+  // If suggestion is asked again by same client_id before the Trial is
+  // completed, the same Trial will be returned. Multiple clients with
+  // different client_ids can ask for suggestions simultaneously, each of them
+  // will get their own Trial.
+  string client_id = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. A human readable string describing why the Trial is
+  // infeasible. This is set only if Trial state is `INFEASIBLE`.
+  string infeasible_reason = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The CustomJob name linked to the Trial.
   // It's set for a HyperparameterTuningJob's Trial.
@@ -258,9 +324,73 @@ message StudySpec {
     repeated ConditionalParameterSpec conditional_parameter_specs = 10;
   }
 
+  // The decay curve automated stopping rule builds a Gaussian Process
+  // Regressor to predict the final objective value of a Trial based on the
+  // already completed Trials and the intermediate measurements of the current
+  // Trial. Early stopping is requested for the current Trial if there is very
+  // low probability to exceed the optimal value found so far.
+  message DecayCurveAutomatedStoppingSpec {
+    // True if [Measurement.elapsed_duration][google.cloud.aiplatform.v1beta1.Measurement.elapsed_duration] is used as the x-axis of each
+    // Trials Decay Curve. Otherwise, [Measurement.step_count][google.cloud.aiplatform.v1beta1.Measurement.step_count] will be used
+    // as the x-axis.
+    bool use_elapsed_duration = 1;
+  }
+
+  // The median automated stopping rule stops a pending Trial if the Trial's
+  // best objective_value is strictly below the median 'performance' of all
+  // completed Trials reported up to the Trial's last measurement.
+  // Currently, 'performance' refers to the running average of the objective
+  // values reported by the Trial in each measurement.
+  message MedianAutomatedStoppingSpec {
+    // True if median automated stopping rule applies on
+    // [Measurement.elapsed_duration][google.cloud.aiplatform.v1beta1.Measurement.elapsed_duration]. It means that elapsed_duration
+    // field of latest measurement of current Trial is used to compute median
+    // objective value for each completed Trials.
+    bool use_elapsed_duration = 1;
+  }
+
+  // Configuration for ConvexStopPolicy.
+  message ConvexStopConfig {
+    // Steps used in predicting the final objective for early stopped trials. In
+    // general, it's set to be the same as the defined steps in training /
+    // tuning. When use_steps is false, this field is set to the maximum elapsed
+    // seconds.
+    int64 max_num_steps = 1;
+
+    // Minimum number of steps for a trial to complete. Trials which do not have
+    // a measurement with num_steps > min_num_steps won't be considered for
+    // early stopping. It's ok to set it to 0, and a trial can be early stopped
+    // at any stage. By default, min_num_steps is set to be one-tenth of the
+    // max_num_steps.
+    // When use_steps is false, this field is set to the minimum elapsed
+    // seconds.
+    int64 min_num_steps = 2;
+
+    // The number of Trial measurements used in autoregressive model for
+    // value prediction. A trial won't be considered early stopping if has fewer
+    // measurement points.
+    int64 autoregressive_order = 3;
+
+    // The hyper-parameter name used in the tuning job that stands for learning
+    // rate. Leave it blank if learning rate is not in a parameter in tuning.
+    // The learning_rate is used to estimate the objective value of the ongoing
+    // trial.
+    string learning_rate_parameter_name = 4;
+
+    // This bool determines whether or not the rule is applied based on
+    // elapsed_secs or steps. If use_seconds==false, the early stopping decision
+    // is made according to the predicted objective values according to the
+    // target steps. If use_seconds==true, elapsed_secs is used instead of
+    // steps. Also, in this case, the parameters max_num_steps and min_num_steps
+    // are overloaded to contain max_elapsed_seconds and min_elapsed_seconds.
+    bool use_seconds = 5;
+  }
+
   // The available search algorithms for the Study.
   enum Algorithm {
-    // The default algorithm used by AI Platform Optimization service.
+    // The default algorithm used by Vertex AI for [hyperparameter
+    // tuning](https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview)
+    // and [Vertex Vizier](https://cloud.google.com/vertex-ai/docs/vizier).
     ALGORITHM_UNSPECIFIED = 0;
 
     // Simple grid search within the feasible space. To use grid search,
@@ -276,15 +406,15 @@ message StudySpec {
   // "Noisy" means that the repeated observations with the same Trial parameters
   // may lead to different metric evaluations.
   enum ObservationNoise {
-    // The default noise level chosen by the AI Platform service.
+    // The default noise level chosen by Vertex AI.
     OBSERVATION_NOISE_UNSPECIFIED = 0;
 
-    // AI Platform Vizier assumes that the objective function is (nearly)
+    // Vertex AI assumes that the objective function is (nearly)
     // perfectly reproducible, and will never repeat the same Trial
     // parameters.
     LOW = 1;
 
-    // AI Platform Vizier will estimate the amount of noise in metric
+    // Vertex AI will estimate the amount of noise in metric
     // evaluations, it may repeat the same Trial parameters more than once.
     HIGH = 2;
   }
@@ -311,6 +441,17 @@ message StudySpec {
 
     // Use the best measurement reported.
     BEST_MEASUREMENT = 2;
+  }
+
+  oneof automated_stopping_spec {
+    // The automated early stopping spec using decay curve rule.
+    DecayCurveAutomatedStoppingSpec decay_curve_stopping_spec = 4;
+
+    // The automated early stopping spec using median rule.
+    MedianAutomatedStoppingSpec median_automated_stopping_spec = 5;
+
+    // The automated early stopping using convex stopping rule.
+    ConvexStopConfig convex_stop_config = 8;
   }
 
   // Required. Metric specs for the Study.
@@ -344,6 +485,9 @@ message Measurement {
     // Output only. The value for this metric.
     double value = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
+
+  // Output only. Time that the Trial has been running at the point of this Measurement.
+  google.protobuf.Duration elapsed_duration = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The number of steps the machine learning model has been trained for.
   // Must be non-negative.
