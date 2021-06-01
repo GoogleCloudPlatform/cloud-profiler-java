@@ -549,6 +549,9 @@ message Document {
 
       // Optional. Identifies the bounding polygon of a layout element on the page.
       BoundingPoly bounding_poly = 4 [(google.api.field_behavior) = OPTIONAL];
+
+      // Optional. Confidence of detected page element, if applicable. Range [0, 1].
+      float confidence = 5 [(google.api.field_behavior) = OPTIONAL];
     }
 
     // One or more references to visual page elements
@@ -586,9 +589,12 @@ message Document {
       // Element is requested for human review.
       EVAL_REQUESTED = 4;
 
-      // Element is review and approved at human review, confidence will be set
-      // to 1.0
+      // Element is reviewed and approved at human review, confidence will be
+      // set to 1.0.
       EVAL_APPROVED = 5;
+
+      // Element is skipped in the validation process.
+      EVAL_SKIPPED = 6;
     }
 
     // The index of the revision that produced this element.

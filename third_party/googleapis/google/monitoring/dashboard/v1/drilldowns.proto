@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,4 +22,5 @@ option go_package = "google.golang.org/genproto/googleapis/monitoring/dashboard/
 option java_multiple_files = true;
 option java_outer_classname = "DrilldownsProto";
 option java_package = "com.google.monitoring.dashboard.v1";
+option php_namespace = "Google\\Cloud\\Monitoring\\Dashboard\\V1";
 option ruby_package = "Google::Cloud::Monitoring::Dashboard::V1";

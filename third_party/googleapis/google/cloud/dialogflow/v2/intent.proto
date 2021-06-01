@@ -48,7 +48,13 @@ service Intents {
     option (google.api.http) = {
       get: "/v2/{parent=projects/*/agent}/intents"
       additional_bindings {
+        get: "/v2/{parent=projects/*/locations/*/agent}/intents"
+      }
+      additional_bindings {
         get: "/v2/{parent=projects/*/agent/environments/*}/intents"
+      }
+      additional_bindings {
+        get: "/v2/{parent=projects/*/locations/*/agent/environments/*}/intents"
       }
     };
     option (google.api.method_signature) = "parent";
@@ -59,6 +65,9 @@ service Intents {
   rpc GetIntent(GetIntentRequest) returns (Intent) {
     option (google.api.http) = {
       get: "/v2/{name=projects/*/agent/intents/*}"
+      additional_bindings {
+        get: "/v2/{name=projects/*/locations/*/agent/intents/*}"
+      }
     };
     option (google.api.method_signature) = "name";
     option (google.api.method_signature) = "name,language_code";
@@ -69,6 +78,10 @@ service Intents {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/agent}/intents"
       body: "intent"
+      additional_bindings {
+        post: "/v2/{parent=projects/*/locations/*/agent}/intents"
+        body: "intent"
+      }
     };
     option (google.api.method_signature) = "parent,intent";
     option (google.api.method_signature) = "parent,intent,language_code";
@@ -79,6 +92,10 @@ service Intents {
     option (google.api.http) = {
       patch: "/v2/{intent.name=projects/*/agent/intents/*}"
       body: "intent"
+      additional_bindings {
+        patch: "/v2/{intent.name=projects/*/locations/*/agent/intents/*}"
+        body: "intent"
+      }
     };
     option (google.api.method_signature) = "intent,language_code";
     option (google.api.method_signature) = "intent,language_code,update_mask";
@@ -88,6 +105,9 @@ service Intents {
   rpc DeleteIntent(DeleteIntentRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v2/{name=projects/*/agent/intents/*}"
+      additional_bindings {
+        delete: "/v2/{name=projects/*/locations/*/agent/intents/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -99,6 +119,10 @@ service Intents {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/agent}/intents:batchUpdate"
       body: "*"
+      additional_bindings {
+        post: "/v2/{parent=projects/*/locations/*/agent}/intents:batchUpdate"
+        body: "*"
+      }
     };
     option (google.api.method_signature) = "parent,intent_batch_uri";
     option (google.api.method_signature) = "parent,intent_batch_inline";
@@ -115,6 +139,10 @@ service Intents {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/agent}/intents:batchDelete"
       body: "*"
+      additional_bindings {
+        post: "/v2/{parent=projects/*/locations/*/agent}/intents:batchDelete"
+        body: "*"
+      }
     };
     option (google.api.method_signature) = "parent,intents";
     option (google.longrunning.operation_info) = {
@@ -137,6 +165,7 @@ message Intent {
   option (google.api.resource) = {
     type: "dialogflow.googleapis.com/Intent"
     pattern: "projects/{project}/agent/intents/{intent}"
+    pattern: "projects/{project}/locations/{location}/agent/intents/{intent}"
   };
 
   // Represents an example that the agent is trained on.
@@ -851,7 +880,15 @@ message Intent {
 // The request message for [Intents.ListIntents][google.cloud.dialogflow.v2.Intents.ListIntents].
 message ListIntentsRequest {
   // Required. The agent to list all intents from.
-  // Format: `projects/<Project ID>/agent`.
+  // Format: `projects/<Project ID>/agent` or `projects/<Project
+  // ID>/locations/<Location ID>/agent`.
+  //
+  // Alternatively, you can specify the environment to list intents for.
+  // Format: `projects/<Project ID>/agent/environments/<Environment ID>`
+  // or `projects/<Project ID>/locations/<Location
+  // ID>/agent/environments/<Environment ID>`.
+  // Note: training phrases of the intents will not be returned for non-draft
+  // environment.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
