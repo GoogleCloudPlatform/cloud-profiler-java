@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -72,7 +71,14 @@ message ReadSession {
     //           "nullable_field is not NULL"
     //           "st_equals(geo_field, st_geofromtext("POINT(2, 2)"))"
     //           "numeric_field BETWEEN 1.0 AND 5.0"
+    //
+    // Restricted to a maximum length for 1 MB.
     string row_restriction = 2;
+
+    oneof output_format_serialization_options {
+      // Optional. Options specific to the Apache Arrow output format.
+      ArrowSerializationOptions arrow_serialization_options = 3 [(google.api.field_behavior) = OPTIONAL];
+    }
   }
 
   // Output only. Unique identifier for the session, in the form

@@ -240,7 +240,12 @@ message StreamingDetectIntentRequest {
 //     complete transcript of what the user said. The last `recognition_result`
 //     has `is_final` set to `true`.
 //
-// 2.  The last message contains `detect_intent_response`.
+// 2.  If `enable_partial_response` is true, the following N messages
+//     (currently 1 <= N <= 4) contain `detect_intent_response`. The first (N-1)
+//     `detect_intent_response`s will have `response_type` set to `PARTIAL`.
+//     The last `detect_intent_response` has `response_type` set to `FINAL`.
+//     If `response_type` is false, response stream only contains
+//     the final `detect_intent_response`.
 message StreamingDetectIntentResponse {
   // The output response.
   oneof response {
@@ -365,12 +370,26 @@ message QueryParameters {
 
   // This field can be used to pass custom data into the webhook associated with
   // the agent. Arbitrary JSON objects are supported.
+  // Some integrations that query a Dialogflow agent may provide additional
+  // information in the payload.
+  // In particular, for the Dialogflow Phone Gateway integration, this field has
+  // the form:
+  // ```
+  // {
+  //  "telephony": {
+  //    "caller_id": "+18558363987"
+  //  }
+  // }
+  // ```
   google.protobuf.Struct payload = 4;
 
   // Additional parameters to be put into [session
   // parameters][SessionInfo.parameters]. To remove a
   // parameter from the session, clients should explicitly set the parameter
   // value to null.
+  //
+  // You can reference the session parameters in the agent with the following
+  // format: $session.params.parameter-id.
   //
   // Depending on your protocol or client library language, this is a
   // map, associative array, symbol table, dictionary, or JSON object
@@ -381,12 +400,27 @@ message QueryParameters {
   // -   MapValue type:
   //     -   If parameter's entity type is a composite entity: map
   //     -   Else: depending on parameter value type, could be one of string,
-  //     number, boolean, null, list or map
+  //         number, boolean, null, list or map
   // -   MapValue value:
   //     -   If parameter's entity type is a composite entity:
   //         map from composite entity property names to property values
   //     -   Else: parameter value
   google.protobuf.Struct parameters = 5;
+
+  // The unique identifier of the [page][google.cloud.dialogflow.cx.v3beta1.Page] to override the [current
+  // page][QueryResult.current_page] in the session. Format: `projects/<Project
+  // ID>/locations/<Location ID>/agents/<Agent ID>/pages/<page ID>`.
+  //
+  // If `current_page` is specified, the previous state of the session will be
+  // ignored by Dialogflow, including the [previous
+  // page][QueryResult.current_page] and the [previous session
+  // parameters][QueryResult.parameters].
+  // In most cases, [current_page][google.cloud.dialogflow.cx.v3beta1.QueryParameters.current_page] and
+  // [parameters][google.cloud.dialogflow.cx.v3beta1.QueryParameters.parameters] should be configured together to
+  // direct a session to a specific state.
+  string current_page = 6 [(google.api.resource_reference) = {
+                             type: "dialogflow.googleapis.com/Page"
+                           }];
 
   // Whether to disable webhook calls for this request.
   bool disable_webhook = 7;
@@ -452,10 +486,14 @@ message QueryResult {
 
     // If an [intent][google.cloud.dialogflow.cx.v3beta1.IntentInput] was provided as input, this field will
     // contain a copy of the intent identifier.
-    string trigger_intent = 11;
+    // Format: `projects/<Project ID>/locations/<Location ID>/agents/<Agent
+    // ID>/intents/<Intent ID>`.
+    string trigger_intent = 11 [(google.api.resource_reference) = {
+                                  type: "dialogflow.googleapis.com/Intent"
+                                }];
 
     // If [natural language speech audio][google.cloud.dialogflow.cx.v3beta1.AudioInput] was provided as input,
-    // this field will contain the trascript for the audio.
+    // this field will contain the transcript for the audio.
     string transcript = 12;
 
     // If an [event][google.cloud.dialogflow.cx.v3beta1.EventInput] was provided as input, this field will contain
@@ -694,10 +732,14 @@ message MatchIntentResponse {
 
     // If an [intent][google.cloud.dialogflow.cx.v3beta1.IntentInput] was provided as input, this field will
     // contain a copy of the intent identifier.
-    string trigger_intent = 2;
+    // Format: `projects/<Project ID>/locations/<Location ID>/agents/<Agent
+    // ID>/intents/<Intent ID>`.
+    string trigger_intent = 2 [(google.api.resource_reference) = {
+                                 type: "dialogflow.googleapis.com/Intent"
+                               }];
 
     // If [natural language speech audio][google.cloud.dialogflow.cx.v3beta1.AudioInput] was provided as input,
-    // this field will contain the trascript for the audio.
+    // this field will contain the transcript for the audio.
     string transcript = 3;
 
     // If an [event][google.cloud.dialogflow.cx.v3beta1.EventInput] was provided as input, this field will
