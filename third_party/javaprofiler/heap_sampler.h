@@ -85,8 +85,20 @@ class HeapEventStorage {
     // This object owns the jweak object parameter. It is freed when the object
     // is sent to the garbage list, and the object is set to nullptr.
     HeapObjectTrace(jweak object, jlong size,
-                    const std::vector<JVMPI_CallFrame> frames)
+                    const std::vector<JVMPI_CallFrame> &&frames)
         : object_(object), size_(size), frames_(std::move(frames)) {}
+
+    HeapObjectTrace(jweak object, jlong size,
+                    const std::vector<JVMPI_CallFrame> &frames)
+        : object_(object), size_(size), frames_(frames) {}
+
+    // Allow moving.
+    HeapObjectTrace(HeapObjectTrace&& o) = default;
+    HeapObjectTrace& operator=(HeapObjectTrace&& o) = default;
+
+    // No copying allowed.
+    HeapObjectTrace(const HeapObjectTrace& o) = delete;
+    HeapObjectTrace& operator=(const HeapObjectTrace& o) = delete;
 
     std::vector<JVMPI_CallFrame> &Frames() {
       return frames_;
@@ -107,9 +119,11 @@ class HeapEventStorage {
       return !env->IsSameObject(object_, NULL);
     }
 
-    // Copyable and assignable for use in std::vector.
-    HeapObjectTrace(const HeapObjectTrace&) = default;
-    HeapObjectTrace& operator=(const HeapObjectTrace&) = default;
+    // Make copying an explicit operation for the one case we need it (adding
+    // to the peak heapz storage)
+    HeapObjectTrace Copy() {
+      return HeapObjectTrace(object_, size_, frames_);
+    }
 
    private:
     jweak object_;
@@ -140,28 +154,24 @@ class HeapEventStorage {
   static std::unique_ptr<perftools::profiles::Profile> ConvertToProto(
       ProfileProtoBuilder *builder, std::vector<HeapObjectTrace> &objects);
 
-  static std::unique_ptr<perftools::profiles::Profile> ConvertToProto(
-      ProfileProtoBuilder *builder,
-      const std::vector<std::unique_ptr<HeapObjectTrace>> &objects);
-
   std::unique_ptr<perftools::profiles::Profile> GetProfiles(
       JNIEnv* env, int sampling_interval, bool force_gc, bool get_live);
 
   // Add object to the garbage list: it uses a queue with a max size of
   // max_garbage_size, provided via the constructor.
-  void AddToGarbage(std::unique_ptr<HeapObjectTrace> obj);
+  // obj will be std::move'd to the garbage_list.
+  void AddToGarbage(HeapObjectTrace &&obj);
 
   // Moves live objects from objects to still_live_objects; live elements from
   // the objects vector are replaced with nullptr via std::move.
   void MoveLiveObjects(
-      JNIEnv *env, std::vector<std::unique_ptr<HeapObjectTrace>> *objects,
-      std::vector<std::unique_ptr<HeapObjectTrace>> *still_live_objects);
+      JNIEnv *env, std::vector<HeapObjectTrace> *objects,
+      std::vector<HeapObjectTrace> *still_live_objects);
 
-  int64_t ProfileSize(
-      const std::vector<std::unique_ptr<HeapObjectTrace>> &objects) const;
+  int64_t ProfileSize(const std::vector<HeapObjectTrace> &objects) const;
 
-  std::vector<std::unique_ptr<HeapObjectTrace>> newly_allocated_objects_;
-  std::vector<std::unique_ptr<HeapObjectTrace>> live_objects_;
+  std::vector<HeapObjectTrace> newly_allocated_objects_;
+  std::vector<HeapObjectTrace> live_objects_;
 
   int64_t peak_profile_size_;
   std::vector<HeapObjectTrace> peak_objects_;
@@ -170,7 +180,7 @@ class HeapEventStorage {
   // requested.
   int max_garbage_size_;
   int cur_garbage_pos_;
-  std::vector<std::unique_ptr<HeapObjectTrace>> garbage_objects_;
+  std::vector<HeapObjectTrace> garbage_objects_;
 
   std::mutex storage_lock_;
   jvmtiEnv *jvmti_;

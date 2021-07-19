@@ -78,8 +78,7 @@ void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
       return;
     }
 
-    auto live_object = std::unique_ptr<HeapObjectTrace>(
-        new HeapObjectTrace(weak_ref, size, std::move(frames)));
+    HeapObjectTrace live_object(weak_ref, size, std::move(frames));
 
     // Only now lock and get things done quickly.
     std::lock_guard<std::mutex> lock(storage_lock_);
@@ -87,7 +86,7 @@ void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
   }
 }
 
-void HeapEventStorage::AddToGarbage(std::unique_ptr<HeapObjectTrace> obj) {
+void HeapEventStorage::AddToGarbage(HeapObjectTrace &&obj) {
   if (garbage_objects_.size() >= max_garbage_size_) {
     garbage_objects_[cur_garbage_pos_] = std::move(obj);
     cur_garbage_pos_ = (cur_garbage_pos_ + 1) % max_garbage_size_;
@@ -97,23 +96,23 @@ void HeapEventStorage::AddToGarbage(std::unique_ptr<HeapObjectTrace> obj) {
 }
 
 void HeapEventStorage::MoveLiveObjects(
-    JNIEnv *env, std::vector<std::unique_ptr<HeapObjectTrace>> *objects,
-    std::vector<std::unique_ptr<HeapObjectTrace>> *still_live_objects) {
+    JNIEnv *env, std::vector<HeapObjectTrace> *objects,
+    std::vector<HeapObjectTrace> *still_live_objects) {
   for (auto &elem : *objects) {
-    if (elem->IsLive(env)) {
+    if (elem.IsLive(env)) {
       still_live_objects->push_back(std::move(elem));
     } else {
-      elem->DeleteWeakReference(env);
+      elem.DeleteWeakReference(env);
       AddToGarbage(std::move(elem));
     }
   }
 }
 
 int64_t HeapEventStorage::ProfileSize(
-    const std::vector<std::unique_ptr<HeapObjectTrace>> &live_objects) const {
+    const std::vector<HeapObjectTrace> &live_objects) const {
   int64_t total = 0;
   for (auto &trace : live_objects) {
-    total += trace->Size();
+    total += trace.Size();
   }
   return total;
 }
@@ -121,7 +120,7 @@ int64_t HeapEventStorage::ProfileSize(
 void HeapEventStorage::CompactSamples(JNIEnv *env) {
   std::lock_guard<std::mutex> lock(storage_lock_);
 
-  std::vector<std::unique_ptr<HeapObjectTrace>> still_live;
+  std::vector<HeapObjectTrace> still_live;
 
   MoveLiveObjects(env, &newly_allocated_objects_, &still_live);
   MoveLiveObjects(env, &live_objects_, &still_live);
@@ -141,7 +140,7 @@ void HeapEventStorage::CompactSamples(JNIEnv *env) {
 
     peak_objects_.clear();
     for (auto &object : live_objects_) {
-      peak_objects_.push_back(*object);
+      peak_objects_.push_back(object.Copy());
     }
   }
 }
@@ -177,18 +176,6 @@ std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::ConvertToProto(
   StackTraceArrayBuilder stack_trace_builder(objects.size());
   for (int i = 0; i < objects.size(); ++i) {
     stack_trace_builder.AddTrace(objects[i]);
-  }
-
-  builder->AddTraces(stack_trace_builder.GetStackTraceData(), objects.size());
-  return builder->CreateProto();
-}
-
-std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::ConvertToProto(
-    ProfileProtoBuilder *builder,
-    const std::vector<std::unique_ptr<HeapObjectTrace>> &objects) {
-  StackTraceArrayBuilder stack_trace_builder(objects.size());
-  for (int i = 0; i < objects.size(); ++i) {
-    stack_trace_builder.AddTrace(*objects[i]);
   }
 
   builder->AddTraces(stack_trace_builder.GetStackTraceData(), objects.size());
