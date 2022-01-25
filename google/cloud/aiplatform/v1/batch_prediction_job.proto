@@ -20,19 +20,25 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1/completion_stats.proto";
 import "google/cloud/aiplatform/v1/encryption_spec.proto";
+import "google/cloud/aiplatform/v1/explanation.proto";
 import "google/cloud/aiplatform/v1/io.proto";
 import "google/cloud/aiplatform/v1/job_state.proto";
 import "google/cloud/aiplatform/v1/machine_resources.proto";
 import "google/cloud/aiplatform/v1/manual_batch_tuning_parameters.proto";
+import "google/cloud/aiplatform/v1/model_monitoring.proto";
+import "google/cloud/aiplatform/v1/unmanaged_container_model.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/rpc/status.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "BatchPredictionJobProto";
 option java_package = "com.google.cloud.aiplatform.v1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1";
+option ruby_package = "Google::Cloud::AIPlatform::V1";
 
 // A job that uses a [Model][google.cloud.aiplatform.v1.BatchPredictionJob.model] to produce predictions
 // on multiple [input instances][google.cloud.aiplatform.v1.BatchPredictionJob.input_config]. If
@@ -91,8 +97,7 @@ message BatchPredictionJob {
       // `errors_N.<extension>` files are created (N depends on total number
       // of failed predictions). These files contain the failed instances,
       // as per their schema, followed by an additional `error` field which as
-      // value has
-      // [`google.rpc.Status`](Status)
+      // value has [google.rpc.Status][google.rpc.Status]
       // containing only `code` and `message` fields.
       GcsDestination gcs_destination = 2;
 
@@ -112,7 +117,7 @@ message BatchPredictionJob {
       // prediction schemata. The `errors` table contains rows for which the
       // prediction has failed, it has instance columns, as per the
       // instance schema, followed by a single "errors" column, which as values
-      // has [`google.rpc.Status`](Status)
+      // has [google.rpc.Status][google.rpc.Status]
       // represented as a STRUCT, and containing only `code` and `message`.
       BigQueryDestination bigquery_destination = 3;
     }
@@ -137,6 +142,12 @@ message BatchPredictionJob {
       // format, into which the prediction output is written.
       string bigquery_output_dataset = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
     }
+
+    // Output only. The name of the BigQuery table created, in
+    // `predictions_<timestamp>`
+    // format, into which the prediction output is written.
+    // Can be used by UI to generate the BigQuery output path, for example.
+    string bigquery_output_table = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
   // Output only. Resource name of the BatchPredictionJob.
@@ -145,16 +156,19 @@ message BatchPredictionJob {
   // Required. The user-defined name of this BatchPredictionJob.
   string display_name = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. The name of the Model that produces the predictions via this job,
+  // The name of the Model resoure that produces the predictions via this job,
   // must share the same ancestor Location.
   // Starting this job has no impact on any existing deployments of the Model
   // and their resources.
-  string model = 3 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      type: "aiplatform.googleapis.com/Model"
-    }
-  ];
+  // Exactly one of model and unmanaged_container_model must be set.
+  string model = 3 [(google.api.resource_reference) = {
+                      type: "aiplatform.googleapis.com/Model"
+                    }];
+
+  // Contains model information necessary to perform batch prediction without
+  // requiring uploading to model registry.
+  // Exactly one of model and unmanaged_container_model must be set.
+  UnmanagedContainerModel unmanaged_container_model = 28;
 
   // Required. Input configuration of the instances on which predictions are performed.
   // The schema of any single instance may be specified via
@@ -190,6 +204,32 @@ message BatchPredictionJob {
   // [dedicated_resources][google.cloud.aiplatform.v1.BatchPredictionJob.dedicated_resources] are used (in other cases Vertex AI does
   // the tuning itself).
   ManualBatchTuningParameters manual_batch_tuning_parameters = 8 [(google.api.field_behavior) = IMMUTABLE];
+
+  // Generate explanation with the batch prediction results.
+  //
+  // When set to `true`, the batch prediction output changes based on the
+  // `predictions_format` field of the
+  // [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config] object:
+  //
+  //  * `bigquery`: output includes a column named `explanation`. The value
+  //    is a struct that conforms to the [Explanation][google.cloud.aiplatform.v1.Explanation] object.
+  //  * `jsonl`: The JSON objects on each line include an additional entry
+  //    keyed `explanation`. The value of the entry is a JSON object that
+  //    conforms to the [Explanation][google.cloud.aiplatform.v1.Explanation] object.
+  //  * `csv`: Generating explanations for CSV format is not supported.
+  //
+  // If this field is set to true, either the [Model.explanation_spec][google.cloud.aiplatform.v1.Model.explanation_spec] or
+  // [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] must be populated.
+  bool generate_explanation = 23;
+
+  // Explanation configuration for this BatchPredictionJob. Can be
+  // specified only if [generate_explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation] is set to `true`.
+  //
+  // This value overrides the value of [Model.explanation_spec][google.cloud.aiplatform.v1.Model.explanation_spec]. All fields of
+  // [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] are optional in the request. If a field of the
+  // [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] object is not populated, the corresponding field of
+  // the [Model.explanation_spec][google.cloud.aiplatform.v1.Model.explanation_spec] object is inherited.
+  ExplanationSpec explanation_spec = 25;
 
   // Output only. Information further describing the output of this job.
   OutputInfo output_info = 9 [(google.api.field_behavior) = OUTPUT_ONLY];

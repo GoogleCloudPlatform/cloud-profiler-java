@@ -19,10 +19,25 @@ package google.cloud.aiplatform.v1;
 import "google/api/field_behavior.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "IoProto";
 option java_package = "com.google.cloud.aiplatform.v1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1";
+option ruby_package = "Google::Cloud::AIPlatform::V1";
+
+// The storage details for Avro input content.
+message AvroSource {
+  // Required. Google Cloud Storage location.
+  GcsSource gcs_source = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The storage details for CSV input content.
+message CsvSource {
+  // Required. Google Cloud Storage location.
+  GcsSource gcs_source = 1 [(google.api.field_behavior) = REQUIRED];
+}
 
 // The Google Cloud Storage location for the input content.
 message GcsSource {
@@ -60,8 +75,21 @@ message BigQueryDestination {
   // Accepted forms:
   //
   // *  BigQuery path. For example:
-  // `bq://projectId` or `bq://projectId.bqDatasetId.bqTableId`.
+  // `bq://projectId` or `bq://projectId.bqDatasetId` or
+  // `bq://projectId.bqDatasetId.bqTableId`.
   string output_uri = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The storage details for CSV output content.
+message CsvDestination {
+  // Required. Google Cloud Storage location.
+  GcsDestination gcs_destination = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The storage details for TFRecord output content.
+message TFRecordDestination {
+  // Required. Google Cloud Storage location.
+  GcsDestination gcs_destination = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The Container Registry location for the container image.

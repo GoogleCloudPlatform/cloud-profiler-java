@@ -21,10 +21,12 @@ load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 proto_library(
     name = "migration_proto",
     srcs = [
+        "assessment_task.proto",
         "migration_entities.proto",
         "migration_error_details.proto",
         "migration_metrics.proto",
         "migration_service.proto",
+        "translation_task.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -170,6 +172,10 @@ py_gapic_library(
     name = "migration_py_gapic",
     srcs = [":migration_proto"],
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
+    opt_args = [
+        "python-gapic-name=bigquery_migration",
+        "python-gapic-namespace=google.cloud",
+    ],
 )
 
 # Open Source Packages
@@ -185,10 +191,10 @@ py_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    php_gapic_assembly_pkg = "php_gapic_assembly_pkg2",
-    php_gapic_library = "php_gapic_library2",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_grpc_library",
+    "php_proto_library",
 )
 
 php_proto_library(

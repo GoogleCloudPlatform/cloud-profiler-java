@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/api/routing.proto";
 import "google/bigtable/v2/data.proto";
 import "google/protobuf/wrappers.proto";
 import "google/rpc/status.proto";
@@ -32,7 +33,7 @@ option java_package = "com.google.bigtable.v2";
 option php_namespace = "Google\\Cloud\\Bigtable\\V2";
 option ruby_package = "Google::Cloud::Bigtable::V2";
 option (google.api.resource_definition) = {
-  type: "bigtable.googleapis.com/Table"
+  type: "bigtableadmin.googleapis.com/Table"
   pattern: "projects/{project}/instances/{instance}/tables/{table}"
 };
 
@@ -57,6 +58,15 @@ service Bigtable {
       post: "/v2/{table_name=projects/*/instances/*/tables/*}:readRows"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
+    };
     option (google.api.method_signature) = "table_name";
     option (google.api.method_signature) = "table_name,app_profile_id";
   }
@@ -69,6 +79,15 @@ service Bigtable {
     option (google.api.http) = {
       get: "/v2/{table_name=projects/*/instances/*/tables/*}:sampleRowKeys"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
+    };
     option (google.api.method_signature) = "table_name";
     option (google.api.method_signature) = "table_name,app_profile_id";
   }
@@ -79,6 +98,15 @@ service Bigtable {
     option (google.api.http) = {
       post: "/v2/{table_name=projects/*/instances/*/tables/*}:mutateRow"
       body: "*"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
     };
     option (google.api.method_signature) = "table_name,row_key,mutations";
     option (google.api.method_signature) = "table_name,row_key,mutations,app_profile_id";
@@ -92,6 +120,15 @@ service Bigtable {
       post: "/v2/{table_name=projects/*/instances/*/tables/*}:mutateRows"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
+    };
     option (google.api.method_signature) = "table_name,entries";
     option (google.api.method_signature) = "table_name,entries,app_profile_id";
   }
@@ -101,6 +138,15 @@ service Bigtable {
     option (google.api.http) = {
       post: "/v2/{table_name=projects/*/instances/*/tables/*}:checkAndMutateRow"
       body: "*"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
     };
     option (google.api.method_signature) = "table_name,row_key,predicate_filter,true_mutations,false_mutations";
     option (google.api.method_signature) = "table_name,row_key,predicate_filter,true_mutations,false_mutations,app_profile_id";
@@ -116,6 +162,15 @@ service Bigtable {
       post: "/v2/{table_name=projects/*/instances/*/tables/*}:readModifyWriteRow"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "table_name"
+        path_template: "{table_name=projects/*/instances/*/tables/*}"
+      }
+      routing_parameters {
+        field: "app_profile_id"
+      }
+    };
     option (google.api.method_signature) = "table_name,row_key,rules";
     option (google.api.method_signature) = "table_name,row_key,rules,app_profile_id";
   }
@@ -129,7 +184,7 @@ message ReadRowsRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 
@@ -137,14 +192,15 @@ message ReadRowsRequest {
   // "default" application profile will be used.
   string app_profile_id = 5;
 
-  // The row keys and/or ranges to read. If not specified, reads from all rows.
+  // The row keys and/or ranges to read sequentially. If not specified, reads
+  // from all rows.
   RowSet rows = 2;
 
   // The filter to apply to the contents of the specified row(s). If unset,
   // reads the entirety of each row.
   RowFilter filter = 3;
 
-  // The read will terminate after committing to N rows' worth of results. The
+  // The read will stop after committing to N rows' worth of results. The
   // default (zero) is to return all results.
   int64 rows_limit = 4;
 }
@@ -236,7 +292,7 @@ message SampleRowKeysRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 
@@ -271,7 +327,7 @@ message MutateRowRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 
@@ -311,7 +367,7 @@ message MutateRowsRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 
@@ -355,7 +411,7 @@ message CheckAndMutateRowRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 
@@ -403,7 +459,7 @@ message ReadModifyWriteRowRequest {
   string table_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "bigtable.googleapis.com/Table"
+      type: "bigtableadmin.googleapis.com/Table"
     }
   ];
 

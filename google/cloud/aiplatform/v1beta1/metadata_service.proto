@@ -31,10 +31,13 @@ import "google/cloud/aiplatform/v1beta1/operation.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "MetadataServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // Service for reading and writing metadata entries.
 service MetadataService {
@@ -70,7 +73,8 @@ service MetadataService {
     option (google.api.method_signature) = "parent";
   }
 
-  // Deletes a single MetadataStore.
+  // Deletes a single MetadataStore and all its child resources (Artifacts,
+  // Executions, and Contexts).
   rpc DeleteMetadataStore(DeleteMetadataStoreRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       delete: "/v1beta1/{name=projects/*/locations/*/metadataStores/*}"
@@ -116,6 +120,31 @@ service MetadataService {
     option (google.api.method_signature) = "artifact,update_mask";
   }
 
+  // Deletes an Artifact.
+  rpc DeleteArtifact(DeleteArtifactRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1beta1/{name=projects/*/locations/*/metadataStores/*/artifacts/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "DeleteOperationMetadata"
+    };
+  }
+
+  // Purges Artifacts.
+  rpc PurgeArtifacts(PurgeArtifactsRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1beta1/{parent=projects/*/locations/*/metadataStores/*}/artifacts:purge"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+    option (google.longrunning.operation_info) = {
+      response_type: "PurgeArtifactsResponse"
+      metadata_type: "PurgeArtifactsMetadata"
+    };
+  }
+
   // Creates a Context associated with a MetadataStore.
   rpc CreateContext(CreateContextRequest) returns (Context) {
     option (google.api.http) = {
@@ -159,6 +188,19 @@ service MetadataService {
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
       metadata_type: "DeleteOperationMetadata"
+    };
+  }
+
+  // Purges Contexts.
+  rpc PurgeContexts(PurgeContextsRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1beta1/{parent=projects/*/locations/*/metadataStores/*}/contexts:purge"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+    option (google.longrunning.operation_info) = {
+      response_type: "PurgeContextsResponse"
+      metadata_type: "PurgeContextsMetadata"
     };
   }
 
@@ -229,6 +271,31 @@ service MetadataService {
     option (google.api.method_signature) = "execution,update_mask";
   }
 
+  // Deletes an Execution.
+  rpc DeleteExecution(DeleteExecutionRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      delete: "/v1beta1/{name=projects/*/locations/*/metadataStores/*/executions/*}"
+    };
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "DeleteOperationMetadata"
+    };
+  }
+
+  // Purges Executions.
+  rpc PurgeExecutions(PurgeExecutionsRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1beta1/{parent=projects/*/locations/*/metadataStores/*}/executions:purge"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+    option (google.longrunning.operation_info) = {
+      response_type: "PurgeExecutionsResponse"
+      metadata_type: "PurgeExecutionsMetadata"
+    };
+  }
+
   // Adds Events to the specified Execution. An Event indicates whether an
   // Artifact was used as an input or output for an Execution. If an Event
   // already exists between the Execution and the Artifact, the Event is
@@ -290,7 +357,7 @@ service MetadataService {
 message CreateMetadataStoreRequest {
   // Required. The resource name of the Location where the MetadataStore should
   // be created.
-  // Format: projects/{project}/locations/{location}/
+  // Format: `projects/{project}/locations/{location}/`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -302,10 +369,10 @@ message CreateMetadataStoreRequest {
   MetadataStore metadata_store = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The {metadatastore} portion of the resource name with the format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   // If not provided, the MetadataStore's ID will be a UUID generated by the
   // service.
-  // Must be 4-128 characters in length. Valid characters are /[a-z][0-9]-/.
+  // Must be 4-128 characters in length. Valid characters are `/[a-z][0-9]-/`.
   // Must be unique across all MetadataStores in the parent Location.
   // (Otherwise the request will fail with ALREADY_EXISTS, or PERMISSION_DENIED
   // if the caller can't view the preexisting MetadataStore.)
@@ -322,7 +389,7 @@ message CreateMetadataStoreOperationMetadata {
 message GetMetadataStoreRequest {
   // Required. The resource name of the MetadataStore to retrieve.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -335,7 +402,7 @@ message GetMetadataStoreRequest {
 message ListMetadataStoresRequest {
   // Required. The Location whose MetadataStores should be listed.
   // Format:
-  // projects/{project}/locations/{location}
+  // `projects/{project}/locations/{location}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -373,7 +440,7 @@ message ListMetadataStoresResponse {
 message DeleteMetadataStoreRequest {
   // Required. The resource name of the MetadataStore to delete.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -381,10 +448,8 @@ message DeleteMetadataStoreRequest {
     }
   ];
 
-  // If set to true, any child resources of this MetadataStore will be deleted.
-  // (Otherwise, the request will fail with a FAILED_PRECONDITION error if the
-  // MetadataStore has any child resources.)
-  bool force = 2;
+  // Deprecated: Field is no longer supported.
+  bool force = 2 [deprecated = true];
 }
 
 // Details of operations that perform [MetadataService.DeleteMetadataStore][google.cloud.aiplatform.v1beta1.MetadataService.DeleteMetadataStore].
@@ -398,7 +463,7 @@ message CreateArtifactRequest {
   // Required. The resource name of the MetadataStore where the Artifact should
   // be created.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -410,9 +475,9 @@ message CreateArtifactRequest {
   Artifact artifact = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The {artifact} portion of the resource name with the format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
   // If not provided, the Artifact's ID will be a UUID generated by the service.
-  // Must be 4-128 characters in length. Valid characters are /[a-z][0-9]-/.
+  // Must be 4-128 characters in length. Valid characters are `/[a-z][0-9]-/`.
   // Must be unique across all Artifacts in the parent MetadataStore. (Otherwise
   // the request will fail with ALREADY_EXISTS, or PERMISSION_DENIED if the
   // caller can't view the preexisting Artifact.)
@@ -423,7 +488,7 @@ message CreateArtifactRequest {
 message GetArtifactRequest {
   // Required. The resource name of the Artifact to retrieve.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -436,7 +501,7 @@ message GetArtifactRequest {
 message ListArtifactsRequest {
   // Required. The MetadataStore whose Artifacts should be listed.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -503,15 +568,76 @@ message UpdateArtifactRequest {
   // The Artifact's [Artifact.name][google.cloud.aiplatform.v1beta1.Artifact.name] field is used to identify the Artifact to
   // be updated.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
   Artifact artifact = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. A FieldMask indicating which fields should be updated.
+  // Functionality of this field is not yet supported.
   google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // If set to true, and the [Artifact][google.cloud.aiplatform.v1beta1.Artifact] is not found, a new [Artifact][google.cloud.aiplatform.v1beta1.Artifact] will
-  // be created. In this situation, `update_mask` is ignored.
+  // If set to true, and the [Artifact][google.cloud.aiplatform.v1beta1.Artifact] is not found, a new [Artifact][google.cloud.aiplatform.v1beta1.Artifact] is
+  // created.
   bool allow_missing = 3;
+}
+
+// Request message for [MetadataService.DeleteArtifact][google.cloud.aiplatform.v1beta1.MetadataService.DeleteArtifact].
+message DeleteArtifactRequest {
+  // Required. The resource name of the Artifact to delete.
+  // Format:
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Artifact"
+    }
+  ];
+
+  // Optional. The etag of the Artifact to delete.
+  // If this is provided, it must match the server's etag. Otherwise, the
+  // request will fail with a FAILED_PRECONDITION.
+  string etag = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Request message for [MetadataService.PurgeArtifacts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeArtifacts].
+message PurgeArtifactsRequest {
+  // Required. The metadata store to purge Artifacts from.
+  // Format:
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "aiplatform.googleapis.com/Artifact"
+    }
+  ];
+
+  // Required. A required filter matching the Artifacts to be purged.
+  // E.g., `update_time <= 2020-11-19T11:30:00-04:00`.
+  string filter = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Flag to indicate to actually perform the purge.
+  // If `force` is set to false, the method will return a sample of
+  // Artifact names that would be deleted.
+  bool force = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for [MetadataService.PurgeArtifacts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeArtifacts].
+message PurgeArtifactsResponse {
+  // The number of Artifacts that this request deleted (or, if `force` is false,
+  // the number of Artifacts that will be deleted). This can be an estimate.
+  int64 purge_count = 1;
+
+  // A sample of the Artifact names that will be deleted.
+  // Only populated if `force` is set to false. The maximum number of samples is
+  // 100 (it is possible to return fewer).
+  repeated string purge_sample = 2 [(google.api.resource_reference) = {
+                                      type: "aiplatform.googleapis.com/Artifact"
+                                    }];
+}
+
+// Details of operations that perform [MetadataService.PurgeArtifacts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeArtifacts].
+message PurgeArtifactsMetadata {
+  // Operation metadata for purging Artifacts.
+  GenericOperationMetadata generic_metadata = 1;
 }
 
 // Request message for [MetadataService.CreateContext][google.cloud.aiplatform.v1beta1.MetadataService.CreateContext].
@@ -519,7 +645,7 @@ message CreateContextRequest {
   // Required. The resource name of the MetadataStore where the Context should be
   // created.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -531,9 +657,9 @@ message CreateContextRequest {
   Context context = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The {context} portion of the resource name with the format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}.
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`.
   // If not provided, the Context's ID will be a UUID generated by the service.
-  // Must be 4-128 characters in length. Valid characters are /[a-z][0-9]-/.
+  // Must be 4-128 characters in length. Valid characters are `/[a-z][0-9]-/`.
   // Must be unique across all Contexts in the parent MetadataStore. (Otherwise
   // the request will fail with ALREADY_EXISTS, or PERMISSION_DENIED if the
   // caller can't view the preexisting Context.)
@@ -544,7 +670,7 @@ message CreateContextRequest {
 message GetContextRequest {
   // Required. The resource name of the Context to retrieve.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -557,7 +683,7 @@ message GetContextRequest {
 message ListContextsRequest {
   // Required. The MetadataStore whose Contexts should be listed.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -628,22 +754,23 @@ message UpdateContextRequest {
   // The Context's [Context.name][google.cloud.aiplatform.v1beta1.Context.name] field is used to identify the Context to be
   // updated.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   Context context = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. A FieldMask indicating which fields should be updated.
+  // Functionality of this field is not yet supported.
   google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // If set to true, and the [Context][google.cloud.aiplatform.v1beta1.Context] is not found, a new [Context][google.cloud.aiplatform.v1beta1.Context] will be
-  // created. In this situation, `update_mask` is ignored.
+  // If set to true, and the [Context][google.cloud.aiplatform.v1beta1.Context] is not found, a new [Context][google.cloud.aiplatform.v1beta1.Context] is
+  // created.
   bool allow_missing = 3;
 }
 
 // Request message for [MetadataService.DeleteContext][google.cloud.aiplatform.v1beta1.MetadataService.DeleteContext].
 message DeleteContextRequest {
-  // Required. The resource name of the Context to retrieve.
+  // Required. The resource name of the Context to delete.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -651,11 +778,56 @@ message DeleteContextRequest {
     }
   ];
 
-  // If set to true, any child resources of this Context will be deleted.
-  // (Otherwise, the request will fail with a FAILED_PRECONDITION error if the
-  // Context has any child resources, such as another Context, Artifact, or
-  // Execution).
+  // The force deletion semantics is still undefined.
+  // Users should not use this field.
   bool force = 2;
+
+  // Optional. The etag of the Context to delete.
+  // If this is provided, it must match the server's etag. Otherwise, the
+  // request will fail with a FAILED_PRECONDITION.
+  string etag = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Request message for [MetadataService.PurgeContexts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeContexts].
+message PurgeContextsRequest {
+  // Required. The metadata store to purge Contexts from.
+  // Format:
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "aiplatform.googleapis.com/Context"
+    }
+  ];
+
+  // Required. A required filter matching the Contexts to be purged.
+  // E.g., `update_time <= 2020-11-19T11:30:00-04:00`.
+  string filter = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Flag to indicate to actually perform the purge.
+  // If `force` is set to false, the method will return a sample of
+  // Context names that would be deleted.
+  bool force = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for [MetadataService.PurgeContexts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeContexts].
+message PurgeContextsResponse {
+  // The number of Contexts that this request deleted (or, if `force` is false,
+  // the number of Contexts that will be deleted). This can be an estimate.
+  int64 purge_count = 1;
+
+  // A sample of the Context names that will be deleted.
+  // Only populated if `force` is set to false. The maximum number of samples is
+  // 100 (it is possible to return fewer).
+  repeated string purge_sample = 2 [(google.api.resource_reference) = {
+                                      type: "aiplatform.googleapis.com/Context"
+                                    }];
+}
+
+// Details of operations that perform [MetadataService.PurgeContexts][google.cloud.aiplatform.v1beta1.MetadataService.PurgeContexts].
+message PurgeContextsMetadata {
+  // Operation metadata for purging Contexts.
+  GenericOperationMetadata generic_metadata = 1;
 }
 
 // Request message for [MetadataService.AddContextArtifactsAndExecutions][google.cloud.aiplatform.v1beta1.MetadataService.AddContextArtifactsAndExecutions].
@@ -663,7 +835,7 @@ message AddContextArtifactsAndExecutionsRequest {
   // Required. The resource name of the Context that the Artifacts and Executions
   // belong to.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   string context = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -674,7 +846,7 @@ message AddContextArtifactsAndExecutionsRequest {
   // The resource names of the Artifacts to attribute to the Context.
   //
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
   repeated string artifacts = 2 [(google.api.resource_reference) = {
                                    type: "aiplatform.googleapis.com/Artifact"
                                  }];
@@ -683,7 +855,7 @@ message AddContextArtifactsAndExecutionsRequest {
   // Context.
   //
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   repeated string executions = 3 [(google.api.resource_reference) = {
                                     type: "aiplatform.googleapis.com/Execution"
                                   }];
@@ -699,7 +871,7 @@ message AddContextChildrenRequest {
   // Required. The resource name of the parent Context.
   //
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   string context = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -723,7 +895,7 @@ message QueryContextLineageSubgraphRequest {
   // Required. The resource name of the Context whose Artifacts and Executions
   // should be retrieved as a LineageSubgraph.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/contexts/{context}`
   //
   // The request may error with FAILED_PRECONDITION if the number of Artifacts,
   // the number of Executions, or the number of Events that would be returned
@@ -741,7 +913,7 @@ message CreateExecutionRequest {
   // Required. The resource name of the MetadataStore where the Execution should
   // be created.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -753,10 +925,10 @@ message CreateExecutionRequest {
   Execution execution = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The {execution} portion of the resource name with the format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   // If not provided, the Execution's ID will be a UUID generated by the
   // service.
-  // Must be 4-128 characters in length. Valid characters are /[a-z][0-9]-/.
+  // Must be 4-128 characters in length. Valid characters are `/[a-z][0-9]-/`.
   // Must be unique across all Executions in the parent MetadataStore.
   // (Otherwise the request will fail with ALREADY_EXISTS, or PERMISSION_DENIED
   // if the caller can't view the preexisting Execution.)
@@ -767,7 +939,7 @@ message CreateExecutionRequest {
 message GetExecutionRequest {
   // Required. The resource name of the Execution to retrieve.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -780,7 +952,7 @@ message GetExecutionRequest {
 message ListExecutionsRequest {
   // Required. The MetadataStore whose Executions should be listed.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -846,15 +1018,77 @@ message UpdateExecutionRequest {
   // The Execution's [Execution.name][google.cloud.aiplatform.v1beta1.Execution.name] field is used to identify the Execution
   // to be updated.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   Execution execution = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. A FieldMask indicating which fields should be updated.
+  // Functionality of this field is not yet supported.
   google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 
   // If set to true, and the [Execution][google.cloud.aiplatform.v1beta1.Execution] is not found, a new [Execution][google.cloud.aiplatform.v1beta1.Execution]
-  // will be created. In this situation, `update_mask` is ignored.
+  // is created.
   bool allow_missing = 3;
+}
+
+// Request message for [MetadataService.DeleteExecution][google.cloud.aiplatform.v1beta1.MetadataService.DeleteExecution].
+message DeleteExecutionRequest {
+  // Required. The resource name of the Execution to delete.
+  // Format:
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Execution"
+    }
+  ];
+
+  // Optional. The etag of the Execution to delete.
+  // If this is provided, it must match the server's etag. Otherwise, the
+  // request will fail with a FAILED_PRECONDITION.
+  string etag = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Request message for [MetadataService.PurgeExecutions][google.cloud.aiplatform.v1beta1.MetadataService.PurgeExecutions].
+message PurgeExecutionsRequest {
+  // Required. The metadata store to purge Executions from.
+  // Format:
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "aiplatform.googleapis.com/Execution"
+    }
+  ];
+
+  // Required. A required filter matching the Executions to be purged.
+  // E.g., `update_time <= 2020-11-19T11:30:00-04:00`.
+  string filter = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Flag to indicate to actually perform the purge.
+  // If `force` is set to false, the method will return a sample of
+  // Execution names that would be deleted.
+  bool force = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for [MetadataService.PurgeExecutions][google.cloud.aiplatform.v1beta1.MetadataService.PurgeExecutions].
+message PurgeExecutionsResponse {
+  // The number of Executions that this request deleted (or, if `force` is
+  // false, the number of Executions that will be deleted). This can be an
+  // estimate.
+  int64 purge_count = 1;
+
+  // A sample of the Execution names that will be deleted.
+  // Only populated if `force` is set to false. The maximum number of samples is
+  // 100 (it is possible to return fewer).
+  repeated string purge_sample = 2 [(google.api.resource_reference) = {
+                                      type: "aiplatform.googleapis.com/Execution"
+                                    }];
+}
+
+// Details of operations that perform [MetadataService.PurgeExecutions][google.cloud.aiplatform.v1beta1.MetadataService.PurgeExecutions].
+message PurgeExecutionsMetadata {
+  // Operation metadata for purging Executions.
+  GenericOperationMetadata generic_metadata = 1;
 }
 
 // Request message for [MetadataService.AddExecutionEvents][google.cloud.aiplatform.v1beta1.MetadataService.AddExecutionEvents].
@@ -862,7 +1096,7 @@ message AddExecutionEventsRequest {
   // Required. The resource name of the Execution that the Events connect
   // Artifacts with.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   string execution = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -884,7 +1118,7 @@ message QueryExecutionInputsAndOutputsRequest {
   // Required. The resource name of the Execution whose input and output Artifacts should
   // be retrieved as a LineageSubgraph.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/executions/{execution}`
   string execution = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -898,7 +1132,7 @@ message CreateMetadataSchemaRequest {
   // Required. The resource name of the MetadataStore where the MetadataSchema should
   // be created.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -910,10 +1144,10 @@ message CreateMetadataSchemaRequest {
   MetadataSchema metadata_schema = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The {metadata_schema} portion of the resource name with the format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/metadataSchemas/{metadataschema}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/metadataSchemas/{metadataschema}`
   // If not provided, the MetadataStore's ID will be a UUID generated by the
   // service.
-  // Must be 4-128 characters in length. Valid characters are /[a-z][0-9]-/.
+  // Must be 4-128 characters in length. Valid characters are `/[a-z][0-9]-/`.
   // Must be unique across all MetadataSchemas in the parent Location.
   // (Otherwise the request will fail with ALREADY_EXISTS, or PERMISSION_DENIED
   // if the caller can't view the preexisting MetadataSchema.)
@@ -924,7 +1158,7 @@ message CreateMetadataSchemaRequest {
 message GetMetadataSchemaRequest {
   // Required. The resource name of the MetadataSchema to retrieve.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/metadataSchemas/{metadataschema}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/metadataSchemas/{metadataschema}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -937,7 +1171,7 @@ message GetMetadataSchemaRequest {
 message ListMetadataSchemasRequest {
   // Required. The MetadataStore whose MetadataSchemas should be listed.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -979,7 +1213,7 @@ message QueryArtifactLineageSubgraphRequest {
   // Required. The resource name of the Artifact whose Lineage needs to be retrieved as a
   // LineageSubgraph.
   // Format:
-  // projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}
+  // `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
   //
   // The request may error with FAILED_PRECONDITION if the number of Artifacts,
   // the number of Executions, or the number of Events that would be returned

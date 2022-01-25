@@ -27,6 +27,7 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
 import "google/type/expr.proto";
 
 option csharp_namespace = "Google.Cloud.Asset.V1";
@@ -165,7 +166,7 @@ service AssetService {
   // [google.longrunning.Operation][google.longrunning.Operation], which allows you to track the operation
   // status. We recommend intervals of at least 2 seconds with exponential
   // backoff retry to poll the operation result. The metadata contains the
-  // request to help callers to map responses to requests.
+  // metadata for the long-running operation.
   rpc AnalyzeIamPolicyLongrunning(AnalyzeIamPolicyLongrunningRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v1/{analysis_query.scope=*/*}:analyzeIamPolicyLongrunning"
@@ -173,9 +174,27 @@ service AssetService {
     };
     option (google.longrunning.operation_info) = {
       response_type: "google.cloud.asset.v1.AnalyzeIamPolicyLongrunningResponse"
-      metadata_type: "google.cloud.asset.v1.AnalyzeIamPolicyLongrunningRequest"
+      metadata_type: "google.cloud.asset.v1.AnalyzeIamPolicyLongrunningMetadata"
     };
   }
+
+  // Analyze moving a resource to a specified destination without kicking off
+  // the actual move. The analysis is best effort depending on the user's
+  // permissions of viewing different hierarchical policies and configurations.
+  // The policies and configuration are subject to change before the actual
+  // resource migration takes place.
+  rpc AnalyzeMove(AnalyzeMoveRequest) returns (AnalyzeMoveResponse) {
+    option (google.api.http) = {
+      get: "/v1/{resource=*/*}:analyzeMove"
+    };
+  }
+}
+
+// Represents the metadata of the longrunning operation for the
+// AnalyzeIamPolicyLongrunning rpc.
+message AnalyzeIamPolicyLongrunningMetadata {
+  // Output only. The time the operation was created.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Export asset request.
@@ -224,6 +243,23 @@ message ExportAssetsRequest {
 
   // Required. Output configuration indicating where the results will be output to.
   OutputConfig output_config = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // A list of relationship types to export, for example:
+  // `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+  // content_type=RELATIONSHIP.
+  // * If specified:
+  // it snapshots specified relationships. It returns an error if
+  // any of the [relationship_types] doesn't belong to the supported
+  // relationship types of the [asset_types] or if any of the [asset_types]
+  // doesn't belong to the source types of the [relationship_types].
+  // * Otherwise:
+  // it snapshots the supported relationships for all [asset_types] or returns
+  // an error if any of the [asset_types] has no relationship support.
+  // An unspecified asset types field means all supported asset_types.
+  // See [Introduction to Cloud Asset
+  // Inventory](https://cloud.google.com/asset-inventory/docs/overview) for all
+  // supported asset types and relationship types.
+  repeated string relationship_types = 6;
 }
 
 // The export asset response. This message is returned by the
@@ -296,6 +332,23 @@ message ListAssetsRequest {
   // unspecified for the first `ListAssetsRequest`. It is a continuation of a
   // prior `ListAssets` call, and the API should return the next page of assets.
   string page_token = 6;
+
+  // A list of relationship types to output, for example:
+  // `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+  // content_type=RELATIONSHIP.
+  // * If specified:
+  // it snapshots specified relationships. It returns an error if
+  // any of the [relationship_types] doesn't belong to the supported
+  // relationship types of the [asset_types] or if any of the [asset_types]
+  // doesn't belong to the source types of the [relationship_types].
+  // * Otherwise:
+  // it snapshots the supported relationships for all [asset_types] or returns
+  // an error if any of the [asset_types] has no relationship support.
+  // An unspecified asset types field means all supported asset_types.
+  // See [Introduction to Cloud Asset
+  // Inventory](https://cloud.google.com/asset-inventory/docs/overview)
+  // for all supported asset types and relationship types.
+  repeated string relationship_types = 7;
 }
 
 // ListAssets response.
@@ -344,6 +397,24 @@ message BatchGetAssetsHistoryRequest {
   // returned. The returned results contain all temporal assets whose time
   // window overlap with read_time_window.
   TimeWindow read_time_window = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A list of relationship types to output, for example:
+  // `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+  // content_type=RELATIONSHIP.
+  // * If specified:
+  // it outputs specified relationships' history on the [asset_names]. It
+  // returns an error if any of the [relationship_types] doesn't belong to the
+  // supported relationship types of the [asset_names] or if any of the
+  // [asset_names]'s types doesn't belong to the source types of the
+  // [relationship_types].
+  // * Otherwise:
+  // it outputs the supported relationships' history on the [asset_names] or
+  // returns an error if any of the [asset_names]'s types has no relationship
+  // support.
+  // See [Introduction to Cloud Asset
+  // Inventory](https://cloud.google.com/asset-inventory/docs/overview) for all
+  // supported asset types and relationship types.
+  repeated string relationship_types = 5 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Batch get assets history response.
@@ -659,9 +730,27 @@ message Feed {
   // optional.
   //
   // See our [user
-  // guide](https://cloud.google.com/asset-inventory/docs/monitoring-asset-changes#feed_with_condition)
+  // guide](https://cloud.google.com/asset-inventory/docs/monitoring-asset-changes-with-condition)
   // for detailed instructions.
   google.type.Expr condition = 6;
+
+  // A list of relationship types to output, for example:
+  // `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+  // content_type=RELATIONSHIP.
+  // * If specified:
+  // it outputs specified relationship updates on the [asset_names] or the
+  // [asset_types]. It returns an error if any of the [relationship_types]
+  // doesn't belong to the supported relationship types of the [asset_names] or
+  // [asset_types], or any of the [asset_names] or the [asset_types] doesn't
+  // belong to the source types of the [relationship_types].
+  // * Otherwise:
+  // it outputs the supported relationships of the types of [asset_names] and
+  // [asset_types] or returns an error if any of the [asset_names] or the
+  // [asset_types] has no replationship support.
+  // See [Introduction to Cloud Asset
+  // Inventory](https://cloud.google.com/asset-inventory/docs/overview)
+  // for all supported asset types and relationship types.
+  repeated string relationship_types = 7;
 }
 
 // Search all resources request.
@@ -703,8 +792,8 @@ message SearchAllResourcesRequest {
   //   encryption key whose name contains the word "key".
   // * `state:ACTIVE` to find Cloud resources whose state contains "ACTIVE" as a
   //   word.
-  // * `NOT state:ACTIVE` to find {{gcp_name}} resources whose state
-  //   doesn't contain "ACTIVE" as a word.
+  // * `NOT state:ACTIVE` to find Cloud resources whose state doesn't contain
+  //   "ACTIVE" as a word.
   // * `createTime<1609459200` to find Cloud resources that were created before
   //   "2021-01-01 00:00:00 UTC". 1609459200 is the epoch timestamp of
   //   "2021-01-01 00:00:00 UTC" in seconds.
@@ -754,6 +843,7 @@ message SearchAllResourcesRequest {
   // to indicate descending order. Redundant space characters are ignored.
   // Example: "location DESC, name".
   // Only singular primitive fields in the response are sortable:
+  //
   //   * name
   //   * assetType
   //   * project
@@ -766,10 +856,41 @@ message SearchAllResourcesRequest {
   //   * state
   //   * parentFullResourceName
   //   * parentAssetType
+  //
   // All the other fields such as repeated fields (e.g., `networkTags`), map
   // fields (e.g., `labels`) and struct fields (e.g., `additionalAttributes`)
   // are not supported.
   string order_by = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A comma-separated list of fields specifying which fields to be returned in
+  // ResourceSearchResult. Only '*' or combination of top level fields can be
+  // specified. Field names of both snake_case and camelCase are supported.
+  // Examples: `"*"`, `"name,location"`, `"name,versionedResources"`.
+  //
+  // The read_mask paths must be valid field paths listed but not limited to
+  // (both snake_case and camelCase are supported):
+  //
+  //   * name
+  //   * assetType
+  //   * project
+  //   * displayName
+  //   * description
+  //   * location
+  //   * labels
+  //   * networkTags
+  //   * kmsKey
+  //   * createTime
+  //   * updateTime
+  //   * state
+  //   * additionalAttributes
+  //   * versionedResources
+  //
+  // If read_mask is not specified, all fields except versionedResources will
+  // be returned.
+  // If only '*' is specified, all fields including versionedResources will be
+  // returned.
+  // Any invalid field path will trigger INVALID_ARGUMENT error.
+  google.protobuf.FieldMask read_mask = 8 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Search all resources response.
@@ -838,6 +959,10 @@ message SearchAllIamPoliciesRequest {
   // * `resource:(instance1 OR instance2) policy:amy` to find
   //   IAM policy bindings that are set on resources "instance1" or
   //   "instance2" and also specify user "amy".
+  // * `roles:roles/compute.admin` to find IAM policy bindings that specify the
+  //   Compute Admin role.
+  // * `memberTypes:user` to find IAM policy bindings that contain the "user"
+  //   member type.
   string query = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The page size for search result pagination. Page size is capped at 500 even
@@ -851,6 +976,36 @@ message SearchAllIamPoliciesRequest {
   // previous response. The values of all other method parameters must be
   // identical to those in the previous call.
   string page_token = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A list of asset types that the IAM policies are attached to. If empty, it
+  // will search the IAM policies that are attached to all the [searchable asset
+  // types](https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types).
+  //
+  // Regular expressions are also supported. For example:
+  //
+  // * "compute.googleapis.com.*" snapshots IAM policies attached to asset type
+  // starts with "compute.googleapis.com".
+  // * ".*Instance" snapshots IAM policies attached to asset type ends with
+  // "Instance".
+  // * ".*Instance.*" snapshots IAM policies attached to asset type contains
+  // "Instance".
+  //
+  // See [RE2](https://github.com/google/re2/wiki/Syntax) for all supported
+  // regular expression syntax. If the regular expression does not match any
+  // supported asset type, an INVALID_ARGUMENT error will be returned.
+  repeated string asset_types = 5 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A comma-separated list of fields specifying the sorting order of the
+  // results. The default order is ascending. Add " DESC" after the field name
+  // to indicate descending order. Redundant space characters are ignored.
+  // Example: "assetType DESC, resource".
+  // Only singular primitive fields in the response are sortable:
+  //   * resource
+  //   * assetType
+  //   * project
+  // All the other fields such as repeated fields (e.g., `folders`) and
+  // non-primitive fields (e.g., `policy`) are not supported.
+  string order_by = 7 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Search all IAM policies response.
@@ -1169,7 +1324,84 @@ message AnalyzeIamPolicyLongrunningRequest {
 }
 
 // A response message for [AssetService.AnalyzeIamPolicyLongrunning][google.cloud.asset.v1.AssetService.AnalyzeIamPolicyLongrunning].
-message AnalyzeIamPolicyLongrunningResponse {}
+message AnalyzeIamPolicyLongrunningResponse {
+
+}
+
+// The request message for performing resource move analysis.
+message AnalyzeMoveRequest {
+  // View enum for supporting partial analysis responses.
+  enum AnalysisView {
+    // The default/unset value.
+    // The API will default to the FULL view.
+    ANALYSIS_VIEW_UNSPECIFIED = 0;
+
+    // Full analysis including all level of impacts of the specified resource
+    // move.
+    FULL = 1;
+
+    // Basic analysis only including blockers which will prevent the specified
+    // resource move at runtime.
+    BASIC = 2;
+  }
+
+  // Required. Name of the resource to perform the analysis against.
+  // Only GCP Project are supported as of today. Hence, this can only be Project
+  // ID (such as "projects/my-project-id") or a Project Number (such as
+  // "projects/12345").
+  string resource = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Name of the GCP Folder or Organization to reparent the target
+  // resource. The analysis will be performed against hypothetically moving the
+  // resource to this specified desitination parent. This can only be a Folder
+  // number (such as "folders/123") or an Organization number (such as
+  // "organizations/123").
+  string destination_parent = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Analysis view indicating what information should be included in the
+  // analysis response. If unspecified, the default view is FULL.
+  AnalysisView view = 3;
+}
+
+// The response message for resource move analysis.
+message AnalyzeMoveResponse {
+  // The list of analyses returned from performing the intended resource move
+  // analysis. The analysis is grouped by different Cloud services.
+  repeated MoveAnalysis move_analysis = 1;
+}
+
+// A message to group the analysis information.
+message MoveAnalysis {
+  // The user friendly display name of the analysis. E.g. IAM, Organization
+  // Policy etc.
+  string display_name = 1;
+
+  oneof result {
+    // Analysis result of moving the target resource.
+    MoveAnalysisResult analysis = 2;
+
+    // Description of error encountered when performing the analysis.
+    google.rpc.Status error = 3;
+  }
+}
+
+// An analysis result including blockers and warnings.
+message MoveAnalysisResult {
+  // Blocking information that would prevent the target resource from moving
+  // to the specified destination at runtime.
+  repeated MoveImpact blockers = 1;
+
+  // Warning information indicating that moving the target resource to the
+  // specified destination might be unsafe. This can include important policy
+  // information and configuration changes, but will not block moves at runtime.
+  repeated MoveImpact warnings = 2;
+}
+
+// A message to group impacts of moving the target resource.
+message MoveImpact {
+  // User friendly impact detail in a free form message.
+  string detail = 1;
+}
 
 // Asset content type.
 enum ContentType {
@@ -1190,4 +1422,7 @@ enum ContentType {
 
   // The runtime OS Inventory information.
   OS_INVENTORY = 6;
+
+  // The related resources.
+  RELATIONSHIP = 7;
 }

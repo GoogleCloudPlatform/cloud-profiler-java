@@ -16,10 +16,11 @@ syntax = "proto3";
 
 package google.cloud.dialogflow.cx.v3beta1;
 
+import "google/api/annotations.proto";
 import "google/api/resource.proto";
+import "google/cloud/dialogflow/cx/v3beta1/advanced_settings.proto";
 import "google/cloud/dialogflow/cx/v3beta1/response_message.proto";
 import "google/protobuf/struct.proto";
-import "google/api/annotations.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Dialogflow.Cx.V3Beta1";
@@ -28,6 +29,7 @@ option java_multiple_files = true;
 option java_outer_classname = "FulfillmentProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3beta1";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3beta1";
 
 // A fulfillment can do one or more of the following actions at the same time:
 //
@@ -94,6 +96,17 @@ message Fulfillment {
   string webhook = 2 [(google.api.resource_reference) = {
                         type: "dialogflow.googleapis.com/Webhook"
                       }];
+
+  // Whether Dialogflow should return currently queued fulfillment response
+  // messages in streaming APIs. If a webhook is specified, it happens before
+  // Dialogflow invokes webhook.
+  // Warning:
+  // 1) This flag only affects streaming API. Responses are still queued
+  // and returned once in non-streaming API.
+  // 2) The flag can be enabled in any fulfillment but only the first 3 partial
+  // responses will be returned. You may only want to apply it to fulfillments
+  // that have slow webhooks.
+  bool return_partial_responses = 8;
 
   // The tag used by the webhook to identify which fulfillment is being called.
   // This field is required if `webhook` is specified.

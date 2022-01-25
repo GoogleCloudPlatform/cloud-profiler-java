@@ -20,7 +20,6 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "google/api/annotations.proto";
 
 option csharp_namespace = "Google.Cloud.ContactCenterInsights.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/contactcenterinsights/v1;contactcenterinsights";
@@ -29,6 +28,11 @@ option java_outer_classname = "ResourcesProto";
 option java_package = "com.google.cloud.contactcenterinsights.v1";
 option php_namespace = "Google\\Cloud\\ContactCenterInsights\\V1";
 option ruby_package = "Google::Cloud::ContactCenterInsights::V1";
+option (google.api.resource_definition) = {
+  type: "dialogflow.googleapis.com/Participant"
+  pattern: "projects/{project}/conversations/{conversation}/participants/{participant}"
+  pattern: "projects/{project}/locations/{location}/conversations/{conversation}/participants/{participant}"
+};
 
 // The conversation resource.
 message Conversation {
@@ -68,30 +72,15 @@ message Conversation {
         float confidence = 4;
       }
 
-      // The participant of the transcript segment.
-      message Participant {
-        // The role of the participant.
-        enum Role {
-          // Participant's role is not set.
-          ROLE_UNSPECIFIED = 0;
-
-          // Participant is a human agent.
-          HUMAN_AGENT = 1;
-
-          // Participant is an automated agent.
-          AUTOMATED_AGENT = 2;
-
-          // Participant is an end user who conversed with the contact center.
-          END_USER = 3;
-        }
-
-        // The name of the Dialogflow participant. Format:
-        // projects/{project}/locations/{location}/conversations/{conversation}/participants/{participant}
-        string dialogflow_participant = 1;
-
-        // The role of the participant.
-        Role role = 2;
+      // Metadata from Dialogflow relating to the current transcript segment.
+      message DialogflowSegmentMetadata {
+        // Whether the transcript segment was covered under the configured smart
+        // reply allowlist in Agent Assist.
+        bool smart_reply_allowlist_covered = 1;
       }
+
+      // The time that the message occurred, if provided.
+      google.protobuf.Timestamp message_time = 6;
 
       // The text of this segment.
       string text = 1;
@@ -115,7 +104,13 @@ message Conversation {
       int32 channel_tag = 5;
 
       // The participant of this segment.
-      Participant participant = 8;
+      ConversationParticipant segment_participant = 9;
+
+      // CCAI metadata relating to the current transcript segment.
+      DialogflowSegmentMetadata dialogflow_segment_metadata = 10;
+
+      // The sentiment for this transcript segment.
+      SentimentData sentiment = 11;
     }
 
     // A list of sequential transcript segments that comprise the conversation.
@@ -124,7 +119,7 @@ message Conversation {
 
   // Possible media for the conversation.
   enum Medium {
-    // Default value.
+    // Default value, if unspecified will default to PHONE_CALL.
     MEDIUM_UNSPECIFIED = 0;
 
     // The format for conversations that took place over the phone.
@@ -185,7 +180,7 @@ message Conversation {
   // Output only. The conversation transcript.
   Transcript transcript = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Immutable. The conversation medium.
+  // Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
   Medium medium = 9 [(google.api.field_behavior) = IMMUTABLE];
 
   // Output only. The duration of the conversation.
@@ -205,6 +200,9 @@ message Conversation {
   // Dialogflow intent, format:
   // projects/{project}/agent/{agent}/intents/{intent}
   map<string, DialogflowIntent> dialogflow_intents = 18 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Obfuscated user ID which the customer sent to us.
+  string obfuscated_user_id = 21;
 }
 
 // The analysis resource.
@@ -302,7 +300,10 @@ message AnalysisResult {
 // Issue Modeling result on a conversation.
 message IssueModelResult {
   // Issue model that generates the result.
-  string issue_model = 1;
+  // Format: projects/{project}/locations/{location}/issueModels/{issue_model}
+  string issue_model = 1 [(google.api.resource_reference) = {
+                            type: "contactcenterinsights.googleapis.com/IssueModel"
+                          }];
 
   // All the matched issues.
   repeated IssueAssignment issues = 2;
@@ -325,6 +326,10 @@ message IssueAssignment {
   // Score indicating the likelihood of the issue assignment.
   // currently bounded on [0,1].
   double score = 2;
+
+  // Immutable. Display name of the assigned issue. This field is set at time of analyis
+  // and immutable since then.
+  string display_name = 3 [(google.api.field_behavior) = IMMUTABLE];
 }
 
 // A piece of metadata that applies to a window of a call.
@@ -368,11 +373,6 @@ message CallAnnotation {
 message AnnotationBoundary {
   // A detailed boundary, which describes a more specific point.
   oneof detailed_boundary {
-    // Deprecated: Use `word_index` for the detailed boundary.
-    // The time offset of this boundary with respect to the start time of the
-    // first word in the transcript piece.
-    google.protobuf.Duration time_offset = 2 [deprecated = true];
-
     // The word index of this boundary with respect to the first word in the
     // transcript piece. This index starts at zero.
     int32 word_index = 3;
@@ -586,6 +586,21 @@ message IssueModel {
     pattern: "projects/{project}/locations/{location}/issueModels/{issue_model}"
   };
 
+  // Configs for the input data used to create the issue model.
+  message InputDataConfig {
+    // Medium of conversations used in training data. This field is being
+    // deprecated. To specify the medium to be used in training a new issue
+    // model, set the `medium` field on `filter`.
+    Conversation.Medium medium = 1 [deprecated = true];
+
+    // Output only. Number of conversations used in training. Output only.
+    int64 training_conversations_count = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // A filter to reduce the conversations used for training the model to a
+    // specific subset.
+    string filter = 3;
+  }
+
   // State of the model.
   enum State {
     // Unspecified.
@@ -624,6 +639,9 @@ message IssueModel {
 
   // Output only. State of the model.
   State state = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Configs for the input data that used to create the issue model.
+  InputDataConfig input_data_config = 6;
 
   // Output only. Immutable. The issue model's label statistics on its training data.
   IssueModelLabelStats training_stats = 7 [
@@ -665,6 +683,9 @@ message IssueModelLabelStats {
 
     // Number of conversations attached to the issue at this point in time.
     int64 labeled_conversations_count = 2;
+
+    // Display name of the issue.
+    string display_name = 3;
   }
 
   // Number of conversations the issue model has analyzed at this point in time.
@@ -734,6 +755,14 @@ message PhraseMatcher {
 
   // Output only. The most recent time at which the activation status was updated.
   google.protobuf.Timestamp activation_update_time = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The role whose utterances the phrase matcher should be matched
+  // against. If the role is ROLE_UNSPECIFIED it will be matched against any
+  // utterances in the transcript.
+  ConversationParticipant.Role role_match = 10;
+
+  // Output only. The most recent time at which the phrase matcher was updated.
+  google.protobuf.Timestamp update_time = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // A message representing a rule in the phrase matcher.
@@ -833,6 +862,8 @@ message Settings {
   // * "create-analysis": Notify each time an analysis is created.
   // * "create-conversation": Notify each time a conversation is created.
   // * "export-insights-data": Notify each time an export is complete.
+  // * "update-conversation": Notify each time a conversation is updated via
+  // UpdateConversation.
   //
   // Values are Pub/Sub topics. The format of each Pub/Sub topic is:
   // projects/{project}/topics/{topic}
@@ -1014,4 +1045,72 @@ message DialogflowInteractionData {
   // The confidence of the match ranging from 0.0 (completely uncertain) to 1.0
   // (completely certain).
   float confidence = 2;
+}
+
+// The call participant speaking for a given utterance.
+message ConversationParticipant {
+  // The role of the participant.
+  enum Role {
+    // Participant's role is not set.
+    ROLE_UNSPECIFIED = 0;
+
+    // Participant is a human agent.
+    HUMAN_AGENT = 1;
+
+    // Participant is an automated agent.
+    AUTOMATED_AGENT = 2;
+
+    // Participant is an end user who conversed with the contact center.
+    END_USER = 3;
+
+    // Participant is either a human or automated agent.
+    ANY_AGENT = 4;
+  }
+
+  oneof participant {
+    // The name of the participant provided by Dialogflow. Format:
+    // projects/{project}/locations/{location}/conversations/{conversation}/participants/{participant}
+    string dialogflow_participant_name = 5 [(google.api.resource_reference) = {
+                                              type: "dialogflow.googleapis.com/Participant"
+                                            }];
+
+    // A user-specified ID representing the participant.
+    string user_id = 6;
+  }
+
+  // Deprecated. Use `dialogflow_participant_name` instead.
+  // The name of the Dialogflow participant. Format:
+  // projects/{project}/locations/{location}/conversations/{conversation}/participants/{participant}
+  string dialogflow_participant = 1 [deprecated = true];
+
+  // Obfuscated user ID from Dialogflow.
+  string obfuscated_external_user_id = 3;
+
+  // The role of the participant.
+  Role role = 2;
+}
+
+// The View resource.
+message View {
+  option (google.api.resource) = {
+    type: "contactcenterinsights.googleapis.com/View"
+    pattern: "projects/{project}/locations/{location}/views/{view}"
+  };
+
+  // Immutable. The resource name of the view.
+  // Format:
+  // projects/{project}/locations/{location}/views/{view}
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The human-readable display name of the view.
+  string display_name = 2;
+
+  // Output only. The time at which this view was created.
+  google.protobuf.Timestamp create_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The most recent time at which the view was updated.
+  google.protobuf.Timestamp update_time = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // String with specific view properties.
+  string value = 5;
 }

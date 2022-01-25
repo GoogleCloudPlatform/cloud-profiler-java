@@ -25,11 +25,15 @@ import "google/cloud/aiplatform/v1beta1/operation.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "EndpointServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
+// A service for managing Vertex AI's Endpoints.
 service EndpointService {
   option (google.api.default_host) = "aiplatform.googleapis.com";
   option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/cloud-platform";
@@ -41,6 +45,7 @@ service EndpointService {
       body: "endpoint"
     };
     option (google.api.method_signature) = "parent,endpoint";
+    option (google.api.method_signature) = "parent,endpoint,endpoint_id";
     option (google.longrunning.operation_info) = {
       response_type: "Endpoint"
       metadata_type: "CreateEndpointOperationMetadata"
@@ -125,6 +130,16 @@ message CreateEndpointRequest {
 
   // Required. The Endpoint to create.
   Endpoint endpoint = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Immutable. The ID to use for endpoint, which will become the final
+  // component of the endpoint resource name.
+  // If not provided, Vertex AI will generate a value for this ID.
+  //
+  // This value should be 1-10 characters, and valid characters are /[0-9]/.
+  // When using HTTP/JSON, this field is populated based on a query string
+  // argument, such as `?endpoint_id=12345`. This is the fallback for fields
+  // that are not included in either the URI or the body.
+  string endpoint_id = 4 [(google.api.field_behavior) = IMMUTABLE];
 }
 
 // Runtime operation information for [EndpointService.CreateEndpoint][google.cloud.aiplatform.v1beta1.EndpointService.CreateEndpoint].

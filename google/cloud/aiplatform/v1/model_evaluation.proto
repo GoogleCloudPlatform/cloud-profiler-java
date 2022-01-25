@@ -18,14 +18,18 @@ package google.cloud.aiplatform.v1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/aiplatform/v1/explanation.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "ModelEvaluationProto";
 option java_package = "com.google.cloud.aiplatform.v1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1";
+option ruby_package = "Google::Cloud::AIPlatform::V1";
 
 // A collection of metrics calculated by comparing Model's predictions on all of
 // the test data against annotations from the test data.
@@ -56,4 +60,10 @@ message ModelEvaluation {
   // [ModelService.ListModelEvaluationSlices][google.cloud.aiplatform.v1.ModelService.ListModelEvaluationSlices] request, in the form of
   // `slice.dimension = <dimension>`.
   repeated string slice_dimensions = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Aggregated explanation metrics for the Model's prediction output over the
+  // data this ModelEvaluation uses. This field is populated only if the Model
+  // is evaluated with explanations, and only for AutoML tabular Models.
+  //
+  ModelExplanation model_explanation = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

@@ -40,6 +40,7 @@ option java_multiple_files = true;
 option java_outer_classname = "TestCaseProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3beta1";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3beta1";
 
 // Service for managing [Test Cases][google.cloud.dialogflow.cx.v3beta1.TestCase] and
 // [Test Case Results][google.cloud.dialogflow.cx.v3beta1.TestCaseResult].
@@ -93,6 +94,13 @@ service TestCases {
   }
 
   // Kicks off a test case run.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: [RunTestCaseMetadata][google.cloud.dialogflow.cx.v3beta1.RunTestCaseMetadata]
+  // - `response`: [RunTestCaseResponse][google.cloud.dialogflow.cx.v3beta1.RunTestCaseResponse]
   rpc RunTestCase(RunTestCaseRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{name=projects/*/locations/*/agents/*/testCases/*}:run"
@@ -105,6 +113,13 @@ service TestCases {
   }
 
   // Kicks off a batch run of test cases.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: [BatchRunTestCasesMetadata][google.cloud.dialogflow.cx.v3beta1.BatchRunTestCasesMetadata]
+  // - `response`: [BatchRunTestCasesResponse][google.cloud.dialogflow.cx.v3beta1.BatchRunTestCasesResponse]
   rpc BatchRunTestCases(BatchRunTestCasesRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{parent=projects/*/locations/*/agents/*}/testCases:batchRun"
@@ -126,6 +141,13 @@ service TestCases {
   // Imports the test cases from a Cloud Storage bucket or a local file. It
   // always creates new test cases and won't overwite any existing ones. The
   // provided ID in the imported test case is neglected.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: [ImportTestCasesMetadata][google.cloud.dialogflow.cx.v3beta1.ImportTestCasesMetadata]
+  // - `response`: [ImportTestCasesResponse][google.cloud.dialogflow.cx.v3beta1.ImportTestCasesResponse]
   rpc ImportTestCases(ImportTestCasesRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{parent=projects/*/locations/*/agents/*}/testCases:import"
@@ -139,6 +161,13 @@ service TestCases {
 
   // Exports the test cases under the agent to a Cloud Storage bucket or a local
   // file. Filter can be applied to export a subset of test cases.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: [ExportTestCasesMetadata][google.cloud.dialogflow.cx.v3beta1.ExportTestCasesMetadata]
+  // - `response`: [ExportTestCasesResponse][google.cloud.dialogflow.cx.v3beta1.ExportTestCasesResponse]
   rpc ExportTestCases(ExportTestCasesRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{parent=projects/*/locations/*/agents/*}/testCases:export"
@@ -266,6 +295,9 @@ message ConversationTurn {
     // utterance. Often if parameters are injected, webhooks should not be
     // enabled.
     bool is_webhook_enabled = 3;
+
+    // Whether sentiment analysis is enabled.
+    bool enable_sentiment_analysis = 7;
   }
 
   // The output from the virtual agent.
@@ -280,7 +312,7 @@ message ConversationTurn {
 
     // Required. Input only. The diagnostic
     // [info][Session.DetectIntentResponse.QueryResult.diagnostic_info]
-    // output for the turn.
+    // output for the turn. Required to calculate the testing coverage.
     google.protobuf.Struct diagnostic_info = 6 [
       (google.api.field_behavior) = REQUIRED,
       (google.api.field_behavior) = INPUT_ONLY
@@ -631,6 +663,7 @@ message RunTestCaseResponse {
 }
 
 // Metadata returned for the [TestCases.RunTestCase][google.cloud.dialogflow.cx.v3beta1.TestCases.RunTestCase] long running operation.
+// This message currently has no fields.
 message RunTestCaseMetadata {
 
 }
@@ -809,6 +842,7 @@ message ExportTestCasesResponse {
 
 // Metadata returned for the [TestCases.ExportTestCases][google.cloud.dialogflow.cx.v3beta1.TestCases.ExportTestCases] long running
 // operation.
+// This message currently has no fields.
 message ExportTestCasesMetadata {
 
 }

@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/dialogflow/cx/v3/advanced_settings.proto";
 import "google/cloud/dialogflow/cx/v3/page.proto";
 import "google/cloud/dialogflow/cx/v3/validation_message.proto";
 import "google/longrunning/operations.proto";
@@ -34,6 +35,7 @@ option java_multiple_files = true;
 option java_outer_classname = "FlowProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3";
 
 // Service for managing [Flows][google.cloud.dialogflow.cx.v3.Flow].
 service Flows {
@@ -43,6 +45,10 @@ service Flows {
       "https://www.googleapis.com/auth/dialogflow";
 
   // Creates a flow in the specified agent.
+  //
+  // Note: You should always train a flow prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc CreateFlow(CreateFlowRequest) returns (Flow) {
     option (google.api.http) = {
       post: "/v3/{parent=projects/*/locations/*/agents/*}/flows"
@@ -76,6 +82,10 @@ service Flows {
   }
 
   // Updates the specified flow.
+  //
+  // Note: You should always train a flow prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc UpdateFlow(UpdateFlowRequest) returns (Flow) {
     option (google.api.http) = {
       patch: "/v3/{flow.name=projects/*/locations/*/agents/*/flows/*}"
@@ -86,6 +96,19 @@ service Flows {
 
   // Trains the specified flow. Note that only the flow in 'draft' environment
   // is trained.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
+  //
+  // Note: You should always train a flow prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc TrainFlow(TrainFlowRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3/{name=projects/*/locations/*/agents/*/flows/*}:train"
@@ -118,6 +141,18 @@ service Flows {
   }
 
   // Imports the specified flow to the specified agent from a binary file.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: [ImportFlowResponse][google.cloud.dialogflow.cx.v3.ImportFlowResponse]
+  //
+  // Note: You should always train a flow prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc ImportFlow(ImportFlowRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3/{parent=projects/*/locations/*/agents/*}/flows:import"
@@ -130,6 +165,14 @@ service Flows {
   }
 
   // Exports the specified flow to a binary file.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: [ExportFlowResponse][google.cloud.dialogflow.cx.v3.ExportFlowResponse]
   //
   // Note that resources (e.g. intents, entities, webhooks) that the flow
   // references will also be exported.
@@ -402,9 +445,9 @@ message UpdateFlowRequest {
   // Required. The flow to update.
   Flow flow = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. The mask to control which fields get updated. If `update_mask` is not
-  // specified, an error will be returned.
-  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+  // The mask to control which fields get updated. If the mask is not present,
+  // all fields will be updated.
+  google.protobuf.FieldMask update_mask = 2;
 
   // The language of the following fields in `flow`:
   //

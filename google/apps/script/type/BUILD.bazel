@@ -10,14 +10,16 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
+    "csharp_gapic_assembly_pkg",
     "csharp_grpc_library",
     "csharp_proto_library",
     "go_proto_library",
+    "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
     "moved_proto_library",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_grpc_library",
+    "php_proto_library",
     "py_grpc_library",
     "py_proto_library",
     "ruby_grpc_library",
@@ -51,6 +53,18 @@ java_grpc_library(
     deps = [":type_java_proto"],
 )
 
+# Please DO-NOT-REMOVE this section.
+# This is required to generate java files for these protos.
+# Open Source Packages
+java_gapic_assembly_gradle_pkg(
+    name = "google-apps-script-type-java",
+    deps = [
+        ":type_java_grpc",
+        ":type_java_proto",
+        ":type_proto",
+    ],
+)
+
 go_proto_library(
     name = "type_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
@@ -69,7 +83,6 @@ moved_proto_library(
 
 py_proto_library(
     name = "type_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
     deps = [":type_moved_proto"],
 )
 
@@ -110,6 +123,17 @@ csharp_grpc_library(
     name = "type_csharp_grpc",
     srcs = [":type_proto"],
     deps = [":type_csharp_proto"],
+)
+
+# Open Source Packages
+csharp_gapic_assembly_pkg(
+    name = "google-apps-script-type-csharp",
+    package_name = "Google.Apps.Script.Type",
+    generate_nongapic_package = True,
+    deps = [
+        ":type_csharp_grpc",
+        ":type_csharp_proto",
+    ],
 )
 
 ##############################################################################
