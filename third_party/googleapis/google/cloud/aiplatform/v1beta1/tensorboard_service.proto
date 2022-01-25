@@ -29,10 +29,13 @@ import "google/cloud/aiplatform/v1beta1/tensorboard_time_series.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "TensorboardServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // TensorboardService
 service TensorboardService {
@@ -148,6 +151,15 @@ service TensorboardService {
     option (google.api.method_signature) = "parent,tensorboard_run,tensorboard_run_id";
   }
 
+  // Batch create TensorboardRuns.
+  rpc BatchCreateTensorboardRuns(BatchCreateTensorboardRunsRequest) returns (BatchCreateTensorboardRunsResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{parent=projects/*/locations/*/tensorboards/*/experiments/*}/runs:batchCreate"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,requests";
+  }
+
   // Gets a TensorboardRun.
   rpc GetTensorboardRun(GetTensorboardRunRequest) returns (TensorboardRun) {
     option (google.api.http) = {
@@ -183,6 +195,15 @@ service TensorboardService {
       response_type: "google.protobuf.Empty"
       metadata_type: "DeleteOperationMetadata"
     };
+  }
+
+  // Batch create TensorboardTimeSeries that belong to a TensorboardExperiment.
+  rpc BatchCreateTensorboardTimeSeries(BatchCreateTensorboardTimeSeriesRequest) returns (BatchCreateTensorboardTimeSeriesResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{parent=projects/*/locations/*/tensorboards/*/experiments/*}/runs/*/timeSeries:batchCreate"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,requests";
   }
 
   // Creates a TensorboardTimeSeries.
@@ -231,11 +252,23 @@ service TensorboardService {
     };
   }
 
-  // Reads a TensorboardTimeSeries' data. Data is returned in paginated
-  // responses. By default, if the number of data points stored is less than
-  // 1000, all data will be returned. Otherwise, 1000 data points will be
-  // randomly selected from this time series and returned. This value can be
-  // changed by changing max_data_points.
+  // Reads multiple TensorboardTimeSeries' data. The data point number limit is
+  // 1000 for scalars, 100 for tensors and blob references. If the number of
+  // data points stored is less than the limit, all data will be returned.
+  // Otherwise, that limit number of data points will be randomly selected from
+  // this time series and returned.
+  rpc BatchReadTensorboardTimeSeriesData(BatchReadTensorboardTimeSeriesDataRequest) returns (BatchReadTensorboardTimeSeriesDataResponse) {
+    option (google.api.http) = {
+      get: "/v1beta1/{tensorboard=projects/*/locations/*/tensorboards/*}/experiments/*/runs/*/timeSeries:batchRead"
+    };
+    option (google.api.method_signature) = "tensorboard";
+  }
+
+  // Reads a TensorboardTimeSeries' data. By default, if the number of data
+  // points stored is less than 1000, all data will be returned. Otherwise, 1000
+  // data points will be randomly selected from this time series and returned.
+  // This value can be changed by changing max_data_points, which can't be
+  // greater than 10k.
   rpc ReadTensorboardTimeSeriesData(ReadTensorboardTimeSeriesDataRequest) returns (ReadTensorboardTimeSeriesDataResponse) {
     option (google.api.http) = {
       get: "/v1beta1/{tensorboard_time_series=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*}:read"
@@ -252,6 +285,17 @@ service TensorboardService {
       get: "/v1beta1/{time_series=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*}:readBlobData"
     };
     option (google.api.method_signature) = "time_series";
+  }
+
+  // Write time series data points of multiple TensorboardTimeSeries in multiple
+  // TensorboardRun's. If any data fail to be ingested, an error will be
+  // returned.
+  rpc WriteTensorboardExperimentData(WriteTensorboardExperimentDataRequest) returns (WriteTensorboardExperimentDataResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{tensorboard_experiment=projects/*/locations/*/tensorboards/*/experiments/*}:write"
+      body: "*"
+    };
+    option (google.api.method_signature) = "tensorboard_experiment,write_run_data_requests";
   }
 
   // Write time series data points into multiple TensorboardTimeSeries under
@@ -308,7 +352,7 @@ message GetTensorboardRequest {
 message ListTensorboardsRequest {
   // Required. The resource name of the Location to list Tensorboards.
   // Format:
-  // 'projects/{project}/locations/{location}'
+  // `projects/{project}/locations/{location}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -494,10 +538,35 @@ message DeleteTensorboardExperimentRequest {
   ];
 }
 
+// Request message for [TensorboardService.BatchCreateTensorboardRuns][google.cloud.aiplatform.v1beta1.TensorboardService.BatchCreateTensorboardRuns].
+message BatchCreateTensorboardRunsRequest {
+  // Required. The resource name of the TensorboardExperiment to create the
+  // TensorboardRuns in. Format:
+  // `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
+  // The parent field in the CreateTensorboardRunRequest messages must match
+  // this field.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/TensorboardExperiment"
+    }
+  ];
+
+  // Required. The request message specifying the TensorboardRuns to create.
+  // A maximum of 1000 TensorboardRuns can be created in a batch.
+  repeated CreateTensorboardRunRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response message for [TensorboardService.BatchCreateTensorboardRuns][google.cloud.aiplatform.v1beta1.TensorboardService.BatchCreateTensorboardRuns].
+message BatchCreateTensorboardRunsResponse {
+  // The created TensorboardRuns.
+  repeated TensorboardRun tensorboard_runs = 1;
+}
+
 // Request message for [TensorboardService.CreateTensorboardRun][google.cloud.aiplatform.v1beta1.TensorboardService.CreateTensorboardRun].
 message CreateTensorboardRunRequest {
-  // Required. The resource name of the Tensorboard to create the TensorboardRun in.
-  // Format:
+  // Required. The resource name of the TensorboardExperiment to create the TensorboardRun
+  // in. Format:
   // `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -554,7 +623,7 @@ message ReadTensorboardBlobDataResponse {
 
 // Request message for [TensorboardService.ListTensorboardRuns][google.cloud.aiplatform.v1beta1.TensorboardService.ListTensorboardRuns].
 message ListTensorboardRunsRequest {
-  // Required. The resource name of the Tensorboard to list TensorboardRuns.
+  // Required. The resource name of the TensorboardExperiment to list TensorboardRuns.
   // Format:
   // 'projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}'
   string parent = 1 [
@@ -629,6 +698,33 @@ message DeleteTensorboardRunRequest {
   ];
 }
 
+// Request message for [TensorboardService.BatchCreateTensorboardTimeSeries][google.cloud.aiplatform.v1beta1.TensorboardService.BatchCreateTensorboardTimeSeries].
+message BatchCreateTensorboardTimeSeriesRequest {
+  // Required. The resource name of the TensorboardExperiment to create the
+  // TensorboardTimeSeries in.
+  // Format:
+  // `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
+  // The TensorboardRuns referenced by the parent fields in the
+  // CreateTensorboardTimeSeriesRequest messages must be sub resources of this
+  // TensorboardExperiment.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/TensorboardExperiment"
+    }
+  ];
+
+  // Required. The request message specifying the TensorboardTimeSeries to create.
+  // A maximum of 1000 TensorboardTimeSeries can be created in a batch.
+  repeated CreateTensorboardTimeSeriesRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response message for [TensorboardService.BatchCreateTensorboardTimeSeries][google.cloud.aiplatform.v1beta1.TensorboardService.BatchCreateTensorboardTimeSeries].
+message BatchCreateTensorboardTimeSeriesResponse {
+  // The created TensorboardTimeSeries.
+  repeated TensorboardTimeSeries tensorboard_time_series = 1;
+}
+
 // Request message for [TensorboardService.CreateTensorboardTimeSeries][google.cloud.aiplatform.v1beta1.TensorboardService.CreateTensorboardTimeSeries].
 message CreateTensorboardTimeSeriesRequest {
   // Required. The resource name of the TensorboardRun to create the
@@ -644,8 +740,7 @@ message CreateTensorboardTimeSeriesRequest {
 
   // Optional. The user specified unique ID to use for the TensorboardTimeSeries, which
   // will become the final component of the TensorboardTimeSeries's resource
-  // name. Ref: go/ucaip-user-specified-id
-  //
+  // name.
   // This value should match "[a-z0-9][a-z0-9-]{0, 127}"
   string tensorboard_time_series_id = 3 [(google.api.field_behavior) = OPTIONAL];
 
@@ -744,6 +839,38 @@ message DeleteTensorboardTimeSeriesRequest {
   ];
 }
 
+// Request message for
+// [TensorboardService.BatchReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1beta1.TensorboardService.BatchReadTensorboardTimeSeriesData].
+message BatchReadTensorboardTimeSeriesDataRequest {
+  // Required. The resource name of the Tensorboard containing TensorboardTimeSeries to
+  // read data from. Format:
+  // `projects/{project}/locations/{location}/tensorboards/{tensorboard}`.
+  // The TensorboardTimeSeries referenced by [time_series][google.cloud.aiplatform.v1beta1.BatchReadTensorboardTimeSeriesDataRequest.time_series] must be sub
+  // resources of this Tensorboard.
+  string tensorboard = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Tensorboard"
+    }
+  ];
+
+  // Required. The resource names of the TensorboardTimeSeries to read data from. Format:
+  // `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
+  repeated string time_series = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/TensorboardTimeSeries"
+    }
+  ];
+}
+
+// Response message for
+// [TensorboardService.BatchReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1beta1.TensorboardService.BatchReadTensorboardTimeSeriesData].
+message BatchReadTensorboardTimeSeriesDataResponse {
+  // The returned time series data.
+  repeated TimeSeriesData time_series_data = 1;
+}
+
 // Request message for [TensorboardService.ReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1beta1.TensorboardService.ReadTensorboardTimeSeriesData].
 message ReadTensorboardTimeSeriesDataRequest {
   // Required. The resource name of the TensorboardTimeSeries to read data from.
@@ -770,6 +897,27 @@ message ReadTensorboardTimeSeriesDataRequest {
 message ReadTensorboardTimeSeriesDataResponse {
   // The returned time series data.
   TimeSeriesData time_series_data = 1;
+}
+
+// Request message for [TensorboardService.WriteTensorboardExperimentData][google.cloud.aiplatform.v1beta1.TensorboardService.WriteTensorboardExperimentData].
+message WriteTensorboardExperimentDataRequest {
+  // Required. The resource name of the TensorboardExperiment to write data to.
+  // Format:
+  // `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
+  string tensorboard_experiment = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/TensorboardExperiment"
+    }
+  ];
+
+  // Required. Requests containing per-run TensorboardTimeSeries data to write.
+  repeated WriteTensorboardRunDataRequest write_run_data_requests = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response message for [TensorboardService.WriteTensorboardExperimentData][google.cloud.aiplatform.v1beta1.TensorboardService.WriteTensorboardExperimentData].
+message WriteTensorboardExperimentDataResponse {
+
 }
 
 // Request message for [TensorboardService.WriteTensorboardRunData][google.cloud.aiplatform.v1beta1.TensorboardService.WriteTensorboardRunData].

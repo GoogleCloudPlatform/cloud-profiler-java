@@ -31,10 +31,10 @@ load(
     "moved_proto_library",
     "nodejs_gapic_assembly_pkg",
     "nodejs_gapic_library",
-    php_gapic_assembly_pkg = "php_gapic_assembly_pkg2",
-    php_gapic_library = "php_gapic_library2",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_grpc_library",
+    "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
@@ -167,6 +167,9 @@ py_gapic_library(
     name = "servicedirectory_py_gapic",
     srcs = [":servicedirectory_proto"],
     grpc_service_config = "servicedirectory_grpc_service_config.json",
+    opt_args = [
+        "warehouse-package-name=google-cloud-service-directory",
+    ],
 )
 
 # Open Source Packages
@@ -298,4 +301,25 @@ csharp_gapic_assembly_pkg(
         ":servicedirectory_csharp_grpc",
         ":servicedirectory_csharp_proto",
     ],
+)
+
+##############################################################################
+# C++
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
+)
+
+cc_proto_library(
+    name = "servicedirectory_cc_proto",
+    deps = [":servicedirectory_proto"],
+)
+
+cc_grpc_library(
+    name = "servicedirectory_cc_grpc",
+    srcs = [":servicedirectory_proto"],
+    grpc_only = True,
+    deps = [":servicedirectory_cc_proto"],
 )

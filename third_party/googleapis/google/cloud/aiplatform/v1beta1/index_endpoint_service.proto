@@ -25,10 +25,13 @@ import "google/cloud/aiplatform/v1beta1/operation.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "IndexEndpointServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // A service for managing Vertex AI's IndexEndpoints.
 service IndexEndpointService {
@@ -111,6 +114,19 @@ service IndexEndpointService {
     option (google.longrunning.operation_info) = {
       response_type: "UndeployIndexResponse"
       metadata_type: "UndeployIndexOperationMetadata"
+    };
+  }
+
+  // Update an existing DeployedIndex under an IndexEndpoint.
+  rpc MutateDeployedIndex(MutateDeployedIndexRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1beta1/{index_endpoint=projects/*/locations/*/indexEndpoints/*}:mutateDeployedIndex"
+      body: "deployed_index"
+    };
+    option (google.api.method_signature) = "index_endpoint,deployed_index";
+    option (google.longrunning.operation_info) = {
+      response_type: "MutateDeployedIndexResponse"
+      metadata_type: "MutateDeployedIndexOperationMetadata"
     };
   }
 }
@@ -252,6 +268,9 @@ message DeployIndexResponse {
 message DeployIndexOperationMetadata {
   // The operation generic information.
   GenericOperationMetadata generic_metadata = 1;
+
+  // The unique index id specified by user
+  string deployed_index_id = 2;
 }
 
 // Request message for [IndexEndpointService.UndeployIndex][google.cloud.aiplatform.v1beta1.IndexEndpointService.UndeployIndex].
@@ -279,4 +298,38 @@ message UndeployIndexResponse {
 message UndeployIndexOperationMetadata {
   // The operation generic information.
   GenericOperationMetadata generic_metadata = 1;
+}
+
+// Request message for [IndexEndpointService.MutateDeployedIndex][google.cloud.aiplatform.v1beta1.IndexEndpointService.MutateDeployedIndex].
+message MutateDeployedIndexRequest {
+  // Required. The name of the IndexEndpoint resource into which to deploy an Index.
+  // Format:
+  // `projects/{project}/locations/{location}/indexEndpoints/{index_endpoint}`
+  string index_endpoint = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/IndexEndpoint"
+    }
+  ];
+
+  // Required. The DeployedIndex to be updated within the IndexEndpoint.
+  // Currently, the updatable fields are [DeployedIndex][automatic_resources]
+  // and [DeployedIndex][dedicated_resources]
+  DeployedIndex deployed_index = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response message for [IndexEndpointService.MutateDeployedIndex][google.cloud.aiplatform.v1beta1.IndexEndpointService.MutateDeployedIndex].
+message MutateDeployedIndexResponse {
+  // The DeployedIndex that had been updated in the IndexEndpoint.
+  DeployedIndex deployed_index = 1;
+}
+
+// Runtime operation information for
+// [IndexEndpointService.MutateDeployedIndex][google.cloud.aiplatform.v1beta1.IndexEndpointService.MutateDeployedIndex].
+message MutateDeployedIndexOperationMetadata {
+  // The operation generic information.
+  GenericOperationMetadata generic_metadata = 1;
+
+  // The unique index id specified by user
+  string deployed_index_id = 2;
 }

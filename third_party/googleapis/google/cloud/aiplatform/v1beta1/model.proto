@@ -23,14 +23,18 @@ import "google/cloud/aiplatform/v1beta1/deployed_model_ref.proto";
 import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/cloud/aiplatform/v1beta1/env_var.proto";
 import "google/cloud/aiplatform/v1beta1/explanation.proto";
+
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "ModelProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // A trained machine learning Model.
 message Model {
@@ -136,7 +140,8 @@ message Model {
   // not available for export.
   repeated ExportFormat supported_export_formats = 20 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Output only. The resource name of the TrainingPipeline that uploaded this Model, if any.
+  // Output only. The resource name of the TrainingPipeline that uploaded this Model, if
+  // any.
   string training_pipeline = 7 [
     (google.api.field_behavior) = OUTPUT_ONLY,
     (google.api.resource_reference) = {
@@ -345,7 +350,7 @@ message ModelContainerSpec {
   // predictions. This URI must identify an image in Artifact Registry or
   // Container Registry. Learn more about the [container publishing
   // requirements](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#publishing),
-  // including permissions requirements for the AI Platform Service Agent.
+  // including permissions requirements for the Vertex AI Service Agent.
   //
   // The container image is ingested upon [ModelService.UploadModel][google.cloud.aiplatform.v1beta1.ModelService.UploadModel], stored
   // internally, and this original path is afterwards not used.
@@ -469,8 +474,8 @@ message ModelContainerSpec {
   repeated EnvVar env = 4 [(google.api.field_behavior) = IMMUTABLE];
 
   // Immutable. List of ports to expose from the container. Vertex AI sends any
-  // prediction requests that it receives to the first port on this list. AI
-  // Platform also sends
+  // prediction requests that it receives to the first port on this list. Vertex
+  // AI also sends
   // [liveness and health
   // checks](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#liveness)
   // to this port.

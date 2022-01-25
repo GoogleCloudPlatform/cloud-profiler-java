@@ -51,6 +51,7 @@ proto_library(
         "//google/longrunning:operations_proto",
         "//google/rpc:status_proto",
         "//google/type:latlng_proto",
+        "@com_google_protobuf//:any_proto",
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
@@ -93,12 +94,15 @@ java_grpc_library(
 java_gapic_library(
     name = "dialogflow_java_gapic",
     srcs = [":dialogflow_proto_with_info"],
+    gapic_yaml = None,
     grpc_service_config = "dialogflow_grpc_service_config.json",
+    service_yaml = "dialogflow_v2.yaml",
     test_deps = [
         ":dialogflow_java_grpc",
     ],
     deps = [
         ":dialogflow_java_proto",
+        "//google/api:api_java_proto",
     ],
 )
 
@@ -223,10 +227,10 @@ py_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    php_gapic_assembly_pkg = "php_gapic_assembly_pkg2",
-    php_gapic_library = "php_gapic_library2",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_grpc_library",
+    "php_proto_library",
 )
 
 php_proto_library(
@@ -323,7 +327,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/dialogflow",
     ],
     grpc_service_config = "dialogflow_grpc_service_config.json",
-    ruby_cloud_description = "Dialogflow is an end-to-end, build-once deploy-everywhere development suite for creating conversational interfaces for websites, mobile applications, popular messaging platforms, and IoT devices. You can use it to build interfaces (such as chatbots and conversational IVR) that enable natural and rich interactions between your users and your business.",
+    ruby_cloud_description = "Dialogflow is an end-to-end, build-once deploy-everywhere development suite for creating conversational interfaces for websites, mobile applications, popular messaging platforms, and IoT devices. You can use it to build interfaces (such as chatbots and conversational IVR) that enable natural and rich interactions between your users and your business. This client is for Dialogflow ES, providing the standard agent type suitable for small and simple agents.",
     ruby_cloud_title = "Dialogflow V2",
     deps = [
         ":dialogflow_ruby_grpc",

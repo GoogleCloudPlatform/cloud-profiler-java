@@ -32,6 +32,7 @@ option java_multiple_files = true;
 option java_outer_classname = "ExperimentProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3beta1";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3beta1";
 
 // Service for managing [Experiments][google.cloud.dialogflow.cx.v3beta1.Experiment].
 service Experiments {
@@ -110,6 +111,24 @@ message Experiment {
     pattern: "projects/{project}/locations/{location}/agents/{agent}/environments/{environment}/experiments/{experiment}"
   };
 
+  // The state of the experiment.
+  enum State {
+    // State unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // The experiment is created but not started yet.
+    DRAFT = 1;
+
+    // The experiment is running.
+    RUNNING = 2;
+
+    // The experiment is done.
+    DONE = 3;
+
+    // The experiment with auto-rollout enabled has failed.
+    ROLLOUT_FAILED = 4;
+  }
+
   // Definition of the experiment.
   message Definition {
     // The condition defines which subset of sessions are selected for
@@ -129,6 +148,43 @@ message Experiment {
   // The inference result which includes an objective metric to optimize and the
   // confidence interval.
   message Result {
+    // Types of ratio-based metric for Dialogflow experiment.
+    enum MetricType {
+      // Metric unspecified.
+      METRIC_UNSPECIFIED = 0;
+
+      // Percentage of contained sessions without user calling back in 24 hours.
+      CONTAINED_SESSION_NO_CALLBACK_RATE = 1;
+
+      // Percentage of sessions that were handed to a human agent.
+      LIVE_AGENT_HANDOFF_RATE = 2;
+
+      // Percentage of sessions with the same user calling back.
+      CALLBACK_SESSION_RATE = 3;
+
+      // Percentage of sessions where user hung up.
+      ABANDONED_SESSION_RATE = 4;
+
+      // Percentage of sessions reached Dialogflow 'END_PAGE' or
+      // 'END_SESSION'.
+      SESSION_END_RATE = 5;
+    }
+
+    // types of count-based metric for Dialogflow experiment.
+    enum CountType {
+      // Count type unspecified.
+      COUNT_TYPE_UNSPECIFIED = 0;
+
+      // Total number of occurrences of a 'NO_MATCH'.
+      TOTAL_NO_MATCH_COUNT = 1;
+
+      // Total number of turn counts.
+      TOTAL_TURN_COUNT = 2;
+
+      // Average turn count in a session.
+      AVERAGE_TURN_COUNT = 3;
+    }
+
     // A confidence interval is a range of possible values for the experiment
     // objective you are trying to measure.
     message ConfidenceInterval {
@@ -188,64 +244,12 @@ message Experiment {
       int32 session_count = 3;
     }
 
-    // Types of ratio-based metric for Dialogflow experiment.
-    enum MetricType {
-      // Metric unspecified.
-      METRIC_UNSPECIFIED = 0;
-
-      // Percentage of contained sessions without user calling back in 24 hours.
-      CONTAINED_SESSION_NO_CALLBACK_RATE = 1;
-
-      // Percentage of sessions that were handed to a human agent.
-      LIVE_AGENT_HANDOFF_RATE = 2;
-
-      // Percentage of sessions with the same user calling back.
-      CALLBACK_SESSION_RATE = 3;
-
-      // Percentage of sessions where user hung up.
-      ABANDONED_SESSION_RATE = 4;
-
-      // Percentage of sessions reached Dialogflow 'END_PAGE' or
-      // 'END_SESSION'.
-      SESSION_END_RATE = 5;
-    }
-
-    // types of count-based metric for Dialogflow experiment.
-    enum CountType {
-      // Count type unspecified.
-      COUNT_TYPE_UNSPECIFIED = 0;
-
-      // Total number of occurrences of a 'NO_MATCH'.
-      TOTAL_NO_MATCH_COUNT = 1;
-
-      // Total number of turn counts.
-      TOTAL_TURN_COUNT = 2;
-
-      // Average turn count in a session.
-      AVERAGE_TURN_COUNT = 3;
-    }
-
     // Version variants and metrics.
     repeated VersionMetrics version_metrics = 1;
 
     // The last time the experiment's stats data was updated. Will have default
     // value if stats have never been computed for this experiment.
     google.protobuf.Timestamp last_update_time = 2;
-  }
-
-  // The state of the experiment.
-  enum State {
-    // State unspecified.
-    STATE_UNSPECIFIED = 0;
-
-    // The experiment is created but not started yet.
-    DRAFT = 1;
-
-    // The experiment is running.
-    RUNNING = 2;
-
-    // The experiment is done.
-    DONE = 3;
   }
 
   // The name of the experiment.
@@ -261,13 +265,27 @@ message Experiment {
   string description = 3;
 
   // The current state of the experiment.
-  // Transition triggered by Expriments.StartExperiment: PENDING->RUNNING.
-  // Transition triggered by Expriments.CancelExperiment: PENDING->CANCELLED or
-  // RUNNING->CANCELLED.
+  // Transition triggered by Experiments.StartExperiment: DRAFT->RUNNING.
+  // Transition triggered by Experiments.CancelExperiment: DRAFT->DONE or
+  // RUNNING->DONE.
   State state = 4;
 
   // The definition of the experiment.
   Definition definition = 5;
+
+  // The configuration for auto rollout. If set, there should be exactly two
+  // variants in the experiment (control variant being the default version of
+  // the flow), the traffic allocation for the non-control variant will
+  // gradually increase to 100% when conditions are met, and eventually
+  // replace the control variant to become the default version of the flow.
+  RolloutConfig rollout_config = 14;
+
+  // State of the auto rollout process.
+  RolloutState rollout_state = 15;
+
+  // The reason why rollout has failed. Should only be set when state is
+  // ROLLOUT_FAILED.
+  string rollout_failure_reason = 16;
 
   // Inference result of the experiment.
   Result result = 6;
@@ -312,6 +330,53 @@ message VersionVariants {
 
   // A list of flow version variants.
   repeated Variant variants = 1;
+}
+
+// The configuration for auto rollout.
+message RolloutConfig {
+  // A single rollout step with specified traffic allocation.
+  message RolloutStep {
+    // The name of the rollout step;
+    string display_name = 1;
+
+    // The percentage of traffic allocated to the flow version of this rollout
+    // step. (0%, 100%].
+    int32 traffic_percent = 2;
+
+    // The minimum time that this step should last. Should be longer than 1
+    // hour. If not set, the default minimum duration for each step will be 1
+    // hour.
+    google.protobuf.Duration min_duration = 3;
+  }
+
+  // Steps to roll out a flow version. Steps should be sorted by percentage in
+  // ascending order.
+  repeated RolloutStep rollout_steps = 1;
+
+  // The conditions that are used to evaluate the success of a rollout
+  // step. If not specified, all rollout steps will proceed to the next one
+  // unless failure conditions are met. E.g. "containment_rate > 60% AND
+  // callback_rate < 20%". See the [conditions
+  // reference](https://cloud.google.com/dialogflow/cx/docs/reference/condition).
+  string rollout_condition = 2;
+
+  // The conditions that are used to evaluate the failure of a rollout
+  // step. If not specified, no rollout steps will fail. E.g. "containment_rate
+  // < 10% OR average_turn_count < 3". See the [conditions
+  // reference](https://cloud.google.com/dialogflow/cx/docs/reference/condition).
+  string failure_condition = 3;
+}
+
+// State of the auto-rollout process.
+message RolloutState {
+  // Display name of the current auto rollout step.
+  string step = 1;
+
+  // Index of the current step in the auto rollout steps list.
+  int32 step_index = 3;
+
+  // Start time of the current step.
+  google.protobuf.Timestamp start_time = 2;
 }
 
 // The history of variants update.

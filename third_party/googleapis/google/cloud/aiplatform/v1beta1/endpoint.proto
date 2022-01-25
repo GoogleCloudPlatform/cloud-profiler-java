@@ -20,15 +20,20 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/cloud/aiplatform/v1beta1/explanation.proto";
+import "google/cloud/aiplatform/v1beta1/io.proto";
 import "google/cloud/aiplatform/v1beta1/machine_resources.proto";
 import "google/cloud/aiplatform/v1beta1/model_deployment_monitoring_job.proto";
+import "google/cloud/aiplatform/v1beta1/model_monitoring.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "EndpointProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // Models are deployed into it, and afterwards Endpoint is called to obtain
 // predictions and explanations.
@@ -87,6 +92,43 @@ message Endpoint {
   // Endpoint and all sub-resources of this Endpoint will be secured by
   // this key.
   EncryptionSpec encryption_spec = 10;
+
+  // The full name of the Google Compute Engine
+  // [network](https://cloud.google.com//compute/docs/networks-and-firewalls#networks)
+  // to which the Endpoint should be peered.
+  //
+  // Private services access must already be configured for the network. If left
+  // unspecified, the Endpoint is not peered with any network.
+  //
+  // Only one of the fields, [network][google.cloud.aiplatform.v1beta1.Endpoint.network] or
+  // [enable_private_service_connect][google.cloud.aiplatform.v1beta1.Endpoint.enable_private_service_connect],
+  // can be set.
+  //
+  // [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert):
+  // `projects/{project}/global/networks/{network}`.
+  // Where `{project}` is a project number, as in `12345`, and `{network}` is
+  // network name.
+  string network = 13 [(google.api.resource_reference) = {
+                         type: "compute.googleapis.com/Network"
+                       }];
+
+  // If true, expose the Endpoint via private service connect.
+  //
+  // Only one of the fields, [network][google.cloud.aiplatform.v1beta1.Endpoint.network] or
+  // [enable_private_service_connect][google.cloud.aiplatform.v1beta1.Endpoint.enable_private_service_connect],
+  // can be set.
+  bool enable_private_service_connect = 17;
+
+  // Output only. Resource name of the Model Monitoring job associated with this Endpoint
+  // if monitoring is enabled by [CreateModelDeploymentMonitoringJob][].
+  // Format:
+  // `projects/{project}/locations/{location}/modelDeploymentMonitoringJobs/{model_deployment_monitoring_job}`
+  string model_deployment_monitoring_job = 14 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/ModelDeploymentMonitoringJob"
+    }
+  ];
 }
 
 // A deployment of a Model. Endpoints contain one or more DeployedModels.
@@ -101,13 +143,16 @@ message DeployedModel {
     // that need a higher degree of manual configuration.
     DedicatedResources dedicated_resources = 7;
 
-    // A description of resources that to large degree are decided by AI
-    // Platform, and require only a modest additional configuration.
+    // A description of resources that to large degree are decided by Vertex
+    // AI, and require only a modest additional configuration.
     AutomaticResources automatic_resources = 8;
   }
 
-  // Output only. The ID of the DeployedModel.
-  string id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // Immutable. The ID of the DeployedModel. If not provided upon deployment, Vertex AI
+  // will generate a value for this ID.
+  //
+  // This value should be 1-10 characters, and valid characters are /[0-9]/.
+  string id = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // Required. The name of the Model that this is the deployment of. Note that the Model
   // may be in a different location than the DeployedModel's Endpoint.
@@ -158,4 +203,29 @@ message DeployedModel {
   // receives prediction requests at a high queries per second rate (QPS).
   // Estimate your costs before enabling this option.
   bool enable_access_logging = 13;
+
+  // Output only. Provide paths for users to send predict/explain/health requests directly to
+  // the deployed model services running on Cloud via private services access.
+  // This field is populated if [network][google.cloud.aiplatform.v1beta1.Endpoint.network] is configured.
+  PrivateEndpoints private_endpoints = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// PrivateEndpoints proto is used to provide paths for users to send
+// requests privately.
+// To send request via private service access, use predict_http_uri,
+// explain_http_uri or health_http_uri. To send request via private service
+// connect, use service_attachment.
+message PrivateEndpoints {
+  // Output only. Http(s) path to send prediction requests.
+  string predict_http_uri = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Http(s) path to send explain requests.
+  string explain_http_uri = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Http(s) path to send health check requests.
+  string health_http_uri = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The name of the service attachment resource. Populated if private service
+  // connect is enabled.
+  string service_attachment = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

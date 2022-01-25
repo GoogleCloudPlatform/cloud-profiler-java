@@ -22,10 +22,13 @@ import "google/cloud/aiplatform/v1beta1/io.proto";
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "ExplanationProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // Explanation of a prediction (provided in [PredictResponse.predictions][google.cloud.aiplatform.v1beta1.PredictResponse.predictions])
 // produced by the Model on a given [instance][google.cloud.aiplatform.v1beta1.ExplainRequest.instances].
@@ -194,6 +197,10 @@ message ExplanationParameters {
     // like a lab or manufacturing line, or from diagnostic equipment, like
     // x-rays or quality-control cameras, use Integrated Gradients instead.
     XraiAttribution xrai_attribution = 3;
+
+    // Similarity explainability that returns the nearest neighbors from the
+    // provided dataset.
+    Similarity similarity = 7;
   }
 
   // If populated, returns attributions for top K indices of outputs
@@ -245,6 +252,14 @@ message IntegratedGradientsAttribution {
   // noise can help improve the computed gradients. Refer to this paper for more
   // details: https://arxiv.org/pdf/1706.03825.pdf
   SmoothGradConfig smooth_grad_config = 2;
+
+  // Config for IG with blur baseline.
+  //
+  // When enabled, a linear path from the maximally blurred image to the input
+  // image is created. Using a blurred baseline instead of zero (black image) is
+  // motivated by the BlurIG approach explained here:
+  // https://arxiv.org/abs/2004.03383
+  BlurBaselineConfig blur_baseline_config = 3;
 }
 
 // An explanation method that redistributes Integrated Gradients
@@ -268,6 +283,14 @@ message XraiAttribution {
   // noise can help improve the computed gradients. Refer to this paper for more
   // details: https://arxiv.org/pdf/1706.03825.pdf
   SmoothGradConfig smooth_grad_config = 2;
+
+  // Config for XRAI with blur baseline.
+  //
+  // When enabled, a linear path from the maximally blurred image to the input
+  // image is created. Using a blurred baseline instead of zero (black image) is
+  // motivated by the BlurIG approach explained here:
+  // https://arxiv.org/abs/2004.03383
+  BlurBaselineConfig blur_baseline_config = 3;
 }
 
 // Config for SmoothGrad approximation of gradients.
@@ -334,8 +357,33 @@ message FeatureNoiseSigma {
   repeated NoiseSigmaForFeature noise_sigma = 1;
 }
 
-// The [ExplanationSpec][google.cloud.aiplatform.v1beta1.ExplanationSpec] entries that can be overridden at [online
-// explanation][PredictionService.Explain][google.cloud.aiplatform.v1beta1.PredictionService.Explain] time.
+// Config for blur baseline.
+//
+// When enabled, a linear path from the maximally blurred image to the input
+// image is created. Using a blurred baseline instead of zero (black image) is
+// motivated by the BlurIG approach explained here:
+// https://arxiv.org/abs/2004.03383
+message BlurBaselineConfig {
+  // The standard deviation of the blur kernel for the blurred baseline. The
+  // same blurring parameter is used for both the height and the width
+  // dimension. If not set, the method defaults to the zero (i.e. black for
+  // images) baseline.
+  float max_blur_sigma = 1;
+}
+
+// Similarity explainability that returns the nearest neighbors from the
+// provided dataset.
+message Similarity {
+  // The Cloud Storage location for the input instances.
+  GcsSource gcs_source = 1;
+
+  // The configuration for the generated index, the semantics are the same as
+  // [metadata][google.cloud.aiplatform.v1beta1.Index.metadata] and should match NearestNeighborSearchConfig.
+  google.protobuf.Value nearest_neighbor_search_config = 2;
+}
+
+// The [ExplanationSpec][google.cloud.aiplatform.v1beta1.ExplanationSpec] entries that can be overridden at
+// [online explanation][google.cloud.aiplatform.v1beta1.PredictionService.Explain] time.
 message ExplanationSpecOverride {
   // The parameters to be overridden. Note that the
   // [method][google.cloud.aiplatform.v1beta1.ExplanationParameters.method] cannot be changed. If not specified,

@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/dialogflow/cx/v3/advanced_settings.proto";
 import "google/cloud/dialogflow/cx/v3/flow.proto";
 import "google/cloud/dialogflow/cx/v3/security_settings.proto";
 import "google/longrunning/operations.proto";
@@ -33,6 +34,7 @@ option java_multiple_files = true;
 option java_outer_classname = "AgentProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3";
 
 // Service for managing [Agents][google.cloud.dialogflow.cx.v3.Agent].
 service Agents {
@@ -58,6 +60,10 @@ service Agents {
   }
 
   // Creates an agent in the specified location.
+  //
+  // Note: You should always train flows prior to sending them queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc CreateAgent(CreateAgentRequest) returns (Agent) {
     option (google.api.http) = {
       post: "/v3/{parent=projects/*/locations/*}/agents"
@@ -67,6 +73,10 @@ service Agents {
   }
 
   // Updates the specified agent.
+  //
+  // Note: You should always train flows prior to sending them queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc UpdateAgent(UpdateAgentRequest) returns (Agent) {
     option (google.api.http) = {
       patch: "/v3/{agent.name=projects/*/locations/*/agents/*}"
@@ -84,6 +94,14 @@ service Agents {
   }
 
   // Exports the specified agent to a binary file.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: [ExportAgentResponse][google.cloud.dialogflow.cx.v3.ExportAgentResponse]
   rpc ExportAgent(ExportAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3/{name=projects/*/locations/*/agents/*}:export"
@@ -99,6 +117,19 @@ service Agents {
   //
   // Replaces the current agent with a new one. Note that all existing resources
   // in agent (e.g. intents, entity types, flows) will be removed.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
+  //
+  // Note: You should always train flows prior to sending them queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
   rpc RestoreAgent(RestoreAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3/{name=projects/*/locations/*/agents/*}:restore"
@@ -159,12 +190,15 @@ message Agent {
   // Required. The human-readable name of the agent, unique within the location.
   string display_name = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Immutable. The default language of the agent as a language tag.
+  // Required. Immutable. The default language of the agent as a language tag.
   // See [Language
   // Support](https://cloud.google.com/dialogflow/cx/docs/reference/language)
   // for a list of the currently supported language codes.
   // This field cannot be set by the [Agents.UpdateAgent][google.cloud.dialogflow.cx.v3.Agents.UpdateAgent] method.
-  string default_language_code = 3 [(google.api.field_behavior) = IMMUTABLE];
+  string default_language_code = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE
+  ];
 
   // The list of all languages supported by the agent (except for the
   // `default_language_code`).
@@ -208,11 +242,17 @@ message Agent {
                                  }];
 
   // Indicates if stackdriver logging is enabled for the agent.
-  bool enable_stackdriver_logging = 18;
+  // Please use [agent.advanced_settings][google.cloud.dialogflow.cx.v3.AdvancedSettings.LoggingSettings]
+  // instead.
+  bool enable_stackdriver_logging = 18 [deprecated = true];
 
   // Indicates if automatic spell correction is enabled in detect intent
   // requests.
   bool enable_spell_correction = 20;
+
+  // Hierarchical advanced settings for this agent. The settings exposed at the
+  // lower level overrides the settings exposed at the higher level.
+  AdvancedSettings advanced_settings = 22;
 }
 
 // The request message for [Agents.ListAgents][google.cloud.dialogflow.cx.v3.Agents.ListAgents].

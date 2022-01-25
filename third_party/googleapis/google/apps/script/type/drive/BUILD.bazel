@@ -15,9 +15,10 @@ load(
     "go_proto_library",
     "java_grpc_library",
     "java_proto_library",
+    "java_gapic_assembly_gradle_pkg",
     "moved_proto_library",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_grpc_library",
+    "php_proto_library",
     "py_grpc_library",
     "py_proto_library",
     "ruby_grpc_library",
@@ -48,6 +49,18 @@ java_grpc_library(
     deps = [":drive_java_proto"],
 )
 
+# Please DO-NOT-REMOVE this section.
+# This is required to generate java files for these protos.
+# Open Source Packages
+java_gapic_assembly_gradle_pkg(
+    name = "google-apps-script-type-drive-java",
+    deps = [
+        ":drive_java_proto",
+        ":drive_java_grpc",
+        ":drive_proto",
+    ],
+)
+
 go_proto_library(
     name = "drive_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
@@ -68,7 +81,6 @@ moved_proto_library(
 
 py_proto_library(
     name = "drive_py_proto",
-    plugin = "@protoc_docs_plugin//:docs_plugin",
     deps = [":drive_moved_proto"],
 )
 

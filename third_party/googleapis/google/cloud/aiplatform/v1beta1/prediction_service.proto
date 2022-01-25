@@ -19,14 +19,18 @@ package google.cloud.aiplatform.v1beta1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
+import "google/api/httpbody.proto";
 import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1beta1/explanation.proto";
 import "google/protobuf/struct.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "PredictionServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // A service for online predictions and explanations.
 service PredictionService {
@@ -40,6 +44,23 @@ service PredictionService {
       body: "*"
     };
     option (google.api.method_signature) = "endpoint,instances,parameters";
+  }
+
+  // Perform an online prediction with an arbitrary HTTP payload.
+  //
+  // The response includes the following HTTP headers:
+  //
+  // * `X-Vertex-AI-Endpoint-Id`: ID of the [Endpoint][google.cloud.aiplatform.v1beta1.Endpoint] that served this
+  // prediction.
+  //
+  // * `X-Vertex-AI-Deployed-Model-Id`: ID of the Endpoint's [DeployedModel][google.cloud.aiplatform.v1beta1.DeployedModel]
+  // that served this prediction.
+  rpc RawPredict(RawPredictRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post: "/v1beta1/{endpoint=projects/*/locations/*/endpoints/*}:rawPredict"
+      body: "*"
+    };
+    option (google.api.method_signature) = "endpoint,http_body";
   }
 
   // Perform an online explanation.
@@ -102,6 +123,47 @@ message PredictResponse {
 
   // ID of the Endpoint's DeployedModel that served this prediction.
   string deployed_model_id = 2;
+
+  // Output only. The resource name of the Model which is deployed as the DeployedModel that
+  // this prediction hits.
+  string model = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Model"
+    }
+  ];
+
+  // Output only. The [display name][google.cloud.aiplatform.v1beta1.Model.display_name] of the Model which is deployed as
+  // the DeployedModel that this prediction hits.
+  string model_display_name = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Request message for [PredictionService.RawPredict][google.cloud.aiplatform.v1beta1.PredictionService.RawPredict].
+message RawPredictRequest {
+  // Required. The name of the Endpoint requested to serve the prediction.
+  // Format:
+  // `projects/{project}/locations/{location}/endpoints/{endpoint}`
+  string endpoint = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Endpoint"
+    }
+  ];
+
+  // The prediction input. Supports HTTP headers and arbitrary data payload.
+  //
+  // A [DeployedModel][google.cloud.aiplatform.v1beta1.DeployedModel] may have an upper limit on the number of instances it
+  // supports per request. When this limit it is exceeded for an AutoML model,
+  // the [RawPredict][google.cloud.aiplatform.v1beta1.PredictionService.RawPredict] method returns an error.
+  // When this limit is exceeded for a custom-trained model, the behavior varies
+  // depending on the model.
+  //
+  // You can specify the schema for each instance in the
+  // [predict_schemata.instance_schema_uri][google.cloud.aiplatform.v1beta1.PredictSchemata.instance_schema_uri]
+  // field when you create a [Model][google.cloud.aiplatform.v1beta1.Model]. This schema applies when you deploy the
+  // `Model` as a `DeployedModel` to an [Endpoint][google.cloud.aiplatform.v1beta1.Endpoint] and use the `RawPredict`
+  // method.
+  google.api.HttpBody http_body = 2;
 }
 
 // Request message for [PredictionService.Explain][google.cloud.aiplatform.v1beta1.PredictionService.Explain].

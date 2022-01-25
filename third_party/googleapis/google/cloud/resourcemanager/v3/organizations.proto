@@ -31,6 +31,7 @@ option java_multiple_files = true;
 option java_outer_classname = "OrganizationsProto";
 option java_package = "com.google.cloud.resourcemanager.v3";
 option php_namespace = "Google\\Cloud\\ResourceManager\\V3";
+option ruby_package = "Google::Cloud::ResourceManager::V3";
 
 // Allows users to manage their organization resources.
 service Organizations {
@@ -191,12 +192,13 @@ message SearchOrganizationsRequest {
   // Optional. An optional query string used to filter the Organizations to return in
   // the response. Query rules are case-insensitive.
   //
-  //
+  // ```
   // | Field            | Description                                |
   // |------------------|--------------------------------------------|
   // | directoryCustomerId, owner.directoryCustomerId | Filters by directory
   // customer id. |
   // | domain           | Filters by domain.                         |
+  // ```
   //
   // Organizations may be queried by `directoryCustomerId` or by
   // `domain`, where the domain is a G Suite domain, for example:

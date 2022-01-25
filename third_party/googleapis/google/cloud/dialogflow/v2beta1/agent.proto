@@ -53,6 +53,10 @@ service Agents {
   }
 
   // Creates/updates the specified agent.
+  //
+  // Note: You should always train an agent prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/es/docs/training).
   rpc SetAgent(SetAgentRequest) returns (Agent) {
     option (google.api.http) = {
       post: "/v2beta1/{agent.parent=projects/*}/agent"
@@ -94,8 +98,18 @@ service Agents {
 
   // Trains the specified agent.
   //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations).
+  // The returned `Operation` type has the following method-specific fields:
   //
-  // Operation <response: [google.protobuf.Empty][google.protobuf.Empty]>
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
+  //
+  // Note: You should always train an agent prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/es/docs/training).
   rpc TrainAgent(TrainAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{parent=projects/*}/agent:train"
@@ -114,8 +128,13 @@ service Agents {
 
   // Exports the specified agent to a ZIP file.
   //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations).
+  // The returned `Operation` type has the following method-specific fields:
   //
-  // Operation <response: [ExportAgentResponse][google.cloud.dialogflow.v2beta1.ExportAgentResponse]>
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: [ExportAgentResponse][google.cloud.dialogflow.v2beta1.ExportAgentResponse]
   rpc ExportAgent(ExportAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{parent=projects/*}/agent:export"
@@ -142,10 +161,21 @@ service Agents {
   // call [TrainAgent][google.cloud.dialogflow.v2beta1.Agents.TrainAgent] and wait for the operation it returns in order to train
   // explicitly.
   //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations).
+  // The returned `Operation` type has the following method-specific fields:
   //
-  // Operation <response: [google.protobuf.Empty][google.protobuf.Empty]>
-  // An operation which tracks when importing is complete. It only tracks
-  // when the draft agent is updated not when it is done training.
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
+  //
+  // The operation only tracks when importing is complete, not when it is done
+  // training.
+  //
+  // Note: You should always train an agent prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/es/docs/training).
   rpc ImportAgent(ImportAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{parent=projects/*}/agent:import"
@@ -170,10 +200,21 @@ service Agents {
   // completed yet. Please call [TrainAgent][google.cloud.dialogflow.v2beta1.Agents.TrainAgent] and wait for the operation it
   // returns in order to train explicitly.
   //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations).
+  // The returned `Operation` type has the following method-specific fields:
   //
-  // Operation <response: [google.protobuf.Empty][google.protobuf.Empty]>
-  // An operation which tracks when restoring is complete. It only tracks
-  // when the draft agent is updated not when it is done training.
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
+  //
+  // The operation only tracks when restoring is complete, not when it is done
+  // training.
+  //
+  // Note: You should always train an agent prior to sending it queries. See the
+  // [training
+  // documentation](https://cloud.google.com/dialogflow/es/docs/training).
   rpc RestoreAgent(RestoreAgentRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v2beta1/{parent=projects/*}/agent:restore"
@@ -252,14 +293,15 @@ message Agent {
     // Not specified. This value should never be used.
     TIER_UNSPECIFIED = 0;
 
-    // Standard tier.
+    // Trial Edition, previously known as Standard Edition.
     TIER_STANDARD = 1;
 
-    // Enterprise tier (Essentials).
+    // Essentials Edition, previously known as Enterprise Essential Edition.
     TIER_ENTERPRISE = 2;
 
-    // Enterprise tier (Plus).
-    TIER_ENTERPRISE_PLUS = 3;
+    // Essentials Edition (same as TIER_ENTERPRISE), previously known as
+    // Enterprise Plus Edition.
+    TIER_ENTERPRISE_PLUS = 3 [deprecated = true];
   }
 
   // Required. The project of this agent.
