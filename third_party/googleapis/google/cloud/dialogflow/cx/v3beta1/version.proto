@@ -20,7 +20,12 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/dialogflow/cx/v3beta1/entity_type.proto";
 import "google/cloud/dialogflow/cx/v3beta1/flow.proto";
+import "google/cloud/dialogflow/cx/v3beta1/intent.proto";
+import "google/cloud/dialogflow/cx/v3beta1/page.proto";
+import "google/cloud/dialogflow/cx/v3beta1/transition_route_group.proto";
+import "google/cloud/dialogflow/cx/v3beta1/webhook.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -33,6 +38,7 @@ option java_multiple_files = true;
 option java_outer_classname = "VersionProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3beta1";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3beta1";
 
 // Service for managing [Versions][google.cloud.dialogflow.cx.v3beta1.Version].
 service Versions {
@@ -58,6 +64,13 @@ service Versions {
   }
 
   // Creates a [Version][google.cloud.dialogflow.cx.v3beta1.Version] in the specified [Flow][google.cloud.dialogflow.cx.v3beta1.Flow].
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: [CreateVersionOperationMetadata][google.cloud.dialogflow.cx.v3beta1.CreateVersionOperationMetadata]
+  // - `response`: [Version][google.cloud.dialogflow.cx.v3beta1.Version]
   rpc CreateVersion(CreateVersionRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{parent=projects/*/locations/*/agents/*/flows/*}/versions"
@@ -88,6 +101,15 @@ service Versions {
   }
 
   // Loads resources in the specified version to the draft flow.
+  //
+  // This method is a [long-running
+  // operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation).
+  // The returned `Operation` type has the following method-specific fields:
+  //
+  // - `metadata`: An empty [Struct
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)
+  // - `response`: An [Empty
+  //   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)
   rpc LoadVersion(LoadVersionRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
       post: "/v3beta1/{name=projects/*/locations/*/agents/*/flows/*/versions/*}:load"
@@ -98,6 +120,15 @@ service Versions {
       response_type: "google.protobuf.Empty"
       metadata_type: "google.protobuf.Struct"
     };
+  }
+
+  // Compares the specified base version with target version.
+  rpc CompareVersions(CompareVersionsRequest) returns (CompareVersionsResponse) {
+    option (google.api.http) = {
+      post: "/v3beta1/{base_version=projects/*/locations/*/agents/*/flows/*/versions/*}:compareVersions"
+      body: "*"
+    };
+    option (google.api.method_signature) = "base_version";
   }
 }
 
@@ -258,4 +289,51 @@ message LoadVersionRequest {
   // `allow_override_agent_resources` is false, conflicted agent-level resources
   // will not be overridden (i.e. intents, entities, webhooks).
   bool allow_override_agent_resources = 2;
+}
+
+// The request message for [Versions.CompareVersions][google.cloud.dialogflow.cx.v3beta1.Versions.CompareVersions].
+message CompareVersionsRequest {
+  // Required. Name of the base flow version to compare with the target version. Use
+  // version ID `0` to indicate the draft version of the specified flow.
+  //
+  // Format: `projects/<Project ID>/locations/<Location ID>/agents/
+  // <Agent ID>/flows/<Flow ID>/versions/<Version ID>`.
+  string base_version = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/Version"
+    }
+  ];
+
+  // Required. Name of the target flow version to compare with the
+  // base version. Use version ID `0` to indicate the draft version of the
+  // specified flow. Format: `projects/<Project ID>/locations/<Location
+  // ID>/agents/<Agent ID>/flows/<Flow ID>/versions/<Version ID>`.
+  string target_version = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "dialogflow.googleapis.com/Version"
+    }
+  ];
+
+  // The language to compare the flow versions for.
+  //
+  // If not specified, the agent's default language is used.
+  // [Many
+  // languages](https://cloud.google.com/dialogflow/docs/reference/language) are
+  // supported. Note: languages must be enabled in the agent before they can be
+  // used.
+  string language_code = 3;
+}
+
+// The response message for [Versions.CompareVersions][google.cloud.dialogflow.cx.v3beta1.Versions.CompareVersions].
+message CompareVersionsResponse {
+  // JSON representation of the base version content.
+  string base_version_content_json = 1;
+
+  // JSON representation of the target version content.
+  string target_version_content_json = 2;
+
+  // The timestamp when the two version compares.
+  google.protobuf.Timestamp compare_time = 3;
 }

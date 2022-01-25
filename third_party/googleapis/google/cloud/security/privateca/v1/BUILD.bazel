@@ -42,6 +42,9 @@ proto_library_with_info(
     deps = [
         ":privateca_proto",
         "//google/cloud:common_resources_proto",
+        "//google/iam/v1:iam_policy_proto",
+        "//google/iam/v1:policy_proto",
+        "//google/cloud/location:location_proto",
     ],
 )
 
@@ -71,12 +74,19 @@ java_grpc_library(
 java_gapic_library(
     name = "privateca_java_gapic",
     srcs = [":privateca_proto_with_info"],
+    gapic_yaml = None,
     grpc_service_config = "privateca_grpc_service_config.json",
+    service_yaml = "privateca_v1.yaml",
     test_deps = [
         ":privateca_java_grpc",
+        "//google/cloud/location:location_java_grpc",
+        "//google/iam/v1:iam_java_grpc",
     ],
     deps = [
         ":privateca_java_proto",
+        "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
+        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -131,6 +141,8 @@ go_gapic_library(
     service_yaml = "privateca_v1.yaml",
     deps = [
         ":privateca_go_proto",
+        "//google/cloud/location:location_go_proto",
+        "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go//longrunning:go_default_library",
         "@com_google_cloud_go//longrunning/autogen:go_default_library",
@@ -169,6 +181,9 @@ py_gapic_library(
     name = "privateca_py_gapic",
     srcs = [":privateca_proto"],
     grpc_service_config = "privateca_grpc_service_config.json",
+    opt_args = [
+        "warehouse-package-name=google-cloud-private-ca",
+    ],
 )
 
 # Open Source Packages
@@ -184,10 +199,10 @@ py_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    php_gapic_assembly_pkg = "php_gapic_assembly_pkg2",
-    php_gapic_library = "php_gapic_library2",
-    php_grpc_library = "php_grpc_library2",
-    php_proto_library = "php_proto_library2",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_grpc_library",
+    "php_proto_library",
 )
 
 php_proto_library(
@@ -233,7 +248,7 @@ load(
 
 nodejs_gapic_library(
     name = "privateca_nodejs_gapic",
-    package_name = "@google-cloud/privateca",
+    package_name = "@google-cloud/security-private-ca",
     src = ":privateca_proto_with_info",
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "privateca_grpc_service_config.json",
@@ -276,7 +291,12 @@ ruby_cloud_gapic_library(
     name = "privateca_ruby_gapic",
     srcs = [":privateca_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-security-privateca-v1",
+        "ruby-cloud-gem-name=google-cloud-security-private_ca-v1",
+        "ruby-cloud-gem-namespace=Google::Cloud::Security::PrivateCA::V1",
+        "ruby-cloud-env-prefix=PRIVATE_CA",
+        "ruby-cloud-product-url=https://cloud.google.com/certificate-authority-service/",
+        "ruby-cloud-api-id=privateca.googleapis.com",
+        "ruby-cloud-api-shortname=privateca",
     ],
     grpc_service_config = "privateca_grpc_service_config.json",
     ruby_cloud_description = "Certificate Authority Service is a highly available, scalable Google Cloud service that enables you to simplify, automate, and customize the deployment, management, and security of private certificate authorities (CA).",
@@ -343,4 +363,20 @@ csharp_gapic_assembly_pkg(
 ##############################################################################
 # C++
 ##############################################################################
-# Put your C++ rules here
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
+)
+
+cc_proto_library(
+    name = "privateca_cc_proto",
+    deps = [":privateca_proto"],
+)
+
+cc_grpc_library(
+    name = "privateca_cc_grpc",
+    srcs = [":privateca_proto"],
+    grpc_only = True,
+    deps = [":privateca_cc_proto"],
+)

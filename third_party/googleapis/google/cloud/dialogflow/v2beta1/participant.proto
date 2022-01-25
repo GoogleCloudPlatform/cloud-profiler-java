@@ -169,7 +169,8 @@ service Participants {
   // This method should be used by human agent client software to fetch auto
   // generated suggestions in real-time, while the conversation with an end user
   // is in progress. The functionality is implemented in terms of the
-  // [list pagination](/apis/design/design_patterns#list_pagination)
+  // [list
+  // pagination](https://cloud.google.com/apis/design/design_patterns#list_pagination)
   // design pattern. The client app should use the `next_page_token` field
   // to fetch the next batch of suggestions. `suggestions` are sorted by
   // `create_time` in descending order.
@@ -263,6 +264,24 @@ message Participant {
   //   hash function like SHA-512.
   // * The length of the user id must be <= 256 characters.
   string obfuscated_external_user_id = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Key-value filters on the metadata of documents returned by article
+  // suggestion. If specified, article suggestion only returns suggested
+  // documents that match all filters in their [Document.metadata][google.cloud.dialogflow.v2beta1.Document.metadata]. Multiple
+  // values for a metadata key should be concatenated by comma. For example,
+  // filters to match all documents that have 'US' or 'CA' in their market
+  // metadata values and 'agent' in their user metadata values will be
+  // ```
+  // documents_metadata_filters {
+  //   key: "market"
+  //   value: "US,CA"
+  // }
+  // documents_metadata_filters {
+  //   key: "user"
+  //   value: "agent"
+  // }
+  // ```
+  map<string, string> documents_metadata_filters = 8 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Represents a message posted into a conversation.
@@ -386,6 +405,20 @@ message OutputAudio {
 
 // Represents a response from an automated agent.
 message AutomatedAgentReply {
+  // Represents different automated agent reply types.
+  enum AutomatedAgentReplyType {
+    // Not specified. This should never happen.
+    AUTOMATED_AGENT_REPLY_TYPE_UNSPECIFIED = 0;
+
+    // Partial reply. e.g. Aggregated responses in a `Fulfillment` that enables
+    // `return_partial_response` can be returned as partial reply.
+    // WARNING: partial reply is not eligible for barge-in.
+    PARTIAL = 1;
+
+    // Final reply.
+    FINAL = 2;
+  }
+
   // Required.
   oneof response {
     // Response of the Dialogflow [Sessions.DetectIntent][google.cloud.dialogflow.v2beta1.Sessions.DetectIntent] call.
@@ -425,6 +458,14 @@ message AutomatedAgentReply {
   // time of this response.
   // Deprecated: Use `parameters` instead.
   google.protobuf.Struct cx_session_parameters = 6 [deprecated = true];
+
+  // AutomatedAgentReply type.
+  AutomatedAgentReplyType automated_agent_reply_type = 7;
+
+  // Indicates whether the partial automated agent reply is interruptible when a
+  // later reply message arrives. e.g. if the agent specified some music as
+  // partial response, it can be cancelled.
+  bool allow_cancellation = 8;
 }
 
 // The type of Human Agent Assistant API suggestion to perform, and the maximum
@@ -448,6 +489,27 @@ message SuggestionFeature {
 
   // Type of Human Agent Assistant API feature to request.
   Type type = 1;
+}
+
+// Represents the parameters of human assist query.
+message AssistQueryParameters {
+  // Key-value filters on the metadata of documents returned by article
+  // suggestion. If specified, article suggestion only returns suggested
+  // documents that match all filters in their [Document.metadata][google.cloud.dialogflow.v2beta1.Document.metadata]. Multiple
+  // values for a metadata key should be concatenated by comma. For example,
+  // filters to match all documents that have 'US' or 'CA' in their market
+  // metadata values and 'agent' in their user metadata values will be
+  // ```
+  // documents_metadata_filters {
+  //   key: "market"
+  //   value: "US,CA"
+  // }
+  // documents_metadata_filters {
+  //   key: "user"
+  //   value: "agent"
+  // }
+  // ```
+  map<string, string> documents_metadata_filters = 1;
 }
 
 // The request message for [Participants.AnalyzeContent][google.cloud.dialogflow.v2beta1.Participants.AnalyzeContent].
@@ -480,6 +542,9 @@ message AnalyzeContentRequest {
 
   // Parameters for a Dialogflow virtual-agent query.
   QueryParameters query_params = 9;
+
+  // Parameters for a human assist query.
+  AssistQueryParameters assist_query_params = 14;
 
   // Optional. The send time of the message from end user or human agent's
   // perspective. It is used for identifying the same message under one
@@ -653,7 +718,9 @@ message SmartReplyAnswer {
   // The name of answer record, in the format of
   // "projects/<Project ID>/locations/<Location ID>/answerRecords/<Answer Record
   // ID>"
-  string answer_record = 3;
+  string answer_record = 3 [(google.api.resource_reference) = {
+                              type: "dialogflow.googleapis.com/AnswerRecord"
+                            }];
 }
 
 // One response of different type of suggestion response which is used in
@@ -704,6 +771,9 @@ message SuggestArticlesRequest {
   // [latest_message][google.cloud.dialogflow.v2beta1.SuggestArticlesRequest.latest_message] to use as context
   // when compiling the suggestion. By default 20 and at most 50.
   int32 context_size = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Parameters for a human assist query.
+  AssistQueryParameters assist_query_params = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The response message for [Participants.SuggestArticles][google.cloud.dialogflow.v2beta1.Participants.SuggestArticles].
@@ -754,6 +824,9 @@ message SuggestFaqAnswersRequest {
   // [latest_message] to use as context when compiling the
   // suggestion. By default 20 and at most 50.
   int32 context_size = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Parameters for a human assist query.
+  AssistQueryParameters assist_query_params = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The request message for [Participants.SuggestFaqAnswers][google.cloud.dialogflow.v2beta1.Participants.SuggestFaqAnswers].
@@ -820,7 +893,9 @@ message SuggestSmartRepliesResponse {
   //
   // Format: `projects/<Project ID>/locations/<Location
   // ID>/conversations/<Conversation ID>/messages/<Message ID>`.
-  string latest_message = 2;
+  string latest_message = 2 [(google.api.resource_reference) = {
+                               type: "dialogflow.googleapis.com/Message"
+                             }];
 
   // Number of messages prior to and including
   // [latest_message][google.cloud.dialogflow.v2beta1.SuggestSmartRepliesResponse.latest_message] to compile the
@@ -1021,6 +1096,20 @@ message ResponseMessage {
 
   }
 
+  // Represents the signal that telles the client to transfer the phone call
+  // connected to the agent to a third-party endpoint.
+  message TelephonyTransferCall {
+    // Endpoint to transfer the call to.
+    oneof endpoint {
+      // Transfer the call to a phone number
+      // in [E.164 format](https://en.wikipedia.org/wiki/E.164).
+      string phone_number = 1;
+
+      // Transfer the call to a SIP endpoint.
+      string sip_uri = 2;
+    }
+  }
+
   // Required. The rich response message.
   oneof message {
     // Returns a text response.
@@ -1035,5 +1124,9 @@ message ResponseMessage {
     // A signal that indicates the interaction with the Dialogflow agent has
     // ended.
     EndInteraction end_interaction = 4;
+
+    // A signal that the client should transfer the phone call connected to
+    // this agent to a third-party endpoint.
+    TelephonyTransferCall telephony_transfer_call = 6;
   }
 }

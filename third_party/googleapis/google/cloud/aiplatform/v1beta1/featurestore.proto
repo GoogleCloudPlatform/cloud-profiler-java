@@ -18,15 +18,21 @@ package google.cloud.aiplatform.v1beta1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/aiplatform/v1beta1/encryption_spec.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "FeaturestoreProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
-// Featurestore configuration information on how the Featurestore is configured.
+// Vertex AI Feature Store provides a centralized repository for organizing,
+// storing, and serving ML features. The Featurestore is a top-level container
+// for your features and their values.
 message Featurestore {
   option (google.api.resource) = {
     type: "aiplatform.googleapis.com/Featurestore"
@@ -36,10 +42,10 @@ message Featurestore {
   // OnlineServingConfig specifies the details for provisioning online serving
   // resources.
   message OnlineServingConfig {
-    // Required. The number of nodes for each cluster. The number of nodes will not
+    // The number of nodes for each cluster. The number of nodes will not
     // scale automatically but can be scaled manually by providing different
     // values when updating.
-    int32 fixed_node_count = 2 [(google.api.field_behavior) = REQUIRED];
+    int32 fixed_node_count = 2;
   }
 
   // Possible states a Featurestore can have.
@@ -95,4 +101,8 @@ message Featurestore {
 
   // Output only. State of the featurestore.
   State state = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Optional. Customer-managed encryption key spec for data storage. If set, both of the
+  // online and offline data storage will be secured by this key.
+  EncryptionSpec encryption_spec = 10 [(google.api.field_behavior) = OPTIONAL];
 }

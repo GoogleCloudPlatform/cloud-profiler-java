@@ -24,6 +24,7 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/api/client.proto";
 
+option csharp_namespace = "Google.Cloud.Monitoring.Dashboard.V1";
 option go_package = "google.golang.org/genproto/googleapis/monitoring/dashboard/v1;dashboard";
 option java_multiple_files = true;
 option java_outer_classname = "DashboardsServiceProto";
@@ -41,12 +42,8 @@ service DashboardsService {
       "https://www.googleapis.com/auth/monitoring.read,"
       "https://www.googleapis.com/auth/monitoring.write";
 
-  // Creates a new custom dashboard. For examples on how you can use this API to
-  // create dashboards, see [Managing dashboards by
-  // API](https://cloud.google.com/monitoring/dashboards/api-dashboard). This method requires the
-  // `monitoring.dashboards.create` permission on the specified project. For
-  // more information about permissions, see [Cloud Identity and Access
-  // Management](https://cloud.google.com/iam).
+  // Creates a new custom dashboard. For examples on how you can use this API to create dashboards, see [Managing dashboards by API](https://cloud.google.com/monitoring/dashboards/api-dashboard).
+  // This method requires the `monitoring.dashboards.create` permission on the specified project. For more information about permissions, see [Cloud Identity and Access Management](https://cloud.google.com/iam).
   rpc CreateDashboard(CreateDashboardRequest) returns (Dashboard) {
     option (google.api.http) = {
       post: "/v1/{parent=projects/*}/dashboards"
@@ -111,6 +108,10 @@ message CreateDashboardRequest {
 
   // Required. The initial dashboard specification.
   Dashboard dashboard = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // If set, validate the request and preview the review, but do not actually
+  // save it.
+  bool validate_only = 3;
 }
 
 // The `ListDashboards` request.
@@ -178,4 +179,8 @@ message DeleteDashboardRequest {
 message UpdateDashboardRequest {
   // Required. The dashboard that will replace the existing dashboard.
   Dashboard dashboard = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // If set, validate the request and preview the review, but do not actually
+  // save it.
+  bool validate_only = 3;
 }

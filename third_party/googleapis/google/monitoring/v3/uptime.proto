@@ -28,27 +28,6 @@ option java_package = "com.google.monitoring.v3";
 option php_namespace = "Google\\Cloud\\Monitoring\\V3";
 option ruby_package = "Google::Cloud::Monitoring::V3";
 
-// The regions from which an Uptime check can be run.
-enum UptimeCheckRegion {
-  // Default value if no region is specified. Will result in Uptime checks
-  // running from all regions.
-  REGION_UNSPECIFIED = 0;
-
-  // Allows checks to run from locations within the United States of America.
-  USA = 1;
-
-  // Allows checks to run from locations within the continent of Europe.
-  EUROPE = 2;
-
-  // Allows checks to run from locations within the continent of South
-  // America.
-  SOUTH_AMERICA = 3;
-
-  // Allows checks to run from locations within the Asia Pacific area (ex:
-  // Singapore).
-  ASIA_PACIFIC = 4;
-}
-
 // An internal checker allows Uptime checks to run on private/internal GCP
 // resources.
 message InternalChecker {
@@ -103,6 +82,27 @@ message InternalChecker {
 
   // The current operational state of the internal checker.
   State state = 7;
+}
+
+// The regions from which an Uptime check can be run.
+enum UptimeCheckRegion {
+  // Default value if no region is specified. Will result in Uptime checks
+  // running from all regions.
+  REGION_UNSPECIFIED = 0;
+
+  // Allows checks to run from locations within the United States of America.
+  USA = 1;
+
+  // Allows checks to run from locations within the continent of Europe.
+  EUROPE = 2;
+
+  // Allows checks to run from locations within the continent of South
+  // America.
+  SOUTH_AMERICA = 3;
+
+  // Allows checks to run from locations within the Asia Pacific area (ex:
+  // Singapore).
+  ASIA_PACIFIC = 4;
 }
 
 // This message configures which resources and services to monitor for
@@ -266,11 +266,13 @@ message UptimeCheckConfig {
 
       // Selects regular-expression matching. The match succeeds of the output
       // matches the regular expression specified in the `content` string.
+      // Regex matching is only supported for HTTP/HTTPS checks.
       MATCHES_REGEX = 3;
 
       // Selects negation of regular-expression matching. The match succeeds if
       // the output does _NOT_ match the regular expression specified in the
-      // `content` string.
+      // `content` string. Regex matching is only supported for HTTP/HTTPS
+      // checks.
       NOT_MATCHES_REGEX = 4;
     }
 
@@ -305,12 +307,13 @@ message UptimeCheckConfig {
     // The [monitored
     // resource](https://cloud.google.com/monitoring/api/resources) associated
     // with the configuration.
-    // The following monitored resource types are supported for Uptime checks:
+    // The following monitored resource types are valid for this field:
     //   `uptime_url`,
     //   `gce_instance`,
     //   `gae_app`,
     //   `aws_ec2_instance`,
     //   `aws_elb_load_balancer`
+    //   `k8s_service`
     google.api.MonitoredResource monitored_resource = 3;
 
     // The group resource associated with the configuration.

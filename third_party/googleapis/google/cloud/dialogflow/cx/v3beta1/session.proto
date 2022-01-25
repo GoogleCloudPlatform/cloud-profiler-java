@@ -17,8 +17,10 @@ syntax = "proto3";
 package google.cloud.dialogflow.cx.v3beta1;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/dialogflow/cx/v3beta1/advanced_settings.proto";
 import "google/cloud/dialogflow/cx/v3beta1/audio_config.proto";
 import "google/cloud/dialogflow/cx/v3beta1/flow.proto";
 import "google/cloud/dialogflow/cx/v3beta1/intent.proto";
@@ -29,7 +31,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/rpc/status.proto";
 import "google/type/latlng.proto";
-import "google/api/client.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Dialogflow.Cx.V3Beta1";
@@ -38,6 +39,7 @@ option java_multiple_files = true;
 option java_outer_classname = "SessionProto";
 option java_package = "com.google.cloud.dialogflow.cx.v3beta1";
 option objc_class_prefix = "DF";
+option ruby_package = "Google::Cloud::Dialogflow::CX::V3beta1";
 option (google.api.resource_definition) = {
   type: "dialogflow.googleapis.com/Session"
   pattern: "projects/{project}/locations/{location}/agents/{agent}/sessions/{session}"
@@ -147,6 +149,20 @@ message DetectIntentRequest {
 
 // The message returned from the DetectIntent method.
 message DetectIntentResponse {
+  // Represents different DetectIntentResponse types.
+  enum ResponseType {
+    // Not specified. This should never happen.
+    RESPONSE_TYPE_UNSPECIFIED = 0;
+
+    // Partial response. e.g. Aggregated responses in a Fulfillment that enables
+    // `return_partial_response` can be returned as partial response.
+    // WARNING: partial response is not eligible for barge-in.
+    PARTIAL = 1;
+
+    // Final response.
+    FINAL = 2;
+  }
+
   // Output only. The unique identifier of the response. It can be used to
   // locate a response in the training example set or for reporting issues.
   string response_id = 1;
@@ -169,6 +185,14 @@ message DetectIntentResponse {
 
   // The config used by the speech synthesizer to generate the output audio.
   OutputAudioConfig output_audio_config = 5;
+
+  // Response type.
+  ResponseType response_type = 6;
+
+  // Indicates whether the partial response can be cancelled when a later
+  // response arrives. e.g. if the agent specified some music as partial
+  // response, it can be cancelled.
+  bool allow_cancellation = 7;
 }
 
 // The top-level message sent by the client to the
@@ -177,7 +201,7 @@ message DetectIntentResponse {
 // Multiple request messages should be sent in order:
 //
 // 1.  The first message must contain
-// [session][google.cloud.dialogflow.cx.v3beta1.StreamingDetectIntentRequest.session],
+//     [session][google.cloud.dialogflow.cx.v3beta1.StreamingDetectIntentRequest.session],
 //     [query_input][google.cloud.dialogflow.cx.v3beta1.StreamingDetectIntentRequest.query_input] plus optionally
 //     [query_params][google.cloud.dialogflow.cx.v3beta1.StreamingDetectIntentRequest.query_params]. If the client
 //     wants to receive an audio response, it should also contain
@@ -229,23 +253,37 @@ message StreamingDetectIntentRequest {
 
   // Instructs the speech synthesizer how to generate the output audio.
   OutputAudioConfig output_audio_config = 4;
+
+  // Enable partial detect intent response. If this flag is not enabled,
+  // response stream still contains only one final `DetectIntentResponse` even
+  // if some `Fulfillment`s in the agent have been configured to return partial
+  // responses.
+  bool enable_partial_response = 5;
 }
 
-// The top-level message returned from the `StreamingDetectIntent` method.
+// The top-level message returned from the
+// [StreamingDetectIntent][google.cloud.dialogflow.cx.v3beta1.Sessions.StreamingDetectIntent] method.
 //
-// Multiple response messages can be returned in order:
+// Multiple response messages (N) can be returned in order.
 //
-// 1.  If the input was set to streaming audio, the first one or more messages
-//     contain `recognition_result`. Each `recognition_result` represents a more
-//     complete transcript of what the user said. The last `recognition_result`
-//     has `is_final` set to `true`.
+// The first (N-1) responses set either the `recognition_result` or
+// `detect_intent_response` field, depending on the request:
 //
-// 2.  If `enable_partial_response` is true, the following N messages
-//     (currently 1 <= N <= 4) contain `detect_intent_response`. The first (N-1)
-//     `detect_intent_response`s will have `response_type` set to `PARTIAL`.
-//     The last `detect_intent_response` has `response_type` set to `FINAL`.
-//     If `response_type` is false, response stream only contains
-//     the final `detect_intent_response`.
+// *   If the `StreamingDetectIntentRequest.query_input.audio` field was
+//     set, and the `StreamingDetectIntentRequest.enable_partial_response`
+//     field was false, the `recognition_result` field is populated for each
+//     of the (N-1) responses.
+//     See the [StreamingRecognitionResult][google.cloud.dialogflow.cx.v3beta1.StreamingRecognitionResult] message for details
+//     about the result message sequence.
+//
+// *   If the `StreamingDetectIntentRequest.enable_partial_response` field was
+//     true, the `detect_intent_response` field is populated for each
+//     of the (N-1) responses, where 1 <= N <= 4.
+//     These responses set the [DetectIntentResponse.response_type][google.cloud.dialogflow.cx.v3beta1.DetectIntentResponse.response_type] field
+//     to `PARTIAL`.
+//
+// For the final Nth response message, the `detect_intent_response` is fully
+// populated, and [DetectIntentResponse.response_type][google.cloud.dialogflow.cx.v3beta1.DetectIntentResponse.response_type] is set to `FINAL`.
 message StreamingDetectIntentResponse {
   // The output response.
   oneof response {
@@ -261,35 +299,39 @@ message StreamingDetectIntentResponse {
 // that is currently being processed or an indication that this is the end
 // of the single requested utterance.
 //
-// Example:
+// While end-user audio is being processed, Dialogflow sends a series of
+// results. Each result may contain a `transcript` value. A transcript
+// represents a portion of the utterance. While the recognizer is processing
+// audio, transcript values may be interim values or finalized values.
+// Once a transcript is finalized, the `is_final` value is set to true and
+// processing continues for the next transcript.
 //
-// 1.  transcript: "tube"
+// If `StreamingDetectIntentRequest.query_input.audio.config.single_utterance`
+// was true, and the recognizer has completed processing audio,
+// the `message_type` value is set to `END_OF_SINGLE_UTTERANCE and the
+// following (last) result contains the last finalized transcript.
 //
-// 2.  transcript: "to be a"
+// The complete end-user utterance is determined by concatenating the
+// finalized transcript values received for the series of results.
 //
-// 3.  transcript: "to be"
+// In the following example, single utterance is enabled. In the case where
+// single utterance is not enabled, result 7 would not occur.
 //
-// 4.  transcript: "to be or not to be"
-//     is_final: true
+// ```
+// Num | transcript              | message_type            | is_final
+// --- | ----------------------- | ----------------------- | --------
+// 1   | "tube"                  | TRANSCRIPT              | false
+// 2   | "to be a"               | TRANSCRIPT              | false
+// 3   | "to be"                 | TRANSCRIPT              | false
+// 4   | "to be or not to be"    | TRANSCRIPT              | true
+// 5   | "that's"                | TRANSCRIPT              | false
+// 6   | "that is                | TRANSCRIPT              | false
+// 7   | unset                   | END_OF_SINGLE_UTTERANCE | unset
+// 8   | " that is the question" | TRANSCRIPT              | true
+// ```
 //
-// 5.  transcript: " that's"
-//
-// 6.  transcript: " that is"
-//
-// 7.  message_type: `END_OF_SINGLE_UTTERANCE`
-//
-// 8.  transcript: " that is the question"
-//     is_final: true
-//
-// Only two of the responses contain final results (#4 and #8 indicated by
-// `is_final: true`). Concatenating these generates the full transcript: "to be
-// or not to be that is the question".
-//
-// In each response we populate:
-//
-// *  for `TRANSCRIPT`: `transcript` and possibly `is_final`.
-//
-// *  for `END_OF_SINGLE_UTTERANCE`: only `message_type`.
+// Concatenating the finalized transcripts with `is_final` set to true,
+// the complete utterance becomes "to be or not to be that is the question".
 message StreamingRecognitionResult {
   // Type of the response message.
   enum MessageType {
@@ -350,6 +392,9 @@ message StreamingRecognitionResult {
   // beginning of the audio. Only populated for `message_type` =
   // `TRANSCRIPT`.
   google.protobuf.Duration speech_end_offset = 8;
+
+  // Detected language code for the transcript.
+  string language_code = 10;
 }
 
 // Represents the parameters of a conversational query.
@@ -408,8 +453,9 @@ message QueryParameters {
   google.protobuf.Struct parameters = 5;
 
   // The unique identifier of the [page][google.cloud.dialogflow.cx.v3beta1.Page] to override the [current
-  // page][QueryResult.current_page] in the session. Format: `projects/<Project
-  // ID>/locations/<Location ID>/agents/<Agent ID>/pages/<page ID>`.
+  // page][QueryResult.current_page] in the session.
+  // Format: `projects/<Project ID>/locations/<Location ID>/agents/<Agent
+  // ID>/flows/<Flow ID>/pages/<Page ID>`.
   //
   // If `current_page` is specified, the previous state of the session will be
   // ignored by Dialogflow, including the [previous
@@ -438,6 +484,18 @@ message QueryParameters {
   // "Content-Length", "Connection", "From", "User-Agent", "Accept-Encoding",
   // "If-Modified-Since", "If-None-Match", "X-Forwarded-For", etc.
   map<string, string> webhook_headers = 10;
+
+  // A list of flow versions to override for the request.
+  // Format: `projects/<Project ID>/locations/<Location ID>/agents/<Agent
+  // ID>/flows/<Flow ID>/versions/<Version ID>`.
+  //
+  // If version 1 of flow X is included in this list, the traffic of
+  // flow X will go through version 1 regardless of the version configuration in
+  // the environment. Each flow can have at most one version specified in this
+  // list.
+  repeated string flow_versions = 14 [(google.api.resource_reference) = {
+                                        type: "dialogflow.googleapis.com/Version"
+                                      }];
 }
 
 // Represents the query input. It can contain one of:
@@ -499,6 +557,10 @@ message QueryResult {
     // If an [event][google.cloud.dialogflow.cx.v3beta1.EventInput] was provided as input, this field will contain
     // the name of the event.
     string trigger_event = 14;
+
+    // If a [DTMF][DTMFInput] was provided as input, this field will contain
+    // a copy of the [DTMFInput][].
+    DtmfInput dtmf = 23;
   }
 
   // The language that was triggered during intent detection.
@@ -655,8 +717,9 @@ message Match {
   // filled for [`INTENT`][google.cloud.dialogflow.cx.v3beta1.Match.MatchType] match type.
   Intent intent = 1;
 
-  // The event that matched the query. Only filled for
-  // [`EVENT`][google.cloud.dialogflow.cx.v3beta1.Match.MatchType] match type.
+  // The event that matched the query. Filled for
+  // [`EVENT`][google.cloud.dialogflow.cx.v3beta1.Match.MatchType], [`NO_MATCH`][google.cloud.dialogflow.cx.v3beta1.Match.MatchType] and
+  // [`NO_INPUT`][google.cloud.dialogflow.cx.v3beta1.Match.MatchType] match types.
   string event = 6;
 
   // The collection of parameters extracted from the query.

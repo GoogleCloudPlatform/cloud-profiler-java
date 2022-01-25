@@ -31,10 +31,13 @@ import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
+option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
 option java_multiple_files = true;
 option java_outer_classname = "FeaturestoreServiceProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
+option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
+option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
 
 // The service that handles CRUD and List for resources for Featurestore.
 service FeaturestoreService {
@@ -48,6 +51,7 @@ service FeaturestoreService {
       body: "featurestore"
     };
     option (google.api.method_signature) = "parent,featurestore";
+    option (google.api.method_signature) = "parent,featurestore,featurestore_id";
     option (google.longrunning.operation_info) = {
       response_type: "Featurestore"
       metadata_type: "CreateFeaturestoreOperationMetadata"
@@ -90,6 +94,7 @@ service FeaturestoreService {
       delete: "/v1beta1/{name=projects/*/locations/*/featurestores/*}"
     };
     option (google.api.method_signature) = "name";
+    option (google.api.method_signature) = "name,force";
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
       metadata_type: "DeleteOperationMetadata"
@@ -103,6 +108,7 @@ service FeaturestoreService {
       body: "entity_type"
     };
     option (google.api.method_signature) = "parent,entity_type";
+    option (google.api.method_signature) = "parent,entity_type,entity_type_id";
     option (google.longrunning.operation_info) = {
       response_type: "EntityType"
       metadata_type: "CreateEntityTypeOperationMetadata"
@@ -141,6 +147,7 @@ service FeaturestoreService {
       delete: "/v1beta1/{name=projects/*/locations/*/featurestores/*/entityTypes/*}"
     };
     option (google.api.method_signature) = "name";
+    option (google.api.method_signature) = "name,force";
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
       metadata_type: "DeleteOperationMetadata"
@@ -154,6 +161,7 @@ service FeaturestoreService {
       body: "feature"
     };
     option (google.api.method_signature) = "parent,feature";
+    option (google.api.method_signature) = "parent,feature,feature_id";
     option (google.longrunning.operation_info) = {
       response_type: "Feature"
       metadata_type: "CreateFeatureOperationMetadata"
@@ -279,6 +287,7 @@ service FeaturestoreService {
       get: "/v1beta1/{location=projects/*/locations/*}/featurestores:searchFeatures"
     };
     option (google.api.method_signature) = "location";
+    option (google.api.method_signature) = "location,query";
   }
 }
 
@@ -333,14 +342,14 @@ message ListFeaturestoresRequest {
   // Lists the featurestores that match the filter expression. The following
   // fields are supported:
   //
-  // * `create_time`: Supports =, !=, <, >, <=, and >= comparisons. Values must
-  // be
+  // * `create_time`: Supports `=`, `!=`, `<`, `>`, `<=`, and `>=` comparisons.
+  // Values must be
   //   in RFC 3339 format.
-  // * `update_time`: Supports =, !=, <, >, <=, and >= comparisons. Values must
-  // be
+  // * `update_time`: Supports `=`, `!=`, `<`, `>`, `<=`, and `>=` comparisons.
+  // Values must be
   //   in RFC 3339 format.
-  // * `online_serving_config.fixed_node_count`: Supports =, !=, <, >, <=,
-  // and >= comparisons.
+  // * `online_serving_config.fixed_node_count`: Supports `=`, `!=`, `<`, `>`,
+  // `<=`, and `>=` comparisons.
   // * `labels`: Supports key-value equality and key presence.
   //
   // Examples:
@@ -516,8 +525,14 @@ message ImportFeatureValuesResponse {
 }
 
 // Request message for [FeaturestoreService.BatchReadFeatureValues][google.cloud.aiplatform.v1beta1.FeaturestoreService.BatchReadFeatureValues].
-// (- Next Id: 6 -)
 message BatchReadFeatureValuesRequest {
+  // Describe pass-through fields in read_instance source.
+  message PassThroughField {
+    // Required. The name of the field in the CSV header or the name of the column in
+    // BigQuery table. The naming restriction is the same as [Feature.name][google.cloud.aiplatform.v1beta1.Feature.name].
+    string field_name = 1 [(google.api.field_behavior) = REQUIRED];
+  }
+
   // Selects Features of an EntityType to read values of and specifies read
   // settings.
   message EntityTypeSpec {
@@ -559,6 +574,9 @@ message BatchReadFeatureValuesRequest {
     // Values in the timestamp column must use the RFC 3339 format, e.g.
     // `2012-07-30T10:43:17.123Z`.
     CsvSource csv_read_instances = 3;
+
+    // Similar to csv_read_instances, but from BigQuery source.
+    BigQuerySource bigquery_read_instances = 5;
   }
 
   // Required. The resource name of the Featurestore from which to query Feature values.
@@ -574,28 +592,62 @@ message BatchReadFeatureValuesRequest {
   // Required. Specifies output location and format.
   FeatureValueDestination destination = 4 [(google.api.field_behavior) = REQUIRED];
 
+  // When not empty, the specified fields in the *_read_instances source will be
+  // joined as-is in the output, in addition to those fields from the
+  // Featurestore Entity.
+  //
+  // For BigQuery source, the type of the pass-through values will be
+  // automatically inferred. For CSV source, the pass-through values will be
+  // passed as opaque bytes.
+  repeated PassThroughField pass_through_fields = 8;
+
   // Required. Specifies EntityType grouping Features to read values of and settings.
   // Each EntityType referenced in
   // [BatchReadFeatureValuesRequest.entity_type_specs] must have a column
-  // specifying entity IDs in tha EntityType in
+  // specifying entity IDs in the EntityType in
   // [BatchReadFeatureValuesRequest.request][] .
   repeated EntityTypeSpec entity_type_specs = 7 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request message for [FeaturestoreService.ExportFeatureValues][google.cloud.aiplatform.v1beta1.FeaturestoreService.ExportFeatureValues].
 message ExportFeatureValuesRequest {
-  // Describes exporting Feature values as of the snapshot timestamp.
+  // Describes exporting the latest Feature values of all entities of the
+  // EntityType between [start_time, snapshot_time].
   message SnapshotExport {
     // Exports Feature values as of this timestamp. If not set,
     // retrieve values as of now. Timestamp, if present, must not have higher
     // than millisecond precision.
     google.protobuf.Timestamp snapshot_time = 1;
+
+    // Excludes Feature values with feature generation timestamp before this
+    // timestamp. If not set, retrieve oldest values kept in Feature Store.
+    // Timestamp, if present, must not have higher than millisecond precision.
+    google.protobuf.Timestamp start_time = 2;
   }
 
+  // Describes exporting all historical Feature values of all entities of the
+  // EntityType between [start_time, end_time].
+  message FullExport {
+    // Excludes Feature values with feature generation timestamp before this
+    // timestamp. If not set, retrieve oldest values kept in Feature Store.
+    // Timestamp, if present, must not have higher than millisecond precision.
+    google.protobuf.Timestamp start_time = 2;
+
+    // Exports Feature values as of this timestamp. If not set,
+    // retrieve values as of now. Timestamp, if present, must not have higher
+    // than millisecond precision.
+    google.protobuf.Timestamp end_time = 1;
+  }
+
+  // Required. The mode in which Feature values are exported.
   oneof mode {
-    // Exports Feature values of all entities of the EntityType as of a snapshot
-    // time.
+    // Exports the latest Feature values of all entities of the EntityType
+    // within a time range.
     SnapshotExport snapshot_export = 3;
+
+    // Exports all historical values of all entities of the EntityType within a
+    // time range
+    FullExport full_export = 7;
   }
 
   // Required. The resource name of the EntityType from which to export Feature values.
@@ -717,10 +769,10 @@ message ListEntityTypesRequest {
   // Lists the EntityTypes that match the filter expression. The following
   // filters are supported:
   //
-  // * `create_time`: Supports =, !=, <, >, >=, and <= comparisons. Values must
-  // be in RFC 3339 format.
-  // * `update_time`: Supports =, !=, <, >, >=, and <= comparisons. Values must
-  // be in RFC 3339 format.
+  // * `create_time`: Supports `=`, `!=`, `<`, `>`, `>=`, and `<=` comparisons.
+  // Values must be in RFC 3339 format.
+  // * `update_time`: Supports `=`, `!=`, `<`, `>`, `>=`, and `<=` comparisons.
+  // Values must be in RFC 3339 format.
   // * `labels`: Supports key-value equality as well as key presence.
   //
   // Examples:
@@ -981,9 +1033,9 @@ message SearchFeaturesRequest {
   // comparison. This is done by:
   //
   //   * Removing leading/trailing whitespace and tokenizing the search value.
-  //   Characters that are not one of alphanumeric [a-zA-Z0-9], underscore [_],
-  //   or asterisk [*] are treated as delimiters for tokens. (*) is treated as a
-  //   wildcard that matches characters within a token.
+  //   Characters that are not one of alphanumeric `[a-zA-Z0-9]`, underscore
+  //   `_`, or asterisk `*` are treated as delimiters for tokens. `*` is treated
+  //   as a wildcard that matches characters within a token.
   //   * Ignoring case.
   //   * Prepending an asterisk to the first and appending an asterisk to the
   //   last token in QUERY.
@@ -1117,15 +1169,15 @@ message UpdateFeaturestoreOperationMetadata {
   GenericOperationMetadata generic_metadata = 1;
 }
 
-// Details of operations that perform import feature values.
+// Details of operations that perform import Feature values.
 message ImportFeatureValuesOperationMetadata {
-  // Operation metadata for Featurestore import feature values.
+  // Operation metadata for Featurestore import Feature values.
   GenericOperationMetadata generic_metadata = 1;
 
   // Number of entities that have been imported by the operation.
   int64 imported_entity_count = 2;
 
-  // Number of feature values that have been imported by the operation.
+  // Number of Feature values that have been imported by the operation.
   int64 imported_feature_value_count = 3;
 
   // The number of rows in input source that weren't imported due to either

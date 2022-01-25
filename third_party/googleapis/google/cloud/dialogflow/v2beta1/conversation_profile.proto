@@ -24,6 +24,7 @@ import "google/cloud/dialogflow/v2beta1/audio_config.proto";
 import "google/cloud/dialogflow/v2beta1/document.proto";
 import "google/cloud/dialogflow/v2beta1/participant.proto";
 import "google/longrunning/operations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -169,7 +170,21 @@ message ConversationProfile {
   // Language code for the conversation profile. If not specified, the language
   // is en-US. Language at ConversationProfile should be set for all non en-us
   // languages.
+  // This should be a [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt)
+  // language tag. Example: "en-US".
   string language_code = 10;
+
+  // The time zone of this conversational profile from the
+  // [time zone database](https://www.iana.org/time-zones), e.g.,
+  // America/New_York, Europe/Paris. Defaults to America/New_York.
+  string time_zone = 14;
+
+  // Name of the CX SecuritySettings reference for the agent.
+  // Format: `projects/<Project ID>/locations/<Location
+  // ID>/securitySettings/<Security Settings ID>`.
+  string security_settings = 13 [(google.api.resource_reference) = {
+                                   type: "dialogflow.googleapis.com/CXSecuritySettings"
+                                 }];
 }
 
 // Defines the Automated Agent to connect to a conversation.
@@ -233,6 +248,9 @@ message HumanAgentAssistantConfig {
 
     // Configs of custom conversation model.
     ConversationModelConfig conversation_model_config = 7;
+
+    // Configs for processing conversation.
+    ConversationProcessConfig conversation_process_config = 8;
   }
 
   // Detail human agent assistant config.
@@ -371,6 +389,13 @@ message HumanAgentAssistantConfig {
     string model = 1 [(google.api.resource_reference) = {
                         type: "dialogflow.googleapis.com/ConversationModel"
                       }];
+  }
+
+  // Config to process conversation.
+  message ConversationProcessConfig {
+    // Number of recent non-small-talk sentences to use as context for article
+    // and FAQ suggestion
+    int32 recent_sentences_count = 2;
   }
 
   // Configuration for analyses to run on each conversation message.
