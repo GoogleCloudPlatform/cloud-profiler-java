@@ -269,7 +269,8 @@ APIThrottler::APIThrottler(
       clock_(clock),
       stub_(std::move(stub)),
       creation_backoff_envelope_ns_(kBackoffNanos),
-      closed_(false) {
+      closed_(false),
+      backing_off_for_testing_(false) {
   grpc_init();
   gpr_set_log_function(GRPCLog);
 
