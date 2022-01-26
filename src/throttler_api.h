@@ -62,6 +62,7 @@ class APIThrottler : public Throttler {
 
  private:
   FRIEND_TEST(APIThrottlerTest, TestCreatesAndUploadsProfile);
+  FRIEND_TEST(APIThrottlerTest, TestCloseInterruptsBackOff);
   // Takes a backoff on profile creation error. The backoff duration
   // may be specified by the server. Otherwise it will be a randomized
   // exponentially increasing value, bounded by kMaxBackoffNanos.
@@ -69,6 +70,9 @@ class APIThrottler : public Throttler {
 
   // Resets the client gRPC context for the next call.
   void ResetClientContext();
+
+  // Back off for a given duration.
+  void BackOff(timespec ts);
 
  private:
   const std::vector<google::devtools::cloudprofiler::v2::ProfileType> types_;
@@ -90,6 +94,10 @@ class APIThrottler : public Throttler {
   std::atomic<bool> closed_;
   std::mutex ctx_mutex_;
   std::unique_ptr<grpc::ClientContext> ctx_;
+
+  // When true, indicates that the throttler is backing off.
+  // For testing only.
+  std::atomic<bool> backing_off_for_testing_;
 };
 
 // Returns true if the service name matches the regex

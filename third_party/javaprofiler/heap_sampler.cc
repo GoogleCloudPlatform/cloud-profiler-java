@@ -19,18 +19,16 @@
 
 namespace {
 
-std::unique_ptr<std::vector<google::javaprofiler::JVMPI_CallFrame>>
+std::vector<google::javaprofiler::JVMPI_CallFrame>
 TransformFrames(jvmtiFrameInfo *stack_frames, int count) {
-  auto frames =
-      std::unique_ptr<std::vector<google::javaprofiler::JVMPI_CallFrame>>(
-          new std::vector<google::javaprofiler::JVMPI_CallFrame>(count));
+  std::vector<google::javaprofiler::JVMPI_CallFrame> frames(count);
 
   for (int i = 0; i < count; i++) {
     // Note that technically this is not the line number; it is the location but
     // our CPU profiler piggy-backs on JVMPI_CallFrame and uses lineno as a
     // jlocation as well...
-    (*frames)[i].lineno = stack_frames[i].location;
-    (*frames)[i].method_id = stack_frames[i].method;
+    frames[i].lineno = stack_frames[i].location;
+    frames[i].method_id = stack_frames[i].method;
   }
 
   return frames;
@@ -57,7 +55,8 @@ std::atomic<int> HeapMonitor::sampling_interval_;
 
 HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
                                    int max_garbage_size)
-    : max_garbage_size_(max_garbage_size),
+    : peak_profile_size_(0),
+      max_garbage_size_(max_garbage_size),
       cur_garbage_pos_(0),
       jvmti_(jvmti), cache_(cache) {
 }
@@ -79,8 +78,7 @@ void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
       return;
     }
 
-    auto live_object = std::unique_ptr<HeapObjectTrace>(
-        new HeapObjectTrace(weak_ref, size, std::move(frames)));
+    HeapObjectTrace live_object(weak_ref, size, std::move(frames));
 
     // Only now lock and get things done quickly.
     std::lock_guard<std::mutex> lock(storage_lock_);
@@ -88,7 +86,7 @@ void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
   }
 }
 
-void HeapEventStorage::AddToGarbage(std::unique_ptr<HeapObjectTrace> obj) {
+void HeapEventStorage::AddToGarbage(HeapObjectTrace &&obj) {
   if (garbage_objects_.size() >= max_garbage_size_) {
     garbage_objects_[cur_garbage_pos_] = std::move(obj);
     cur_garbage_pos_ = (cur_garbage_pos_ + 1) % max_garbage_size_;
@@ -98,22 +96,31 @@ void HeapEventStorage::AddToGarbage(std::unique_ptr<HeapObjectTrace> obj) {
 }
 
 void HeapEventStorage::MoveLiveObjects(
-    JNIEnv *env, std::vector<std::unique_ptr<HeapObjectTrace>> *objects,
-    std::vector<std::unique_ptr<HeapObjectTrace>> *still_live_objects) {
+    JNIEnv *env, std::vector<HeapObjectTrace> *objects,
+    std::vector<HeapObjectTrace> *still_live_objects) {
   for (auto &elem : *objects) {
-    if (elem->IsLive(env)) {
+    if (elem.IsLive(env)) {
       still_live_objects->push_back(std::move(elem));
     } else {
-      elem->DeleteWeakReference(env);
+      elem.DeleteWeakReference(env);
       AddToGarbage(std::move(elem));
     }
   }
 }
 
+int64_t HeapEventStorage::ProfileSize(
+    const std::vector<HeapObjectTrace> &live_objects) const {
+  int64_t total = 0;
+  for (auto &trace : live_objects) {
+    total += trace.Size();
+  }
+  return total;
+}
+
 void HeapEventStorage::CompactSamples(JNIEnv *env) {
   std::lock_guard<std::mutex> lock(storage_lock_);
 
-  std::vector<std::unique_ptr<HeapObjectTrace>> still_live;
+  std::vector<HeapObjectTrace> still_live;
 
   MoveLiveObjects(env, &newly_allocated_objects_, &still_live);
   MoveLiveObjects(env, &live_objects_, &still_live);
@@ -123,36 +130,65 @@ void HeapEventStorage::CompactSamples(JNIEnv *env) {
   // Newly allocated objects is now reset, those still alive are now in
   // live_objects.
   newly_allocated_objects_.clear();
+
+  // Update peak profile if needed.
+
+  int64_t curr_profile_size = ProfileSize(live_objects_);
+
+  if (curr_profile_size > peak_profile_size_) {
+    peak_profile_size_ = curr_profile_size;
+
+    peak_objects_.clear();
+    for (auto &object : live_objects_) {
+      peak_objects_.push_back(object.Copy());
+    }
+  }
+}
+
+HeapEventStorage::StackTraceArrayBuilder::StackTraceArrayBuilder(
+    std::size_t objects_size)
+    : objects_size_(objects_size),
+      stack_trace_data_(
+          new google::javaprofiler::ProfileStackTrace[objects_size_]),
+      call_trace_data_(new JVMPI_CallTrace[objects_size_]) {
+}
+
+void HeapEventStorage::StackTraceArrayBuilder::AddTrace(
+    HeapEventStorage::HeapObjectTrace &object) {
+  std::vector<JVMPI_CallFrame> &frames = object.Frames();
+
+  call_trace_data_[curr_trace_] = {nullptr,
+                                   static_cast<int>(frames.size()),
+                                   frames.data()};
+
+  stack_trace_data_[curr_trace_] = {&call_trace_data_[curr_trace_],
+                                    object.Size()};
+
+  // Add the size as a label to help post-processing filtering.
+  stack_trace_data_[curr_trace_].trace_and_labels.AddLabel(
+      "bytes", object.Size(), "bytes");
+
+  curr_trace_++;
 }
 
 std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::ConvertToProto(
-    ProfileProtoBuilder *builder,
-    const std::vector<std::unique_ptr<HeapObjectTrace>> &objects) {
-
-  std::size_t objects_size = objects.size();
-
-  std::unique_ptr<google::javaprofiler::ProfileStackTrace[]> stack_trace_data(
-      new google::javaprofiler::ProfileStackTrace[objects_size]);
-
-  std::unique_ptr<JVMPI_CallTrace[]> call_trace_data(
-      new JVMPI_CallTrace[objects_size]);
-
-  for (int i = 0; i < objects_size; ++i) {
-    auto *object = objects[i].get();
-    auto *call_target = call_trace_data.get() + i;
-    auto *trace_target = stack_trace_data.get() + i;
-
-    auto *frames = object->Frames();
-    *call_target = {nullptr, static_cast<int>(frames->size()), frames->data()};
-    *trace_target = {call_target, object->Size()};
-
-    // Add the size as a label to help post-processing filtering.
-    trace_target->trace_and_labels.AddLabel("bytes", object->Size(), "bytes");
+    ProfileProtoBuilder *builder, std::vector<HeapObjectTrace> &objects) {
+  StackTraceArrayBuilder stack_trace_builder(objects.size());
+  for (int i = 0; i < objects.size(); ++i) {
+    stack_trace_builder.AddTrace(objects[i]);
   }
 
-  builder->AddTraces(stack_trace_data.get(), objects_size);
-
+  builder->AddTraces(stack_trace_builder.GetStackTraceData(), objects.size());
   return builder->CreateProto();
+}
+
+std::unique_ptr<perftools::profiles::Profile>
+HeapEventStorage::GetPeakHeapProfiles(JNIEnv *env, int sampling_interval) {
+  auto builder =
+      ProfileProtoBuilder::ForHeap(env, jvmti_, sampling_interval, cache_);
+
+  std::lock_guard<std::mutex> lock(storage_lock_);
+  return ConvertToProto(builder.get(), peak_objects_);
 }
 
 std::unique_ptr<perftools::profiles::Profile> HeapEventStorage::GetProfiles(
@@ -328,6 +364,18 @@ std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetHeapProfiles(
   if (jvmti_) {
     return GetInstance()->storage_.GetHeapProfiles(env, sampling_interval_,
                                                    force_gc);
+  }
+#endif
+  return EmptyHeapProfile(env);
+}
+
+std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetPeakHeapProfiles(
+    JNIEnv* env, bool force_gc) {
+#ifdef ENABLE_HEAP_SAMPLING
+  // Note: technically this means that you cannot disable the sampler and then
+  // get the profile afterwards; this could be changed if needed.
+  if (jvmti_) {
+    return GetInstance()->storage_.GetPeakHeapProfiles(env, sampling_interval_);
   }
 #endif
   return EmptyHeapProfile(env);

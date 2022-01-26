@@ -32,6 +32,7 @@
 #include "grpcpp/create_channel.h"
 #include "grpcpp/security/credentials.h"
 #include "grpcpp/support/channel_arguments.h"
+#include "third_party/javaprofiler/clock.h"
 
 // API curated profiling configuration.
 DEFINE_string(cprof_api_address, "cloudprofiler.googleapis.com",
@@ -268,7 +269,8 @@ APIThrottler::APIThrottler(
       clock_(clock),
       stub_(std::move(stub)),
       creation_backoff_envelope_ns_(kBackoffNanos),
-      closed_(false) {
+      closed_(false),
+      backing_off_for_testing_(false) {
   grpc_init();
   gpr_set_log_function(GRPCLog);
 
@@ -321,10 +323,10 @@ bool APIThrottler::WaitNext() {
       creation_backoff_envelope_ns_ = kBackoffNanos;
       break;
     }
+    OnCreationError(st);
     if (closed_) {
       return false;
     }
-    OnCreationError(st);
   }
 
   return true;
@@ -390,7 +392,7 @@ void APIThrottler::OnCreationError(const grpc::Status& st) {
       if (backoff_ns > 0) {
         LOG(INFO) << "Got ABORTED, will retry after backing off for "
                   << backoff_ns / kNanosPerMilli << "ms";
-        clock_->SleepFor(NanosToTimeSpec(backoff_ns));
+        BackOff(NanosToTimeSpec(backoff_ns));
         return;
       }
     }
@@ -399,8 +401,7 @@ void APIThrottler::OnCreationError(const grpc::Status& st) {
   LOG(WARNING) << "Failed to create profile, will retry: " << DebugString(st);
 
   double random_factor = static_cast<double>(dist_(gen_)) / kRandomRange;
-  clock_->SleepFor(
-      NanosToTimeSpec(creation_backoff_envelope_ns_ * random_factor));
+  BackOff(NanosToTimeSpec(creation_backoff_envelope_ns_ * random_factor));
   creation_backoff_envelope_ns_ = std::min(
       static_cast<int64_t>(creation_backoff_envelope_ns_ * kBackoffFactor),
       kMaxBackoffNanos);
@@ -424,6 +425,20 @@ void APIThrottler::Close() {
   if (ctx_) {
     ctx_->TryCancel();
   }
+}
+
+void APIThrottler::BackOff(timespec ts) {
+  backing_off_for_testing_ = true;
+  auto end = TimeAdd(clock_->Now(), ts);
+  // Poll every 0.5s in case the throttler is closed during the backoff.
+  const timespec poll_interval = {0, 500 * 1000 * 1000};  // 0.5s
+  while (!closed_ && !AlmostThere(clock_, end, poll_interval)) {
+    clock_->SleepFor(poll_interval);
+  }
+  if (!closed_) {
+    clock_->SleepUntil(end);
+  }
+  backing_off_for_testing_ = false;
 }
 
 }  // namespace profiler

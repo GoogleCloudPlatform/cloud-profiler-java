@@ -19,8 +19,6 @@
 
 #include <memory>
 
-#include "src/globals.h"
-
 namespace cloud {
 namespace profiler {
 

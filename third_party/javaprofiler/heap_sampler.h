@@ -57,6 +57,10 @@ class HeapEventStorage {
     return GetProfiles(env, sampling_interval, force_gc, true);
   }
 
+  // Return the largest profile recorded so far.
+  std::unique_ptr<perftools::profiles::Profile> GetPeakHeapProfiles(
+      JNIEnv *env, int sampling_interval);
+
   // Returns a perftools::profiles::Profile with the objects that have been
   // GC'd.
   // force_gc provides a means to force GC before returning the sampled heap
@@ -81,11 +85,23 @@ class HeapEventStorage {
     // This object owns the jweak object parameter. It is freed when the object
     // is sent to the garbage list, and the object is set to nullptr.
     HeapObjectTrace(jweak object, jlong size,
-                    std::unique_ptr<std::vector<JVMPI_CallFrame>> frames)
+                    const std::vector<JVMPI_CallFrame> &&frames)
         : object_(object), size_(size), frames_(std::move(frames)) {}
 
-    std::vector<JVMPI_CallFrame> *Frames() const {
-      return frames_.get();
+    HeapObjectTrace(jweak object, jlong size,
+                    const std::vector<JVMPI_CallFrame> &frames)
+        : object_(object), size_(size), frames_(frames) {}
+
+    // Allow moving.
+    HeapObjectTrace(HeapObjectTrace&& o) = default;
+    HeapObjectTrace& operator=(HeapObjectTrace&& o) = default;
+
+    // No copying allowed.
+    HeapObjectTrace(const HeapObjectTrace& o) = delete;
+    HeapObjectTrace& operator=(const HeapObjectTrace& o) = delete;
+
+    std::vector<JVMPI_CallFrame> &Frames() {
+      return frames_;
     }
 
     int Size() const {
@@ -103,41 +119,68 @@ class HeapEventStorage {
       return !env->IsSameObject(object_, NULL);
     }
 
-    // Not copyable or movable.
-    HeapObjectTrace(const HeapObjectTrace&) = delete;
-    HeapObjectTrace& operator=(const HeapObjectTrace&) = delete;
+    // Make copying an explicit operation for the one case we need it (adding
+    // to the peak heapz storage)
+    HeapObjectTrace Copy() {
+      return HeapObjectTrace(object_, size_, frames_);
+    }
 
    private:
     jweak object_;
     int size_;
-    std::unique_ptr<std::vector<JVMPI_CallFrame>> frames_;
+    std::vector<JVMPI_CallFrame> frames_;
   };
 
+  // Helper for creating a google::javaprofiler::ProfileStackTrace array
+  // to pass to ProfileProtoBuilder.
+  class StackTraceArrayBuilder {
+   public:
+    StackTraceArrayBuilder(std::size_t objects_size);
+
+    void AddTrace(HeapEventStorage::HeapObjectTrace &object);
+
+    google::javaprofiler::ProfileStackTrace* GetStackTraceData() const {
+      return stack_trace_data_.get();
+    }
+
+   private:
+    int curr_trace_ = 0;
+    std::size_t objects_size_;
+    std::unique_ptr<google::javaprofiler::ProfileStackTrace[]> stack_trace_data_;
+    std::unique_ptr<JVMPI_CallTrace[]> call_trace_data_;
+  };
+
+
   static std::unique_ptr<perftools::profiles::Profile> ConvertToProto(
-    ProfileProtoBuilder *builder,
-    const std::vector<std::unique_ptr<HeapObjectTrace>> &objects);
+      ProfileProtoBuilder *builder, std::vector<HeapObjectTrace> &objects);
 
   std::unique_ptr<perftools::profiles::Profile> GetProfiles(
       JNIEnv* env, int sampling_interval, bool force_gc, bool get_live);
 
   // Add object to the garbage list: it uses a queue with a max size of
   // max_garbage_size, provided via the constructor.
-  void AddToGarbage(std::unique_ptr<HeapObjectTrace> obj);
+  // obj will be std::move'd to the garbage_list.
+  void AddToGarbage(HeapObjectTrace &&obj);
 
   // Moves live objects from objects to still_live_objects; live elements from
   // the objects vector are replaced with nullptr via std::move.
   void MoveLiveObjects(
-      JNIEnv *env, std::vector<std::unique_ptr<HeapObjectTrace>> *objects,
-      std::vector<std::unique_ptr<HeapObjectTrace>> *still_live_objects);
+      JNIEnv *env, std::vector<HeapObjectTrace> *objects,
+      std::vector<HeapObjectTrace> *still_live_objects);
 
-  std::vector<std::unique_ptr<HeapObjectTrace>> newly_allocated_objects_;
-  std::vector<std::unique_ptr<HeapObjectTrace>> live_objects_;
+  int64_t ProfileSize(const std::vector<HeapObjectTrace> &objects) const;
+
+  std::vector<HeapObjectTrace> newly_allocated_objects_;
+  std::vector<HeapObjectTrace> live_objects_;
+
+  int64_t peak_profile_size_;
+  std::vector<HeapObjectTrace> peak_objects_;
 
   // Though a queue really would be nice, we need a way to iterate when
   // requested.
   int max_garbage_size_;
   int cur_garbage_pos_;
-  std::vector<std::unique_ptr<HeapObjectTrace>> garbage_objects_;
+  std::vector<HeapObjectTrace> garbage_objects_;
 
   std::mutex storage_lock_;
   jvmtiEnv *jvmti_;
@@ -161,6 +204,10 @@ class HeapMonitor {
   // the HeapEventStorage.
   static std::unique_ptr<perftools::profiles::Profile> GetGarbageHeapProfiles(
       JNIEnv* env, bool force_gc);
+
+  // Return the largest profile recorded so far.
+  static std::unique_ptr<perftools::profiles::Profile> GetPeakHeapProfiles(
+    JNIEnv* env, bool force_gc);
 
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
                         jclass object_klass, jlong size) {
