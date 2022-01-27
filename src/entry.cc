@@ -100,7 +100,7 @@ void CreateJMethodIDsForClass(jvmtiEnv *jvmti, jclass klass) {
     // JVMTI_ERROR_CLASS_NOT_PREPARED is okay because some classes may
     // be loaded but not prepared at this point.
     google::javaprofiler::JvmtiScopedPtr<char> ksig(jvmti);
-    JVMTI_ERROR((jvmti->GetClassSignature(klass, ksig.GetRef(), NULL)));
+    JVMTI_ERROR((jvmti->GetClassSignature(klass, ksig.GetRef(), nullptr)));
     LOG(ERROR) << "Failed to create method IDs for methods in class "
                << ksig.Get() << " with error " << e;
   }
@@ -146,7 +146,7 @@ void JNICALL OnVMDeath(jvmtiEnv *jvmti_env, JNIEnv *jni_env) {
   LOG(INFO) << "On VM death";
   worker->Stop();
   delete worker;
-  worker = NULL;
+  worker = nullptr;
 
   if (google::javaprofiler::HeapMonitor::Enabled()) {
     google::javaprofiler::HeapMonitor::Disable();
@@ -231,7 +231,7 @@ static bool RegisterJvmti(jvmtiEnv *jvmti) {
   // Events are enumerated in jvmstatagent.h
   for (int i = 0; i < events.size(); i++) {
     JVMTI_ERROR_1(
-        (jvmti->SetEventNotificationMode(JVMTI_ENABLE, events[i], NULL)),
+        (jvmti->SetEventNotificationMode(JVMTI_ENABLE, events[i], nullptr)),
         false);
   }
 
