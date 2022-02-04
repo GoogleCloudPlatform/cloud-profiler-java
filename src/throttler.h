@@ -26,6 +26,9 @@ namespace profiler {
 constexpr char kTypeCPU[] = "cpu";
 constexpr char kTypeWall[] = "wall";
 constexpr char kTypeHeap[] = "heap";
+// contention and threads are not supported in Java but are needed here for C++
+constexpr char kTypeContention[] = "contention";
+constexpr char kTypeThreads[] = "threads";
 
 // Iterator-like abstraction used to guide a profiling loop comprising of
 // waiting for when the next profile may be collected and saving its data once

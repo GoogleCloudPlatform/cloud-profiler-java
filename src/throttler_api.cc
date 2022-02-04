@@ -341,6 +341,12 @@ std::string APIThrottler::ProfileType() {
       return kTypeWall;
     case api::HEAP:
       return kTypeHeap;
+    // contention and threads are not supported in Java but are needed here
+    // for C++
+    case api::CONTENTION:
+      return kTypeContention;
+    case api::THREADS:
+      return kTypeThreads;
     default:
       const std::string& pt_name = api::ProfileType_Name(pt);
       LOG(ERROR) << "Unsupported profile type " << pt_name;
