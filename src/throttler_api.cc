@@ -178,7 +178,7 @@ bool InitializeDeployment(CloudEnv* env, const std::string& labels,
   if (!IsValidServiceName(service)) {
     LOG(ERROR)
         << "Deployment service name '" << service
-        << "' does not match pattern '^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$'";
+        << "' does not match pattern '^[a-z0-9]([-a-z0-9_.]{0,253}[a-z0-9])?$'";
     return false;
   }
   d->set_target(service);
@@ -227,12 +227,12 @@ bool AddProfileLabels(api::Profile* p, const std::string& labels) {
 }  // namespace
 
 // Returns true if the service name matches the regex
-// "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
+// "^[a-z0-9]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
 bool IsValidServiceName(std::string s) {
   if (s.length() < 1 || s.length() > 255) {
     return false;
   }
-  if (s[0] < 'a' || s[0] > 'z') {
+  if ((s[0] < 'a' || s[0] > 'z') && (s[0] < '0' || s[0] > '9')) {
     return false;
   }
   if ((s.back() < 'a' || s.back() > 'z') &&
