@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
+#include <iostream>
+#include <memory>
+#include <ostream>
+
+#include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
+#include "third_party/javaprofiler/stacktrace_decls.h"
+#include "third_party/javaprofiler/stacktraces.h"
 
 namespace {
 
-std::vector<google::javaprofiler::JVMPI_CallFrame>
+using google::javaprofiler::JVMPI_CallFrame;
+
+std::vector<JVMPI_CallFrame>
 TransformFrames(jvmtiFrameInfo *stack_frames, int count) {
-  std::vector<google::javaprofiler::JVMPI_CallFrame> frames(count);
+  std::vector<JVMPI_CallFrame> frames(count);
 
   for (int i = 0; i < count; i++) {
     // Note that technically this is not the line number; it is the location but
@@ -32,6 +41,32 @@ TransformFrames(jvmtiFrameInfo *stack_frames, int count) {
   }
 
   return frames;
+}
+
+std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTrace(JNIEnv *jni) {
+  std::unique_ptr<std::vector<JVMPI_CallFrame>> trace_result = nullptr;
+
+// Cannot use the fast stacktrace for standalone builds as their standard
+// libraries do not support getcontext.
+
+  return trace_result;
+}
+
+std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
+    JNIEnv *jni, jvmtiEnv *jvmti, jthread thread) {
+  const int kMaxFrames = 128;
+  jint count = 0;
+  jvmtiFrameInfo stack_frames[kMaxFrames];
+
+  jvmtiError err =
+      jvmti->GetStackTrace(thread, 0, kMaxFrames, stack_frames, &count);
+
+  if (err != JVMTI_ERROR_NONE || count <= 0) {
+    return nullptr;
+  }
+
+  return std::unique_ptr<std::vector<JVMPI_CallFrame>>(
+      new std::vector<JVMPI_CallFrame>(TransformFrames(stack_frames, count)));
 }
 
 extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv *jvmti_env,
@@ -50,8 +85,10 @@ extern "C" JNIEXPORT void GarbageCollectionFinish(jvmtiEnv *jvmti_env) {
 
 namespace google {
 namespace javaprofiler {
+
 std::atomic<jvmtiEnv *> HeapMonitor::jvmti_;
 std::atomic<int> HeapMonitor::sampling_interval_;
+std::atomic<bool> HeapMonitor::use_jvm_trace_;
 
 HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
                                    int max_garbage_size)
@@ -62,28 +99,19 @@ HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
 }
 
 void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
-                           jclass klass, jlong size) {
-  const int kMaxFrames = 128;
-  jint count = 0;
-  jvmtiFrameInfo stack_frames[kMaxFrames];
-  jvmtiError err =
-      jvmti_->GetStackTrace(thread, 0, kMaxFrames, stack_frames, &count);
-
-  if (err == JVMTI_ERROR_NONE && count > 0) {
-    auto frames = TransformFrames(stack_frames, count);
-
-    jweak weak_ref = jni->NewWeakGlobalRef(object);
-    if (jni->ExceptionCheck()) {
-      LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";
-      return;
-    }
-
-    HeapObjectTrace live_object(weak_ref, size, std::move(frames));
-
-    // Only now lock and get things done quickly.
-    std::lock_guard<std::mutex> lock(storage_lock_);
-    newly_allocated_objects_.push_back(std::move(live_object));
+                           jclass klass, jlong size,
+                           const std::vector<JVMPI_CallFrame> &&frames) {
+  jweak weak_ref = jni->NewWeakGlobalRef(object);
+  if (jni->ExceptionCheck()) {
+    LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";
+    return;
   }
+
+  HeapObjectTrace live_object(weak_ref, size, std::move(frames));
+
+  // Only now lock and get things done quickly.
+  std::lock_guard<std::mutex> lock(storage_lock_);
+  newly_allocated_objects_.push_back(std::move(live_object));
 }
 
 void HeapEventStorage::AddToGarbage(HeapObjectTrace &&obj) {
@@ -266,6 +294,19 @@ bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
 #endif
 }
 
+void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
+                            jclass object_klass, jlong size) {
+  auto trace = use_jvm_trace_.load()
+    ? GetTrace(jni_env)
+    : GetTraceUsingJvmti(jni_env, jvmti_.load(), thread);
+  if (trace == nullptr) {
+    return;
+  }
+
+  GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size,
+                              std::move(*trace));
+}
+
 void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 #ifdef ENABLE_HEAP_SAMPLING
   callbacks->SampledObjectAlloc = &SampledObjectAlloc;
@@ -274,7 +315,8 @@ void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 }
 
 // Currently, we enable once and forget about it.
-bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
+bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
+                         bool use_jvm_trace) {
 #ifdef ENABLE_HEAP_SAMPLING
   if (!Supported(jvmti)) {
     LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
@@ -304,6 +346,7 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
 
   jvmti_.store(jvmti);
   sampling_interval_.store(sampling_interval);
+  use_jvm_trace_.store(use_jvm_trace);
 
   if (!GetInstance()->CreateGCWaitingThread(jvmti, jni)) {
     return false;
@@ -326,6 +369,10 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
     LOG(WARNING) << "Failed to enable garbage collection finish event, "
                  << "disabling the heap sampling monitor";
     return false;
+  }
+
+  if (use_jvm_trace) {
+    Asgct::SetAsgct(Accessors::GetJvmFunction<ASGCTType>("AsyncGetCallTrace"));
   }
 
   return true;

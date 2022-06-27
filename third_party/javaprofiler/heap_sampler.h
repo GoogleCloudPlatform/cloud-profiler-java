@@ -20,13 +20,13 @@
 #include <jni.h>
 #include <jvmti.h>
 
+#include <atomic>
 #include <condition_variable>  // NOLINT
 #include <list>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <vector>
 
-#include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
 
 namespace google {
@@ -45,7 +45,7 @@ class HeapEventStorage {
 
   // Adds an object to the storage system.
   void Add(JNIEnv *jni, jthread thread, jobject object, jclass klass,
-           jlong size);
+           jlong size, const std::vector<JVMPI_CallFrame> &&frames);
 
   // Returns a perftools::profiles::Profile with the objects stored via
   // calls to the Add method.
@@ -190,7 +190,8 @@ class HeapEventStorage {
 // Due to the JVMTI callback, everything here is static.
 class HeapMonitor {
  public:
-  static bool Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval);
+  static bool Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
+                     bool use_jvm_trace);
   static void Disable();
 
   static bool Enabled() { return jvmti_ != nullptr; }
@@ -210,9 +211,7 @@ class HeapMonitor {
     JNIEnv* env, bool force_gc);
 
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
-                        jclass object_klass, jlong size) {
-    GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size);
-  }
+                        jclass object_klass, jlong size);
 
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
@@ -229,13 +228,19 @@ class HeapMonitor {
   HeapMonitor &operator=(const HeapMonitor &) = delete;
 
  private:
-  HeapMonitor() : storage_(jvmti_.load()) {}
+  HeapMonitor() : storage_(jvmti_.load(), GetFrameCache()) {
+  }
 
   // We construct the heap_monitor at the first call to GetInstance, so ensure
   // Enable was called at least once before to initialize jvmti_.
   static HeapMonitor *GetInstance() {
     static HeapMonitor heap_monitor;
     return &heap_monitor;
+  }
+
+  ProfileFrameCache *GetFrameCache() {
+    ProfileFrameCache *cache = nullptr;
+    return cache;
   }
 
   static bool Supported(jvmtiEnv* jvmti);
@@ -259,6 +264,7 @@ class HeapMonitor {
 
   static std::atomic<jvmtiEnv *> jvmti_;
   static std::atomic<int> sampling_interval_;
+  static std::atomic<bool> use_jvm_trace_;
 
   std::list<GcEvent> gc_notify_events_;
   std::condition_variable gc_waiting_cv_;
