@@ -43,6 +43,9 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
       location_builder_(&builder_) {
   AddSampleType(count_type);
   AddSampleType(metric_type);
+  builder_.mutable_profile()->set_default_sample_type(
+      builder_.StringId(metric_type.type.c_str()));
+
   SetPeriodType(metric_type);
 }
 
