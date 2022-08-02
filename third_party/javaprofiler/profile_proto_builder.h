@@ -441,6 +441,8 @@ class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
             ProfileProtoBuilder::SampleType("delay", "microseconds")) {
     builder_.mutable_profile()->set_duration_nanos(duration_nanos);
     builder_.mutable_profile()->set_period(sampling_rate);
+    builder_.mutable_profile()->set_default_sample_type(
+        builder_.StringId("delay"));
   }
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() {
