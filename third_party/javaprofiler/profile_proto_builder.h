@@ -288,43 +288,6 @@ class ProfileProtoBuilder {
   int64 sampling_rate_ = 0;
 
  private:
-  // Track progress through a stack as we traverse it, in order to determine
-  // how processing should proceed based on the context of a frame.
-  class StackState {
-   public:
-    StackState() {
-    }
-
-    // Notify the state that we are visiting a Java frame.
-    void JavaFrame() {
-      in_jni_helpers_ = false;
-    }
-
-    // Notify the state that we are visiting a native frame.
-    void NativeFrame(const std::string &function_name) {
-      if (StartsWith(function_name, "JavaCalls::call_helper")) {
-        in_jni_helpers_ = true;
-      }
-    }
-
-    // Should we skip the current frame?
-    bool SkipFrame() const {
-      return in_jni_helpers_;
-    }
-
-   private:
-    // We don't add native frames that are just "helper" native code for
-    // dispatching to JNI code. We determine this by detecting a native
-    // JavaCalls::call_helper frame, then skipping until the we see a Java
-    // frame again.
-    // TODO: Support a "complete detail" mode to override this.
-    bool in_jni_helpers_ = false;
-
-    static bool StartsWith(const std::string &s, const std::string &prefix) {
-      return s.find(prefix) == 0;
-    }
-  };
-
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
   void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
@@ -334,12 +297,10 @@ class ProfileProtoBuilder {
   void AddTrace(const ProfileStackTrace &trace, int32 count);
   void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
                    perftools::profiles::Profile *profile,
-                   perftools::profiles::Sample *sample,
-                   StackState *stack_state);
+                   perftools::profiles::Sample *sample);
   void AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                      perftools::profiles::Profile *profile,
-                     perftools::profiles::Sample *sample,
-                     StackState *stack_state);
+                     perftools::profiles::Sample *sample);
   void UnsampleMetrics();
 
   MethodInfo *Method(jmethodID id);

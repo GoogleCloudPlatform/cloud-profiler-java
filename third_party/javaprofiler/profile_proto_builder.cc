@@ -181,15 +181,13 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
   const JVMPI_CallTrace *trace = trace_and_labels.trace;
   int first_frame = SkipTopNativeFrames(*trace);
 
-  StackState stack_state;
-
   for (int i = first_frame; i < trace->num_frames; ++i) {
     auto &jvm_frame = trace->frames[i];
 
     if (jvm_frame.lineno == kNativeFrameLineNum) {
-      AddNativeInfo(jvm_frame, profile, sample, &stack_state);
+      AddNativeInfo(jvm_frame, profile, sample);
     } else {
-      AddJavaInfo(jvm_frame, profile, sample, &stack_state);
+      AddJavaInfo(jvm_frame, profile, sample);
     }
   }
 }
@@ -197,10 +195,7 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
 void ProfileProtoBuilder::AddJavaInfo(
     const JVMPI_CallFrame &jvm_frame,
     perftools::profiles::Profile *profile,
-    perftools::profiles::Sample *sample,
-    StackState *stack_state) {
-  stack_state->JavaFrame();
-
+    perftools::profiles::Sample *sample) {
   if (!jvm_frame.method_id) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
         "", "[Unknown method]", "", 0);
@@ -265,8 +260,7 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
 
 void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                         perftools::profiles::Profile *profile,
-                                        perftools::profiles::Sample *sample,
-                                        StackState *stack_state) {
+                                        perftools::profiles::Sample *sample) {
   if (!native_cache_) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
         "", "[Unknown non-Java frame]", "", 0);
@@ -285,12 +279,8 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                &location_builder_);
 
 
-  stack_state->NativeFrame(function_name);
-
-  if (!stack_state->SkipFrame()) {
-    location->set_address(reinterpret_cast<uint64>(jvm_frame.method_id));
-    sample->add_location_id(location->id());
-  }
+  location->set_address(reinterpret_cast<uint64>(jvm_frame.method_id));
+  sample->add_location_id(location->id());
 }
 
 void ContentionProfileProtoBuilder::MultiplyBySamplingRate() {
