@@ -75,7 +75,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
 void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
                                              int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
-      name, name, "", -1);
+      name, name, "", -1, 0);
 
   auto profile = builder_.mutable_profile();
   auto sample = profile->add_sample();
@@ -198,7 +198,7 @@ void ProfileProtoBuilder::AddJavaInfo(
     perftools::profiles::Sample *sample) {
   if (!jvm_frame.method_id) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown method]", "", 0);
+        "", "[Unknown method]", "", 0, 0);
     sample->add_location_id(location->id());
     return;
   }
@@ -208,7 +208,7 @@ void ProfileProtoBuilder::AddJavaInfo(
 }
 
 int64 ProfileProtoBuilder::Location(MethodInfo *method,
-                                       const JVMPI_CallFrame &frame) {
+                                    const JVMPI_CallFrame &frame) {
   // lineno is actually the BCI of the frame.
   int bci = frame.lineno;
 
@@ -225,7 +225,8 @@ int64 ProfileProtoBuilder::Location(MethodInfo *method,
       location_builder_.LocationFor(method->ClassName(),
                                     method->MethodName(),
                                     method->FileName(),
-                                    line_number);
+                                    line_number,
+                                    0);
 
   method->AddLocation(bci, location->id());
   return location->id();
@@ -262,8 +263,9 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                         perftools::profiles::Profile *profile,
                                         perftools::profiles::Sample *sample) {
   if (!native_cache_) {
+    int64_t address = reinterpret_cast<int64_t>(jvm_frame.method_id);
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown non-Java frame]", "", 0);
+        "", "[Unknown non-Java frame]", "", 0, address);
     sample->add_location_id(location->id());
     return;
   }
@@ -279,7 +281,6 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                &location_builder_);
 
 
-  location->set_address(reinterpret_cast<uint64>(jvm_frame.method_id));
   sample->add_location_id(location->id());
 }
 
@@ -310,6 +311,7 @@ size_t LocationBuilder::LocationInfoHash::operator()(
   h = 31U * h + hash_string(info.function_name);
   h = 31U * h + hash_string(info.file_name);
   h = 31U * h + hash_int(info.line_number);
+  h = 31U * h + hash_int(info.address);
 
   return h;
 }
@@ -319,15 +321,30 @@ bool LocationBuilder::LocationInfoEquals::operator()(
   return info1.class_name == info2.class_name &&
       info1.function_name == info2.function_name &&
       info1.file_name == info2.file_name &&
-      info1.line_number == info2.line_number;
+      info1.line_number == info2.line_number &&
+      info1.address == info2.address;
 }
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
     const std::string &class_name, const std::string &function_name,
-    const std::string &file_name, int line_number) {
+    const std::string &file_name, int line_number, int64_t address) {
   auto profile = builder_->mutable_profile();
 
-  LocationInfo info{ class_name, function_name, file_name, line_number };
+  // Adjust address by -1, so that the address is within the call instruction
+  // instead of at the start of the return instruction, as per
+  // go/new-z-page#ret-addr-fixup
+  //
+  // We use 0 (NULL) to indicate the absence of a valid address, and so
+  // do not do this where it would be invalid i.e. leading to -1
+  address = (address > 0) ? address - 1 : 0;
+
+  LocationInfo info {
+      class_name,
+      function_name,
+      file_name,
+      line_number,
+      address
+  };
 
   if (locations_.count(info) > 0) {
     return locations_.find(info)->second;
@@ -336,6 +353,7 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
   auto location_id = profile->location_size() + 1;
   perftools::profiles::Location *location = profile->add_location();
   location->set_id(location_id);
+  location->set_address(address);
 
   locations_[info] = location;
 

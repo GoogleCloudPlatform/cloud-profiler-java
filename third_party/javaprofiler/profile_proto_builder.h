@@ -168,7 +168,8 @@ class LocationBuilder {
   perftools::profiles::Location *LocationFor(const std::string &class_name,
                                              const std::string &function_name,
                                              const std::string &file_name,
-                                             int line_number);
+                                             int line_number,
+                                             int64_t address);
 
  private:
   struct LocationInfo {
@@ -176,6 +177,7 @@ class LocationBuilder {
     std::string function_name;
     std::string file_name;
     int line_number;
+    int64_t address;
   };
 
   struct LocationInfoHash {
