@@ -29,6 +29,12 @@
 
 #include "third_party/javaprofiler/profile_proto_builder.h"
 
+typedef void (*AllocationInstrumentationFunction)(jlong thread_id,
+                                                  jbyte *name,
+                                                  int name_length,
+                                                  int size,
+                                                  jlong gcontext);
+
 namespace google {
 namespace javaprofiler {
 
@@ -213,6 +219,17 @@ class HeapMonitor {
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
                         jclass object_klass, jlong size);
 
+  static void InvokeAllocationInstrumentationFunctions(jlong thread_id,
+                                                       jbyte *name,
+                                                       int name_length,
+                                                       int size,
+                                                       jlong gcontext);
+
+  static void AddAllocationInstrumentation(
+    AllocationInstrumentationFunction fn);
+
+  static bool HasAllocationInstrumentation();
+
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
   static void NotifyGCWaitingThread() {
@@ -259,6 +276,7 @@ class HeapMonitor {
 
   void CompactData(JNIEnv* jni_env);
 
+  static std::vector<AllocationInstrumentationFunction> alloc_inst_functions_;
   static std::unique_ptr<perftools::profiles::Profile> EmptyHeapProfile(
       JNIEnv *jni_env);
 

@@ -69,12 +69,46 @@ std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
       new std::vector<JVMPI_CallFrame>(TransformFrames(stack_frames, count)));
 }
 
+static jstring GetClassName(JNIEnv *jni_env, jobject object,
+                            jclass object_klass) {
+  jclass cls = jni_env->FindClass("java/lang/Class");
+  jmethodID get_name_id =
+      jni_env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
+  jstring name_obj = static_cast<jstring>(
+      jni_env->CallObjectMethod(object_klass, get_name_id));
+  return name_obj;
+}
+
+static jlong GetThreadId(JNIEnv *jni_env, jthread thread) {
+  jclass thread_class = jni_env->FindClass("java/lang/Thread");
+  jmethodID get_id_method_id = jni_env->GetMethodID(thread_class,
+                                                    "getId", "()J");
+  jlong thread_id = jni_env->CallLongMethod(thread, get_id_method_id);
+  return thread_id;
+}
+
 extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv *jvmti_env,
                                              JNIEnv *jni_env, jthread thread,
                                              jobject object,
                                              jclass object_klass, jlong size) {
   google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
                                                object_klass, size);
+  if (!google::javaprofiler::HeapMonitor::HasAllocationInstrumentation()) {
+    return;
+  }
+  jstring class_name = GetClassName(jni_env, object, object_klass);
+  const char* name_str = jni_env->GetStringUTFChars(class_name, NULL);
+  int name_len = strlen(name_str);
+
+  jlong thread_id = GetThreadId(jni_env, thread);
+
+  jbyte *name_bytes = const_cast<jbyte*>(
+      reinterpret_cast<const jbyte *>(name_str));
+
+  // Invoke all functions in HeapMonitor::alloc_inst_functions_
+  google::javaprofiler::HeapMonitor::InvokeAllocationInstrumentationFunctions(
+      thread_id, name_bytes, name_len, size, 0);
+  jni_env->ReleaseStringUTFChars(class_name, name_str);
 }
 
 extern "C" JNIEXPORT void GarbageCollectionFinish(jvmtiEnv *jvmti_env) {
@@ -89,6 +123,8 @@ namespace javaprofiler {
 std::atomic<jvmtiEnv *> HeapMonitor::jvmti_;
 std::atomic<int> HeapMonitor::sampling_interval_;
 std::atomic<bool> HeapMonitor::use_jvm_trace_;
+std::vector<AllocationInstrumentationFunction>
+    HeapMonitor::alloc_inst_functions_;
 
 HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
                                    int max_garbage_size)
@@ -305,6 +341,27 @@ void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
 
   GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size,
                               std::move(*trace));
+}
+
+void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong thread_id,
+                                              jbyte *name,
+                                              int name_length,
+                                              int size,
+                                              jlong gcontext) {
+  std::vector<AllocationInstrumentationFunction> fn_list =
+      GetInstance()->alloc_inst_functions_;
+  for (auto fn : fn_list) {
+    fn(thread_id, name, name_length, size, gcontext);
+  }
+}
+
+void HeapMonitor::AddAllocationInstrumentation(
+    AllocationInstrumentationFunction fn) {
+  GetInstance()->alloc_inst_functions_.push_back(fn);
+}
+
+bool HeapMonitor::HasAllocationInstrumentation() {
+  return !GetInstance()->alloc_inst_functions_.empty();
 }
 
 void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
