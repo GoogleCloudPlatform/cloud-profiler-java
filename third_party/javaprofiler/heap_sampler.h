@@ -35,12 +35,6 @@ typedef void (*AllocationInstrumentationFunction)(jlong thread_id,
                                                   int size,
                                                   jlong gcontext);
 
-typedef void (*GarbageInstrumentationFunction)(jlong thread_id,
-                                               jbyte *name,
-                                               int name_length,
-                                               int size,
-                                               jlong gcontext);
-
 namespace google {
 namespace javaprofiler {
 
@@ -57,8 +51,7 @@ class HeapEventStorage {
 
   // Adds an object to the storage system.
   void Add(JNIEnv *jni, jthread thread, jobject object, jclass klass,
-           jlong size, const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
-           jint name_len, jlong thread_id);
+           jlong size, const std::vector<JVMPI_CallFrame> &&frames);
 
   // Returns a perftools::profiles::Profile with the objects stored via
   // calls to the Add method.
@@ -98,10 +91,8 @@ class HeapEventStorage {
     // This object owns the jweak object parameter. It is freed when the object
     // is sent to the garbage list, and the object is set to nullptr.
     HeapObjectTrace(jweak object, jlong size,
-                    const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
-                    int name_length, jlong thread_id)
-        : object_(object), size_(size), frames_(std::move(frames)),
-          name_(name), name_length_(name_length), thread_id_(thread_id) {}
+                    const std::vector<JVMPI_CallFrame> &&frames)
+        : object_(object), size_(size), frames_(std::move(frames)) {}
 
     HeapObjectTrace(jweak object, jlong size,
                     const std::vector<JVMPI_CallFrame> &frames)
@@ -121,18 +112,6 @@ class HeapEventStorage {
 
     int Size() const {
       return size_;
-    }
-
-    jbyte *Name() const {
-      return name_;
-    }
-
-    int NameLength() const {
-      return name_length_;
-    }
-
-    jlong ThreadId() const {
-      return thread_id_;
     }
 
     void DeleteWeakReference(JNIEnv* env) {
@@ -156,9 +135,6 @@ class HeapEventStorage {
     jweak object_;
     int size_;
     std::vector<JVMPI_CallFrame> frames_;
-    jbyte *name_;
-    int name_length_;
-    jlong thread_id_;
   };
 
   // Helper for creating a google::javaprofiler::ProfileStackTrace array
@@ -176,8 +152,7 @@ class HeapEventStorage {
    private:
     int curr_trace_ = 0;
     std::size_t objects_size_;
-    std::unique_ptr<google::javaprofiler::ProfileStackTrace[]>
-        stack_trace_data_;
+    std::unique_ptr<google::javaprofiler::ProfileStackTrace[]> stack_trace_data_;
     std::unique_ptr<JVMPI_CallTrace[]> call_trace_data_;
   };
 
@@ -242,8 +217,7 @@ class HeapMonitor {
     JNIEnv* env, bool force_gc);
 
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
-                        jclass object_klass, jlong size, jbyte *name,
-                        jint name_len, jlong thread_id);
+                        jclass object_klass, jlong size);
 
   static void InvokeAllocationInstrumentationFunctions(jlong thread_id,
                                                        jbyte *name,
@@ -255,16 +229,6 @@ class HeapMonitor {
     AllocationInstrumentationFunction fn);
 
   static bool HasAllocationInstrumentation();
-
-  static void InvokeGarbageInstrumentationFunctions(jlong thread_id,
-                                                    jbyte *name,
-                                                    int name_length,
-                                                    int size,
-                                                    jlong gcontext);
-
-  static void AddGarbageInstrumentation(GarbageInstrumentationFunction fn);
-
-  static bool HasGarbageInstrumentation();
 
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
@@ -313,7 +277,6 @@ class HeapMonitor {
   void CompactData(JNIEnv* jni_env);
 
   static std::vector<AllocationInstrumentationFunction> alloc_inst_functions_;
-  static std::vector<GarbageInstrumentationFunction> gc_inst_functions_;
   static std::unique_ptr<perftools::profiles::Profile> EmptyHeapProfile(
       JNIEnv *jni_env);
 
