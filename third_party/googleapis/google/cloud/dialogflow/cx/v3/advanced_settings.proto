@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@ syntax = "proto3";
 
 package google.cloud.dialogflow.cx.v3;
 
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Dialogflow.Cx.V3";
@@ -31,7 +28,13 @@ option ruby_package = "Google::Cloud::Dialogflow::CX::V3";
 
 // Hierarchical advanced settings for agent/flow/page/fulfillment/parameter.
 // Settings exposed at lower level overrides the settings exposed at higher
-// level.
+// level. Overriding occurs at the sub-setting level. For example, the
+// playback_interruption_settings at fulfillment level only overrides the
+// playback_interruption_settings at the agent level, leaving other settings
+// at the agent level unchanged.
+//
+// DTMF settings does not override each other. DTMF settings set at different
+// levels define DTMF detections running in parallel.
 //
 // Hierarchy: Agent->Flow->Page->Fulfillment/Parameter.
 message AdvancedSettings {

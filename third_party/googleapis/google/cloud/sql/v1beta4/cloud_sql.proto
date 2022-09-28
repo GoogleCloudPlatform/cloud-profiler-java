@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ syntax = "proto3";
 package google.cloud.sql.v1beta4;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/cloud/sql/v1beta4/cloud_sql_resources.proto";
-import "google/api/client.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/cloud/sql/v1beta4;sql";
 option java_multiple_files = true;

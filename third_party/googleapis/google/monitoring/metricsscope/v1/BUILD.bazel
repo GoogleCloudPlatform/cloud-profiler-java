@@ -161,6 +161,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -172,6 +173,17 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "ware-house-package-name=google-cloud-monitoring-metrics-scopes",
     ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "metricsscope_py_gapic_test",
+    srcs = [
+        "metricsscope_py_gapic_pytest.py",
+        "metricsscope_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":metricsscope_py_gapic"],
 )
 
 # Open Source Packages
@@ -331,6 +343,7 @@ csharp_gapic_library(
     srcs = [":metricsscope_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "metricsscopes_grpc_service_config.json",
+    service_yaml = "monitoring.yaml",
     deps = [
         ":metricsscope_csharp_grpc",
         ":metricsscope_csharp_proto",

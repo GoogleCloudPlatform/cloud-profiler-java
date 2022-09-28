@@ -124,6 +124,7 @@ go_gapic_library(
     grpc_service_config = "iam_grpc_service_config.json",
     importpath = "cloud.google.com/go/iam/apiv1beta;iam",
     service_yaml = "iam_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
@@ -156,12 +157,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "iam_py_gapic",
     srcs = [":iam_proto"],
     grpc_service_config = "iam_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "iam_py_gapic_test",
+    srcs = [
+        "iam_py_gapic_pytest.py",
+        "iam_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":iam_py_gapic"],
 )
 
 # Open Source Packages
@@ -247,8 +260,8 @@ nodejs_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_gapic_assembly_pkg",
     "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -266,7 +279,7 @@ ruby_grpc_library(
 
 ruby_cloud_gapic_library(
     name = "iam_ruby_gapic",
-    srcs = [":iam_proto_with_info",],
+    srcs = [":iam_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-iam-v1beta",
         "ruby-cloud-env-prefix=IAM",
@@ -320,6 +333,7 @@ csharp_gapic_library(
     srcs = [":iam_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "iam_grpc_service_config.json",
+    service_yaml = "iam_v1beta.yaml",
     deps = [
         ":iam_csharp_grpc",
         ":iam_csharp_proto",

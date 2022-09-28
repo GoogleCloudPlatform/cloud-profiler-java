@@ -24,8 +24,8 @@ proto_library(
         "access_context_manager.proto",
         "access_level.proto",
         "access_policy.proto",
-        "service_perimeter.proto",
         "gcp_user_access_binding.proto",
+        "service_perimeter.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -45,6 +45,41 @@ proto_library_with_info(
     deps = [
         ":accesscontextmanager_proto",
         "//google/cloud:common_resources_proto",
+    ],
+)
+
+proto_library(
+    name = "access_level_proto",
+    srcs = [
+        "access_level.proto",
+    ],
+    deps = [
+        "//google/api:resource_proto",
+        "//google/identity/accesscontextmanager/type:type_proto",
+        "//google/type:expr_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "access_policy_proto",
+    srcs = [
+        "access_policy.proto",
+    ],
+    deps = [
+        "//google/api:resource_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "service_perimeter_proto",
+    srcs = [
+        "service_perimeter.proto",
+    ],
+    deps = [
+        "//google/api:resource_proto",
+        "@com_google_protobuf//:timestamp_proto",
     ],
 )
 
@@ -78,6 +113,7 @@ java_gapic_library(
     test_deps = [
         ":accesscontextmanager_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_java_proto",
     ],
@@ -86,6 +122,7 @@ java_gapic_library(
 java_gapic_test(
     name = "accesscontextmanager_java_gapic_test_suite",
     test_classes = [
+        "com.google.identity.accesscontextmanager.v1.AccessContextManagerClientHttpJsonTest",
         "com.google.identity.accesscontextmanager.v1.AccessContextManagerClientTest",
     ],
     runtime_deps = [":accesscontextmanager_java_gapic_test"],
@@ -94,6 +131,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-accesscontextmanager-v1-java",
+    transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_java_gapic",
         ":accesscontextmanager_java_grpc",
@@ -133,6 +171,7 @@ go_gapic_library(
     importpath = "cloud.google.com/go/identity/accesscontextmanager/apiv1;accesscontextmanager",
     metadata = True,
     service_yaml = "accesscontextmanager_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_go_proto",
         "//google/longrunning:longrunning_go_proto",
@@ -166,13 +205,41 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_proto_library",
+)
+
+py_proto_library(
+    name = "access_level_py_proto",
+    deps = ["access_level_proto"],
+)
+
+py_proto_library(
+    name = "access_policy_py_proto",
+    deps = ["access_policy_proto"],
+)
+
+py_proto_library(
+    name = "service_perimeter_py_proto",
+    deps = ["service_perimeter_proto"],
 )
 
 py_gapic_library(
     name = "accesscontextmanager_py_gapic",
     srcs = [":accesscontextmanager_proto"],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    transport = "grpc",
 )
+
+# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
+#py_test(
+#    name = "accesscontextmanager_py_gapic_test",
+#    srcs = [
+#        "accesscontextmanager_py_gapic_pytest.py",
+#        "accesscontextmanager_py_gapic_test.py",
+#    ],
+#    legacy_create_init = False,
+#    deps = [":accesscontextmanager_py_gapic"],
+#)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -250,7 +317,7 @@ nodejs_gapic_assembly_pkg(
     deps = [
         ":accesscontextmanager_nodejs_gapic",
         ":accesscontextmanager_proto",
-        "//google/identity/accesscontextmanager/type:type_proto"
+        "//google/identity/accesscontextmanager/type:type_proto",
     ],
 )
 
@@ -334,6 +401,7 @@ csharp_gapic_library(
     srcs = [":accesscontextmanager_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    service_yaml = "accesscontextmanager_v1.yaml",
     deps = [
         ":accesscontextmanager_csharp_grpc",
         ":accesscontextmanager_csharp_proto",

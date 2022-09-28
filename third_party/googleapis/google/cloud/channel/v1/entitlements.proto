@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@ syntax = "proto3";
 
 package google.cloud.channel.v1;
 
-import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/channel/v1/common.proto";
 import "google/cloud/channel/v1/offers.proto";
 import "google/cloud/channel/v1/products.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/cloud/channel/v1;channel";
 option java_multiple_files = true;
@@ -106,7 +104,8 @@ message Entitlement {
   // Optional. This purchase order (PO) information is for resellers to use for their
   // company tracking usage. If a purchaseOrderId value is given, it appears in
   // the API responses and shows up in the invoice. The property accepts up to
-  // 80 plain text characters.
+  // 80 plain text characters. This is only supported for Google Workspace
+  // entitlements.
   string purchase_order_id = 19 [(google.api.field_behavior) = OPTIONAL];
 
   // Output only. Settings for trial offers.
@@ -153,8 +152,9 @@ message AssociationInfo {
 
 // Service provisioned for an entitlement.
 message ProvisionedService {
-  // Output only. Provisioning ID of the entitlement. For Google Workspace, this would be the
-  // underlying Subscription ID.
+  // Output only. Provisioning ID of the entitlement. For Google Workspace, this is the
+  // underlying Subscription ID. For Google Cloud Platform, this is the
+  // Billing Account ID of the billing subaccount."
   string provisioning_id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The product pertaining to the provisioning resource as specified in the

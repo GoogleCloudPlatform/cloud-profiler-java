@@ -14,6 +14,8 @@ proto_library(
     srcs = [
         "bigtable.proto",
         "data.proto",
+        "request_stats.proto",
+        "response_params.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -22,6 +24,7 @@ proto_library(
         "//google/api:resource_proto",
         "//google/api:routing_proto",
         "//google/rpc:status_proto",
+        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:wrappers_proto",
     ],
 )
@@ -65,6 +68,7 @@ java_gapic_library(
     test_deps = [
         ":bigtable_java_grpc",
     ],
+    transport = "grpc",
     deps = [
         ":bigtable_java_proto",
     ],
@@ -81,6 +85,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-bigtable-v2-java",
+    transport = "grpc",
     deps = [
         ":bigtable_java_gapic",
         ":bigtable_java_grpc",
@@ -117,6 +122,7 @@ go_gapic_library(
     grpc_service_config = "bigtable_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigtable/apiv2;bigtable",
     service_yaml = "bigtable_v2.yaml",
+    transport = "grpc",
     deps = [
         ":bigtable_go_proto",
     ],
@@ -146,13 +152,28 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "bigtable_py_gapic",
     srcs = [":bigtable_proto"],
     grpc_service_config = "bigtable_grpc_service_config.json",
-    opt_args = ["python-gapic-namespace=google.cloud"],
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "autogen-snippets=False",
+    ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "bigtable_py_gapic_test",
+    srcs = [
+        "bigtable_py_gapic_pytest.py",
+        "bigtable_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":bigtable_py_gapic"],
 )
 
 py_gapic_assembly_pkg(
@@ -219,6 +240,7 @@ nodejs_gapic_library(
     src = ":bigtable_proto_with_info",
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "bigtable_grpc_service_config.json",
+    handwritten_layer = True,
     main_service = "bigtable",
     package = "google.bigtable.v2",
     service_yaml = "bigtable_v2.yaml",
@@ -311,6 +333,7 @@ csharp_gapic_library(
     srcs = [":bigtable_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "bigtable_grpc_service_config.json",
+    service_yaml = "bigtable_v2.yaml",
     deps = [
         ":bigtable_csharp_grpc",
         ":bigtable_csharp_proto",

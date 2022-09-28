@@ -25,12 +25,17 @@ proto_library(
         "catalog_service.proto",
         "common.proto",
         "completion_service.proto",
+        "control.proto",
+        "control_service.proto",
         "import_config.proto",
         "prediction_service.proto",
         "product.proto",
         "product_service.proto",
+        "promotion.proto",
         "purge_config.proto",
         "search_service.proto",
+        "serving_config.proto",
+        "serving_config_service.proto",
         "user_event.proto",
         "user_event_service.proto",
     ],
@@ -86,10 +91,13 @@ java_grpc_library(
 java_gapic_library(
     name = "retail_java_gapic",
     srcs = [":retail_proto_with_info"],
+    gapic_yaml = None,
     grpc_service_config = "retail_grpc_service_config.json",
+    service_yaml = "retail_v2.yaml",
     test_deps = [
         ":retail_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":retail_java_proto",
         "//google/api:api_java_proto",
@@ -99,11 +107,21 @@ java_gapic_library(
 java_gapic_test(
     name = "retail_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.retail.v2.CatalogServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.CatalogServiceClientTest",
+        "com.google.cloud.retail.v2.ControlServiceClientHttpJsonTest",
+        "com.google.cloud.retail.v2.ControlServiceClientTest",
+        "com.google.cloud.retail.v2.CompletionServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.CompletionServiceClientTest",
+        "com.google.cloud.retail.v2.PredictionServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.PredictionServiceClientTest",
+        "com.google.cloud.retail.v2.ProductServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.ProductServiceClientTest",
+        "com.google.cloud.retail.v2.SearchServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.SearchServiceClientTest",
+        "com.google.cloud.retail.v2.ServingConfigServiceClientHttpJsonTest",
+        "com.google.cloud.retail.v2.ServingConfigServiceClientTest",
+        "com.google.cloud.retail.v2.UserEventServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.UserEventServiceClientTest",
     ],
     runtime_deps = [":retail_java_gapic_test"],
@@ -112,6 +130,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-retail-v2-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":retail_java_gapic",
         ":retail_java_grpc",
@@ -188,12 +208,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "retail_py_gapic",
     srcs = [":retail_proto"],
     grpc_service_config = "retail_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "retail_py_gapic_test",
+    srcs = [
+        "retail_py_gapic_pytest.py",
+        "retail_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":retail_py_gapic"],
 )
 
 # Open Source Packages
@@ -265,6 +297,7 @@ nodejs_gapic_library(
     package = "google.cloud.retail.v2",
     service_yaml = "retail_v2.yaml",
     deps = [],
+    mixins = "google.longrunning.Operations;google.cloud.location.Locations",
 )
 
 nodejs_gapic_assembly_pkg(
@@ -353,6 +386,7 @@ csharp_gapic_library(
     srcs = [":retail_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "retail_grpc_service_config.json",
+    service_yaml = "retail_v2.yaml",
     deps = [
         ":retail_csharp_grpc",
         ":retail_csharp_proto",

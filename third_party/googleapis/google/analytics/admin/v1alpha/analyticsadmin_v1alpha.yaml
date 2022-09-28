@@ -47,7 +47,12 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetAndroidAppDataStream
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetAttributionSettings
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetAudience
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
@@ -102,11 +107,6 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetIosAppDataStream
-    oauth:
-      canonical_scopes: |-
-        https://www.googleapis.com/auth/analytics.edit,
-        https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetMeasurementProtocolSecret
     oauth:
       canonical_scopes: |-
@@ -122,11 +122,6 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.manage.users,
         https://www.googleapis.com/auth/analytics.manage.users.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetWebDataStream
-    oauth:
-      canonical_scopes: |-
-        https://www.googleapis.com/auth/analytics.edit,
-        https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListAccountSummaries
     oauth:
       canonical_scopes: |-
@@ -137,7 +132,7 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListAndroidAppDataStreams
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListAudiences
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
@@ -182,11 +177,6 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListIosAppDataStreams
-    oauth:
-      canonical_scopes: |-
-        https://www.googleapis.com/auth/analytics.edit,
-        https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListMeasurementProtocolSecrets
     oauth:
       canonical_scopes: |-
@@ -202,7 +192,7 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.manage.users,
         https://www.googleapis.com/auth/analytics.manage.users.readonly
-  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListWebDataStreams
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.RunAccessReport
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,

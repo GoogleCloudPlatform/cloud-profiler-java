@@ -10,6 +10,7 @@ load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 proto_library(
     name = "storage_proto",
     srcs = [
+        "annotations.proto",
         "arrow.proto",
         "avro.proto",
         "protobuf.proto",
@@ -161,6 +162,17 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "python-gapic-name=bigquery_storage",
     ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "storage_py_gapic_test",
+    srcs = [
+        "storage_py_gapic_pytest.py",
+        "storage_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":storage_py_gapic"],
 )
 
 py_gapic_assembly_pkg(
@@ -319,6 +331,7 @@ csharp_gapic_library(
     srcs = [":storage_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "bigquerystorage_grpc_service_config.json",
+    service_yaml = "bigquerystorage_v1.yaml",
     deps = [
         ":storage_csharp_grpc",
         ":storage_csharp_proto",

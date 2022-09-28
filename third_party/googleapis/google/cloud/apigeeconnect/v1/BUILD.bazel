@@ -72,6 +72,7 @@ java_gapic_library(
     test_deps = [
         ":apigeeconnect_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":apigeeconnect_java_proto",
     ],
@@ -80,7 +81,9 @@ java_gapic_library(
 java_gapic_test(
     name = "apigeeconnect_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.apigeeconnect.v1.ConnectionServiceClientHttpJsonTest",
         "com.google.cloud.apigeeconnect.v1.ConnectionServiceClientTest",
+        "com.google.cloud.apigeeconnect.v1.TetherClientHttpJsonTest",
         "com.google.cloud.apigeeconnect.v1.TetherClientTest",
     ],
     runtime_deps = [":apigeeconnect_java_gapic_test"],
@@ -89,6 +92,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-apigeeconnect-v1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":apigeeconnect_java_gapic",
         ":apigeeconnect_java_grpc",
@@ -157,13 +162,25 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "apigeeconnect_py_gapic",
     srcs = [":apigeeconnect_proto"],
     grpc_service_config = "connection_grpc_service_config.json",
-    opt_args = ["warehouse-package-name=google-cloud-apigee-connect"]
+    opt_args = ["warehouse-package-name=google-cloud-apigee-connect"],
+    transport = "grpc",
+)
+
+py_test(
+    name = "apigeeconnect_py_gapic_test",
+    srcs = [
+        "apigeeconnect_py_gapic_pytest.py",
+        "apigeeconnect_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":apigeeconnect_py_gapic"],
 )
 
 # Open Source Packages
@@ -323,6 +340,7 @@ csharp_gapic_library(
     srcs = [":apigeeconnect_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "connection_grpc_service_config.json",
+    service_yaml = "apigeeconnect_v1.yaml",
     deps = [
         ":apigeeconnect_csharp_grpc",
         ":apigeeconnect_csharp_proto",
