@@ -73,6 +73,7 @@ java_gapic_library(
     test_deps = [
         ":recaptchaenterprise_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":recaptchaenterprise_java_proto",
     ],
@@ -81,6 +82,7 @@ java_gapic_library(
 java_gapic_test(
     name = "recaptchaenterprise_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.recaptchaenterprise.v1beta1.RecaptchaEnterpriseServiceV1Beta1ClientHttpJsonTest",
         "com.google.cloud.recaptchaenterprise.v1beta1.RecaptchaEnterpriseServiceV1Beta1ClientTest",
     ],
     runtime_deps = [":recaptchaenterprise_java_gapic_test"],
@@ -89,6 +91,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-recaptchaenterprise-v1beta1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":recaptchaenterprise_java_gapic",
         ":recaptchaenterprise_java_grpc",
@@ -124,6 +128,7 @@ go_gapic_library(
     grpc_service_config = "recaptchaenterprise_grpc_service_config.json",
     importpath = "cloud.google.com/go/recaptchaenterprise/apiv1beta1;recaptchaenterprise",
     service_yaml = "recaptchaenterprise_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":recaptchaenterprise_go_proto",
     ],
@@ -153,6 +158,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -162,6 +168,17 @@ py_gapic_library(
     opt_args = [
         "warehouse-package-name=google-cloud-recaptcha-enterprise",
     ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "recaptchaenterprise_py_gapic_test",
+    srcs = [
+        "recaptchaenterprise_py_gapic_pytest.py",
+        "recaptchaenterprise_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":recaptchaenterprise_py_gapic"],
 )
 
 # Open Source Packages
@@ -321,6 +338,7 @@ csharp_gapic_library(
     srcs = [":recaptchaenterprise_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "recaptchaenterprise_grpc_service_config.json",
+    service_yaml = "recaptchaenterprise_v1beta1.yaml",
     deps = [
         ":recaptchaenterprise_csharp_grpc",
         ":recaptchaenterprise_csharp_proto",

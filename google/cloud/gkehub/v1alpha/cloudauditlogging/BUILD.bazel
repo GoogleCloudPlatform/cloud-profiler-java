@@ -67,6 +67,7 @@ load(
 py_gapic_library(
     name = "cloudauditlogging_py_gapic",
     srcs = [":cloudauditlogging_proto"],
+    transport = "grpc",
 )
 
 ##############################################################################
@@ -97,7 +98,6 @@ load(
     "nodejs_gapic_assembly_pkg",
     "nodejs_gapic_library",
 )
-
 
 ##############################################################################
 # Ruby

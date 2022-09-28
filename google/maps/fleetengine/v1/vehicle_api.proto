@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ syntax = "proto3";
 package maps.fleetengine.v1;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/api/routing.proto";
 import "google/maps/fleetengine/v1/fleetengine.proto";
 import "google/maps/fleetengine/v1/header.proto";
 import "google/maps/fleetengine/v1/vehicles.proto";
@@ -27,7 +29,6 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/type/latlng.proto";
-import "google/api/client.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/v1;fleetengine";
 option java_multiple_files = true;
@@ -72,12 +73,24 @@ service VehicleService {
       post: "/v1/{parent=providers/*}/vehicles"
       body: "vehicle"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Returns a vehicle from the Fleet Engine.
   rpc GetVehicle(GetVehicleRequest) returns (Vehicle) {
     option (google.api.http) = {
       get: "/v1/{name=providers/*/vehicles/*}"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 
@@ -103,6 +116,12 @@ service VehicleService {
       put: "/v1/{name=providers/*/vehicles/*}"
       body: "vehicle"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Deprecated: Use the `UpdateVehicle` method instead.
@@ -112,6 +131,12 @@ service VehicleService {
     option (google.api.http) = {
       put: "/v1/{name=providers/*/vehicles/*}:updateLocation"
       body: "*"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 
@@ -125,6 +150,12 @@ service VehicleService {
       post: "/v1/{name=providers/*/vehicles/*}:updateAttributes"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Returns a paginated list of vehicles associated with
@@ -133,6 +164,12 @@ service VehicleService {
     option (google.api.http) = {
       get: "/v1/{parent=providers/*}/vehicles"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Returns a list of vehicles that match the request options.
@@ -140,6 +177,12 @@ service VehicleService {
     option (google.api.http) = {
       post: "/v1/{parent=providers/*}/vehicles:search"
       body: "*"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 
@@ -152,6 +195,12 @@ service VehicleService {
     option (google.api.http) = {
       post: "/v1/{parent=providers/*}/vehicles:searchFuzzed"
       body: "*"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 }
@@ -167,15 +216,15 @@ message CreateVehicleRequest {
   // this call is a member.
   string parent = 3 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. Unique Vehicle ID; must be unique per provider.
+  // Required. Unique Vehicle ID.
   // Subject to the following restrictions:
   //
-  // 1. IDs must not contain any of the following ASCII characters: '/', ':',
-  // '?', or '#'.
-  // 2. IDs are limited to a maximum length of 64 characters.
-  // 3. IDs must be valid Unicode strings.
-  // 4. IDs must be normalized according to Unicode Normalization Form C
+  // * Must be a valid Unicode string.
+  // * Limited to a maximum length of 64 characters.
+  // * Normalized according to [Unicode Normalization Form C]
   // (http://www.unicode.org/reports/tr15/).
+  // * May not contain any of the following ASCII characters: '/', ':', '?',
+  // ',', or '#'.
   string vehicle_id = 4 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The Vehicle entity to create. When creating a Vehicle, the following
@@ -344,6 +393,23 @@ message SearchVehiclesRequest {
     COST = 5;
   }
 
+  // Specifies the types of restrictions on a vehicle's current trips.
+  enum CurrentTripsPresent {
+    // Only vehicles without trips can appear in search results.
+    // A validation exception is thrown if `include_back_to_back` is true. See
+    // the `include_back_to_back` flag for more details.
+    CURRENT_TRIPS_PRESENT_UNSPECIFIED = 0;
+
+    // Vehicles without trips can appear in search results.
+    // A validation exception is thrown if `include_back_to_back` is true.
+    NONE = 1;
+
+    // Vehicles with at most 5 current trips and 10 waypoints are included
+    // in the search results.
+    // A validation exception is thrown if `include_back_to_back` is true.
+    ANY = 2;
+  }
+
   // The standard Fleet Engine request header.
   RequestHeader header = 1;
 
@@ -374,10 +440,12 @@ message SearchVehiclesRequest {
   // the capacity value.
   int32 minimum_capacity = 8 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. Restricts the search to only those vehicles that support at least
-  // one of the specified trip types.
+  // Required. Represents the type of proposed trip. Eligible vehicles are those
+  // that can support at least one of the specified trip type.
   //
-  // At the present time, only `EXCLUSIVE` is supported.
+  // `EXCLUSIVE` and `SHARED` may not be included together.
+  // `SHARED` is not supported when `current_trips_present` is
+  // `CURRENT_TRIPS_PRESENT_UNSPECIFIED`.
   repeated TripType trip_types = 9 [(google.api.field_behavior) = REQUIRED];
 
   // Restricts the search to only those vehicles that have updated their
@@ -429,10 +497,12 @@ message SearchVehiclesRequest {
   // ```
   // (required_attributes[0] AND required_attributes[1] AND ...)
   // AND
-  // (required_one_of_attributes[0][0] AND required_one_of_attributes[0][1] AND
+  // (required_one_of_attribute_sets[0][0] AND
+  // required_one_of_attribute_sets[0][1] AND
   // ...)
   // OR
-  // (required_one_of_attributes[1][0] AND required_one_of_attributes[1][1] AND
+  // (required_one_of_attribute_sets[1][0] AND
+  // required_one_of_attribute_sets[1][1] AND
   // ...)
   // ```
   //
@@ -459,6 +529,13 @@ message SearchVehiclesRequest {
 
   // Indicates the trip associated with this `SearchVehicleRequest`.
   string trip_id = 19;
+
+  // Restricts vehicles from appearing in the search results based on
+  // their current trips.
+  //
+  // When current_trips_present is `NONE` or `ANY`, `trip_types` can be either
+  // `EXCLUSIVE` or `SHARED`, but not both.
+  CurrentTripsPresent current_trips_present = 21;
 }
 
 // `SearchVehicles` response message.

@@ -61,6 +61,7 @@ java_gapic_library(
     test_deps = [
         ":webrisk_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":webrisk_java_proto",
     ],
@@ -69,6 +70,7 @@ java_gapic_library(
 java_gapic_test(
     name = "webrisk_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.webrisk.v1beta1.WebRiskServiceV1Beta1ClientHttpJsonTest",
         "com.google.cloud.webrisk.v1beta1.WebRiskServiceV1Beta1ClientTest",
     ],
     runtime_deps = [":webrisk_java_gapic_test"],
@@ -77,6 +79,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-webrisk-v1beta1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":webrisk_java_gapic",
         ":webrisk_java_grpc",
@@ -112,6 +116,7 @@ go_gapic_library(
     grpc_service_config = "webrisk_grpc_service_config.json",
     importpath = "cloud.google.com/go/webrisk/apiv1beta1;webrisk",
     service_yaml = "webrisk_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":webrisk_go_proto",
     ],
@@ -142,12 +147,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "webrisk_py_gapic",
     srcs = [":webrisk_proto"],
     grpc_service_config = "webrisk_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "webrisk_py_gapic_test",
+    srcs = [
+        "webrisk_py_gapic_pytest.py",
+        "webrisk_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":webrisk_py_gapic"],
 )
 
 py_gapic_assembly_pkg(
@@ -306,6 +323,7 @@ csharp_gapic_library(
     srcs = [":webrisk_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "webrisk_grpc_service_config.json",
+    service_yaml = "webrisk_v1beta1.yaml",
     deps = [
         ":webrisk_csharp_grpc",
         ":webrisk_csharp_proto",

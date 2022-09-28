@@ -98,6 +98,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-asset-v1p7beta1-java",
+    transport = "grpc+rest",
     deps = [
         ":asset_java_gapic",
         ":asset_java_grpc",
@@ -181,7 +182,19 @@ py_gapic_library(
     name = "asset_py_gapic",
     srcs = [":asset_proto"],
     grpc_service_config = "cloudasset_grpc_service_config.json",
+    transport = "grpc",
 )
+
+# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
+#py_test(
+#    name = "asset_py_gapic_test",
+#    srcs = [
+#        "asset_py_gapic_pytest.py",
+#        "asset_py_gapic_test.py",
+#    ],
+#    legacy_create_init = False,
+#    deps = [":asset_py_gapic"],
+#)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -266,8 +279,8 @@ nodejs_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_gapic_assembly_pkg",
     "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -285,7 +298,7 @@ ruby_grpc_library(
 
 ruby_cloud_gapic_library(
     name = "asset_ruby_gapic",
-    srcs = [":asset_proto_with_info",],
+    srcs = [":asset_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-asset-v1p7beta1"],
     deps = [
         ":asset_ruby_grpc",

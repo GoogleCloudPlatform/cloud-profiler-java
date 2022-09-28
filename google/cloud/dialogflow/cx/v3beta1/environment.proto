@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -208,6 +208,15 @@ message Environment {
     bool enable_predeployment_run = 3;
   }
 
+  // Configuration for webhooks.
+  message WebhookConfig {
+    // The list of webhooks to override for the agent environment. The webhook
+    // must exist in the agent. You can override fields in
+    // [`generic_web_service`][google.cloud.dialogflow.cx.v3beta1.Webhook.generic_web_service] and
+    // [`service_directory`][google.cloud.dialogflow.cx.v3beta1.Webhook.service_directory].
+    repeated Webhook webhook_overrides = 1;
+  }
+
   // The name of the environment.
   // Format: `projects/<Project ID>/locations/<Location ID>/agents/<Agent
   // ID>/environments/<Environment ID>`.
@@ -232,6 +241,9 @@ message Environment {
 
   // The test cases config for continuous tests of this environment.
   TestCasesConfig test_cases_config = 7;
+
+  // The webhook configuration for this environment.
+  WebhookConfig webhook_config = 10;
 }
 
 // The request message for [Environments.ListEnvironments][google.cloud.dialogflow.cx.v3beta1.Environments.ListEnvironments].

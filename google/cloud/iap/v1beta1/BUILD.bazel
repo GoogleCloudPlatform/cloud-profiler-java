@@ -70,6 +70,7 @@ java_gapic_library(
         ":iap_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":iap_java_proto",
         "//google/iam/v1:iam_java_proto",
@@ -79,6 +80,7 @@ java_gapic_library(
 java_gapic_test(
     name = "iap_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.iap.v1beta1.IdentityAwareProxyAdminV1Beta1ClientHttpJsonTest",
         "com.google.cloud.iap.v1beta1.IdentityAwareProxyAdminV1Beta1ClientTest",
     ],
     runtime_deps = [":iap_java_gapic_test"],
@@ -87,6 +89,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-iap-v1beta1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":iap_java_gapic",
         ":iap_java_grpc",
@@ -124,6 +128,7 @@ go_gapic_library(
     importpath = "cloud.google.com/go/iap/apiv1beta1;iap",
     metadata = True,
     service_yaml = "iap_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iap_go_proto",
         "//google/iam/v1:iam_go_proto",
@@ -155,12 +160,27 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "iap_py_gapic",
     srcs = [":iap_proto"],
     grpc_service_config = "iap_grpc_service_config.json",
+    transport = "grpc",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
+)
+
+py_test(
+    name = "iap_py_gapic_test",
+    srcs = [
+        "iap_py_gapic_pytest.py",
+        "iap_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":iap_py_gapic"],
 )
 
 # Open Source Packages
@@ -320,6 +340,7 @@ csharp_gapic_library(
     srcs = [":iap_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "iap_grpc_service_config.json",
+    service_yaml = "iap_v1beta1.yaml",
     deps = [
         ":iap_csharp_grpc",
         ":iap_csharp_proto",

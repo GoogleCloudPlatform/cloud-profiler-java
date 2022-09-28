@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package google.cloud.aiplatform.v1;
 
 import "google/api/field_behavior.proto";
 import "google/cloud/aiplatform/v1/accelerator_type.proto";
-import "google/api/annotations.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
@@ -79,6 +78,11 @@ message DedicatedResources {
   // replicas at maximum may handle, a portion of the traffic will be dropped.
   // If this value is not provided, will use [min_replica_count][google.cloud.aiplatform.v1.DedicatedResources.min_replica_count] as the
   // default value.
+  //
+  // The value of this field impacts the charge against Vertex CPU and GPU
+  // quotas. Specifically, you will be charged for (max_replica_count *
+  // number of cores in the selected machine type) and (max_replica_count *
+  // number of GPUs per replica in the selected machine type).
   int32 max_replica_count = 3 [(google.api.field_behavior) = IMMUTABLE];
 
   // Immutable. The metric specifications that overrides a resource
@@ -163,6 +167,21 @@ message DiskSpec {
 
   // Size in GB of the boot disk (default is 100GB).
   int32 boot_disk_size_gb = 2;
+}
+
+// Represents a mount configuration for Network File System (NFS) to mount.
+message NfsMount {
+  // Required. IP address of the NFS server.
+  string server = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Source path exported from NFS server.
+  // Has to start with '/', and combined with the ip address, it indicates
+  // the source mount path in the form of `server:path`
+  string path = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Destination mount path. The NFS will be mounted for the user under
+  // /mnt/nfs/<mount_point>
+  string mount_point = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The metric specification that defines the target resource utilization

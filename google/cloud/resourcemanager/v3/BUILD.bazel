@@ -82,6 +82,7 @@ java_gapic_library(
         ":resourcemanager_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":resourcemanager_java_proto",
         "//google/iam/v1:iam_java_proto",
@@ -91,11 +92,17 @@ java_gapic_library(
 java_gapic_test(
     name = "resourcemanager_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.resourcemanager.v3.FoldersClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.FoldersClientTest",
+        "com.google.cloud.resourcemanager.v3.OrganizationsClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.OrganizationsClientTest",
+        "com.google.cloud.resourcemanager.v3.ProjectsClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.ProjectsClientTest",
+        "com.google.cloud.resourcemanager.v3.TagBindingsClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.TagBindingsClientTest",
+        "com.google.cloud.resourcemanager.v3.TagKeysClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.TagKeysClientTest",
+        "com.google.cloud.resourcemanager.v3.TagValuesClientHttpJsonTest",
         "com.google.cloud.resourcemanager.v3.TagValuesClientTest",
     ],
     runtime_deps = [":resourcemanager_java_gapic_test"],
@@ -104,6 +111,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-resourcemanager-v3-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":resourcemanager_java_gapic",
         ":resourcemanager_java_grpc",
@@ -142,6 +151,7 @@ go_gapic_library(
     importpath = "cloud.google.com/go/resourcemanager/apiv3;resourcemanager",
     metadata = True,
     service_yaml = "cloudresourcemanager_v3.yaml",
+    transport = "grpc+rest",
     deps = [
         ":resourcemanager_go_proto",
         "//google/iam/v1:iam_go_proto",
@@ -176,12 +186,27 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "resourcemanager_py_gapic",
     srcs = [":resourcemanager_proto"],
     grpc_service_config = "cloudresourcemanager_v3_grpc_service_config.json",
+    transport = "grpc",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
+)
+
+py_test(
+    name = "resourcemanager_py_gapic_test",
+    srcs = [
+        "resourcemanager_py_gapic_pytest.py",
+        "resourcemanager_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":resourcemanager_py_gapic"],
 )
 
 # Open Source Packages
@@ -341,6 +366,7 @@ csharp_gapic_library(
     srcs = [":resourcemanager_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "cloudresourcemanager_v3_grpc_service_config.json",
+    service_yaml = "cloudresourcemanager_v3.yaml",
     deps = [
         ":resourcemanager_csharp_grpc",
         ":resourcemanager_csharp_proto",

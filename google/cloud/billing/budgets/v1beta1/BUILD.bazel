@@ -91,6 +91,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-billing-budgets-v1beta1-java",
+    include_samples = True,
     deps = [
         ":budgets_java_gapic",
         ":budgets_java_grpc",
@@ -159,12 +160,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "budgets_py_gapic",
     srcs = [":budgets_proto"],
     grpc_service_config = "billingbudgets_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "budgets_py_gapic_test",
+    srcs = [
+        "budgets_py_gapic_pytest.py",
+        "budgets_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":budgets_py_gapic"],
 )
 
 # Open Source Packages
@@ -323,6 +336,7 @@ csharp_gapic_library(
     srcs = [":budgets_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "billingbudgets_grpc_service_config.json",
+    service_yaml = "billingbudgets.yaml",
     deps = [
         ":budgets_csharp_grpc",
         ":budgets_csharp_proto",

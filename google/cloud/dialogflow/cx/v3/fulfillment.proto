@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@ syntax = "proto3";
 
 package google.cloud.dialogflow.cx.v3;
 
-import "google/api/annotations.proto";
 import "google/api/resource.proto";
-import "google/cloud/dialogflow/cx/v3/advanced_settings.proto";
 import "google/cloud/dialogflow/cx/v3/response_message.proto";
 import "google/protobuf/struct.proto";
 
@@ -108,7 +106,11 @@ message Fulfillment {
   // that have slow webhooks.
   bool return_partial_responses = 8;
 
-  // The tag used by the webhook to identify which fulfillment is being called.
+  // The value of this field will be populated in the [WebhookRequest][google.cloud.dialogflow.cx.v3.WebhookRequest]
+  // `fulfillmentInfo.tag` field by Dialogflow when the associated webhook is
+  // called.
+  // The tag is typically used by the webhook service to identify which
+  // fulfillment is being called, but it could be used for other purposes.
   // This field is required if `webhook` is specified.
   string tag = 3;
 

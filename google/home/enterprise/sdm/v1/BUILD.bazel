@@ -72,6 +72,7 @@ java_gapic_library(
     test_deps = [
         ":sdm_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":sdm_java_proto",
     ],
@@ -80,6 +81,7 @@ java_gapic_library(
 java_gapic_test(
     name = "sdm_java_gapic_test_suite",
     test_classes = [
+        "com.google.home.enterprise.sdm.v1.SmartDeviceManagementServiceClientHttpJsonTest",
         "com.google.home.enterprise.sdm.v1.SmartDeviceManagementServiceClientTest",
     ],
     runtime_deps = [":sdm_java_gapic_test"],
@@ -88,6 +90,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-enterprise-sdm-v1-java",
+    transport = "grpc+rest",
     deps = [
         ":sdm_java_gapic",
         ":sdm_java_grpc",
@@ -123,6 +126,7 @@ go_gapic_library(
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     importpath = "google.golang.org/google/home/enterprise/sdm/v1;sdm",
     service_yaml = "smartdevicemanagement_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":sdm_go_proto",
     ],
@@ -152,12 +156,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "sdm_py_gapic",
     srcs = [":sdm_proto"],
     grpc_service_config = "smart_device_management_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "sdm_py_gapic_test",
+    srcs = [
+        "sdm_py_gapic_pytest.py",
+        "sdm_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":sdm_py_gapic"],
 )
 
 # Open Source Packages
@@ -242,8 +258,8 @@ nodejs_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_gapic_assembly_pkg",
     "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -261,7 +277,7 @@ ruby_grpc_library(
 
 ruby_cloud_gapic_library(
     name = "sdm_ruby_gapic",
-    srcs = [":sdm_proto_with_info",],
+    srcs = [":sdm_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-sdm-v1"],
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     deps = [
@@ -307,6 +323,7 @@ csharp_gapic_library(
     srcs = [":sdm_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "smart_device_management_grpc_service_config.json",
+    service_yaml = "smartdevicemanagement_v1.yaml",
     deps = [
         ":sdm_csharp_grpc",
         ":sdm_csharp_proto",

@@ -11,12 +11,16 @@ apis:
 documentation:
   summary: |-
     Enables Fleet Engine for access to the On Demand Rides and Deliveries and
-    Last Mile Fleet Solution APIs.
+    Last Mile Fleet Solution APIs.  Customer's use of Google Maps Content in
+    the Cloud Logging Services is subject to the Google Maps Platform Terms of
+    Service located at https://cloud.google.com/maps-platform/terms.
 
 backend:
   rules:
   - selector: 'maps.fleetengine.delivery.v1.DeliveryService.*'
     deadline: 10.0
+  - selector: maps.fleetengine.delivery.v1.DeliveryService.BatchCreateTasks
+    deadline: 60.0
   - selector: maps.fleetengine.delivery.v1.DeliveryService.GetDeliveryVehicle
     deadline: 4.0
   - selector: maps.fleetengine.delivery.v1.DeliveryService.GetTask

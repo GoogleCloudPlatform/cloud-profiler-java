@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ syntax = "proto3";
 package maps.fleetengine.v1;
 
 import "google/api/annotations.proto";
+import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/api/routing.proto";
 import "google/maps/fleetengine/v1/fleetengine.proto";
 import "google/maps/fleetengine/v1/header.proto";
 import "google/maps/fleetengine/v1/trips.proto";
@@ -26,7 +28,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
-import "google/api/client.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/v1;fleetengine";
 option java_multiple_files = true;
@@ -44,12 +45,24 @@ service TripService {
       post: "/v1/{parent=providers/*}/trips"
       body: "trip"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Get information about a single trip.
   rpc GetTrip(GetTripRequest) returns (Trip) {
     option (google.api.http) = {
       get: "/v1/{name=providers/*/trips/*}"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 
@@ -59,6 +72,12 @@ service TripService {
       post: "/v1/{name=providers/*/billableTrips/*}:report"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Get all the trips for a specific vehicle.
@@ -67,6 +86,12 @@ service TripService {
       post: "/v1/{parent=providers/*}/trips:search"
       body: "*"
     };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "parent"
+        path_template: "{provider_id=providers/*}"
+      }
+    };
   }
 
   // Updates trip data.
@@ -74,6 +99,12 @@ service TripService {
     option (google.api.http) = {
       put: "/v1/{name=providers/*/trips/*}"
       body: "trip"
+    };
+    option (google.api.routing) = {
+      routing_parameters {
+        field: "name"
+        path_template: "{provider_id=providers/*}"
+      }
     };
   }
 }
@@ -94,15 +125,15 @@ message CreateTripRequest {
     }
   ];
 
-  // Required. Unique Trip ID; must be unique per provider.
+  // Required. Unique Trip ID.
   // Subject to the following restrictions:
   //
-  // 1. IDs must not contain any of the following ASCII characters: '/', ':',
-  // '?', or '#'.
-  // 2. IDs are limited to a maximum length of 64 characters.
-  // 3. IDs must be valid Unicode strings.
-  // 4. IDs must be normalized according to Unicode Normalization Form C
+  // * Must be a valid Unicode string.
+  // * Limited to a maximum length of 64 characters.
+  // * Normalized according to [Unicode Normalization Form C]
   // (http://www.unicode.org/reports/tr15/).
+  // * May not contain any of the following ASCII characters: '/', ':', '?',
+  // ',', or '#'.
   string trip_id = 5 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Trip entity to create.

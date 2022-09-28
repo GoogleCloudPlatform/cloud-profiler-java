@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1/entity_type.proto";
 import "google/cloud/aiplatform/v1/feature.proto";
-import "google/cloud/aiplatform/v1/feature_monitoring_stats.proto";
 import "google/cloud/aiplatform/v1/feature_selector.proto";
 import "google/cloud/aiplatform/v1/featurestore.proto";
 import "google/cloud/aiplatform/v1/io.proto";
@@ -419,6 +418,7 @@ message UpdateFeaturestoreRequest {
   //
   //   * `labels`
   //   * `online_serving_config.fixed_node_count`
+  //   * `online_serving_config.scaling`
   google.protobuf.FieldMask update_mask = 2;
 }
 
@@ -506,6 +506,9 @@ message ImportFeatureValuesRequest {
   // If not set, defaults to using 1 worker. The low count ensures minimal
   // impact on online serving performance.
   int32 worker_count = 11;
+
+  // If true, API doesn't start ingestion analysis pipeline.
+  bool disable_ingestion_analysis = 12;
 }
 
 // Response message for [FeaturestoreService.ImportFeatureValues][google.cloud.aiplatform.v1.FeaturestoreService.ImportFeatureValues].
@@ -522,6 +525,10 @@ message ImportFeatureValuesResponse {
   // * Having a null timestamp.
   // * Not being parsable (applicable for CSV sources).
   int64 invalid_row_count = 6;
+
+  // The number rows that weren't ingested due to having feature timestamps
+  // outside the retention boundary.
+  int64 timestamp_outside_retention_rows_count = 4;
 }
 
 // Request message for [FeaturestoreService.BatchReadFeatureValues][google.cloud.aiplatform.v1.FeaturestoreService.BatchReadFeatureValues].
@@ -847,7 +854,12 @@ message UpdateEntityTypeRequest {
   //   * `description`
   //   * `labels`
   //   * `monitoring_config.snapshot_analysis.disabled`
-  //   * `monitoring_config.snapshot_analysis.monitoring_interval`
+  //   * `monitoring_config.snapshot_analysis.monitoring_interval_days`
+  //   * `monitoring_config.snapshot_analysis.staleness_days`
+  //   * `monitoring_config.import_features_analysis.state`
+  //   * `monitoring_config.import_features_analysis.anomaly_detection_baseline`
+  //   * `monitoring_config.numerical_threshold_config.value`
+  //   * `monitoring_config.categorical_threshold_config.value`
   google.protobuf.FieldMask update_mask = 2;
 }
 
@@ -1139,8 +1151,7 @@ message UpdateFeatureRequest {
   //
   //   * `description`
   //   * `labels`
-  //   * `monitoring_config.snapshot_analysis.disabled`
-  //   * `monitoring_config.snapshot_analysis.monitoring_interval`
+  //   * `disable_monitoring`
   google.protobuf.FieldMask update_mask = 2;
 }
 
@@ -1186,6 +1197,10 @@ message ImportFeatureValuesOperationMetadata {
   // * Having a null timestamp.
   // * Not being parsable (applicable for CSV sources).
   int64 invalid_row_count = 6;
+
+  // The number rows that weren't ingested due to having timestamps outside the
+  // retention boundary.
+  int64 timestamp_outside_retention_rows_count = 7;
 }
 
 // Details of operations that exports Features values.
