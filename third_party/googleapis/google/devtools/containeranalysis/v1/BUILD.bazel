@@ -88,6 +88,7 @@ java_gapic_library(
         ":containeranalysis_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":containeranalysis_java_proto",
         "//google/api:api_java_proto",
@@ -99,6 +100,7 @@ java_gapic_library(
 java_gapic_test(
     name = "containeranalysis_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.devtools.containeranalysis.v1.ContainerAnalysisClientHttpJsonTest",
         "com.google.cloud.devtools.containeranalysis.v1.ContainerAnalysisClientTest",
     ],
     runtime_deps = [":containeranalysis_java_gapic_test"],
@@ -107,6 +109,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-devtools-containeranalysis-v1-java",
+    transport = "grpc+rest",
     deps = [
         ":containeranalysis_java_gapic",
         ":containeranalysis_java_grpc",
@@ -177,6 +180,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -184,6 +188,22 @@ py_gapic_library(
     srcs = [":containeranalysis_proto"],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     opt_args = ["python-gapic-namespace=google.cloud.devtools"],
+    transport = "grpc",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+        "//google/iam/v1:policy_py_proto",
+        "//grafeas/v1:grafeas_py_proto",
+    ],
+)
+
+py_test(
+    name = "containeranalysis_py_gapic_test",
+    srcs = [
+        "containeranalysis_py_gapic_pytest.py",
+        "containeranalysis_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":containeranalysis_py_gapic"],
 )
 
 # Open Source Packages
@@ -300,7 +320,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/container-registry/docs/container-analysis",
         "ruby-cloud-api-id=containeranalysis.googleapis.com",
         "ruby-cloud-api-shortname=containeranalysis",
-        "ruby-cloud-extra-dependencies=grafeas-v1=> 0.0|< 2.a",
+        "ruby-cloud-extra-dependencies=grafeas-v1=>= 0.4|< 2.a",
     ],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     ruby_cloud_description = "The Container Analysis API is an implementation of Grafeas. It stores, and enables querying and retrieval of, critical metadata about all of your software artifacts.",
@@ -348,6 +368,7 @@ csharp_gapic_library(
     srcs = [":containeranalysis_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "containeranalysis_grpc_service_config.json",
+    service_yaml = "containeranalysis_v1.yaml",
     deps = [
         ":containeranalysis_csharp_grpc",
         ":containeranalysis_csharp_proto",

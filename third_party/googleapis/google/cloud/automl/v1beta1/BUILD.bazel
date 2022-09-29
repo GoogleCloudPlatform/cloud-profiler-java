@@ -95,6 +95,7 @@ java_gapic_library(
     test_deps = [
         ":automl_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":automl_java_proto",
     ],
@@ -103,7 +104,9 @@ java_gapic_library(
 java_gapic_test(
     name = "automl_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.automl.v1beta1.AutoMlClientHttpJsonTest",
         "com.google.cloud.automl.v1beta1.AutoMlClientTest",
+        "com.google.cloud.automl.v1beta1.PredictionServiceClientHttpJsonTest",
         "com.google.cloud.automl.v1beta1.PredictionServiceClientTest",
     ],
     runtime_deps = [":automl_java_gapic_test"],
@@ -112,6 +115,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-automl-v1beta1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":automl_java_gapic",
         ":automl_java_grpc",
@@ -149,6 +154,7 @@ go_gapic_library(
     grpc_service_config = "automl_grpc_service_config.json",
     importpath = "cloud.google.com/go/automl/apiv1beta1;automl",
     service_yaml = "automl_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":automl_go_proto",
         "//google/longrunning:longrunning_go_proto",
@@ -184,12 +190,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "automl_py_gapic",
     srcs = [":automl_proto"],
     grpc_service_config = "automl_grpc_service_config.json",
+    transport = "grpc",
+)
+
+py_test(
+    name = "automl_py_gapic_test",
+    srcs = [
+        "automl_py_gapic_pytest.py",
+        "automl_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":automl_py_gapic"],
 )
 
 # Open Source Packages
@@ -352,6 +370,7 @@ csharp_gapic_library(
     srcs = [":automl_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "automl_grpc_service_config.json",
+    service_yaml = "automl_v1beta1.yaml",
     deps = [
         ":automl_csharp_grpc",
         ":automl_csharp_proto",

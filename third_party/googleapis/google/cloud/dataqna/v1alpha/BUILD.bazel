@@ -77,6 +77,7 @@ java_gapic_library(
     test_deps = [
         ":dataqna_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":dataqna_java_proto",
     ],
@@ -85,7 +86,9 @@ java_gapic_library(
 java_gapic_test(
     name = "dataqna_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.dataqna.v1alpha.AutoSuggestionServiceClientHttpJsonTest",
         "com.google.cloud.dataqna.v1alpha.AutoSuggestionServiceClientTest",
+        "com.google.cloud.dataqna.v1alpha.QuestionServiceClientHttpJsonTest",
         "com.google.cloud.dataqna.v1alpha.QuestionServiceClientTest",
     ],
     runtime_deps = [":dataqna_java_gapic_test"],
@@ -94,6 +97,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-dataqna-v1alpha-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":dataqna_java_gapic",
         ":dataqna_java_grpc",
@@ -130,6 +135,7 @@ go_gapic_library(
     grpc_service_config = "dataqna_grpc_service_config.json",
     importpath = "cloud.google.com/go/dataqna/apiv1alpha;dataqna",
     service_yaml = "dataqna_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":dataqna_go_proto",
     ],
@@ -159,12 +165,24 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "dataqna_py_gapic",
     srcs = [":dataqna_proto"],
     grpc_service_config = "dataqna_grpc_service_config.json",
+    transport = "grpc+rest",
+)
+
+py_test(
+    name = "dataqna_py_gapic_test",
+    srcs = [
+        "dataqna_py_gapic_pytest.py",
+        "dataqna_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":dataqna_py_gapic"],
 )
 
 py_gapic_assembly_pkg(
@@ -323,6 +341,7 @@ csharp_gapic_library(
     srcs = [":dataqna_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "dataqna_grpc_service_config.json",
+    service_yaml = "dataqna_v1alpha.yaml",
     deps = [
         ":dataqna_csharp_grpc",
         ":dataqna_csharp_proto",

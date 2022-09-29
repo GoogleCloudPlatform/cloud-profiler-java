@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package google.cloud.aiplatform.v1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
-import "google/cloud/aiplatform/v1/feature.proto";
+import "google/cloud/aiplatform/v1/featurestore_monitoring.proto";
 import "google/protobuf/timestamp.proto";
-import "google/api/annotations.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
 option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
@@ -74,4 +73,14 @@ message EntityType {
   // Optional. Used to perform a consistent read-modify-write updates. If not set, a blind
   // "overwrite" update happens.
   string etag = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The default monitoring configuration for all Features with value type
+  // ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL, STRING, DOUBLE or INT64 under this
+  // EntityType.
+  //
+  // If this is populated with
+  // [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot
+  // analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is
+  // disabled.
+  FeaturestoreMonitoringConfig monitoring_config = 8 [(google.api.field_behavior) = OPTIONAL];
 }

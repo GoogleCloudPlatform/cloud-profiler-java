@@ -75,6 +75,7 @@ java_gapic_library(
     test_deps = [
         ":networkmanagement_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":networkmanagement_java_proto",
     ],
@@ -83,6 +84,7 @@ java_gapic_library(
 java_gapic_test(
     name = "networkmanagement_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.networkmanagement.v1beta1.ReachabilityServiceClientHttpJsonTest",
         "com.google.cloud.networkmanagement.v1beta1.ReachabilityServiceClientTest",
     ],
     runtime_deps = [":networkmanagement_java_gapic_test"],
@@ -91,6 +93,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-networkmanagement-v1beta1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":networkmanagement_java_gapic",
         ":networkmanagement_java_grpc",
@@ -129,6 +133,7 @@ go_gapic_library(
     importpath = "cloud.google.com/go/networkmanagement/apiv1beta1;networkmanagement",
     metadata = True,
     service_yaml = "networkmanagement_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":networkmanagement_go_proto",
         "//google/longrunning:longrunning_go_proto",
@@ -168,7 +173,19 @@ py_gapic_library(
     name = "networkmanagement_py_gapic",
     srcs = [":networkmanagement_proto"],
     grpc_service_config = "networkmanagement_grpc_service_config.json",
+    transport = "grpc",
 )
+
+# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
+#py_test(
+#    name = "networkmanagement_py_gapic_test",
+#    srcs = [
+#        "networkmanagement_py_gapic_pytest.py",
+#        "networkmanagement_py_gapic_test.py",
+#    ],
+#    legacy_create_init = False,
+#    deps = [":networkmanagement_py_gapic"],
+#)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -326,6 +343,7 @@ csharp_gapic_library(
     srcs = [":networkmanagement_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "networkmanagement_grpc_service_config.json",
+    service_yaml = "networkmanagement_v1beta1.yaml",
     deps = [
         ":networkmanagement_csharp_grpc",
         ":networkmanagement_csharp_proto",

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ syntax = "proto3";
 package google.cloud.securitycenter.v1;
 
 import public "google/cloud/securitycenter/v1/run_asset_discovery_response.proto";
+
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/securitycenter/v1/asset.proto";
+import "google/cloud/securitycenter/v1/bigquery_export.proto";
 import "google/cloud/securitycenter/v1/external_system.proto";
 import "google/cloud/securitycenter/v1/finding.proto";
 import "google/cloud/securitycenter/v1/folder.proto";
@@ -139,6 +141,20 @@ service SecurityCenter {
   rpc DeleteNotificationConfig(DeleteNotificationConfigRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1/{name=organizations/*/notificationConfigs/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Gets a big query export.
+  rpc GetBigQueryExport(GetBigQueryExportRequest) returns (BigQueryExport) {
+    option (google.api.http) = {
+      get: "/v1/{name=organizations/*/bigQueryExports/*}"
+      additional_bindings {
+        get: "/v1/{name=folders/*/bigQueryExports/*}"
+      }
+      additional_bindings {
+        get: "/v1/{name=projects/*/bigQueryExports/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -475,6 +491,72 @@ service SecurityCenter {
     };
     option (google.api.method_signature) = "security_marks";
   }
+
+  // Creates a big query export.
+  rpc CreateBigQueryExport(CreateBigQueryExportRequest) returns (BigQueryExport) {
+    option (google.api.http) = {
+      post: "/v1/{parent=organizations/*}/bigQueryExports"
+      body: "big_query_export"
+      additional_bindings {
+        post: "/v1/{parent=folders/*}/bigQueryExports"
+        body: "big_query_export"
+      }
+      additional_bindings {
+        post: "/v1/{parent=projects/*}/bigQueryExports"
+        body: "big_query_export"
+      }
+    };
+    option (google.api.method_signature) = "parent,big_query_export,big_query_export_id";
+  }
+
+  // Deletes an existing big query export.
+  rpc DeleteBigQueryExport(DeleteBigQueryExportRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/{name=organizations/*/bigQueryExports/*}"
+      additional_bindings {
+        delete: "/v1/{name=folders/*/bigQueryExports/*}"
+      }
+      additional_bindings {
+        delete: "/v1/{name=projects/*/bigQueryExports/*}"
+      }
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Updates a BigQuery export.
+  rpc UpdateBigQueryExport(UpdateBigQueryExportRequest) returns (BigQueryExport) {
+    option (google.api.http) = {
+      patch: "/v1/{big_query_export.name=organizations/*/bigQueryExports/*}"
+      body: "big_query_export"
+      additional_bindings {
+        patch: "/v1/{big_query_export.name=folders/*/bigQueryExports/*}"
+        body: "big_query_export"
+      }
+      additional_bindings {
+        patch: "/v1/{big_query_export.name=projects/*/bigQueryExports/*}"
+        body: "big_query_export"
+      }
+    };
+    option (google.api.method_signature) = "big_query_export,update_mask";
+  }
+
+  // Lists BigQuery exports. Note that when requesting BigQuery exports at a
+  // given level all exports under that level are also returned e.g. if
+  // requesting BigQuery exports under a folder, then all BigQuery exports
+  // immediately under the folder plus the ones created under the projects
+  // within the folder are returned.
+  rpc ListBigQueryExports(ListBigQueryExportsRequest) returns (ListBigQueryExportsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=organizations/*}/bigQueryExports"
+      additional_bindings {
+        get: "/v1/{parent=folders/*}/bigQueryExports"
+      }
+      additional_bindings {
+        get: "/v1/{parent=projects/*}/bigQueryExports"
+      }
+    };
+    option (google.api.method_signature) = "parent";
+  }
 }
 
 // Request message for bulk findings update.
@@ -629,6 +711,20 @@ message DeleteNotificationConfigRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
       type: "securitycenter.googleapis.com/NotificationConfig"
+    }
+  ];
+}
+
+// Request message for retrieving a big query export.
+message GetBigQueryExportRequest {
+  // Required. Name of the big query export to retrieve. Its format is
+  // organizations/{organization}/bigQueryExports/{export_id},
+  // folders/{folder}/bigQueryExports/{export_id}, or
+  // projects/{project}/bigQueryExports/{export_id}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/BigQueryExport"
     }
   ];
 }
@@ -1459,37 +1555,6 @@ message ListFindingsRequest {
 message ListFindingsResponse {
   // Result containing the Finding and its StateChange.
   message ListFindingsResult {
-    // Information related to the Google Cloud resource that is
-    // associated with this finding.
-    message Resource {
-      // The full resource name of the resource. See:
-      // https://cloud.google.com/apis/design/resource_names#full_resource_name
-      string name = 1;
-
-      // The full resource name of project that the resource belongs to.
-      string project_name = 2;
-
-      // The human readable name of project that the resource belongs to.
-      string project_display_name = 3;
-
-      // The full resource name of resource's parent.
-      string parent_name = 4;
-
-      // The human readable name of resource's parent.
-      string parent_display_name = 5;
-
-      // The full resource type of the resource.
-      string type = 6;
-
-      // Contains a Folder message for each folder in the assets ancestry.
-      // The first folder is the deepest nested folder, and the last folder is
-      // the folder directly under the Organization.
-      repeated Folder folders = 7;
-
-      // The human readable name of the resource.
-      string display_name = 8;
-    }
-
     // The change in state of the finding.
     //
     // When querying across two points in time this describes
@@ -1516,6 +1581,37 @@ message ListFindingsResponse {
       // The finding at timestamp does not match the filter specified, but it
       // did at timestamp - compare_duration.
       REMOVED = 4;
+    }
+
+    // Information related to the Google Cloud resource that is
+    // associated with this finding.
+    message Resource {
+      // The full resource name of the resource. See:
+      // https://cloud.google.com/apis/design/resource_names#full_resource_name
+      string name = 1;
+
+      // The human readable name of the resource.
+      string display_name = 8;
+
+      // The full resource type of the resource.
+      string type = 6;
+
+      // The full resource name of project that the resource belongs to.
+      string project_name = 2;
+
+      // The project ID that the resource belongs to.
+      string project_display_name = 3;
+
+      // The full resource name of resource's parent.
+      string parent_name = 4;
+
+      // The human readable name of resource's parent.
+      string parent_display_name = 5;
+
+      // Contains a Folder message for each folder in the assets ancestry.
+      // The first folder is the deepest nested folder, and the last folder is
+      // the folder directly under the Organization.
+      repeated Folder folders = 7;
     }
 
     // Finding matching the search request.
@@ -1681,6 +1777,89 @@ message UpdateSecurityMarksRequest {
 
   // The time at which the updated SecurityMarks take effect.
   // If not set uses current server time.  Updates will be applied to the
-  // SecurityMarks that are active immediately preceding this time.
+  // SecurityMarks that are active immediately preceding this time. Must be
+  // earlier or equal to the server time.
   google.protobuf.Timestamp start_time = 3;
+}
+
+// Request message for creating a big query export.
+message CreateBigQueryExportRequest {
+  // Required. Resource name of the new big query export's parent. Its format is
+  // "organizations/[organization_id]", "folders/[folder_id]", or
+  // "projects/[project_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "securitycenter.googleapis.com/BigQueryExport"
+    }
+  ];
+
+  // Required. The big query export being created.
+  BigQueryExport big_query_export = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Unique identifier provided by the client within the parent scope.
+  // It must consist of lower case letters, numbers, and hyphen, with the first
+  // character a letter, the last a letter or a number, and a 63 character
+  // maximum.
+  string big_query_export_id = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Request message for updating a BigQuery export.
+message UpdateBigQueryExportRequest {
+  // Required. The BigQuery export being updated.
+  BigQueryExport big_query_export = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The list of fields to be updated.
+  // If empty all mutable fields will be updated.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Request message for listing  BigQuery exports at a given scope e.g.
+// organization, folder or project.
+message ListBigQueryExportsRequest {
+  // Required. The parent, which owns the collection of BigQuery exports. Its format is
+  // "organizations/[organization_id]", "folders/[folder_id]",
+  // "projects/[project_id]".
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "securitycenter.googleapis.com/BigQueryExport"
+    }
+  ];
+
+  // The maximum number of configs to return. The service may return fewer than
+  // this value.
+  // If unspecified, at most 10 configs will be returned.
+  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  int32 page_size = 2;
+
+  // A page token, received from a previous `ListBigQueryExports` call.
+  // Provide this to retrieve the subsequent page.
+  // When paginating, all other parameters provided to `ListBigQueryExports`
+  // must match the call that provided the page token.
+  string page_token = 3;
+}
+
+// Response message for listing BigQuery exports.
+message ListBigQueryExportsResponse {
+  // The BigQuery exports from the specified parent.
+  repeated BigQueryExport big_query_exports = 1;
+
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// Request message for deleting a big query export.
+message DeleteBigQueryExportRequest {
+  // Required. Name of the big query export to delete. Its format is
+  // organizations/{organization}/bigQueryExports/{export_id},
+  // folders/{folder}/bigQueryExports/{export_id}, or
+  // projects/{project}/bigQueryExports/{export_id}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "securitycenter.googleapis.com/BigQueryExport"
+    }
+  ];
 }

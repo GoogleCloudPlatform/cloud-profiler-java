@@ -81,6 +81,7 @@ java_gapic_library(
     test_deps = [
         ":gaming_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":gaming_java_proto",
     ],
@@ -89,9 +90,13 @@ java_gapic_library(
 java_gapic_test(
     name = "gaming_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.gaming.v1.GameServerClustersServiceClientHttpJsonTest",
         "com.google.cloud.gaming.v1.GameServerClustersServiceClientTest",
+        "com.google.cloud.gaming.v1.GameServerConfigsServiceClientHttpJsonTest",
         "com.google.cloud.gaming.v1.GameServerConfigsServiceClientTest",
+        "com.google.cloud.gaming.v1.GameServerDeploymentsServiceClientHttpJsonTest",
         "com.google.cloud.gaming.v1.GameServerDeploymentsServiceClientTest",
+        "com.google.cloud.gaming.v1.RealmsServiceClientHttpJsonTest",
         "com.google.cloud.gaming.v1.RealmsServiceClientTest",
     ],
     runtime_deps = [":gaming_java_gapic_test"],
@@ -100,6 +105,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-gaming-v1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":gaming_java_gapic",
         ":gaming_java_grpc",
@@ -136,6 +143,7 @@ go_gapic_library(
     grpc_service_config = "gaming_grpc_service_config.json",
     importpath = "cloud.google.com/go/gaming/apiv1;gaming",
     service_yaml = "gameservices_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":gaming_go_proto",
         "//google/longrunning:longrunning_go_proto",
@@ -169,6 +177,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -178,6 +187,17 @@ py_gapic_library(
     opt_args = [
         "warehouse-package-name=google-cloud-game-servers",
     ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "gaming_py_gapic_test",
+    srcs = [
+        "gaming_py_gapic_pytest.py",
+        "gaming_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":gaming_py_gapic"],
 )
 
 # Open Source Packages
@@ -337,6 +357,7 @@ csharp_gapic_library(
     srcs = [":gaming_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "gaming_grpc_service_config.json",
+    service_yaml = "gameservices_v1.yaml",
     deps = [
         ":gaming_csharp_grpc",
         ":gaming_csharp_proto",

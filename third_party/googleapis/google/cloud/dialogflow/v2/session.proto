@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/dialogflow/v2/audio_config.proto";
 import "google/cloud/dialogflow/v2/context.proto";
-import "google/cloud/dialogflow/v2/gcs.proto";
 import "google/cloud/dialogflow/v2/intent.proto";
 import "google/cloud/dialogflow/v2/session_entity_type.proto";
 import "google/protobuf/duration.proto";
@@ -257,7 +256,8 @@ message QueryInput {
     // Instructs the speech recognizer how to process the speech audio.
     InputAudioConfig audio_config = 1;
 
-    // The natural language text to be processed.
+    // The natural language text to be processed. Text length must not exceed
+    // 256 character for virtual agent interactions.
     TextInput text = 2;
 
     // The event to be processed.
@@ -325,7 +325,8 @@ message QueryResult {
   bool all_required_params_present = 5;
 
   // Indicates whether the conversational query triggers a cancellation for slot
-  // filling.
+  // filling. For more information, see the [cancel slot filling
+  // documentation](https://cloud.google.com/dialogflow/es/docs/intents-actions-parameters#cancel).
   bool cancels_slot_filling = 21;
 
   // The text to be pronounced to the user or shown on the screen.
@@ -609,10 +610,13 @@ message StreamingRecognitionResult {
   string language_code = 10;
 }
 
+// ============================================================================
+// Auxiliary proto messages.
+//
 // Represents the natural language text to be processed.
 message TextInput {
   // Required. The UTF-8 encoded natural language text to be processed.
-  // Text length must not exceed 256 characters.
+  // Text length must not exceed 256 characters for virtual agent interactions.
   string text = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The language of this conversational query. See [Language
@@ -653,6 +657,11 @@ message EventInput {
   // Support](https://cloud.google.com/dialogflow/docs/reference/language)
   // for a list of the currently supported language codes. Note that queries in
   // the same session do not necessarily need to specify the same language.
+  //
+  // This field is ignored when used in the context of a
+  // [WebhookResponse.followup_event_input][google.cloud.dialogflow.v2.WebhookResponse.followup_event_input] field,
+  // because the language was already defined in the originating detect
+  // intent request.
   string language_code = 3 [(google.api.field_behavior) = REQUIRED];
 }
 

@@ -81,6 +81,7 @@ java_gapic_library(
     test_deps = [
         ":servicecontrol_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":servicecontrol_java_proto",
     ],
@@ -89,7 +90,9 @@ java_gapic_library(
 java_gapic_test(
     name = "servicecontrol_java_gapic_test_suite",
     test_classes = [
+        "com.google.api.servicecontrol.v1.QuotaControllerClientHttpJsonTest",
         "com.google.api.servicecontrol.v1.QuotaControllerClientTest",
+        "com.google.api.servicecontrol.v1.ServiceControllerClientHttpJsonTest",
         "com.google.api.servicecontrol.v1.ServiceControllerClientTest",
     ],
     runtime_deps = [":servicecontrol_java_gapic_test"],
@@ -98,6 +101,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-api-servicecontrol-v1-java",
+    transport = "grpc+rest",
     deps = [
         ":servicecontrol_java_gapic",
         ":servicecontrol_java_grpc",
@@ -137,6 +141,7 @@ go_gapic_library(
     importpath = "cloud.google.com/go/api/servicecontrol/apiv1;servicecontrol",
     metadata = True,
     service_yaml = "servicecontrol.yaml",
+    transport = "grpc+rest",
     deps = [
         ":servicecontrol_go_proto",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
@@ -168,6 +173,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -179,6 +185,17 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "warehouse-package-name=google-cloud-service-control",
     ],
+    transport = "grpc",
+)
+
+py_test(
+    name = "servicecontrol_py_gapic_test",
+    srcs = [
+        "servicecontrol_py_gapic_pytest.py",
+        "servicecontrol_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":servicecontrol_py_gapic"],
 )
 
 # Open Source Packages
@@ -340,6 +357,7 @@ csharp_gapic_library(
     srcs = [":servicecontrol_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "servicecontrol_grpc_service_config.json",
+    service_yaml = "servicecontrol.yaml",
     deps = [
         ":servicecontrol_csharp_grpc",
         ":servicecontrol_csharp_proto",

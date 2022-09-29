@@ -72,6 +72,7 @@ java_gapic_library(
         ":policytroubleshooter_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":policytroubleshooter_java_proto",
         "//google/iam/v1:iam_java_proto",
@@ -81,6 +82,7 @@ java_gapic_library(
 java_gapic_test(
     name = "policytroubleshooter_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.policytroubleshooter.v1.IamCheckerClientHttpJsonTest",
         "com.google.cloud.policytroubleshooter.v1.IamCheckerClientTest",
     ],
     runtime_deps = [":policytroubleshooter_java_gapic_test"],
@@ -89,6 +91,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-policytroubleshooter-v1-java",
+    include_samples = True,
+    transport = "grpc+rest",
     deps = [
         ":policytroubleshooter_java_gapic",
         ":policytroubleshooter_java_grpc",
@@ -126,6 +130,7 @@ go_gapic_library(
     grpc_service_config = "checker_grpc_service_config.json",
     importpath = "cloud.google.com/go/policytroubleshooter/apiv1;policytroubleshooter",
     service_yaml = "policytroubleshooter_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":policytroubleshooter_go_proto",
         "//google/iam/v1:iam_go_proto",
@@ -156,13 +161,28 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "policytroubleshooter_py_gapic",
     srcs = [":policytroubleshooter_proto"],
     grpc_service_config = "checker_grpc_service_config.json",
-    opt_args = ["warehouse-package-name=google-cloud-policy-troubleshooter"]
+    opt_args = ["warehouse-package-name=google-cloud-policy-troubleshooter"],
+    transport = "grpc",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
+)
+
+py_test(
+    name = "policytroubleshooter_py_gapic_test",
+    srcs = [
+        "policytroubleshooter_py_gapic_pytest.py",
+        "policytroubleshooter_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":policytroubleshooter_py_gapic"],
 )
 
 # Open Source Packages
@@ -321,6 +341,7 @@ csharp_gapic_library(
     srcs = [":policytroubleshooter_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "checker_grpc_service_config.json",
+    service_yaml = "policytroubleshooter_v1.yaml",
     deps = [
         ":policytroubleshooter_csharp_grpc",
         ":policytroubleshooter_csharp_proto",

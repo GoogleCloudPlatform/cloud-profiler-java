@@ -73,6 +73,7 @@ java_gapic_library(
     test_deps = [
         ":spanner_java_grpc",
     ],
+    transport = "grpc+rest",
     deps = [
         ":spanner_java_proto",
     ],
@@ -81,6 +82,7 @@ java_gapic_library(
 java_gapic_test(
     name = "spanner_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.spanner.v1.SpannerClientHttpJsonTest",
         "com.google.cloud.spanner.v1.SpannerClientTest",
     ],
     runtime_deps = [":spanner_java_gapic_test"],
@@ -89,6 +91,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-spanner-v1-java",
+    transport = "grpc+rest",
     deps = [
         ":spanner_java_gapic",
         ":spanner_java_grpc",
@@ -125,6 +128,7 @@ go_gapic_library(
     grpc_service_config = "spanner_grpc_service_config.json",
     importpath = "cloud.google.com/go/spanner/apiv1;spanner",
     service_yaml = "spanner.yaml",
+    transport = "grpc+rest",
     deps = [
         ":spanner_go_proto",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
@@ -155,6 +159,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -162,6 +167,17 @@ py_gapic_library(
     srcs = [":spanner_proto"],
     grpc_service_config = "spanner_grpc_service_config.json",
     opt_args = ["python-gapic-namespace=google.cloud"],
+    transport = "grpc",
+)
+
+py_test(
+    name = "spanner_py_gapic_test",
+    srcs = [
+        "spanner_py_gapic_pytest.py",
+        "spanner_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":spanner_py_gapic"],
 )
 
 py_gapic_assembly_pkg(
@@ -227,8 +243,12 @@ nodejs_gapic_library(
     name = "spanner_nodejs_gapic",
     package_name = "@google-cloud/spanner",
     src = ":spanner_proto_with_info",
-    extra_protoc_parameters = ["metadata", "template=typescript_gapic"],
+    extra_protoc_parameters = [
+        "metadata",
+        "template=typescript_gapic",
+    ],
     grpc_service_config = "spanner_grpc_service_config.json",
+    handwritten_layer = True,
     main_service = "spanner",
     package = "google.spanner.v1",
     service_yaml = "spanner.yaml",
@@ -321,6 +341,7 @@ csharp_gapic_library(
     srcs = [":spanner_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "spanner_grpc_service_config.json",
+    service_yaml = "spanner.yaml",
     deps = [
         ":spanner_csharp_grpc",
         ":spanner_csharp_proto",
