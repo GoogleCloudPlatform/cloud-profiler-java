@@ -54,12 +54,12 @@ std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTrace(JNIEnv *jni) {
 
 std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
     JNIEnv *jni, jvmtiEnv *jvmti, jthread thread) {
-  const int kMaxFrames = 128;
   jint count = 0;
-  jvmtiFrameInfo stack_frames[kMaxFrames];
+  jvmtiFrameInfo stack_frames[google::javaprofiler::kMaxFramesToCapture];
 
   jvmtiError err =
-      jvmti->GetStackTrace(thread, 0, kMaxFrames, stack_frames, &count);
+      jvmti->GetStackTrace(thread, 0, google::javaprofiler::kMaxFramesToCapture,
+                           stack_frames, &count);
 
   if (err != JVMTI_ERROR_NONE || count <= 0) {
     return nullptr;
