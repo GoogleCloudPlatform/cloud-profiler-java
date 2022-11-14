@@ -75,7 +75,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
 void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
                                              int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
-      name, name, "", -1, 0);
+      name, name, "", 0, -1, 0);
 
   auto profile = builder_.mutable_profile();
   auto sample = profile->add_sample();
@@ -198,7 +198,7 @@ void ProfileProtoBuilder::AddJavaInfo(
     perftools::profiles::Sample *sample) {
   if (!jvm_frame.method_id) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown method]", "", 0, 0);
+        "", "[Unknown method]", "", 0, 0, 0);
     sample->add_location_id(location->id());
     return;
   }
@@ -225,6 +225,7 @@ int64 ProfileProtoBuilder::Location(MethodInfo *method,
       location_builder_.LocationFor(method->ClassName(),
                                     method->MethodName(),
                                     method->FileName(),
+                                    method->StartLine(),
                                     line_number,
                                     0);
 
@@ -242,17 +243,18 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
   std::string class_name;
   std::string method_name;
   std::string signature;
+  int start_line = 0;
 
-  // Ignore lineno since we pass nullptr anyway.
+  // Set lineno to zero to get method first line.
   JVMPI_CallFrame jvm_frame = { 0, method_id };
   GetStackFrameElements(jni_env_, jvmti_env_, jvm_frame, &file_name,
-                        &class_name, &method_name, &signature, nullptr);
+                        &class_name, &method_name, &signature, &start_line);
 
   FixMethodParameters(&signature);
   std::string full_method_name = class_name + "." + method_name + signature;
 
   std::unique_ptr<MethodInfo> unique_method(
-      new MethodInfo(full_method_name, class_name, file_name));
+      new MethodInfo(full_method_name, class_name, file_name, start_line));
 
   auto method_ptr = unique_method.get();
   methods_[method_id] = std::move(unique_method);
@@ -265,7 +267,7 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
   if (!native_cache_) {
     int64_t address = reinterpret_cast<int64_t>(jvm_frame.method_id);
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown non-Java frame]", "", 0, address);
+        "", "[Unknown non-Java frame]", "", 0, 0, address);
     sample->add_location_id(location->id());
     return;
   }
@@ -327,7 +329,8 @@ bool LocationBuilder::LocationInfoEquals::operator()(
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
     const std::string &class_name, const std::string &function_name,
-    const std::string &file_name, int line_number, int64_t address) {
+    const std::string &file_name, int start_line, int line_number,
+    int64_t address) {
   auto profile = builder_->mutable_profile();
 
   // Adjust address by -1, so that the address is within the call instruction
@@ -361,8 +364,9 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   std::string simplified_name = function_name;
   SimplifyFunctionName(&simplified_name);
-  auto function_id = builder_->FunctionId(
-      simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);
+  auto function_id =
+      builder_->FunctionId(simplified_name.c_str(), function_name.c_str(),
+                           file_name.c_str(), start_line);
 
   line->set_function_id(function_id);
   line->set_line(line_number);

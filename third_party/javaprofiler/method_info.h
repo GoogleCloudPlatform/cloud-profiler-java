@@ -34,10 +34,11 @@ class MethodInfo {
  public:
   // Constructor providing all the information regarding a method.
   MethodInfo(const std::string &method_name, const std::string &class_name,
-             const std::string &file_name)
+             const std::string &file_name, const int &start_line)
       : method_name_(method_name),
         class_name_(class_name),
-        file_name_(file_name) {}
+        file_name_(file_name),
+        start_line_(start_line) {}
 
   // An invalid location Id.
   static const int64 kInvalidLocationId = 0;
@@ -57,10 +58,13 @@ class MethodInfo {
 
   const std::string &FileName() const { return file_name_; }
 
+  const int& StartLine() const { return start_line_; }
+
  private:
   std::string method_name_;
   std::string class_name_;
   std::string file_name_;
+  int start_line_;
 
   // Cache of jlocation results.
   std::unordered_map<int, int64> locations_;

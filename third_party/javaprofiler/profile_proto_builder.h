@@ -168,6 +168,7 @@ class LocationBuilder {
   perftools::profiles::Location *LocationFor(const std::string &class_name,
                                              const std::string &function_name,
                                              const std::string &file_name,
+                                             int start_line,
                                              int line_number,
                                              int64_t address);
 
