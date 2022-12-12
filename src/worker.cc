@@ -18,7 +18,6 @@
 #include "src/profiler.h"
 #include "src/throttler_api.h"
 #include "src/throttler_timed.h"
-#include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 
 DEFINE_bool(cprof_enabled, true,

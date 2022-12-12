@@ -14,6 +14,12 @@
 
 #include "src/throttler_api.h"
 
+#include <grpc/grpc_security.h>
+#include <grpc/support/string_util.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/channel_arguments.h>
+
 #include <algorithm>
 #include <chrono>  // NOLINT
 #include <sstream>
@@ -26,12 +32,6 @@
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "google/protobuf/duration.pb.h"  // NOLINT
 #include "google/rpc/error_details.pb.h"  // NOLINT
-#include "grpc/grpc_security.h"
-#include "grpc/support/log.h"
-#include "grpc/support/string_util.h"
-#include "grpcpp/create_channel.h"
-#include "grpcpp/security/credentials.h"
-#include "grpcpp/support/channel_arguments.h"
 #include "third_party/javaprofiler/clock.h"
 
 // API curated profiling configuration.

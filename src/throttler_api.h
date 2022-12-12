@@ -30,8 +30,6 @@
 #include "src/cloud_env.h"
 #include "src/throttler.h"
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
-#include "grpcpp/client_context.h"
-#include "grpcpp/support/status.h"
 
 namespace cloud {
 namespace profiler {
