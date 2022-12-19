@@ -169,12 +169,14 @@ java_gapic_library(
     srcs = [":aiplatform_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "aiplatform_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
     test_deps = [
         ":aiplatform_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ] + _JAVA_GRPC_SUBPACKAGE_DEPS,
+    transport = "grpc",
     deps = [
         ":aiplatform_java_proto",
         "//google/api:api_java_proto",
@@ -208,6 +210,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-aiplatform-v1beta1-java",
+    transport = "grpc",
     deps = [
         ":aiplatform_java_gapic",
         ":aiplatform_java_grpc",
@@ -248,15 +251,17 @@ go_gapic_library(
     grpc_service_config = "aiplatform_grpc_service_config.json",
     importpath = "cloud.google.com/go/aiplatform/apiv1beta1;aiplatform",
     metadata = True,
+    rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":aiplatform_go_proto",
         "//google/api:httpbody_go_proto",
         "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
         "@io_bazel_rules_go//proto/wkt:struct_go_proto",
     ],
@@ -301,6 +306,7 @@ py_gapic_library(
     name = "aiplatform_py_gapic",
     srcs = [":aiplatform_proto"],
     grpc_service_config = "aiplatform_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
     transport = "grpc",
     deps = [
@@ -352,7 +358,9 @@ php_gapic_library(
     name = "aiplatform_php_gapic",
     srcs = [":aiplatform_proto_with_info"],
     grpc_service_config = "aiplatform_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":aiplatform_php_grpc",
         ":aiplatform_php_proto",
@@ -385,7 +393,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "aiplatform_grpc_service_config.json",
     package = "google.cloud.aiplatform.v1beta1",
+    rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -424,6 +434,7 @@ ruby_cloud_gapic_library(
     srcs = [":aiplatform_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-aiplatform-v1beta1"],
     grpc_service_config = "aiplatform_grpc_service_config.json",
+    rest_numeric_enums = False,
     deps = [
         ":aiplatform_ruby_grpc",
         ":aiplatform_ruby_proto",

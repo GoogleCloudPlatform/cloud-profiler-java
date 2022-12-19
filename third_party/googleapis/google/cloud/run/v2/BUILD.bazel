@@ -22,10 +22,15 @@ proto_library(
     name = "run_proto",
     srcs = [
         "condition.proto",
+        "execution.proto",
+        "execution_template.proto",
+        "job.proto",
         "k8s.min.proto",
         "revision.proto",
         "revision_template.proto",
         "service.proto",
+        "task.proto",
+        "task_template.proto",
         "traffic_target.proto",
         "vendor_settings.proto",
     ],
@@ -39,6 +44,7 @@ proto_library(
         "//google/iam/v1:iam_policy_proto",
         "//google/iam/v1:policy_proto",
         "//google/longrunning:operations_proto",
+        "//google/rpc:status_proto",
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -49,6 +55,7 @@ proto_library_with_info(
     deps = [
         ":run_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
     ],
 )
 
@@ -80,15 +87,18 @@ java_gapic_library(
     srcs = [":run_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "run_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
     test_deps = [
         ":run_java_grpc",
+        "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":run_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
         "//google/iam/v1:iam_java_proto",
     ],
 )
@@ -96,10 +106,16 @@ java_gapic_library(
 java_gapic_test(
     name = "run_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.run.v2.ExecutionsClientHttpJsonTest",
+        "com.google.cloud.run.v2.ExecutionsClientTest",
+        "com.google.cloud.run.v2.JobsClientHttpJsonTest",
+        "com.google.cloud.run.v2.JobsClientTest",
         "com.google.cloud.run.v2.RevisionsClientHttpJsonTest",
         "com.google.cloud.run.v2.RevisionsClientTest",
         "com.google.cloud.run.v2.ServicesClientHttpJsonTest",
         "com.google.cloud.run.v2.ServicesClientTest",
+        "com.google.cloud.run.v2.TasksClientHttpJsonTest",
+        "com.google.cloud.run.v2.TasksClientTest",
     ],
     runtime_deps = [":run_java_gapic_test"],
 )
@@ -139,6 +155,7 @@ go_proto_library(
         "//google/api:routing_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
+        "//google/rpc:status_go_proto",
     ],
 )
 
@@ -148,14 +165,16 @@ go_gapic_library(
     grpc_service_config = "run_grpc_service_config.json",
     importpath = "cloud.google.com/go/run/apiv2;run",
     metadata = True,
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
     transport = "grpc+rest",
     deps = [
         ":run_go_proto",
+        "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
 )
@@ -185,12 +204,14 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
     name = "run_py_gapic",
     srcs = [":run_proto"],
     grpc_service_config = "run_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
     transport = "grpc+rest",
     deps = [
@@ -242,7 +263,9 @@ php_gapic_library(
     name = "run_php_gapic",
     srcs = [":run_proto_with_info"],
     grpc_service_config = "run_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":run_php_grpc",
         ":run_php_proto",
@@ -275,7 +298,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "run_grpc_service_config.json",
     package = "google.cloud.run.v2",
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -320,8 +345,10 @@ ruby_cloud_gapic_library(
         "ruby-cloud-wrapper-gem-override=google-cloud-run-client",
     ],
     grpc_service_config = "run_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Cloud Run deploys and manages user provided container images that scale automatically based on incoming requests.",
     ruby_cloud_title = "Cloud Run V2",
+    service_yaml = "run_v2.yaml",
     deps = [
         ":run_ruby_grpc",
         ":run_ruby_proto",
@@ -365,6 +392,7 @@ csharp_gapic_library(
     srcs = [":run_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "run_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
     deps = [
         ":run_csharp_grpc",

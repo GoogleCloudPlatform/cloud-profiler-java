@@ -60,9 +60,9 @@ rules_pkg_dependencies()
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "c29d8b4b79389463c546f98b15aa4391d4ed7ec459340c47bffe15db63eb9126",
-    strip_prefix = "protobuf-3.21.3",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.3.tar.gz"],
+    sha256 = "ce2fbea3c78147a41b2a922485d283137845303e5e1b6cbd7ece94b96ade7031",
+    strip_prefix = "protobuf-3.21.7",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.7.tar.gz"],
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -111,9 +111,9 @@ go_register_toolchains(version = "1.16")
 # rules_gapic also depends on rules_go, so it must come after our own dependency on rules_go.
 # It must also come before gapic-generator-go so as to ensure that it does not bring in an old
 # version of rules_gapic.
-_rules_gapic_version = "0.17.0"
+_rules_gapic_version = "0.19.2"
 
-_rules_gapic_sha256 = "3fd8b13f0b801c5efc1bb24cf08c33ddc61793ba48818154058c2c533dfc11c5"
+_rules_gapic_sha256 = "8eff349ac8c3e306db603c8e00ac6d30c59138bb65cabf0f69bf79d23905eec4"
 
 http_archive(
     name = "rules_gapic",
@@ -138,7 +138,18 @@ http_archive(
     ],
 )
 
-_gapic_generator_go_version = "0.32.1"
+# Until this project is migrated to consume the new subdirectory of generated
+# types e.g. longrunningpb, we must define our own version of longrunning here.
+load("@bazel_gazelle//:deps.bzl", "go_repository")
+
+go_repository(
+  name = "com_google_cloud_go_longrunning",
+  importpath = "cloud.google.com/go/longrunning",
+  sum = "h1:y50CXG4j0+qvEukslYFBCrzaXX0qpFbBzc3PchSu/LE=",
+  version = "v0.1.1",
+)
+
+_gapic_generator_go_version = "0.33.5"
 
 http_archive(
     name = "com_googleapis_gapic_generator_go",
@@ -244,7 +255,7 @@ maven_install(
     ],
 )
 
-_gax_java_version = "2.19.0"
+_gax_java_version = "2.19.4"
 
 http_archive(
     name = "com_google_api_gax_java",
@@ -269,7 +280,7 @@ grpc_java_repositories()
 
 # Java microgenerator.
 # Must go AFTER java-gax, since both java gax and gapic-generator are written in java and may conflict.
-_gapic_generator_java_version = "2.10.0"
+_gapic_generator_java_version = "2.11.0"
 
 http_archive(
     name = "gapic_generator_java",
@@ -292,7 +303,7 @@ load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install()
 
-_gapic_generator_python_version = "1.4.4"
+_gapic_generator_python_version = "1.7.1"
 
 http_archive(
     name = "gapic_generator_python",
@@ -347,7 +358,7 @@ yarn_install(
 ##############################################################################
 
 # PHP micro-generator
-_gapic_generator_php_version = "1.5.0"
+_gapic_generator_php_version = "1.6.3"
 
 http_archive(
     name = "gapic_generator_php",
@@ -388,9 +399,9 @@ http_archive(
     urls = ["https://github.com/googleapis/gax-dotnet/archive/refs/tags/%s.tar.gz" % _gax_dotnet_version],
 )
 
-_gapic_generator_csharp_version = "1.4.8"
+_gapic_generator_csharp_version = "1.4.9"
 
-_gapic_generator_csharp_sha256 = "1c155829aabb32a1e94fb9c4fe70054d683b1142fe7853c01f3adc3d5b184a6e"
+_gapic_generator_csharp_sha256 = "b3641de24520ca9efa34146c447f89055fc4f803275501947d0fb7b1fa7aad49"
 
 http_archive(
     name = "gapic_generator_csharp",
@@ -403,35 +414,13 @@ load("@gapic_generator_csharp//:repositories.bzl", "gapic_generator_csharp_repos
 
 gapic_generator_csharp_repositories()
 
-# Version of C# generator targeting GAX v3. This is present so that teams that
-# do not want to move immediately to GAX v4 when it comes out (e.g. Ads) are
-# able to stick with the GAX-v3-based generator.
-
-_gapic_generator_csharp_gax_v3_version = "1.3.20"
-
-_gapic_generator_csharp_gax_v3_sha256 = "20cacae7641c51eda434adb1279716030def82c2617f4d3507ba56478ff879f9"
-
-http_archive(
-    name = "gapic_generator_csharp_gax_v3",
-    repo_mapping = {
-        "@gapic_generator_restore": "@gapic_generator_restore_gax_v3",
-    },
-    sha256 = _gapic_generator_csharp_gax_v3_sha256,
-    strip_prefix = "gapic-generator-csharp-%s" % _gapic_generator_csharp_gax_v3_version,
-    urls = ["https://github.com/googleapis/gapic-generator-csharp/archive/refs/tags/v%s.tar.gz" % _gapic_generator_csharp_gax_v3_version],
-)
-
-load("@gapic_generator_csharp_gax_v3//:repositories.bzl", gapic_generator_csharp_repositories_gax_v3 = "gapic_generator_csharp_repositories")
-
-gapic_generator_csharp_repositories_gax_v3(gapic_generator_suffix = "_gax_v3")
-
 ##############################################################################
 # Ruby
 ##############################################################################
 
-_gapic_generator_ruby_version = "v0.16.1"
+_gapic_generator_ruby_version = "v0.18.1"
 
-_gapic_generator_ruby_sha256 = "b99c5a7cdbbdc0c7dc4314c5327f164e3a0c7ff3eb896096a3fa86098cba8fd6"
+_gapic_generator_ruby_sha256 = "510337661a2668583748cae9b55282ee0b359bed96858abdc3f4924f3dc1c3b3"
 
 http_archive(
     name = "gapic_generator_ruby",
