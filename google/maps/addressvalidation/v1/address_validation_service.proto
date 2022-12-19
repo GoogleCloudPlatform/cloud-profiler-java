@@ -35,13 +35,13 @@ option objc_class_prefix = "GMPAVV1";
 option php_namespace = "Google\\Maps\\AddressValidation\\V1";
 option ruby_package = "Google::Maps::AddressValidation::V1";
 
-
 // The service for validating addresses.
 service AddressValidation {
   option (google.api.default_host) = "addressvalidation.googleapis.com";
 
   // Validates an address.
-  rpc ValidateAddress(ValidateAddressRequest) returns (ValidateAddressResponse) {
+  rpc ValidateAddress(ValidateAddressRequest)
+      returns (ValidateAddressResponse) {
     option (google.api.http) = {
       post: "/v1:validateAddress"
       body: "*"
@@ -53,7 +53,8 @@ service AddressValidation {
   // same address, and should be called once the transaction is concluded. This
   // should only be sent once for the sequence of `ValidateAddress` requests
   // needed to validate an address fully.
-  rpc ProvideValidationFeedback(ProvideValidationFeedbackRequest) returns (ProvideValidationFeedbackResponse) {
+  rpc ProvideValidationFeedback(ProvideValidationFeedbackRequest)
+      returns (ProvideValidationFeedbackResponse) {
     option (google.api.http) = {
       post: "/v1:provideValidationFeedback"
       body: "*"
@@ -66,22 +67,23 @@ message ValidateAddressRequest {
   // Required. The address being validated. Unformatted addresses should be
   // submitted via [`address_lines`][google.type.PostalAddress.address_lines].
   //
-  // The total length of the fields in this input must not exceed 300
+  // The total length of the fields in this input must not exceed 280
   // characters.
   //
   // Supported regions can be found in the
   // [FAQ](https://developers.google.com/maps/documentation/address-validation/faq#which_regions_are_currently_supported).
   //
-  // The [language_code][google.type.PostalAddress.language_code] value for the
-  // given address is not yet used. The validated address result will be
-  // populated based on the preferred language for the given address, as
-  // identified by the system.
+  // The [language_code][google.type.PostalAddress.language_code] value in the
+  // input address is reserved for future uses and is ignored today. The
+  // validated address result will be populated based on the preferred language
+  // for the given address, as identified by the system.
   //
   // The Address Validation API ignores the values in
   // [recipients][google.type.PostalAddress.recipients] and
   // [organization][google.type.PostalAddress.organization]. Any values in those
   // fields will be discarded and not returned. Please do not set them.
-  google.type.PostalAddress address = 1 [(google.api.field_behavior) = REQUIRED];
+  google.type.PostalAddress address = 1
+      [(google.api.field_behavior) = REQUIRED];
 
   // This field must be empty for the first address validation request. If
   // more requests are necessary to fully validate a single address (for
@@ -104,9 +106,6 @@ message ValidateAddressRequest {
   // at least two [google.type.PostalAddress.address_lines] where the first line
   // contains the street number and name and the second line contains the city,
   // state, and zip code.
-  //
-  // Warning: though this option will enable the USPS CASS compatible mode, the
-  // Address Validation API is not yet officially CASS certified.
   bool enable_usps_cass = 3;
 }
 
@@ -153,7 +152,8 @@ message ProvideValidationFeedbackRequest {
   // `INVALID_ARGUMENT` error will be returned.
   ValidationConclusion conclusion = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. The ID of the response that this feedback is for. This should be the
+  // Required. The ID of the response that this feedback is for. This should be
+  // the
   // [response_id][google.maps.addressvalidation.v1.ValidateAddressRequest.response_id]
   // from the first response in a series of address validation attempts.
   string response_id = 2 [(google.api.field_behavior) = REQUIRED];
@@ -162,9 +162,7 @@ message ProvideValidationFeedbackRequest {
 // The response for validation feedback.
 //
 // The response is empty if the feedback is sent successfully.
-message ProvideValidationFeedbackResponse {
-
-}
+message ProvideValidationFeedbackResponse {}
 
 // The result of validating an address.
 message ValidationResult {
@@ -180,8 +178,8 @@ message ValidationResult {
   // Other information relevant to deliverability.
   AddressMetadata metadata = 4;
 
-  // Extra deliverability flags provided by USPS. Only provided for US
-  // addresses.
+  // Extra deliverability flags provided by USPS. Only provided in region `US`
+  // and `PR`.
   UspsData usps_data = 5;
 }
 
@@ -206,7 +204,7 @@ message Verdict {
     PREMISE = 2;
 
     // A geocode that should be very close to the building-level location of
-    // the address. Only used for geocodes and not for addresses.
+    // the address.
     PREMISE_PROXIMITY = 3;
 
     // The address or geocode indicates a block. Only used in regions which

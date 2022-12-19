@@ -25,6 +25,7 @@ proto_library(
         "channel_connection.proto",
         "discovery.proto",
         "eventarc.proto",
+        "google_channel_config.proto",
         "trigger.proto",
     ],
     deps = [
@@ -44,6 +45,8 @@ proto_library_with_info(
     deps = [
         ":eventarc_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
+        "//google/iam/v1:iam_policy_proto",
     ],
 )
 
@@ -75,14 +78,19 @@ java_gapic_library(
     srcs = [":eventarc_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "eventarc_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
     test_deps = [
         ":eventarc_java_grpc",
+        "//google/cloud/location:location_java_grpc",
+        "//google/iam/v1:iam_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":eventarc_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
+        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -137,13 +145,16 @@ go_gapic_library(
     grpc_service_config = "eventarc_grpc_service_config.json",
     importpath = "cloud.google.com/go/eventarc/apiv1;eventarc",
     metadata = True,
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":eventarc_go_proto",
+        "//google/cloud/location:location_go_proto",
+        "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
 )
 
@@ -179,8 +190,12 @@ py_gapic_library(
     name = "eventarc_py_gapic",
     srcs = [":eventarc_proto"],
     grpc_service_config = "eventarc_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
     transport = "grpc",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
 )
 
 py_test(
@@ -227,7 +242,9 @@ php_gapic_library(
     name = "eventarc_php_gapic",
     srcs = [":eventarc_proto_with_info"],
     grpc_service_config = "eventarc_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":eventarc_php_grpc",
         ":eventarc_php_proto",
@@ -260,7 +277,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "eventarc_grpc_service_config.json",
     package = "google.cloud.eventarc.v1",
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -305,8 +324,10 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/eventarc/",
     ],
     grpc_service_config = "eventarc_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Eventarc lets you asynchronously deliver events from Google services, SaaS, and your own apps using loosely coupled services that react to state changes. Eventarc requires no infrastructure management — you can optimize productivity and costs while building a modern, event-driven solution.",
     ruby_cloud_title = "Eventarc V1",
+    service_yaml = "eventarc_v1.yaml",
     deps = [
         ":eventarc_ruby_grpc",
         ":eventarc_ruby_proto",
@@ -350,6 +371,7 @@ csharp_gapic_library(
     srcs = [":eventarc_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "eventarc_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
     deps = [
         ":eventarc_csharp_grpc",

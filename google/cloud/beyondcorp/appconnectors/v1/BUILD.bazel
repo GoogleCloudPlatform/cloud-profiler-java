@@ -94,12 +94,14 @@ java_gapic_library(
     srcs = [":appconnectors_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     test_deps = [
         ":appconnectors_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc",
     deps = [
         ":appconnectors_java_proto",
         "//google/api:api_java_proto",
@@ -120,6 +122,7 @@ java_gapic_test(
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-beyondcorp-appconnectors-v1-java",
     include_samples = True,
+    transport = "grpc",
     deps = [
         ":appconnectors_java_gapic",
         ":appconnectors_java_grpc",
@@ -145,14 +148,15 @@ go_gapic_library(
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
     importpath = "cloud.google.com/go/beyondcorp/appconnectors/apiv1;appconnectors",
     metadata = True,
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     deps = [
         ":appconnectors_go_proto",
         "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:any_go_proto",
     ],
 )
@@ -184,6 +188,7 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "python-gapic-name=beyondcorp_appconnectors",
     ],
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -224,7 +229,9 @@ php_gapic_library(
     name = "appconnectors_php_gapic",
     srcs = [":appconnectors_proto_with_info"],
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":appconnectors_php_grpc",
         ":appconnectors_php_proto",
@@ -248,7 +255,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
     package = "google.cloud.beyondcorp.appconnectors.v1",
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -282,6 +291,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-wrapper-gem-override=google-cloud-beyond_corp",
     ],
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Beyondcorp Enterprise provides identity and context aware access controls for enterprise resources and enables zero-trust access. Using the Beyondcorp Enterprise APIs, enterprises can set up multi-cloud and on-prem connectivity using the App Connector hybrid connectivity solution.",
     ruby_cloud_title = "BeyondCorp AppConnectors V1",
     service_yaml = "beyondcorp_v1.yaml",
@@ -317,6 +327,7 @@ csharp_gapic_library(
     srcs = [":appconnectors_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "beyondcorp-appconnectors_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     deps = [
         ":appconnectors_csharp_grpc",

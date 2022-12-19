@@ -73,8 +73,6 @@ message CreateDocumentRequest {
 }
 
 // Request message for DocumentService.GetDocument.
-//
-// Next ID: 4
 message GetDocumentRequest {
   // Required. The name of the document to retrieve.
   // Format:
@@ -139,6 +137,7 @@ message DeleteDocumentRequest {
   RequestMetadata request_metadata = 2;
 }
 
+// Request message for DocumentService.SearchDocuments.
 message SearchDocumentsRequest {
   // Required. The parent, which owns this collection of documents.
   // Format: projects/{project_number}/locations/{location}.
@@ -205,7 +204,7 @@ message SearchDocumentsRequest {
   //
   // * Histogram facet (aka filterable properties): Facet names with format
   // &lt;schema id&gt;.&lt;facet&gt;. Facets will have the
-  // format of: [a-zA-Z][a-zA-Z0-9_:/-.]. If the facet is a child
+  // format of: `[a-zA-Z][a-zA-Z0-9_:/-.]`. If the facet is a child
   // facet, then the parent hierarchy needs to be specified separated by
   // dots in the prefix after the schema id. Thus, the format for a multi-
   // level facet is: &lt;schema id&gt;.&lt;parent facet name&gt;.
@@ -227,7 +226,9 @@ message SearchDocumentsRequest {
   // Optional. Controls if the search document request requires the return of a total size
   // of matched documents. See [SearchDocumentsResponse.total_size][google.cloud.contentwarehouse.v1.SearchDocumentsResponse.total_size].
   //
-  // Enabling this flag may adversely impact performance.
+  // Enabling this flag may adversely impact performance. Hint: If this is
+  // used with pagination, set this flag on the initial query but set this
+  // to false on subsequent page calls (keep the total count locally).
   //
   // Defaults to false.
   bool require_total_size = 10;
