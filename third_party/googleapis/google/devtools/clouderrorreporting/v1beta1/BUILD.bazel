@@ -9,14 +9,43 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
-# This is an API workspace, having public visibility by default makes perfect sense.
-package(default_visibility = ["//visibility:public"])
-
 ##############################################################################
 # Common
 ##############################################################################
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "csharp_gapic_assembly_pkg",
+    "csharp_gapic_library",
+    "csharp_grpc_library",
+    "csharp_proto_library",
+    "go_gapic_assembly_pkg",
+    "go_gapic_library",
+    "go_proto_library",
+    "go_test",
+    "java_gapic_assembly_gradle_pkg",
+    "java_gapic_library",
+    "java_gapic_test",
+    "java_grpc_library",
+    "java_proto_library",
+    "nodejs_gapic_assembly_pkg",
+    "nodejs_gapic_library",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_grpc_library",
+    "php_proto_library",
+    "proto_library_with_info",
+    "py_gapic_assembly_pkg",
+    "py_gapic_library",
+    "py_test",
+    "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
+    "ruby_grpc_library",
+    "ruby_proto_library",
+)
+
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "clouderrorreporting_proto",
@@ -44,18 +73,6 @@ proto_library_with_info(
     ],
 )
 
-##############################################################################
-# Java
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "java_gapic_assembly_gradle_pkg",
-    "java_gapic_library",
-    "java_gapic_test",
-    "java_grpc_library",
-    "java_proto_library",
-)
-
 java_proto_library(
     name = "clouderrorreporting_java_proto",
     deps = [":clouderrorreporting_proto"],
@@ -71,6 +88,7 @@ java_gapic_library(
     name = "clouderrorreporting_java_gapic",
     srcs = [":clouderrorreporting_proto_with_info"],
     grpc_service_config = "errorreporting_grpc_service_config.json",
+    rest_numeric_enums = True,
     test_deps = [
         ":clouderrorreporting_java_grpc",
     ],
@@ -96,6 +114,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-devtools-clouderrorreporting-v1beta1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":clouderrorreporting_java_gapic",
@@ -103,17 +122,6 @@ java_gapic_assembly_gradle_pkg(
         ":clouderrorreporting_java_proto",
         ":clouderrorreporting_proto",
     ],
-)
-
-##############################################################################
-# Go
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "go_gapic_assembly_pkg",
-    "go_gapic_library",
-    "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -132,6 +140,7 @@ go_gapic_library(
     srcs = [":clouderrorreporting_proto_with_info"],
     grpc_service_config = "errorreporting_grpc_service_config.json",
     importpath = "cloud.google.com/go/devtools/clouderrorreporting/apiv1beta1;clouderrorreporting",
+    rest_numeric_enums = True,
     service_yaml = "clouderrorreporting_v1beta1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -157,16 +166,6 @@ go_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# Python
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "py_gapic_assembly_pkg",
-    "py_gapic_library",
-    "py_test",
-)
-
 py_gapic_library(
     name = "clouderrorreporting_py_gapic",
     srcs = [":clouderrorreporting_proto"],
@@ -174,7 +173,9 @@ py_gapic_library(
     opt_args = [
         "python-gapic-name=errorreporting",
         "python-gapic-namespace=google.cloud",
+        "warehouse-package-name=google-cloud-error-reporting",
     ],
+    rest_numeric_enums = True,
     transport = "grpc",
 )
 
@@ -196,17 +197,6 @@ py_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# PHP
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "php_gapic_assembly_pkg",
-    "php_gapic_library",
-    "php_grpc_library",
-    "php_proto_library",
-)
-
 php_proto_library(
     name = "clouderrorreporting_php_proto",
     deps = [":clouderrorreporting_proto"],
@@ -222,6 +212,8 @@ php_gapic_library(
     name = "clouderrorreporting_php_gapic",
     srcs = [":clouderrorreporting_proto_with_info"],
     grpc_service_config = "errorreporting_grpc_service_config.json",
+    rest_numeric_enums = True,
+    transport = "grpc+rest",
     deps = [
         ":clouderrorreporting_php_grpc",
         ":clouderrorreporting_php_proto",
@@ -238,15 +230,6 @@ php_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# Node.js
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-)
-
 nodejs_gapic_library(
     name = "clouderrorreporting_nodejs_gapic",
     package_name = "@google-cloud/clouderrorreporting",
@@ -254,7 +237,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "errorreporting_grpc_service_config.json",
     package = "google.devtools.clouderrorreporting.v1beta1",
+    rest_numeric_enums = True,
     service_yaml = "clouderrorreporting_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -264,17 +249,6 @@ nodejs_gapic_assembly_pkg(
         ":clouderrorreporting_nodejs_gapic",
         ":clouderrorreporting_proto",
     ],
-)
-
-##############################################################################
-# Ruby
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_cloud_gapic_library",
-    "ruby_gapic_assembly_pkg",
-    "ruby_grpc_library",
-    "ruby_proto_library",
 )
 
 ruby_proto_library(
@@ -299,6 +273,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-shortname=clouderrorreporting",
     ],
     grpc_service_config = "errorreporting_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Error Reporting API provides a simple endpoint to report errors from your running service, and read access to error groups and their associated errors.",
     ruby_cloud_title = "Error Reporting V1beta1",
     deps = [
@@ -317,17 +292,6 @@ ruby_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# C#
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "csharp_gapic_assembly_pkg",
-    "csharp_gapic_library",
-    "csharp_grpc_library",
-    "csharp_proto_library",
-)
-
 csharp_proto_library(
     name = "clouderrorreporting_csharp_proto",
     deps = [":clouderrorreporting_proto"],
@@ -344,6 +308,7 @@ csharp_gapic_library(
     srcs = [":clouderrorreporting_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "errorreporting_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "clouderrorreporting_v1beta1.yaml",
     deps = [
         ":clouderrorreporting_csharp_grpc",

@@ -32,6 +32,7 @@ option java_multiple_files = true;
 option java_outer_classname = "DocumentServiceProto";
 option java_package = "com.google.cloud.contentwarehouse.v1";
 
+// This service lets you manage document.
 service DocumentService {
   option (google.api.default_host) = "contentwarehouse.googleapis.com";
   option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/cloud-platform";
@@ -69,7 +70,7 @@ service DocumentService {
         body: "*"
       }
     };
-    option (google.api.method_signature) = "document";
+    option (google.api.method_signature) = "name,document";
   }
 
   // Deletes a document. Returns NOT_FOUND if the document does not exist.
@@ -212,7 +213,10 @@ message SearchDocumentsResponse {
 
   // The total number of matched documents which is available only if the client
   // set [SearchDocumentsRequest.require_total_size][google.cloud.contentwarehouse.v1.SearchDocumentsRequest.require_total_size] to `true`. Otherwise, the
-  // value will be `-1`.
+  // value will be `-1`. `total_size` will max at &quot;100,000&quot;. If this
+  // is returned, then it can be assumed that the count is equal to or greater
+  // than 100,000. Typically a UI would handle this condition by displaying
+  // &quot;of many&quot;, for example: &quot;Displaying 10 of many&quot;.
   int32 total_size = 3;
 
   // Additional information for the API invocation, such as the request tracking

@@ -26,12 +26,8 @@ option objc_class_prefix = "GMPAVV1";
 option php_namespace = "Google\\Maps\\AddressValidation\\V1";
 option ruby_package = "Google::Maps::AddressValidation::V1";
 
-// The metadata for the address
+// The metadata for the address.
 message AddressMetadata {
-  // Indicates that this address is a high-rise building.
-  // If unset, indicates that the value is unknown.
-  optional bool highrise = 1;
-
   // Indicates that this is the address of a business.
   // If unset, indicates that the value is unknown.
   optional bool business = 2;
@@ -39,10 +35,6 @@ message AddressMetadata {
   // Indicates that the address of a PO box.
   // If unset, indicates that the value is unknown.
   optional bool po_box = 3;
-
-  // Indicates that the address is of a multi_family building.
-  // If unset, indicates that the value is unknown.
-  optional bool multi_family = 4;
 
   // Indicates that this is the address of a residence.
   // If unset, indicates that the value is unknown.

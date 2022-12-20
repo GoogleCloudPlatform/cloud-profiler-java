@@ -22,6 +22,7 @@ proto_library(
     name = "issuerswitch_proto",
     srcs = [
         "common_fields.proto",
+        "logs.proto",
         "resolutions.proto",
         "rules.proto",
         "transactions.proto",
@@ -31,6 +32,7 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
+        "//google/logging/type:type_proto",
         "//google/longrunning:operations_proto",
         "//google/type:date_proto",
         "//google/type:money_proto",
@@ -75,6 +77,7 @@ java_gapic_library(
     srcs = [":issuerswitch_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "issuerswitch_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
     test_deps = [
         ":issuerswitch_java_grpc",
@@ -130,6 +133,7 @@ go_proto_library(
     protos = [":issuerswitch_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+        "//google/logging/type:type_go_proto",
         "//google/longrunning:longrunning_go_proto",
         "//google/type:date_go_proto",
         "//google/type:money_go_proto",
@@ -142,13 +146,14 @@ go_gapic_library(
     grpc_service_config = "issuerswitch_grpc_service_config.json",
     importpath = "cloud.google.com/go/paymentgateway/issuerswitch/apiv1;issuerswitch",
     metadata = True,
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
-    transport = "grpc+rest",
+    transport = "grpc",
     deps = [
         ":issuerswitch_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
 )
 
@@ -185,12 +190,15 @@ py_gapic_library(
     srcs = [":issuerswitch_proto"],
     grpc_service_config = "issuerswitch_grpc_service_config.json",
     opt_args = [
-        "warehouse-package-name=google-cloud-payment-gateway-issuer-switch",
-        "python-gapic-namespace=google.cloud",
         "python-gapic-name=payment_gateway_issuer_switch",
+        "python-gapic-namespace=google.cloud",
+        "warehouse-package-name=google-cloud-payment-gateway-issuer-switch",
     ],
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
     transport = "grpc",
+    deps = [
+    ],
 )
 
 py_test(
@@ -237,7 +245,9 @@ php_gapic_library(
     name = "issuerswitch_php_gapic",
     srcs = [":issuerswitch_proto_with_info"],
     grpc_service_config = "issuerswitch_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":issuerswitch_php_grpc",
         ":issuerswitch_php_proto",
@@ -270,7 +280,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "issuerswitch_grpc_service_config.json",
     package = "google.cloud.paymentgateway.issuerswitch.v1",
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -309,6 +321,7 @@ ruby_cloud_gapic_library(
     srcs = [":issuerswitch_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-paymentgateway-issuerswitch-v1"],
     grpc_service_config = "issuerswitch_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
     deps = [
         ":issuerswitch_ruby_grpc",
@@ -353,6 +366,7 @@ csharp_gapic_library(
     srcs = [":issuerswitch_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "issuerswitch_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "issuerswitch_v1.yaml",
     deps = [
         ":issuerswitch_csharp_grpc",
