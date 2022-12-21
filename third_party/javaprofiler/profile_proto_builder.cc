@@ -43,6 +43,9 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
       location_builder_(&builder_) {
   AddSampleType(count_type);
   AddSampleType(metric_type);
+  builder_.mutable_profile()->set_default_sample_type(
+      builder_.StringId(metric_type.type.c_str()));
+
   SetPeriodType(metric_type);
 }
 
@@ -72,7 +75,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
 void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
                                              int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
-      name, name, "", -1);
+      name, name, "", 0, -1, 0);
 
   auto profile = builder_.mutable_profile();
   auto sample = profile->add_sample();
@@ -178,15 +181,13 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
   const JVMPI_CallTrace *trace = trace_and_labels.trace;
   int first_frame = SkipTopNativeFrames(*trace);
 
-  StackState stack_state;
-
   for (int i = first_frame; i < trace->num_frames; ++i) {
     auto &jvm_frame = trace->frames[i];
 
     if (jvm_frame.lineno == kNativeFrameLineNum) {
-      AddNativeInfo(jvm_frame, profile, sample, &stack_state);
+      AddNativeInfo(jvm_frame, profile, sample);
     } else {
-      AddJavaInfo(jvm_frame, profile, sample, &stack_state);
+      AddJavaInfo(jvm_frame, profile, sample);
     }
   }
 }
@@ -194,13 +195,10 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
 void ProfileProtoBuilder::AddJavaInfo(
     const JVMPI_CallFrame &jvm_frame,
     perftools::profiles::Profile *profile,
-    perftools::profiles::Sample *sample,
-    StackState *stack_state) {
-  stack_state->JavaFrame();
-
+    perftools::profiles::Sample *sample) {
   if (!jvm_frame.method_id) {
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown method]", "", 0);
+        "", "[Unknown method]", "", 0, 0, 0);
     sample->add_location_id(location->id());
     return;
   }
@@ -210,7 +208,7 @@ void ProfileProtoBuilder::AddJavaInfo(
 }
 
 int64 ProfileProtoBuilder::Location(MethodInfo *method,
-                                       const JVMPI_CallFrame &frame) {
+                                    const JVMPI_CallFrame &frame) {
   // lineno is actually the BCI of the frame.
   int bci = frame.lineno;
 
@@ -227,7 +225,9 @@ int64 ProfileProtoBuilder::Location(MethodInfo *method,
       location_builder_.LocationFor(method->ClassName(),
                                     method->MethodName(),
                                     method->FileName(),
-                                    line_number);
+                                    method->StartLine(),
+                                    line_number,
+                                    0);
 
   method->AddLocation(bci, location->id());
   return location->id();
@@ -243,17 +243,18 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
   std::string class_name;
   std::string method_name;
   std::string signature;
+  int start_line = 0;
 
-  // Ignore lineno since we pass nullptr anyway.
+  // Set lineno to zero to get method first line.
   JVMPI_CallFrame jvm_frame = { 0, method_id };
   GetStackFrameElements(jni_env_, jvmti_env_, jvm_frame, &file_name,
-                        &class_name, &method_name, &signature, nullptr);
+                        &class_name, &method_name, &signature, &start_line);
 
   FixMethodParameters(&signature);
   std::string full_method_name = class_name + "." + method_name + signature;
 
   std::unique_ptr<MethodInfo> unique_method(
-      new MethodInfo(full_method_name, class_name, file_name));
+      new MethodInfo(full_method_name, class_name, file_name, start_line));
 
   auto method_ptr = unique_method.get();
   methods_[method_id] = std::move(unique_method);
@@ -262,11 +263,11 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
 
 void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                         perftools::profiles::Profile *profile,
-                                        perftools::profiles::Sample *sample,
-                                        StackState *stack_state) {
+                                        perftools::profiles::Sample *sample) {
   if (!native_cache_) {
+    int64_t address = reinterpret_cast<int64_t>(jvm_frame.method_id);
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown non-Java frame]", "", 0);
+        "", "[Unknown non-Java frame]", "", 0, 0, address);
     sample->add_location_id(location->id());
     return;
   }
@@ -282,12 +283,7 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
                                &location_builder_);
 
 
-  stack_state->NativeFrame(function_name);
-
-  if (!stack_state->SkipFrame()) {
-    location->set_address(reinterpret_cast<uint64>(jvm_frame.method_id));
-    sample->add_location_id(location->id());
-  }
+  sample->add_location_id(location->id());
 }
 
 void ContentionProfileProtoBuilder::MultiplyBySamplingRate() {
@@ -317,6 +313,7 @@ size_t LocationBuilder::LocationInfoHash::operator()(
   h = 31U * h + hash_string(info.function_name);
   h = 31U * h + hash_string(info.file_name);
   h = 31U * h + hash_int(info.line_number);
+  h = 31U * h + hash_int(info.address);
 
   return h;
 }
@@ -326,15 +323,31 @@ bool LocationBuilder::LocationInfoEquals::operator()(
   return info1.class_name == info2.class_name &&
       info1.function_name == info2.function_name &&
       info1.file_name == info2.file_name &&
-      info1.line_number == info2.line_number;
+      info1.line_number == info2.line_number &&
+      info1.address == info2.address;
 }
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
     const std::string &class_name, const std::string &function_name,
-    const std::string &file_name, int line_number) {
+    const std::string &file_name, int start_line, int line_number,
+    int64_t address) {
   auto profile = builder_->mutable_profile();
 
-  LocationInfo info{ class_name, function_name, file_name, line_number };
+  // Adjust address by -1, so that the address is within the call instruction
+  // instead of at the start of the return instruction, as per
+  // go/new-z-page#ret-addr-fixup
+  //
+  // We use 0 (NULL) to indicate the absence of a valid address, and so
+  // do not do this where it would be invalid i.e. leading to -1
+  address = (address > 0) ? address - 1 : 0;
+
+  LocationInfo info {
+      class_name,
+      function_name,
+      file_name,
+      line_number,
+      address
+  };
 
   if (locations_.count(info) > 0) {
     return locations_.find(info)->second;
@@ -343,6 +356,7 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
   auto location_id = profile->location_size() + 1;
   perftools::profiles::Location *location = profile->add_location();
   location->set_id(location_id);
+  location->set_address(address);
 
   locations_[info] = location;
 
@@ -350,8 +364,9 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   std::string simplified_name = function_name;
   SimplifyFunctionName(&simplified_name);
-  auto function_id = builder_->FunctionId(
-      simplified_name.c_str(), function_name.c_str(), file_name.c_str(), 0);
+  auto function_id =
+      builder_->FunctionId(simplified_name.c_str(), function_name.c_str(),
+                           file_name.c_str(), start_line);
 
   line->set_function_id(function_id);
   line->set_line(line_number);

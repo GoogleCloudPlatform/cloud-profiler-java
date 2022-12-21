@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
+#include <iostream>
+#include <memory>
+#include <ostream>
+
+#include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
+#include "third_party/javaprofiler/stacktrace_decls.h"
+#include "third_party/javaprofiler/stacktraces.h"
 
 namespace {
 
-std::vector<google::javaprofiler::JVMPI_CallFrame>
+using google::javaprofiler::JVMPI_CallFrame;
+
+std::vector<JVMPI_CallFrame>
 TransformFrames(jvmtiFrameInfo *stack_frames, int count) {
-  std::vector<google::javaprofiler::JVMPI_CallFrame> frames(count);
+  std::vector<JVMPI_CallFrame> frames(count);
 
   for (int i = 0; i < count; i++) {
     // Note that technically this is not the line number; it is the location but
@@ -34,12 +43,76 @@ TransformFrames(jvmtiFrameInfo *stack_frames, int count) {
   return frames;
 }
 
+std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTrace(JNIEnv *jni) {
+  std::unique_ptr<std::vector<JVMPI_CallFrame>> trace_result = nullptr;
+
+// Cannot use the fast stacktrace for standalone builds as their standard
+// libraries do not support getcontext.
+
+  return trace_result;
+}
+
+std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
+    JNIEnv *jni, jvmtiEnv *jvmti, jthread thread) {
+  jint count = 0;
+  jvmtiFrameInfo stack_frames[google::javaprofiler::kMaxFramesToCapture];
+
+  jvmtiError err =
+      jvmti->GetStackTrace(thread, 0, google::javaprofiler::kMaxFramesToCapture,
+                           stack_frames, &count);
+
+  if (err != JVMTI_ERROR_NONE || count <= 0) {
+    return nullptr;
+  }
+
+  return std::unique_ptr<std::vector<JVMPI_CallFrame>>(
+      new std::vector<JVMPI_CallFrame>(TransformFrames(stack_frames, count)));
+}
+
+static jstring GetClassName(JNIEnv *jni_env, jobject object,
+                            jclass object_klass) {
+  jclass cls = jni_env->FindClass("java/lang/Class");
+  jmethodID get_name_id =
+      jni_env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
+  jstring name_obj = static_cast<jstring>(
+      jni_env->CallObjectMethod(object_klass, get_name_id));
+  return name_obj;
+}
+
+static jlong GetThreadId(JNIEnv *jni_env, jthread thread) {
+  jclass thread_class = jni_env->FindClass("java/lang/Thread");
+  jmethodID get_id_method_id = jni_env->GetMethodID(thread_class,
+                                                    "getId", "()J");
+  jlong thread_id = jni_env->CallLongMethod(thread, get_id_method_id);
+  return thread_id;
+}
+
 extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv *jvmti_env,
                                              JNIEnv *jni_env, jthread thread,
                                              jobject object,
                                              jclass object_klass, jlong size) {
+  if (!google::javaprofiler::HeapMonitor::HasAllocationInstrumentation() &&
+      !google::javaprofiler::HeapMonitor::HasGarbageInstrumentation()) {
+    google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
+                                                 object_klass, size, nullptr, 0,
+                                                 0);
+    return;
+  }
+  jstring class_name = GetClassName(jni_env, object, object_klass);
+  const char *name_str = jni_env->GetStringUTFChars(class_name, NULL);
+  int name_len = strlen(name_str);
+  jbyte *name_bytes = const_cast<jbyte *>(
+      reinterpret_cast<const jbyte *>(name_str));
+
+  jlong thread_id = GetThreadId(jni_env, thread);
+
   google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
-                                               object_klass, size);
+                                               object_klass, size, name_bytes,
+                                               name_len, thread_id);
+  // Invoke all functions in HeapMonitor::alloc_inst_functions_
+  google::javaprofiler::HeapMonitor::InvokeAllocationInstrumentationFunctions(
+      thread_id, name_bytes, name_len, size, 0);
+  jni_env->ReleaseStringUTFChars(class_name, name_str);
 }
 
 extern "C" JNIEXPORT void GarbageCollectionFinish(jvmtiEnv *jvmti_env) {
@@ -50,40 +123,52 @@ extern "C" JNIEXPORT void GarbageCollectionFinish(jvmtiEnv *jvmti_env) {
 
 namespace google {
 namespace javaprofiler {
+
+const HeapEventStorage::GcCallback HeapMonitor::gc_callback_ =
+    [](const HeapObjectTrace &elem) {
+  HeapMonitor::InvokeGarbageInstrumentationFunctions(elem.ThreadId(),
+                                                     elem.Name(),
+                                                     elem.NameLength(),
+                                                     elem.Size(),
+                                                     0);
+};
+
+std::atomic<HeapMonitor *> HeapMonitor::heap_monitor_;
+
 std::atomic<jvmtiEnv *> HeapMonitor::jvmti_;
 std::atomic<int> HeapMonitor::sampling_interval_;
+std::atomic<bool> HeapMonitor::use_jvm_trace_;
+std::vector<AllocationInstrumentationFunction>
+    HeapMonitor::alloc_inst_functions_;
+std::vector<GarbageInstrumentationFunction>
+    HeapMonitor::gc_inst_functions_;
 
-HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache,
-                                   int max_garbage_size)
+HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti,
+                                   ProfileFrameCache *cache,
+                                   int max_garbage_size,
+                                   GcCallback gc_callback)
     : peak_profile_size_(0),
       max_garbage_size_(max_garbage_size),
       cur_garbage_pos_(0),
-      jvmti_(jvmti), cache_(cache) {
+      jvmti_(jvmti), cache_(cache), gc_callback_(gc_callback) {
 }
 
 void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
-                           jclass klass, jlong size) {
-  const int kMaxFrames = 128;
-  jint count = 0;
-  jvmtiFrameInfo stack_frames[kMaxFrames];
-  jvmtiError err =
-      jvmti_->GetStackTrace(thread, 0, kMaxFrames, stack_frames, &count);
-
-  if (err == JVMTI_ERROR_NONE && count > 0) {
-    auto frames = TransformFrames(stack_frames, count);
-
-    jweak weak_ref = jni->NewWeakGlobalRef(object);
-    if (jni->ExceptionCheck()) {
-      LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";
-      return;
-    }
-
-    HeapObjectTrace live_object(weak_ref, size, std::move(frames));
-
-    // Only now lock and get things done quickly.
-    std::lock_guard<std::mutex> lock(storage_lock_);
-    newly_allocated_objects_.push_back(std::move(live_object));
+                           jclass klass, jlong size,
+                           const std::vector<JVMPI_CallFrame> &&frames,
+                           jbyte *name, jint name_len, jlong thread_id) {
+  jweak weak_ref = jni->NewWeakGlobalRef(object);
+  if (jni->ExceptionCheck()) {
+    LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";
+    return;
   }
+
+  HeapObjectTrace live_object(weak_ref, size, std::move(frames), name, name_len,
+                              thread_id);
+
+  // Only now lock and get things done quickly.
+  std::lock_guard<std::mutex> lock(storage_lock_);
+  newly_allocated_objects_.push_back(std::move(live_object));
 }
 
 void HeapEventStorage::AddToGarbage(HeapObjectTrace &&obj) {
@@ -102,6 +187,7 @@ void HeapEventStorage::MoveLiveObjects(
     if (elem.IsLive(env)) {
       still_live_objects->push_back(std::move(elem));
     } else {
+      gc_callback_(elem);
       elem.DeleteWeakReference(env);
       AddToGarbage(std::move(elem));
     }
@@ -154,7 +240,7 @@ HeapEventStorage::StackTraceArrayBuilder::StackTraceArrayBuilder(
 }
 
 void HeapEventStorage::StackTraceArrayBuilder::AddTrace(
-    HeapEventStorage::HeapObjectTrace &object) {
+    HeapObjectTrace &object) {
   std::vector<JVMPI_CallFrame> &frames = object.Frames();
 
   call_trace_data_[curr_trace_] = {nullptr,
@@ -266,6 +352,74 @@ bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
 #endif
 }
 
+void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
+                            jclass object_klass, jlong size, jbyte *name,
+                            jint name_len, jlong thread_id) {
+  auto trace = use_jvm_trace_.load()
+    ? GetTrace(jni_env)
+    : GetTraceUsingJvmti(jni_env, jvmti_.load(), thread);
+  if (trace == nullptr) {
+    return;
+  }
+
+  GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size,
+                              std::move(*trace), name, name_len, thread_id);
+}
+
+void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong thread_id,
+                                              jbyte *name,
+                                              int name_length,
+                                              int size,
+                                              jlong gcontext) {
+  for (auto fn : GetInstance()->alloc_inst_functions_) {
+    fn(thread_id, name, name_length, size, gcontext);
+  }
+}
+
+void HeapMonitor::AddAllocationInstrumentation(
+    AllocationInstrumentationFunction fn) {
+  GetInstance()->alloc_inst_functions_.push_back(fn);
+}
+
+bool HeapMonitor::HasAllocationInstrumentation() {
+  return !GetInstance()->alloc_inst_functions_.empty();
+}
+
+bool HeapMonitor::HasGarbageInstrumentation() {
+  return !GetInstance()->gc_inst_functions_.empty();
+}
+
+void HeapMonitor::InvokeGarbageInstrumentationFunctions(jlong thread_id,
+                                                        jbyte *name,
+                                                        int name_length,
+                                                        int size,
+                                                        jlong gcontext) {
+  for (auto fn : GetInstance()->gc_inst_functions_) {
+    fn(thread_id, name, name_length, size, gcontext);
+  }
+}
+
+void HeapMonitor::AddGarbageInstrumentation(
+    GarbageInstrumentationFunction fn) {
+  GetInstance()->gc_inst_functions_.push_back(fn);
+}
+
+void HeapMonitor::ShutdownGCWaitingThread() {
+  GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::SHUTDOWN);
+  GetInstance()->WaitForShutdown();
+}
+
+void HeapMonitor::WaitForShutdown() {
+  // Here we wait for the GC thread to process the shutdown event.
+  // We can't use JNI to call "Thread.join" on the thread as FindClass
+  // crashes if called in VM shutdown.
+
+  std::unique_lock<std::mutex> lock(gc_waiting_mutex_);
+
+  // If we are woken up without having been notified, just go back to sleep.
+  gc_waiting_cv_.wait(lock, [this] { return gc_thread_shutdown; } );
+}
+
 void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 #ifdef ENABLE_HEAP_SAMPLING
   callbacks->SampledObjectAlloc = &SampledObjectAlloc;
@@ -274,12 +428,23 @@ void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 }
 
 // Currently, we enable once and forget about it.
-bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
+bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
+                         bool use_jvm_trace) {
 #ifdef ENABLE_HEAP_SAMPLING
   if (!Supported(jvmti)) {
     LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
                  << " heap sampling monitor";
     return false;
+  }
+
+  jvmti_.store(jvmti);
+  sampling_interval_.store(sampling_interval);
+  use_jvm_trace_.store(use_jvm_trace);
+
+  // Ensure this is really a singleton i.e. don't recreate it if sampling is
+  // re-enabled.
+  if (heap_monitor_ == nullptr) {
+    heap_monitor_.store(new HeapMonitor());
   }
 
   jvmtiCapabilities caps;
@@ -302,9 +467,6 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
     return false;
   }
 
-  jvmti_.store(jvmti);
-  sampling_interval_.store(sampling_interval);
-
   if (!GetInstance()->CreateGCWaitingThread(jvmti, jni)) {
     return false;
   }
@@ -326,6 +488,10 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval) {
     LOG(WARNING) << "Failed to enable garbage collection finish event, "
                  << "disabling the heap sampling monitor";
     return false;
+  }
+
+  if (use_jvm_trace) {
+    Asgct::SetAsgct(Accessors::GetJvmFunction<ASGCTType>("AsyncGetCallTrace"));
   }
 
   return true;
@@ -428,6 +594,9 @@ void HeapMonitor::GCWaitingThreadRun(JNIEnv* jni_env) {
 
     // Was the heap monitor disabled?
     if (event == GcEvent::SHUTDOWN) {
+      std::unique_lock<std::mutex> lock(gc_waiting_mutex_);
+      gc_thread_shutdown = true;
+      gc_waiting_cv_.notify_all();
       break;
     }
 

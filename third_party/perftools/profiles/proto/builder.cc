@@ -121,8 +121,9 @@ bool Builder::MarshalToFile(const Profile &profile, int fd) {
 
 bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
   int fd;
-  while ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0444)) < 0 &&
-         errno == EINTR) {}
+  while ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0 &&
+         errno == EINTR) {
+  }
   if (fd == -1) {
     PLOG(ERROR) << "Failed to open file " << filename;
     return false;
@@ -189,6 +190,26 @@ bool Builder::CheckValid(const Profile &profile) {
   int sample_type_len = profile.sample_type_size();
   if (sample_type_len == 0) {
     LOG(ERROR) << "No sample type specified";
+    return false;
+  }
+
+  const int default_sample_type = profile.default_sample_type();
+  if (default_sample_type <= 0 ||
+      default_sample_type >= profile.string_table_size()) {
+    LOG(ERROR) << "No default sample type specified";
+    return false;
+  }
+
+  std::unordered_set<int> value_types;
+  for (const auto &sample_type : profile.sample_type()) {
+    if (!value_types.insert(sample_type.type()).second) {
+      LOG(ERROR) << "Duplicate sample_type specified";
+      return false;
+    }
+  }
+
+  if (value_types.count(default_sample_type) == 0) {
+    LOG(ERROR) << "Default sample type not found";
     return false;
   }
 

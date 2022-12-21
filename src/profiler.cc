@@ -158,7 +158,7 @@ bool SignalHandler::SetSigprofInterval(int64_t period_usec) {
   timer.it_interval.tv_sec = 0;
   timer.it_interval.tv_usec = period_usec;
   timer.it_value = timer.it_interval;
-  if (setitimer(ITIMER_PROF, &timer, 0) == -1) {
+  if (setitimer(ITIMER_PROF, &timer, nullptr) == -1) {
     LOG(ERROR) << "Scheduling profiler interval failed with error " << errno;
     return false;
   }
@@ -168,7 +168,7 @@ bool SignalHandler::SetSigprofInterval(int64_t period_usec) {
 struct sigaction SignalHandler::SetAction(void (*action)(int, siginfo_t *,
                                                          void *)) {
   struct sigaction sa;
-  sa.sa_handler = NULL;
+  sa.sa_handler = nullptr;
   sa.sa_sigaction = action;
   sa.sa_flags = SA_RESTART | SA_SIGINFO;
 

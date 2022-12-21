@@ -177,6 +177,25 @@ static jvmtiError GetStackTrace(jvmtiEnv* env, jthread thread, jint start_depth,
   return JVMTI_ERROR_NONE;
 }
 
+std::vector<JVMPI_CallFrame> CreateStackTrace(int i) {
+  std::vector<JVMPI_CallFrame> frames;
+
+  switch (i) {
+    case 0:
+      frames.push_back({30, reinterpret_cast<jmethodID>(1)});
+      frames.push_back({64, reinterpret_cast<jmethodID>(2)});
+      break;
+    case 1:
+      frames.push_back({128, reinterpret_cast<jmethodID>(3)});
+      break;
+    default:
+      // Add nothing
+      ;
+  }
+
+  return frames;
+}
+
 static jvmtiError ForceGarbageCollection(jvmtiEnv* env) {
   return JVMTI_ERROR_NONE;
 }

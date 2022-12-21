@@ -61,6 +61,7 @@ RUN git clone --depth=1 -b curl-7_69_1 https://github.com/curl/curl.git /tmp/cur
     ./buildconf && \
     ./configure --disable-ldap --disable-shared --without-libssh2 \
                 --without-librtmp --without-libidn --enable-static \
+                --without-libidn2 \
                 --with-pic --with-ssl=/usr/local/ssl/ && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/curl
@@ -86,13 +87,15 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
 # which causes link errors later when the agent is linked with the static
 # OpenSSL library itself.
+# Limit the number of threads used by make, as unlimited threads causes
+# memory exhausted error on the Kokoro VM.
 RUN git clone --depth=1 --recursive -b v1.28.1 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc && \
     cd third_party/protobuf && \
     ./autogen.sh && \
     ./configure --with-pic CXXFLAGS="$(pkg-config --cflags protobuf)" LIBS="$(pkg-config --libs protobuf)" LDFLAGS="-Wl,--no-as-needed" && \
-    make -j && make install && ldconfig && \
+    make -j4 && make install && ldconfig && \
     cd ../.. && \
-    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make -j CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
+    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make -j4 CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
     CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
     rm -rf /tmp/grpc

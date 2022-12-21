@@ -231,6 +231,8 @@ void ProfileProtoBuilder::Populate(
   sample_type->set_type(builder_.StringId(profile_type));
   sample_type->set_unit(builder_.StringId("nanoseconds"));
 
+  profile->set_default_sample_type(builder_.StringId(profile_type));
+
   profile->set_duration_nanos(duration_ns);
 
   for (const auto &trace : traces) {

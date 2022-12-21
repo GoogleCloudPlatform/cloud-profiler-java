@@ -69,17 +69,25 @@ class Accessors {
 
   template <class FunctionType>
   static inline FunctionType GetJvmFunction(const char *function_name) {
-    // get handle to library
-    static void *handle = dlopen("libjvm.so", RTLD_LAZY);
-    if (handle == NULL) {
-      return NULL;
+    static void *handle = GetJvmLibHandle();
+    if (handle == nullptr) {
+      return nullptr;
     }
 
-    // get address of function, return null if not found
+    // Get address of function, return null if not found
     return bit_cast<FunctionType>(dlsym(handle, function_name));
   }
 
  private:
+  static void *GetJvmLibHandle() {
+    void *handle = dlopen("libjvm.so", RTLD_LAZY);
+    if (handle != nullptr) {
+      return handle;
+    }
+
+    return dlopen(nullptr, RTLD_LAZY);
+  }
+
   // This is subtle and potentially dangerous, read this carefully.
   //
   // In glibc, TLS access is not signal-async-safe, as they can call malloc for

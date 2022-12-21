@@ -14,6 +14,12 @@
 
 #include "src/throttler_api.h"
 
+#include <grpc/grpc_security.h>
+#include <grpc/support/string_util.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/channel_arguments.h>
+
 #include <algorithm>
 #include <chrono>  // NOLINT
 #include <sstream>
@@ -26,12 +32,6 @@
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "google/protobuf/duration.pb.h"  // NOLINT
 #include "google/rpc/error_details.pb.h"  // NOLINT
-#include "grpc/grpc_security.h"
-#include "grpc/support/log.h"
-#include "grpc/support/string_util.h"
-#include "grpcpp/create_channel.h"
-#include "grpcpp/security/credentials.h"
-#include "grpcpp/support/channel_arguments.h"
 #include "third_party/javaprofiler/clock.h"
 
 // API curated profiling configuration.
@@ -178,7 +178,7 @@ bool InitializeDeployment(CloudEnv* env, const std::string& labels,
   if (!IsValidServiceName(service)) {
     LOG(ERROR)
         << "Deployment service name '" << service
-        << "' does not match pattern '^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$'";
+        << "' does not match pattern '^[a-z0-9]([-a-z0-9_.]{0,253}[a-z0-9])?$'";
     return false;
   }
   d->set_target(service);
@@ -227,12 +227,12 @@ bool AddProfileLabels(api::Profile* p, const std::string& labels) {
 }  // namespace
 
 // Returns true if the service name matches the regex
-// "^[a-z]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
+// "^[a-z0-9]([-a-z0-9_.]{0,253}[a-z0-9])?$", and false otherwise.
 bool IsValidServiceName(std::string s) {
   if (s.length() < 1 || s.length() > 255) {
     return false;
   }
-  if (s[0] < 'a' || s[0] > 'z') {
+  if ((s[0] < 'a' || s[0] > 'z') && (s[0] < '0' || s[0] > '9')) {
     return false;
   }
   if ((s.back() < 'a' || s.back() > 'z') &&
@@ -341,6 +341,12 @@ std::string APIThrottler::ProfileType() {
       return kTypeWall;
     case api::HEAP:
       return kTypeHeap;
+    // contention and threads are not supported in Java but are needed here
+    // for C++
+    case api::CONTENTION:
+      return kTypeContention;
+    case api::THREADS:
+      return kTypeThreads;
     default:
       const std::string& pt_name = api::ProfileType_Name(pt);
       LOG(ERROR) << "Unsupported profile type " << pt_name;

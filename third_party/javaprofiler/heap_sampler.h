@@ -20,24 +20,111 @@
 #include <jni.h>
 #include <jvmti.h>
 
+#include <atomic>
 #include <condition_variable>  // NOLINT
+#include <functional>
 #include <list>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <vector>
 
-#include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
+
+typedef void (*AllocationInstrumentationFunction)(jlong thread_id,
+                                                  jbyte *name,
+                                                  int name_length,
+                                                  int size,
+                                                  jlong gcontext);
+
+typedef void (*GarbageInstrumentationFunction)(jlong thread_id,
+                                               jbyte *name,
+                                               int name_length,
+                                               int size,
+                                               jlong gcontext);
 
 namespace google {
 namespace javaprofiler {
+
+// A sampled heap object, defined by the object, its size, and the stack
+// frame.
+class HeapObjectTrace {
+ public:
+  // This object owns the jweak object parameter. It is freed when the object
+  // is sent to the garbage list, and the object is set to nullptr.
+  HeapObjectTrace(jweak object, jlong size,
+                  const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
+                  int name_length, jlong thread_id)
+      : object_(object), size_(size), frames_(std::move(frames)),
+        name_(name), name_length_(name_length), thread_id_(thread_id) {}
+
+  HeapObjectTrace(jweak object, jlong size,
+                  const std::vector<JVMPI_CallFrame> &frames)
+      : object_(object), size_(size), frames_(frames) {}
+
+  // Allow moving.
+  HeapObjectTrace(HeapObjectTrace&& o) = default;
+  HeapObjectTrace& operator=(HeapObjectTrace&& o) = default;
+
+  // No copying allowed.
+  HeapObjectTrace(const HeapObjectTrace& o) = delete;
+  HeapObjectTrace& operator=(const HeapObjectTrace& o) = delete;
+
+  std::vector<JVMPI_CallFrame> &Frames() {
+    return frames_;
+  }
+
+  int Size() const {
+    return size_;
+  }
+
+  jbyte *Name() const {
+    return name_;
+  }
+
+  int NameLength() const {
+    return name_length_;
+  }
+
+  jlong ThreadId() const {
+    return thread_id_;
+  }
+
+  void DeleteWeakReference(JNIEnv* env) {
+    env->DeleteWeakGlobalRef(object_);
+    object_ = nullptr;
+  }
+
+  bool IsLive(JNIEnv *env) {
+    // When GC collects the object, the object represented by the weak
+    // reference will be considered as the same object as NULL.
+    return !env->IsSameObject(object_, NULL);
+  }
+
+  // Make copying an explicit operation for the one case we need it (adding
+  // to the peak heapz storage)
+  HeapObjectTrace Copy() {
+    return HeapObjectTrace(object_, size_, frames_);
+  }
+
+ private:
+  jweak object_;
+  int size_;
+  std::vector<JVMPI_CallFrame> frames_;
+  jbyte *name_;
+  int name_length_;
+  jlong thread_id_;
+};
 
 // Storage for the sampled heap objects recorded from the heap sampling JVMTI
 // API callbacks.
 class HeapEventStorage {
  public:
-  HeapEventStorage(jvmtiEnv *jvmti, ProfileFrameCache *cache = nullptr,
-                   int max_garbage_size = 200);
+  typedef std::function<void(const HeapObjectTrace &)> GcCallback;
+
+  HeapEventStorage(jvmtiEnv *jvmti,
+                   ProfileFrameCache *cache = nullptr,
+                   int max_garbage_size = 200,
+                   GcCallback gc_callback = [](const HeapObjectTrace &t){});
 
   // TODO: establish correct shutdown sequence: how do we ensure that
   // things are not going to go awfully wrong at shutdown, is it this class' job
@@ -45,7 +132,8 @@ class HeapEventStorage {
 
   // Adds an object to the storage system.
   void Add(JNIEnv *jni, jthread thread, jobject object, jclass klass,
-           jlong size);
+           jlong size, const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
+           jint name_len, jlong thread_id);
 
   // Returns a perftools::profiles::Profile with the objects stored via
   // calls to the Add method.
@@ -78,66 +166,13 @@ class HeapEventStorage {
   HeapEventStorage& operator=(const HeapEventStorage&) = delete;
 
  private:
-  // A sampled heap object, defined by the object, its size, and the stack
-  // frame.
-  class HeapObjectTrace {
-   public:
-    // This object owns the jweak object parameter. It is freed when the object
-    // is sent to the garbage list, and the object is set to nullptr.
-    HeapObjectTrace(jweak object, jlong size,
-                    const std::vector<JVMPI_CallFrame> &&frames)
-        : object_(object), size_(size), frames_(std::move(frames)) {}
-
-    HeapObjectTrace(jweak object, jlong size,
-                    const std::vector<JVMPI_CallFrame> &frames)
-        : object_(object), size_(size), frames_(frames) {}
-
-    // Allow moving.
-    HeapObjectTrace(HeapObjectTrace&& o) = default;
-    HeapObjectTrace& operator=(HeapObjectTrace&& o) = default;
-
-    // No copying allowed.
-    HeapObjectTrace(const HeapObjectTrace& o) = delete;
-    HeapObjectTrace& operator=(const HeapObjectTrace& o) = delete;
-
-    std::vector<JVMPI_CallFrame> &Frames() {
-      return frames_;
-    }
-
-    int Size() const {
-      return size_;
-    }
-
-    void DeleteWeakReference(JNIEnv* env) {
-      env->DeleteWeakGlobalRef(object_);
-      object_ = nullptr;
-    }
-
-    bool IsLive(JNIEnv *env) {
-      // When GC collects the object, the object represented by the weak
-      // reference will be considered as the same object as NULL.
-      return !env->IsSameObject(object_, NULL);
-    }
-
-    // Make copying an explicit operation for the one case we need it (adding
-    // to the peak heapz storage)
-    HeapObjectTrace Copy() {
-      return HeapObjectTrace(object_, size_, frames_);
-    }
-
-   private:
-    jweak object_;
-    int size_;
-    std::vector<JVMPI_CallFrame> frames_;
-  };
-
   // Helper for creating a google::javaprofiler::ProfileStackTrace array
   // to pass to ProfileProtoBuilder.
   class StackTraceArrayBuilder {
    public:
     StackTraceArrayBuilder(std::size_t objects_size);
 
-    void AddTrace(HeapEventStorage::HeapObjectTrace &object);
+    void AddTrace(HeapObjectTrace &object);
 
     google::javaprofiler::ProfileStackTrace* GetStackTraceData() const {
       return stack_trace_data_.get();
@@ -146,7 +181,8 @@ class HeapEventStorage {
    private:
     int curr_trace_ = 0;
     std::size_t objects_size_;
-    std::unique_ptr<google::javaprofiler::ProfileStackTrace[]> stack_trace_data_;
+    std::unique_ptr<google::javaprofiler::ProfileStackTrace[]>
+        stack_trace_data_;
     std::unique_ptr<JVMPI_CallTrace[]> call_trace_data_;
   };
 
@@ -185,12 +221,14 @@ class HeapEventStorage {
   std::mutex storage_lock_;
   jvmtiEnv *jvmti_;
   ProfileFrameCache *cache_;
+  const GcCallback gc_callback_;
 };
 
 // Due to the JVMTI callback, everything here is static.
 class HeapMonitor {
  public:
-  static bool Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval);
+  static bool Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
+                     bool use_jvm_trace);
   static void Disable();
 
   static bool Enabled() { return jvmti_ != nullptr; }
@@ -210,9 +248,29 @@ class HeapMonitor {
     JNIEnv* env, bool force_gc);
 
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
-                        jclass object_klass, jlong size) {
-    GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size);
-  }
+                        jclass object_klass, jlong size, jbyte *name,
+                        jint name_len, jlong thread_id);
+
+  static void InvokeAllocationInstrumentationFunctions(jlong thread_id,
+                                                       jbyte *name,
+                                                       int name_length,
+                                                       int size,
+                                                       jlong gcontext);
+
+  static void AddAllocationInstrumentation(
+    AllocationInstrumentationFunction fn);
+
+  static bool HasAllocationInstrumentation();
+
+  static void InvokeGarbageInstrumentationFunctions(jlong thread_id,
+                                                    jbyte *name,
+                                                    int name_length,
+                                                    int size,
+                                                    jlong gcontext);
+
+  static void AddGarbageInstrumentation(GarbageInstrumentationFunction fn);
+
+  static bool HasGarbageInstrumentation();
 
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
@@ -220,22 +278,30 @@ class HeapMonitor {
     GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::GC_FINISHED);
   }
 
-  static void ShutdownGCWaitingThread() {
-    GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::SHUTDOWN);
-  }
+  static void ShutdownGCWaitingThread();
 
   // Not copyable or movable.
   HeapMonitor(const HeapMonitor &) = delete;
   HeapMonitor &operator=(const HeapMonitor &) = delete;
 
  private:
-  HeapMonitor() : storage_(jvmti_.load()) {}
+  static const HeapEventStorage::GcCallback gc_callback_;
 
-  // We construct the heap_monitor at the first call to GetInstance, so ensure
-  // Enable was called at least once before to initialize jvmti_.
+  HeapMonitor() : storage_(jvmti_.load(), GetFrameCache(), 200, gc_callback_) {
+  }
+
+  static std::atomic<HeapMonitor *> heap_monitor_;
+
+  // We initialize heap_monitor_ in Enable, so ensure Enable is called before
+  // any call to this method.
   static HeapMonitor *GetInstance() {
-    static HeapMonitor heap_monitor;
-    return &heap_monitor;
+    assert(heap_monitor_ != nullptr);
+    return heap_monitor_;
+  }
+
+  ProfileFrameCache *GetFrameCache() {
+    ProfileFrameCache *cache = nullptr;
+    return cache;
   }
 
   static bool Supported(jvmtiEnv* jvmti);
@@ -251,16 +317,21 @@ class HeapMonitor {
   void GCWaitingThreadRun(JNIEnv* jni_env);
   GcEvent WaitForGC();
   void NotifyGCWaitingThreadInternal(GcEvent event);
+  void WaitForShutdown();
 
   void CompactData(JNIEnv* jni_env);
 
+  static std::vector<AllocationInstrumentationFunction> alloc_inst_functions_;
+  static std::vector<GarbageInstrumentationFunction> gc_inst_functions_;
   static std::unique_ptr<perftools::profiles::Profile> EmptyHeapProfile(
       JNIEnv *jni_env);
 
   static std::atomic<jvmtiEnv *> jvmti_;
   static std::atomic<int> sampling_interval_;
+  static std::atomic<bool> use_jvm_trace_;
 
   std::list<GcEvent> gc_notify_events_;
+  bool gc_thread_shutdown = false;
   std::condition_variable gc_waiting_cv_;
   std::mutex gc_waiting_mutex_;
   HeapEventStorage storage_;

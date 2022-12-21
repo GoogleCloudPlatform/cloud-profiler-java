@@ -76,6 +76,8 @@ class JvmProfileTestLib {
   static std::atomic<int> method_name_call_count;
 };
 
+std::vector<JVMPI_CallFrame> CreateStackTrace(int i);
+
 }  // namespace javaprofiler
 }  // namespace google
 

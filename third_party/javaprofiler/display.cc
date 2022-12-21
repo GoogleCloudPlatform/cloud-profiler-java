@@ -174,6 +174,10 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
   if (entry_count == 1) {
     return table_ptr[0].line_number;
   }
+  if (location == 0) {
+    // Return method first line.
+    return table_ptr[0].line_number;
+  }
 
   jlocation last_location = table_ptr[0].start_location;
   for (int l = 1; l < entry_count; l++) {
