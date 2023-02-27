@@ -321,7 +321,6 @@ bool HeapMonitor::CreateGCWaitingThread(jvmtiEnv* jvmti, JNIEnv* jni) {
 }
 
 bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
-#ifdef ENABLE_HEAP_SAMPLING
   jvmtiCapabilities caps;
   memset(&caps, 0, sizeof(caps));
   if (jvmti->GetPotentialCapabilities(&caps) != JVMTI_ERROR_NONE) {
@@ -347,9 +346,6 @@ bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
     return false;
   }
   return true;
-#else
-  return false;
-#endif
 }
 
 void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
@@ -421,16 +417,13 @@ void HeapMonitor::WaitForShutdown() {
 }
 
 void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
-#ifdef ENABLE_HEAP_SAMPLING
   callbacks->SampledObjectAlloc = &SampledObjectAlloc;
   callbacks->GarbageCollectionFinish = &GarbageCollectionFinish;
-#endif
 }
 
 // Currently, we enable once and forget about it.
 bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
                          bool use_jvm_trace) {
-#ifdef ENABLE_HEAP_SAMPLING
   if (!Supported(jvmti)) {
     LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
                  << " heap sampling monitor";
@@ -495,13 +488,9 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
   }
 
   return true;
-#else
-  return false;
-#endif
 }
 
 void HeapMonitor::Disable() {
-#ifdef ENABLE_HEAP_SAMPLING
   jvmtiEnv *jvmti = jvmti_.load();
   if (!jvmti) {
     return;
@@ -516,47 +505,37 @@ void HeapMonitor::Disable() {
 
   // Notify the agent thread that we are done.
   google::javaprofiler::HeapMonitor::GetInstance()->ShutdownGCWaitingThread();
-
-#else
-  // Do nothing: we never enabled ourselves.
-#endif
 }
 
 std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetHeapProfiles(
     JNIEnv* env, bool force_gc) {
-#ifdef ENABLE_HEAP_SAMPLING
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
   if (jvmti_) {
     return GetInstance()->storage_.GetHeapProfiles(env, sampling_interval_,
                                                    force_gc);
   }
-#endif
   return EmptyHeapProfile(env);
 }
 
 std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetPeakHeapProfiles(
     JNIEnv* env, bool force_gc) {
-#ifdef ENABLE_HEAP_SAMPLING
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
   if (jvmti_) {
     return GetInstance()->storage_.GetPeakHeapProfiles(env, sampling_interval_);
   }
-#endif
   return EmptyHeapProfile(env);
 }
 
 std::unique_ptr<perftools::profiles::Profile>
 HeapMonitor::GetGarbageHeapProfiles(JNIEnv* env, bool force_gc) {
-#ifdef ENABLE_HEAP_SAMPLING
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
   if (jvmti_) {
     return GetInstance()->storage_.GetGarbageHeapProfiles(
         env, sampling_interval_, force_gc);
   }
-#endif
   return EmptyHeapProfile(env);
 }
 
