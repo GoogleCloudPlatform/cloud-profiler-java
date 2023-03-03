@@ -21,7 +21,7 @@ import "google/cloud/run/v2/k8s.min.proto";
 import "google/cloud/run/v2/vendor_settings.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/run/v2;run";
+option go_package = "cloud.google.com/go/run/apiv2/runpb;runpb";
 option java_multiple_files = true;
 option java_outer_classname = "TaskTemplateProto";
 option java_package = "com.google.cloud.run.v2";
@@ -59,8 +59,8 @@ message TaskTemplate {
   // this container image. For more information, go to
   // https://cloud.google.com/run/docs/securing/using-cmek
   string encryption_key = 7 [(google.api.resource_reference) = {
-                               type: "cloudkms.googleapis.com/CryptoKey"
-                             }];
+    type: "cloudkms.googleapis.com/CryptoKey"
+  }];
 
   // VPC Access configuration to use for this Task. For more information,
   // visit https://cloud.google.com/run/docs/configuring/connecting-vpc.

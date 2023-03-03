@@ -119,7 +119,7 @@ load(
 go_proto_library(
     name = "vision_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/vision/v1p4beta1",
+    importpath = "cloud.google.com/go/vision/apiv1p4beta1/visionpb",
     protos = [":vision_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -135,6 +135,7 @@ go_gapic_library(
     srcs = [":vision_proto_with_info"],
     grpc_service_config = "vision_grpc_service_config.json",
     importpath = "cloud.google.com/go/vision/apiv1p4beta1;vision",
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "vision_v1p4beta1.yaml",
     transport = "grpc+rest",
@@ -178,7 +179,8 @@ py_gapic_library(
     srcs = [":vision_proto"],
     grpc_service_config = "vision_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "vision_v1p4beta1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -311,6 +313,8 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "Cloud Vision API allows developers to easily integrate vision detection features within applications, including image labeling, face and landmark detection, optical character recognition (OCR), and tagging of explicit content.",
     ruby_cloud_title = "Cloud Vision V1p4beta1",
+    service_yaml = "vision_v1p4beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":vision_ruby_grpc",
         ":vision_ruby_proto",
@@ -355,6 +359,8 @@ csharp_gapic_library(
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "vision_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "vision_v1p4beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":vision_csharp_grpc",
         ":vision_csharp_proto",

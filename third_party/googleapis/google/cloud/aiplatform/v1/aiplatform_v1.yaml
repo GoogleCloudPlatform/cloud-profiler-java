@@ -32,6 +32,8 @@ types:
 - name: google.cloud.aiplatform.v1.BatchReadFeatureValuesResponse
 - name: google.cloud.aiplatform.v1.CheckTrialEarlyStoppingStateMetatdata
 - name: google.cloud.aiplatform.v1.CheckTrialEarlyStoppingStateResponse
+- name: google.cloud.aiplatform.v1.CopyModelOperationMetadata
+- name: google.cloud.aiplatform.v1.CopyModelResponse
 - name: google.cloud.aiplatform.v1.CreateDatasetOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateEndpointOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateEntityTypeOperationMetadata
@@ -42,6 +44,8 @@ types:
 - name: google.cloud.aiplatform.v1.CreateMetadataStoreOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateSpecialistPoolOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateTensorboardOperationMetadata
+- name: google.cloud.aiplatform.v1.DeleteFeatureValuesOperationMetadata
+- name: google.cloud.aiplatform.v1.DeleteFeatureValuesResponse
 - name: google.cloud.aiplatform.v1.DeleteMetadataStoreOperationMetadata
 - name: google.cloud.aiplatform.v1.DeleteOperationMetadata
 - name: google.cloud.aiplatform.v1.DeployIndexOperationMetadata
@@ -181,18 +185,26 @@ http:
     additional_bindings:
     - get: '/v1/{name=projects/*}/locations'
   - selector: google.iam.v1.IAMPolicy.GetIamPolicy
-    post: '/ui/{resource=projects/*/locations/*/featurestores/*}:getIamPolicy'
+    post: '/v1/{resource=projects/*/locations/*/featurestores/*}:getIamPolicy'
     additional_bindings:
+    - post: '/v1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
+    - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
   - selector: google.iam.v1.IAMPolicy.SetIamPolicy
-    post: '/ui/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
+    post: '/v1/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
     body: '*'
     additional_bindings:
+    - post: '/v1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:setIamPolicy'
+      body: '*'
+    - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
+      body: '*'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:setIamPolicy'
       body: '*'
   - selector: google.iam.v1.IAMPolicy.TestIamPermissions
-    post: '/ui/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
+    post: '/v1/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
     additional_bindings:
+    - post: '/v1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
+    - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
   - selector: google.longrunning.Operations.CancelOperation
     post: '/ui/{name=projects/*/locations/*/operations/*}:cancel'
@@ -221,6 +233,7 @@ http:
     - post: '/ui/{name=projects/*/locations/*/studies/*/trials/*/operations/*}:cancel'
     - post: '/ui/{name=projects/*/locations/*/trainingPipelines/*/operations/*}:cancel'
     - post: '/ui/{name=projects/*/locations/*/pipelineJobs/*/operations/*}:cancel'
+    - post: '/ui/{name=projects/*/locations/*/schedules/*/operations/*}:cancel'
     - post: '/ui/{name=projects/*/locations/*/specialistPools/*/operations/*}:cancel'
     - post: '/ui/{name=projects/*/locations/*/tensorboards/*/operations/*}:cancel'
     - post: '/ui/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}:cancel'
@@ -282,6 +295,7 @@ http:
     - delete: '/ui/{name=projects/*/locations/*/studies/*/trials/*/operations/*}'
     - delete: '/ui/{name=projects/*/locations/*/trainingPipelines/*/operations/*}'
     - delete: '/ui/{name=projects/*/locations/*/pipelineJobs/*/operations/*}'
+    - delete: '/ui/{name=projects/*/locations/*/schedules/*/operations/*}'
     - delete: '/ui/{name=projects/*/locations/*/specialistPools/*/operations/*}'
     - delete: '/ui/{name=projects/*/locations/*/tensorboards/*/operations/*}'
     - delete: '/ui/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}'
@@ -344,6 +358,7 @@ http:
     - get: '/ui/{name=projects/*/locations/*/studies/*/trials/*/operations/*}'
     - get: '/ui/{name=projects/*/locations/*/trainingPipelines/*/operations/*}'
     - get: '/ui/{name=projects/*/locations/*/pipelineJobs/*/operations/*}'
+    - get: '/ui/{name=projects/*/locations/*/schedules/*/operations/*}'
     - get: '/ui/{name=projects/*/locations/*/specialistPools/*/operations/*}'
     - get: '/ui/{name=projects/*/locations/*/tensorboards/*/operations/*}'
     - get: '/ui/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}'
@@ -405,6 +420,7 @@ http:
     - get: '/ui/{name=projects/*/locations/*/studies/*/trials/*}/operations'
     - get: '/ui/{name=projects/*/locations/*/trainingPipelines/*}/operations'
     - get: '/ui/{name=projects/*/locations/*/pipelineJobs/*}/operations'
+    - get: '/ui/{name=projects/*/locations/*/schedules/*}/operations'
     - get: '/ui/{name=projects/*/locations/*/specialistPools/*}/operations'
     - get: '/ui/{name=projects/*/locations/*/tensorboards/*}/operations'
     - get: '/ui/{name=projects/*/locations/*/tensorboards/*/experiments/*}/operations'
@@ -466,6 +482,7 @@ http:
     - post: '/ui/{name=projects/*/locations/*/studies/*/trials/*/operations/*}:wait'
     - post: '/ui/{name=projects/*/locations/*/trainingPipelines/*/operations/*}:wait'
     - post: '/ui/{name=projects/*/locations/*/pipelineJobs/*/operations/*}:wait'
+    - post: '/ui/{name=projects/*/locations/*/schedules/*/operations/*}:wait'
     - post: '/ui/{name=projects/*/locations/*/specialistPools/*/operations/*}:wait'
     - post: '/ui/{name=projects/*/locations/*/tensorboards/*/operations/*}:wait'
     - post: '/ui/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}:wait'
@@ -531,6 +548,11 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.aiplatform.v1.JobService.GetNasJob
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform,
+        https://www.googleapis.com/auth/cloud-platform.read-only
   - selector: 'google.cloud.aiplatform.v1.MetadataService.*'
     oauth:
       canonical_scopes: |-

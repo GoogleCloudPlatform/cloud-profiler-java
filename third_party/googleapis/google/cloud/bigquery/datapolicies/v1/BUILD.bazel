@@ -97,6 +97,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-bigquery-datapolicies-v1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":datapolicies_java_gapic",
@@ -104,7 +105,6 @@ java_gapic_assembly_gradle_pkg(
         ":datapolicies_java_proto",
         ":datapolicies_proto",
     ],
-    include_samples = True,
 )
 
 ##############################################################################
@@ -121,7 +121,7 @@ load(
 go_proto_library(
     name = "datapolicies_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/datapolicies/v1",
+    importpath = "cloud.google.com/go/bigquery/datapolicies/apiv1/datapoliciespb",
     protos = [":datapolicies_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -135,6 +135,7 @@ go_gapic_library(
     grpc_service_config = "datapolicies_v1_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/datapolicies/apiv1;datapolicies",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "bigquerydatapolicy_v1.yaml",
     transport = "grpc+rest",
@@ -156,8 +157,8 @@ go_gapic_assembly_pkg(
     name = "gapi-cloud-bigquery-datapolicies-v1-go",
     deps = [
         ":datapolicies_go_gapic",
-        ":datapolicies_go_gapic_srcjar-test.srcjar",
         ":datapolicies_go_gapic_srcjar-metadata.srcjar",
+        ":datapolicies_go_gapic_srcjar-test.srcjar",
         ":datapolicies_go_proto",
     ],
 )
@@ -282,8 +283,8 @@ nodejs_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_gapic_assembly_pkg",
     "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -303,10 +304,15 @@ ruby_cloud_gapic_library(
     name = "datapolicies_ruby_gapic",
     srcs = [":datapolicies_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-bigquery-datapolicies-v1",
+        "ruby-cloud-api-id=bigquerydatapolicy.googleapis.com",
+        "ruby-cloud-api-shortname=bigquerydatapolicy",
+        "ruby-cloud-gem-name=google-cloud-bigquery-data_policies-v1",
+        "ruby-cloud-product-url=https://cloud.google.com/bigquery/docs",
     ],
     grpc_service_config = "datapolicies_v1_grpc_service_config.json",
     rest_numeric_enums = True,
+    ruby_cloud_description = "The Data Policy Service provides APIs for managing the BigQuery label-policy bindings.",
+    ruby_cloud_title = "BigQuery Data Policy Service V1",
     service_yaml = "bigquerydatapolicy_v1.yaml",
     deps = [
         ":datapolicies_ruby_grpc",
@@ -353,6 +359,7 @@ csharp_gapic_library(
     grpc_service_config = "datapolicies_v1_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "bigquerydatapolicy_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":datapolicies_csharp_grpc",
         ":datapolicies_csharp_proto",

@@ -32,6 +32,7 @@ proto_library(
         "//google/type:dayofweek_proto",
         "//google/type:timeofday_proto",
         "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -124,7 +125,7 @@ load(
 go_proto_library(
     name = "memcache_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/memcache/v1beta2",
+    importpath = "cloud.google.com/go/memcache/apiv1beta2/memcachepb",
     protos = [":memcache_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -140,6 +141,7 @@ go_gapic_library(
     grpc_service_config = "memcache_grpc_service_config.json",
     importpath = "cloud.google.com/go/memcache/apiv1beta2;memcache",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "memcache_v1beta2.yaml",
     transport = "grpc+rest",
@@ -187,7 +189,7 @@ py_gapic_library(
     grpc_service_config = "memcache_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "memcache_v1beta2.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
     ],
 )
@@ -367,6 +369,7 @@ csharp_gapic_library(
     grpc_service_config = "memcache_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "memcache_v1beta2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":memcache_csharp_grpc",
         ":memcache_csharp_proto",

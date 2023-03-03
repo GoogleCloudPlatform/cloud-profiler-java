@@ -90,7 +90,6 @@ java_gapic_library(
 java_gapic_test(
     name = "roads_java_gapic_test_suite",
     test_classes = [
-        "com.google.maps.roads.v1op.RoadsServiceClientHttpJsonTest",
         "com.google.maps.roads.v1op.RoadsServiceClientTest",
     ],
     runtime_deps = ["roads_java_gapic_test"],
@@ -161,6 +160,7 @@ py_gapic_library(
     srcs = [":roads_proto"],
     grpc_service_config = "roads_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "roads_v1op.yaml",
     transport = "grpc",
 )
 
@@ -255,6 +255,7 @@ ruby_cloud_gapic_library(
     srcs = [":roads_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-roads-v1op"],
     rest_numeric_enums = True,
+    service_yaml = "roads_v1op.yaml",
     deps = [
         ":roads_ruby_grpc",
         ":roads_ruby_proto",
@@ -288,6 +289,8 @@ csharp_gapic_library(
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "roads_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "roads_v1op.yaml",
+    transport = "grpc",
     deps = [
         ":roads_csharp_grpc",
         ":roads_csharp_proto",

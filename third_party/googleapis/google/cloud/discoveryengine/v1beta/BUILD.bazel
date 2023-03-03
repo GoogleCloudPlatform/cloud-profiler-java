@@ -133,7 +133,7 @@ load(
 go_proto_library(
     name = "discoveryengine_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/discoveryengine/v1beta",
+    importpath = "cloud.google.com/go/discoveryengine/apiv1beta/discoveryenginepb",
     protos = [":discoveryengine_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -150,6 +150,7 @@ go_gapic_library(
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     importpath = "cloud.google.com/go/discoveryengine/apiv1beta;discoveryengine",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
     transport = "grpc+rest",
@@ -370,6 +371,7 @@ csharp_gapic_library(
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":discoveryengine_csharp_grpc",
         ":discoveryengine_csharp_proto",

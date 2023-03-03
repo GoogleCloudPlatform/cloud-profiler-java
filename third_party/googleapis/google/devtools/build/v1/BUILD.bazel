@@ -169,6 +169,7 @@ py_gapic_library(
     srcs = [":build_proto"],
     grpc_service_config = "buildeventservice_grpc_service_config.json",
     rest_numeric_enums = False,
+    service_yaml = "buildeventservice_v1.yaml",
     transport = "grpc",
 )
 
@@ -206,6 +207,7 @@ php_gapic_library(
     srcs = [":build_proto_with_info"],
     grpc_service_config = "buildeventservice_grpc_service_config.json",
     rest_numeric_enums = False,
+    service_yaml = "buildeventservice_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":build_php_grpc",
@@ -259,6 +261,7 @@ ruby_cloud_gapic_library(
     srcs = [":build_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-build-v1"],
     rest_numeric_enums = False,
+    service_yaml = "buildeventservice_v1.yaml",
     deps = [
         ":build_ruby_grpc",
         ":build_ruby_proto",

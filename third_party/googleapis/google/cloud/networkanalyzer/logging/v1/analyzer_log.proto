@@ -19,7 +19,7 @@ package google.cloud.networkanalyzer.logging.v1;
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.NetworkAnalyzer.Logging.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/networkanalyzer/logging/v1;logging";
+option go_package = "cloud.google.com/go/networkanalyzer/logging/apiv1/loggingpb;loggingpb";
 option java_multiple_files = true;
 option java_outer_classname = "AnalyzerLogProto";
 option java_package = "com.google.cloud.networkanalyzer.logging.v1";
@@ -43,6 +43,9 @@ enum ReportCauseCode {
   ROUTE_INVALID_NEXT_HOP_ILB_BACKEND_IP_FORWARDING_DISABLED = 6;
 
   IP_UTILIZATION_IP_ALLOCATION_RATIO_HIGH = 20;
+
+  // Summary of ip utilization of all subnet ranges in the project.
+  IP_UTILIZATION_IP_ALLOCATION_SUMMARY = 21;
 
   // Kubernetes Engine
   GKE_NODE_TO_CONTROL_PLANE_BLOCKED_BY_ROUTING_ISSUE = 201;
@@ -84,17 +87,21 @@ enum ReportCauseCode {
   DYNAMIC_ROUTE_SHADOWED_PARTIALLY_SHADOWED_BY_PEERING_STATIC_ROUTE = 808;
 
   // Network Services
-  LOAD_BALANCER_HEALTH_CHECK_FIREWALL_HEALTH_CHECK_FIREWALL_NOT_CONFIGURED = 1001;
+  LOAD_BALANCER_HEALTH_CHECK_FIREWALL_HEALTH_CHECK_FIREWALL_NOT_CONFIGURED =
+      1001;
 
   LOAD_BALANCER_HEALTH_CHECK_FIREWALL_HEALTH_CHECK_RANGE_BLOCKED = 1002;
 
   LOAD_BALANCER_HEALTH_CHECK_FIREWALL_FIREWALL_CONFIG_INCONSISTENT = 1003;
 
-  LOAD_BALANCER_HEALTH_CHECK_FIREWALL_HEALTH_CHECK_RANGE_PARTIALLY_BLOCKED = 1004;
+  LOAD_BALANCER_HEALTH_CHECK_FIREWALL_HEALTH_CHECK_RANGE_PARTIALLY_BLOCKED =
+      1004;
 
-  LOAD_BALANCER_BEST_PRACTICES_BACKEND_SERVICE_BALANCING_MODE_BREAKS_SESSION_AFFINITY = 1021;
+  LOAD_BALANCER_BEST_PRACTICES_BACKEND_SERVICE_BALANCING_MODE_BREAKS_SESSION_AFFINITY =
+      1021;
 
-  LOAD_BALANCER_BEST_PRACTICES_BACKEND_SERVICE_HEALTH_CHECK_PORT_MISMATCH = 1024;
+  LOAD_BALANCER_BEST_PRACTICES_BACKEND_SERVICE_HEALTH_CHECK_PORT_MISMATCH =
+      1024;
 }
 
 message IpUtilizationInfo {

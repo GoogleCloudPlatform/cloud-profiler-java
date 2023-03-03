@@ -17,7 +17,7 @@ syntax = "proto3";
 package google.cloud.aiplatform.v1;
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "AcceleratorTypeProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -25,6 +25,7 @@ option php_namespace = "Google\\Cloud\\AIPlatform\\V1";
 option ruby_package = "Google::Cloud::AIPlatform::V1";
 
 // Represents a hardware accelerator type.
+// NEXT ID: 11.
 enum AcceleratorType {
   // Unspecified accelerator type, which means no accelerator.
   ACCELERATOR_TYPE_UNSPECIFIED = 0;
@@ -52,4 +53,7 @@ enum AcceleratorType {
 
   // TPU v3.
   TPU_V3 = 7;
+
+  // TPU v4.
+  TPU_V4_POD = 10;
 }

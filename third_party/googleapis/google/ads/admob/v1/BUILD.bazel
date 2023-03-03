@@ -182,6 +182,7 @@ py_gapic_library(
         ":admob_proto_with_info",
     ],
     rest_numeric_enums = True,
+    service_yaml = "//google/ads/admob:admob_v1.yaml",
     transport = "rest",
 )
 
@@ -308,6 +309,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-admob-v1"],
     grpc_service_config = None,
     rest_numeric_enums = True,
+    service_yaml = "//google/ads/admob:admob_v1.yaml",
     deps = [
         ":admob_ruby_grpc",
         ":admob_ruby_proto",
@@ -351,6 +353,8 @@ csharp_gapic_library(
     srcs = [":admob_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     rest_numeric_enums = True,
+    service_yaml = "//google/ads/admob:admob_v1.yaml",
+    transport = "rest",
     deps = [
         ":admob_csharp_grpc",
         ":admob_csharp_proto",

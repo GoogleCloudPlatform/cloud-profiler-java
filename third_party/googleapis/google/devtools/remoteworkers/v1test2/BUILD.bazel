@@ -169,6 +169,7 @@ py_gapic_library(
     srcs = [":remoteworkers_proto"],
     grpc_service_config = "remoteworkers_grpc_service_config.json",
     rest_numeric_enums = False,
+    service_yaml = "remoteworkers_v1beta2.yaml",
     transport = "grpc",
 )
 
@@ -206,6 +207,7 @@ php_gapic_library(
     srcs = [":remoteworkers_proto_with_info"],
     grpc_service_config = "remoteworkers_grpc_service_config.json",
     rest_numeric_enums = False,
+    service_yaml = "remoteworkers_v1beta2.yaml",
     transport = "grpc+rest",
     deps = [
         ":remoteworkers_php_grpc",
@@ -259,6 +261,7 @@ ruby_cloud_gapic_library(
     srcs = [":remoteworkers_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-remoteworkers-v1test2"],
     rest_numeric_enums = False,
+    service_yaml = "remoteworkers_v1beta2.yaml",
     deps = [
         ":remoteworkers_ruby_grpc",
         ":remoteworkers_ruby_proto",

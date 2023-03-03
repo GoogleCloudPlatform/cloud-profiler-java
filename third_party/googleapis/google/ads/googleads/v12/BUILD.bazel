@@ -150,6 +150,7 @@ csharp_gapic_library(
         ":googleads_proto_with_info",
     ],
     grpc_service_config = "googleads_grpc_service_config.json",
+    service_yaml = "googleads_v12.yaml",
     deps = [
         "//google/ads/googleads/v12/services:services_csharp_grpc",
     ],
@@ -186,6 +187,7 @@ ruby_ads_gapic_library(
         ":overrides.:namespace.Googleads=GoogleAds",
     ],
     grpc_service_config = "googleads_grpc_service_config.json",
+    service_yaml = "googleads_v12.yaml",
 )
 
 ruby_gapic_assembly_pkg(
@@ -221,6 +223,7 @@ py_gapic_library(
         "python-gapic-templates=ads-templates",
         "warehouse-package-name=google-ads",
     ],
+    service_yaml = "googleads_v12.yaml",
 )
 
 py_gapic_assembly_pkg(

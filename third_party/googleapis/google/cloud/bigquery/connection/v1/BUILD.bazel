@@ -111,7 +111,7 @@ load(
 go_proto_library(
     name = "connection_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/connection/v1",
+    importpath = "cloud.google.com/go/bigquery/connection/apiv1/connectionpb",
     protos = [":connection_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -124,6 +124,8 @@ go_gapic_library(
     srcs = [":connection_proto_with_info"],
     grpc_service_config = "bigqueryconnection_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/connection/apiv1;connection",
+    metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "bigqueryconnection_v1.yaml",
     transport = "grpc+rest",
@@ -169,7 +171,8 @@ py_gapic_library(
         "python-gapic-name=bigquery_connection",
     ],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "bigqueryconnection_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -220,6 +223,7 @@ php_gapic_library(
     srcs = [":connection_proto_with_info"],
     grpc_service_config = "bigqueryconnection_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "bigqueryconnection_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":connection_php_grpc",
@@ -304,6 +308,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "The BigQuery Connection API allows users to manage BigQuery connections to external data sources.",
     ruby_cloud_title = "BigQuery Connection V1",
+    service_yaml = "bigqueryconnection_v1.yaml",
     deps = [
         ":connection_ruby_grpc",
         ":connection_ruby_proto",
@@ -349,6 +354,7 @@ csharp_gapic_library(
     grpc_service_config = "bigqueryconnection_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "bigqueryconnection_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":connection_csharp_grpc",
         ":connection_csharp_proto",

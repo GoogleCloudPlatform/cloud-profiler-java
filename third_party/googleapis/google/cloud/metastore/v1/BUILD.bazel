@@ -31,6 +31,7 @@ proto_library(
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
         "//google/type:dayofweek_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
         "@com_google_protobuf//:wrappers_proto",
@@ -119,7 +120,7 @@ load(
 go_proto_library(
     name = "metastore_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/metastore/v1",
+    importpath = "cloud.google.com/go/metastore/apiv1/metastorepb",
     protos = [":metastore_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -134,6 +135,7 @@ go_gapic_library(
     grpc_service_config = "metastore_grpc_service_config.json",
     importpath = "cloud.google.com/go/metastore/apiv1;metastore",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "metastore_v1.yaml",
     transport = "grpc+rest",
@@ -183,7 +185,9 @@ py_gapic_library(
         "warehouse-package-name=google-cloud-dataproc-metastore",
     ],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "metastore_v1.yaml",
+    transport = "grpc+rest",
+    deps = ["//google/iam/v1:iam_policy_py_proto"],
 )
 
 py_test(
@@ -315,6 +319,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "Dataproc Metastore is a fully managed, highly available within a region, autohealing serverless Apache Hive metastore (HMS) on Google Cloud for data analytics products. It supports HMS and serves as a critical component for managing the metadata of relational entities and provides interoperability between data processing applications in the open source data ecosystem.",
     ruby_cloud_title = "Dataproc Metastore V1",
+    service_yaml = "metastore_v1.yaml",
     deps = [
         ":metastore_ruby_grpc",
         ":metastore_ruby_proto",
@@ -360,6 +365,7 @@ csharp_gapic_library(
     grpc_service_config = "metastore_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "metastore_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":metastore_csharp_grpc",
         ":metastore_csharp_proto",

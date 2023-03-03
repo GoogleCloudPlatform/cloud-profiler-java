@@ -61,6 +61,7 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/longrunning:operations_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -175,7 +176,8 @@ py_gapic_library(
     grpc_service_config = "datastore_admin_grpc_service_config.json",
     opt_args = ["python-gapic-namespace=google.cloud, python-gapic-name=datastore-admin"],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "datastore_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -271,12 +273,12 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/datastore",
         "ruby-cloud-api-id=datastore.googleapis.com",
         "ruby-cloud-api-shortname=datastore",
-        "ruby-cloud-wrapper-gem-override=google-cloud-datastore",
     ],
     grpc_service_config = "datastore_admin_grpc_service_config.json",
     rest_numeric_enums = True,
     ruby_cloud_description = "Firestore in Datastore mode is a NoSQL document database built for automatic scaling, high performance, and ease of application development.",
     ruby_cloud_title = "Firestore in Datastore mode Admin V1",
+    service_yaml = "datastore_v1.yaml",
     deps = [
         ":admin_ruby_grpc",
         ":admin_ruby_proto",
@@ -311,6 +313,7 @@ csharp_gapic_library(
     grpc_service_config = "datastore_admin_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "datastore_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_csharp_grpc",
         ":admin_csharp_proto",

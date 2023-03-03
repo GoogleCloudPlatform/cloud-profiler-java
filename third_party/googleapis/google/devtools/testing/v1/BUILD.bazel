@@ -179,7 +179,8 @@ py_gapic_library(
     srcs = [":testing_proto"],
     grpc_service_config = "testing_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "testing_v1.yaml",
+    transport = "grpc+rest",
 )
 
 # Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
@@ -275,6 +276,7 @@ ruby_cloud_gapic_library(
     ],
     grpc_service_config = "testing_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "testing_v1.yaml",
     deps = [
         ":testing_ruby_grpc",
         ":testing_ruby_proto",
@@ -322,6 +324,7 @@ ruby_gapic_assembly_pkg(
 #     srcs = [":testing_proto_with_info"],
 #     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
 #     grpc_service_config = "testing_grpc_service_config.json",
+#     service_yaml = "testing_v1.yaml",
 #     deps = [
 #         ":testing_csharp_grpc",
 #         ":testing_csharp_proto",

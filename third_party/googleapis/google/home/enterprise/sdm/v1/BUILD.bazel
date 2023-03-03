@@ -163,7 +163,8 @@ py_gapic_library(
     srcs = [":sdm_proto"],
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "smartdevicemanagement_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -200,6 +201,7 @@ php_gapic_library(
     srcs = [":sdm_proto_with_info"],
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "smartdevicemanagement_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":sdm_php_grpc",
@@ -254,6 +256,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-sdm-v1"],
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "smartdevicemanagement_v1.yaml",
     deps = [
         ":sdm_ruby_grpc",
         ":sdm_ruby_proto",
@@ -288,6 +291,7 @@ csharp_gapic_library(
     grpc_service_config = "smart_device_management_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "smartdevicemanagement_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":sdm_csharp_grpc",
         ":sdm_csharp_proto",

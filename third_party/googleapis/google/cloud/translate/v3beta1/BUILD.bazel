@@ -124,7 +124,7 @@ load(
 go_proto_library(
     name = "translation_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/translate/v3beta1",
+    importpath = "cloud.google.com/go/translation/apiv3beta1/translationpb",
     protos = [":translation_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -139,6 +139,7 @@ go_gapic_library(
     grpc_service_config = "translate_grpc_service_config.json",
     importpath = "cloud.google.com/go/translate/apiv3beta1;translate",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "translate_v3beta1.yaml",
     transport = "grpc+rest",
@@ -185,7 +186,8 @@ py_gapic_library(
     grpc_service_config = "translate_grpc_service_config.json",
     opt_args = ["python-gapic-name=translate"],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "translate_v3beta1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -309,6 +311,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-translation-v3beta1"],
     grpc_service_config = "translate_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "translate_v3beta1.yaml",
     deps = [
         ":translation_ruby_grpc",
         ":translation_ruby_proto",
@@ -354,6 +357,7 @@ csharp_gapic_library(
     grpc_service_config = "translate_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "translate_v3beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":translation_csharp_grpc",
         ":translation_csharp_proto",

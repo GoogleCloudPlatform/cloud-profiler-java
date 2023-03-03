@@ -53,6 +53,7 @@ proto_library(
         "delivery_api.proto",
         "delivery_vehicles.proto",
         "header.proto",
+        "task_tracking_info.proto",
         "tasks.proto",
     ],
     deps = [
@@ -179,22 +180,22 @@ py_gapic_library(
     srcs = [":delivery_proto"],
     grpc_service_config = "//google/maps/fleetengine/v1:fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "fleetengine.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/geo/type:viewport_py_proto",
     ],
 )
 
-# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1371 is fixed
-#py_test(
-#    name = "delivery_py_gapic_test",
-#    srcs = [
-#        "delivery_py_gapic_pytest.py",
-#        "delivery_py_gapic_test.py",
-#    ],
-#    legacy_create_init = False,
-#    deps = [":delivery_py_gapic"],
-#)
+py_test(
+    name = "delivery_py_gapic_test",
+    srcs = [
+        "delivery_py_gapic_pytest.py",
+        "delivery_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":delivery_py_gapic"],
+)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -279,6 +280,7 @@ ruby_cloud_gapic_library(
     ],
     grpc_service_config = "//google/maps/fleetengine/v1:fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "fleetengine.yaml",
     deps = [
         ":delivery_ruby_grpc",
         ":delivery_ruby_proto",
@@ -312,6 +314,10 @@ csharp_gapic_library(
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "//google/maps/fleetengine/v1:fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
+    # Currently the service YAML file refers to APIs from the "base" fleetengine
+    # API. This needs fixing before we can publish this API for C#.
+    #   service_yaml = "fleetengine.yaml",
+    transport = "grpc+rest",
     deps = [
         ":delivery_csharp_grpc",
         ":delivery_csharp_proto",

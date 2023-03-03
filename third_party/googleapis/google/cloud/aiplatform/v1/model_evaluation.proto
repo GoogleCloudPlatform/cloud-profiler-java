@@ -23,7 +23,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "ModelEvaluationProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -58,8 +58,8 @@ message ModelEvaluation {
   string display_name = 10;
 
   // Points to a YAML file stored on Google Cloud Storage describing the
-  // [metrics][google.cloud.aiplatform.v1.ModelEvaluation.metrics] of this ModelEvaluation. The schema is
-  // defined as an OpenAPI 3.0.2 [Schema
+  // [metrics][google.cloud.aiplatform.v1.ModelEvaluation.metrics] of this
+  // ModelEvaluation. The schema is defined as an OpenAPI 3.0.2 [Schema
   // Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
   string metrics_schema_uri = 2;
 
@@ -68,18 +68,19 @@ message ModelEvaluation {
   google.protobuf.Value metrics = 3;
 
   // Output only. Timestamp when this ModelEvaluation was created.
-  google.protobuf.Timestamp create_time = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 4
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // All possible [dimensions][ModelEvaluationSlice.slice.dimension] of
   // ModelEvaluationSlices. The dimensions can be used as the filter of the
-  // [ModelService.ListModelEvaluationSlices][google.cloud.aiplatform.v1.ModelService.ListModelEvaluationSlices] request, in the form of
-  // `slice.dimension = <dimension>`.
+  // [ModelService.ListModelEvaluationSlices][google.cloud.aiplatform.v1.ModelService.ListModelEvaluationSlices]
+  // request, in the form of `slice.dimension = <dimension>`.
   repeated string slice_dimensions = 5;
 
   // Points to a YAML file stored on Google Cloud Storage describing
   // [EvaluatedDataItemView.data_item_payload][] and
-  // [EvaluatedAnnotation.data_item_payload][]. The schema is defined as an
-  // OpenAPI 3.0.2 [Schema
+  // [EvaluatedAnnotation.data_item_payload][google.cloud.aiplatform.v1.EvaluatedAnnotation.data_item_payload].
+  // The schema is defined as an OpenAPI 3.0.2 [Schema
   // Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
   //
   // This field is not populated if there are neither EvaluatedDataItemViews nor
@@ -89,9 +90,10 @@ message ModelEvaluation {
   // Points to a YAML file stored on Google Cloud Storage describing
   // [EvaluatedDataItemView.predictions][],
   // [EvaluatedDataItemView.ground_truths][],
-  // [EvaluatedAnnotation.predictions][], and
-  // [EvaluatedAnnotation.ground_truths][]. The schema is defined as an
-  // OpenAPI 3.0.2 [Schema
+  // [EvaluatedAnnotation.predictions][google.cloud.aiplatform.v1.EvaluatedAnnotation.predictions],
+  // and
+  // [EvaluatedAnnotation.ground_truths][google.cloud.aiplatform.v1.EvaluatedAnnotation.ground_truths].
+  // The schema is defined as an OpenAPI 3.0.2 [Schema
   // Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
   //
   // This field is not populated if there are neither EvaluatedDataItemViews nor
@@ -104,8 +106,9 @@ message ModelEvaluation {
   //
   ModelExplanation model_explanation = 8;
 
-  // Describes the values of [ExplanationSpec][google.cloud.aiplatform.v1.ExplanationSpec] that are used for explaining
-  // the predicted values on the evaluated data.
+  // Describes the values of
+  // [ExplanationSpec][google.cloud.aiplatform.v1.ExplanationSpec] that are used
+  // for explaining the predicted values on the evaluated data.
   repeated ModelEvaluationExplanationSpec explanation_specs = 9;
 
   // The metadata of the ModelEvaluation.
