@@ -111,7 +111,7 @@ load(
 go_proto_library(
     name = "resourcesettings_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/resourcesettings/v1",
+    importpath = "cloud.google.com/go/resourcesettings/apiv1/resourcesettingspb",
     protos = [":resourcesettings_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -124,6 +124,7 @@ go_gapic_library(
     grpc_service_config = "resourcesettings_grpc_service_config.json",
     importpath = "cloud.google.com/go/resourcesettings/apiv1;resourcesettings",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "resourcesettings_v1.yaml",
     transport = "grpc+rest",
@@ -166,7 +167,8 @@ py_gapic_library(
     grpc_service_config = "resourcesettings_grpc_service_config.json",
     opt_args = ["warehouse-package-name=google-cloud-resource-settings"],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "resourcesettings_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -298,6 +300,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "You can use Resource Settings to centrally configure settings for your Google Cloud projects, folders, and organization. These settings are inherited by their descendants in the resource hierarchy. Each setting is created and managed by Google.",
     ruby_cloud_title = "Resource Settings V1",
+    service_yaml = "resourcesettings_v1.yaml",
     deps = [
         ":resourcesettings_ruby_grpc",
         ":resourcesettings_ruby_proto",
@@ -343,6 +346,7 @@ csharp_gapic_library(
     grpc_service_config = "resourcesettings_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "resourcesettings_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":resourcesettings_csharp_grpc",
         ":resourcesettings_csharp_proto",

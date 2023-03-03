@@ -32,6 +32,7 @@ proto_library(
         "//google/type:dayofweek_proto",
         "//google/type:timeofday_proto",
         "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -121,7 +122,7 @@ load(
 go_proto_library(
     name = "redis_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/redis/v1",
+    importpath = "cloud.google.com/go/redis/apiv1/redispb",
     protos = [":redis_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -137,6 +138,7 @@ go_gapic_library(
     grpc_service_config = "redis_grpc_service_config.json",
     importpath = "cloud.google.com/go/redis/apiv1;redis",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "redis_v1.yaml",
     transport = "grpc+rest",
@@ -182,7 +184,8 @@ py_gapic_library(
     srcs = [":redis_proto"],
     grpc_service_config = "redis_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "redis_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -314,6 +317,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "Creates and manages Redis instances on the Google Cloud Platform.",
     ruby_cloud_title = "Google Cloud Memorystore for Redis V1",
+    service_yaml = "redis_v1.yaml",
     deps = [
         ":redis_ruby_grpc",
         ":redis_ruby_proto",
@@ -359,6 +363,7 @@ csharp_gapic_library(
     grpc_service_config = "redis_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "redis_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":redis_csharp_grpc",
         ":redis_csharp_proto",

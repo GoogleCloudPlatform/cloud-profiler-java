@@ -114,7 +114,7 @@ load(
 go_proto_library(
     name = "language_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/language/v1beta2",
+    importpath = "cloud.google.com/go/language/apiv1beta2/languagepb",
     protos = [":language_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -127,6 +127,7 @@ go_gapic_library(
     grpc_service_config = "language_grpc_service_config.json",
     importpath = "cloud.google.com/go/language/apiv1beta2;language",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "language_v1beta2.yaml",
     transport = "grpc+rest",
@@ -169,7 +170,7 @@ py_gapic_library(
     grpc_service_config = "language_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "language_v1beta2.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
     ],
 )
@@ -304,6 +305,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Provides natural language understanding technologies, such as sentiment analysis, entity recognition, entity sentiment analysis, and other text annotations.",
     ruby_cloud_title = "Natural Language V1beta2",
     service_yaml = "language_v1beta2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":language_ruby_grpc",
         ":language_ruby_proto",
@@ -349,6 +351,7 @@ csharp_gapic_library(
     grpc_service_config = "language_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "language_v1beta2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":language_csharp_grpc",
         ":language_csharp_proto",

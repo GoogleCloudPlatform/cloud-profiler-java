@@ -117,7 +117,7 @@ load(
 go_proto_library(
     name = "transcoder_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/video/transcoder/v1",
+    importpath = "cloud.google.com/go/video/transcoder/apiv1/transcoderpb",
     protos = [":transcoder_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -131,6 +131,7 @@ go_gapic_library(
     grpc_service_config = "transcoder_grpc_service_config.json",
     importpath = "cloud.google.com/go/video/transcoder/apiv1;transcoder",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
     transport = "grpc+rest",
@@ -173,7 +174,8 @@ py_gapic_library(
     srcs = [":transcoder_proto"],
     grpc_service_config = "transcoder_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -305,6 +307,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "The Transcoder API allows you to convert video files and package them for optimized delivery to web, mobile and connected TVs.",
     ruby_cloud_title = "Transcoder V1",
+    service_yaml = "transcoder_v1.yaml",
     deps = [
         ":transcoder_ruby_grpc",
         ":transcoder_ruby_proto",
@@ -350,6 +353,7 @@ csharp_gapic_library(
     grpc_service_config = "transcoder_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":transcoder_csharp_grpc",
         ":transcoder_csharp_proto",

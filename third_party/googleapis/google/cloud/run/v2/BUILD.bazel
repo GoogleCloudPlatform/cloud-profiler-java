@@ -147,7 +147,7 @@ load(
 go_proto_library(
     name = "run_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/run/v2",
+    importpath = "cloud.google.com/go/run/apiv2/runpb",
     protos = [":run_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -165,6 +165,7 @@ go_gapic_library(
     grpc_service_config = "run_grpc_service_config.json",
     importpath = "cloud.google.com/go/run/apiv2;run",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
     transport = "grpc+rest",
@@ -394,6 +395,7 @@ csharp_gapic_library(
     grpc_service_config = "run_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "run_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":run_csharp_grpc",
         ":run_csharp_proto",

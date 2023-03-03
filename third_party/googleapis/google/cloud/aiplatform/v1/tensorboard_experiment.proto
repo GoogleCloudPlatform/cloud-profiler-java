@@ -21,7 +21,7 @@ import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "TensorboardExperimentProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -48,10 +48,12 @@ message TensorboardExperiment {
   string description = 3;
 
   // Output only. Timestamp when this TensorboardExperiment was created.
-  google.protobuf.Timestamp create_time = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 4
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Timestamp when this TensorboardExperiment was last updated.
-  google.protobuf.Timestamp update_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp update_time = 5
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The labels with user-defined metadata to organize your Datasets.
   //
@@ -73,6 +75,7 @@ message TensorboardExperiment {
   // "overwrite" update happens.
   string etag = 7;
 
-  // Immutable. Source of the TensorboardExperiment. Example: a custom training job.
+  // Immutable. Source of the TensorboardExperiment. Example: a custom training
+  // job.
   string source = 8 [(google.api.field_behavior) = IMMUTABLE];
 }

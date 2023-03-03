@@ -28,7 +28,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.Notebooks.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/notebooks/v1;notebooks";
+option go_package = "cloud.google.com/go/notebooks/apiv1/notebookspb;notebookspb";
 option java_multiple_files = true;
 option java_outer_classname = "ManagedNotebooksProto";
 option java_package = "com.google.cloud.notebooks.v1";
@@ -234,7 +234,7 @@ message ListRuntimesResponse {
   string next_page_token = 2;
 
   // Locations that could not be reached. For example,
-  // ['us-west1', 'us-central1'].
+  // `['us-west1', 'us-central1']`.
   // A ListRuntimesResponse will only contain either runtimes or unreachables,
   repeated string unreachable = 3;
 }
@@ -386,12 +386,12 @@ message UpdateRuntimeRequest {
   //
   //
   // Currently, only the following fields can be updated:
-  // - software_config.kernels
-  // - software_config.post_startup_script
-  // - software_config.custom_gpu_driver_path
-  // - software_config.idle_shutdown
-  // - software_config.idle_shutdown_timeout
-  // - software_config.disable_terminal
+  // - `software_config.kernels`
+  // - `software_config.post_startup_script`
+  // - `software_config.custom_gpu_driver_path`
+  // - `software_config.idle_shutdown`
+  // - `software_config.idle_shutdown_timeout`
+  // - `software_config.disable_terminal`
   google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Idempotent request UUID.

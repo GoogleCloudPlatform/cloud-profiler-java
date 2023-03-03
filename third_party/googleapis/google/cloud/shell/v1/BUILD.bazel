@@ -115,7 +115,7 @@ load(
 go_proto_library(
     name = "shell_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/shell/v1",
+    importpath = "cloud.google.com/go/shell/apiv1/shellpb",
     protos = [":shell_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -129,6 +129,7 @@ go_gapic_library(
     grpc_service_config = "cloudshell_grpc_service_config.json",
     importpath = "cloud.google.com/go/shell/apiv1;shell",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "cloudshell_v1.yaml",
     transport = "grpc+rest",
@@ -173,7 +174,8 @@ py_gapic_library(
     srcs = [":shell_proto"],
     grpc_service_config = "cloudshell_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "cloudshell_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -305,6 +307,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "Cloud Shell is an interactive shell environment for Google Cloud that makes it easy for you to learn and experiment with Google Cloud and manage your projects and resources from your web browser.",
     ruby_cloud_title = "Cloud Shell V1",
+    service_yaml = "cloudshell_v1.yaml",
     deps = [
         ":shell_ruby_grpc",
         ":shell_ruby_proto",
@@ -350,6 +353,7 @@ csharp_gapic_library(
     grpc_service_config = "cloudshell_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "cloudshell_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":shell_csharp_grpc",
         ":shell_csharp_proto",

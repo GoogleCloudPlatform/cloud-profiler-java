@@ -108,7 +108,7 @@ load(
 go_proto_library(
     name = "vision_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/vision/v1p1beta1",
+    importpath = "cloud.google.com/go/vision/apiv1p1beta1/visionpb",
     protos = [":vision_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -123,6 +123,7 @@ go_gapic_library(
     srcs = [":vision_proto_with_info"],
     grpc_service_config = "vision_grpc_service_config.json",
     importpath = "cloud.google.com/go/vision/apiv1p1beta1;vision",
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "vision_v1p1beta1.yaml",
     transport = "grpc+rest",
@@ -163,7 +164,8 @@ py_gapic_library(
     srcs = [":vision_proto"],
     grpc_service_config = "vision_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "vision_v1p1beta1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -211,6 +213,7 @@ php_gapic_library(
     gapic_yaml = "vision_gapic.yaml",
     grpc_service_config = "vision_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "vision_v1p1beta1.yaml",
     transport = "grpc+rest",
     deps = [
         ":vision_php_grpc",
@@ -286,6 +289,7 @@ ruby_cloud_gapic_library(
     srcs = [":vision_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-vision-v1p1beta1"],
     rest_numeric_enums = True,
+    service_yaml = "vision_v1p1beta1.yaml",
     deps = [
         ":vision_ruby_grpc",
         ":vision_ruby_proto",
@@ -330,6 +334,8 @@ csharp_gapic_library(
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "vision_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "vision_v1p1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":vision_csharp_grpc",
         ":vision_csharp_proto",

@@ -172,7 +172,8 @@ py_gapic_library(
     srcs = [":firestore_proto"],
     grpc_service_config = "firestore_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "firestore_v1beta1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -208,6 +209,7 @@ php_gapic_library(
     name = "firestore_php_gapic",
     srcs = [":firestore_proto_with_info"],
     rest_numeric_enums = True,
+    service_yaml = "firestore_v1beta1.yaml",
     transport = "grpc+rest",
     deps = [
         ":firestore_php_grpc",
@@ -261,6 +263,7 @@ ruby_cloud_gapic_library(
     srcs = [":firestore_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-firestore-v1beta1"],
     rest_numeric_enums = True,
+    service_yaml = "firestore_v1beta1.yaml",
     deps = [
         ":firestore_ruby_grpc",
         ":firestore_ruby_proto",

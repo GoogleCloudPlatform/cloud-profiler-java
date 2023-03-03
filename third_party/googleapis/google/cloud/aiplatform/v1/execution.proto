@@ -22,7 +22,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "ExecutionProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -87,10 +87,12 @@ message Execution {
   map<string, string> labels = 10;
 
   // Output only. Timestamp when this Execution was created.
-  google.protobuf.Timestamp create_time = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 11
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Timestamp when this Execution was last updated.
-  google.protobuf.Timestamp update_time = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp update_time = 12
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The title of the schema describing the metadata.
   //

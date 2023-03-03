@@ -187,7 +187,7 @@ py_gapic_library(
     ],
     rest_numeric_enums = True,
     service_yaml = "spanner.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -330,6 +330,7 @@ csharp_gapic_library(
     grpc_service_config = "spanner_admin_database_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "spanner.yaml",
+    transport = "grpc+rest",
     deps = [
         ":database_csharp_grpc",
         ":database_csharp_proto",

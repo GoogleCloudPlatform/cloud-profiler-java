@@ -113,7 +113,7 @@ load(
 go_proto_library(
     name = "asset_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/asset/v1p2beta1",
+    importpath = "cloud.google.com/go/asset/apiv1p2beta1/assetpb",
     protos = [":asset_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -127,6 +127,7 @@ go_gapic_library(
     srcs = [":asset_proto_with_info"],
     grpc_service_config = "cloudasset_grpc_service_config.json",
     importpath = "cloud.google.com/go/asset/apiv1p2beta1;asset",
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "cloudasset_v1p2beta1.yaml",
     transport = "grpc+rest",
@@ -173,7 +174,8 @@ py_gapic_library(
     srcs = [":asset_proto"],
     grpc_service_config = "cloudasset_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "cloudasset_v1p2beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -223,6 +225,7 @@ php_gapic_library(
     srcs = [":asset_proto_with_info"],
     grpc_service_config = "cloudasset_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "cloudasset_v1p2beta1.yaml",
     transport = "grpc+rest",
     deps = [
         ":asset_php_grpc",
@@ -297,6 +300,7 @@ ruby_cloud_gapic_library(
     srcs = [":asset_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-asset-v1p2beta1"],
     rest_numeric_enums = True,
+    service_yaml = "cloudasset_v1p2beta1.yaml",
     deps = [
         ":asset_ruby_grpc",
         ":asset_ruby_proto",
@@ -341,6 +345,7 @@ csharp_grpc_library(
 #     srcs = [":asset_proto_with_info"],
 #     grpc_service_config = "cloudasset_grpc_service_config.json",
 #     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+#     service_yaml = "cloudasset_v1p2beta1.yaml",
 #     deps = [
 #         ":asset_csharp_grpc",
 #         ":asset_csharp_proto",

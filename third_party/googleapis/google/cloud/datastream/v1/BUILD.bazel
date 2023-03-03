@@ -31,6 +31,7 @@ proto_library(
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
         "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -126,7 +127,7 @@ load(
 go_proto_library(
     name = "datastream_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/datastream/v1",
+    importpath = "cloud.google.com/go/datastream/apiv1/datastreampb",
     protos = [":datastream_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -140,6 +141,7 @@ go_gapic_library(
     grpc_service_config = "datastream_grpc_service_config.json",
     importpath = "cloud.google.com/go/datastream/apiv1;datastream",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "datastream_v1.yaml",
     transport = "grpc+rest",
@@ -188,7 +190,7 @@ py_gapic_library(
     grpc_service_config = "datastream_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "datastream_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -368,6 +370,7 @@ csharp_gapic_library(
     grpc_service_config = "datastream_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "datastream_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":datastream_csharp_grpc",
         ":datastream_csharp_proto",

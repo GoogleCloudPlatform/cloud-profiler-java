@@ -29,6 +29,7 @@ proto_library(
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -118,7 +119,7 @@ load(
 go_proto_library(
     name = "gkehub_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/gkehub/v1alpha2",
+    importpath = "cloud.google.com/go/gkehub/apiv1alpha2/gkehubpb",
     protos = [":gkehub_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -132,6 +133,7 @@ go_gapic_library(
     grpc_service_config = "membership_grpc_service_config.json",
     importpath = "cloud.google.com/go/gkehub/apiv1alpha2;gkehub",
     metadata = True,
+    release_level = "alpha",
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1alpha2.yaml",
     transport = "grpc+rest",
@@ -177,7 +179,8 @@ py_gapic_library(
     grpc_service_config = "membership_grpc_service_config.json",
     opt_args = ["warehouse-package-name=google-cloud-gke-hub"],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "gkehub_v1alpha2.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -301,6 +304,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-gkehub-v1alpha2"],
     grpc_service_config = "membership_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "gkehub_v1alpha2.yaml",
     deps = [
         ":gkehub_ruby_grpc",
         ":gkehub_ruby_proto",
@@ -346,6 +350,7 @@ csharp_gapic_library(
     grpc_service_config = "membership_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1alpha2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":gkehub_csharp_grpc",
         ":gkehub_csharp_proto",

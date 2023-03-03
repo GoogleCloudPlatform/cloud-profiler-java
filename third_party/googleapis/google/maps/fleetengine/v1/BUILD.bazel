@@ -179,19 +179,22 @@ py_gapic_library(
     srcs = [":fleetengine_proto"],
     grpc_service_config = "fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "fleetengine.yaml",
     transport = "grpc",
+    deps = [
+        "//google/geo/type:viewport_py_proto",
+    ],
 )
 
-# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1371 is fixed
-#py_test(
-#    name = "fleetengine_py_gapic_test",
-#    srcs = [
-#        "fleetengine_py_gapic_pytest.py",
-#        "fleetengine_py_gapic_test.py",
-#    ],
-#    legacy_create_init = False,
-#    deps = [":fleetengine_py_gapic"],
-#)
+py_test(
+    name = "fleetengine_py_gapic_test",
+    srcs = [
+        "fleetengine_py_gapic_pytest.py",
+        "fleetengine_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":fleetengine_py_gapic"],
+)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -274,6 +277,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-maps-fleetengine-v1"],
     grpc_service_config = "fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "fleetengine.yaml",
     deps = [
         ":fleetengine_ruby_grpc",
         ":fleetengine_ruby_proto",
@@ -307,6 +311,8 @@ csharp_gapic_library(
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "fleetengine_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "fleetengine.yaml",
+    transport = "grpc+rest",
     deps = [
         ":fleetengine_csharp_grpc",
         ":fleetengine_csharp_proto",

@@ -119,7 +119,7 @@ load(
 go_proto_library(
     name = "reservation_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/reservation/v1",
+    importpath = "cloud.google.com/go/bigquery/reservation/apiv1/reservationpb",
     protos = [":reservation_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -133,6 +133,7 @@ go_gapic_library(
     grpc_service_config = "bigqueryreservation_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/reservation/apiv1;reservation",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "bigqueryreservation_v1.yaml",
     transport = "grpc+rest",
@@ -178,7 +179,8 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
     ],
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "bigqueryreservation_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -310,6 +312,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "The BigQuery Reservation API provides the mechanisms by which enterprise users can provision and manage dedicated resources such as slots and BigQuery BI Engine memory allocations.",
     ruby_cloud_title = "BigQuery Reservation V1",
+    service_yaml = "bigqueryreservation_v1.yaml",
     deps = [
         ":reservation_ruby_grpc",
         ":reservation_ruby_proto",
@@ -355,6 +358,7 @@ csharp_gapic_library(
     grpc_service_config = "bigqueryreservation_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "bigqueryreservation_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":reservation_csharp_grpc",
         ":reservation_csharp_proto",

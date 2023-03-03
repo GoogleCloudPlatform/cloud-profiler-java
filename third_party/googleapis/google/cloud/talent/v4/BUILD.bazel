@@ -143,7 +143,7 @@ load(
 go_proto_library(
     name = "talent_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/talent/v4",
+    importpath = "cloud.google.com/go/talent/apiv4/talentpb",
     protos = [":talent_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -161,8 +161,10 @@ go_gapic_library(
     srcs = [":talent_proto_with_info"],
     grpc_service_config = "talent_grpc_service_config.json",
     importpath = "cloud.google.com/go/talent/apiv4;talent",
+    metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
-    service_yaml = "//google/cloud/talent:talent_v4.yaml",
+    service_yaml = "jobs_v4.yaml",
     transport = "grpc+rest",
     deps = [
         ":talent_go_proto",
@@ -206,7 +208,8 @@ py_gapic_library(
     srcs = [":talent_proto"],
     grpc_service_config = "talent_grpc_service_config.json",
     rest_numeric_enums = True,
-    transport = "grpc",
+    service_yaml = "jobs_v4.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -289,7 +292,7 @@ nodejs_gapic_library(
     main_service = "talent",
     package = "google.cloud.talent.v4",
     rest_numeric_enums = True,
-    service_yaml = "//google/cloud/talent:talent_v4.yaml",
+    service_yaml = "jobs_v4.yaml",
     transport = "grpc+rest",
     deps = [],
 )
@@ -338,6 +341,7 @@ ruby_cloud_gapic_library(
     rest_numeric_enums = True,
     ruby_cloud_description = "Transform your job search and candidate matching capabilities with Cloud Talent Solution, designed to support enterprise talent acquisition technology and evolve with your growing needs. This AI solution includes features such as Job Search and Profile Search to provide candidates and employers with an enhanced talent acquisition experience.",
     ruby_cloud_title = "Cloud Talent Solution V4",
+    service_yaml = "jobs_v4.yaml",
     deps = [
         ":talent_ruby_grpc",
         ":talent_ruby_proto",
@@ -380,7 +384,8 @@ csharp_gapic_library(
     name = "talent_csharp_gapic",
     srcs = [":talent_proto_with_info"],
     rest_numeric_enums = True,
-    service_yaml = "//google/cloud/talent:talent_v4.yaml",
+    service_yaml = "jobs_v4.yaml",
+    transport = "grpc+rest",
     deps = [
         ":talent_csharp_grpc",
         ":talent_csharp_proto",
