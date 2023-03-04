@@ -102,6 +102,7 @@ int64_t ThreadTable::Size() const {
 std::vector<pid_t> ThreadTable::Threads() const {
   std::vector<pid_t> tids;
   std::lock_guard<std::mutex> lock(thread_mutex_);
+  tids.reserve(threads_.size());
   for (const auto& t : threads_) {
     tids.push_back(t.first);
   }

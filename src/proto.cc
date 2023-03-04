@@ -239,6 +239,7 @@ void ProfileProtoBuilder::Populate(
     int64_t count = trace.second;
     if (count != 0) {
       std::vector<uint64_t> locations;
+      locations.reserve(trace.first.frames.size());
       for (const auto &frame : trace.first.frames) {
         locations.push_back(LocationID(jni, frame));
       }
