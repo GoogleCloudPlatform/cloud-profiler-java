@@ -292,6 +292,7 @@ bool APIThrottler::WaitNext() {
   }
 
   api::CreateProfileRequest req;
+  req.mutable_profile_type()->Reserve(types_.size());
   for (const auto& type : types_) {
     req.add_profile_type(type);
   }

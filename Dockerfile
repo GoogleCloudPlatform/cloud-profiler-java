@@ -49,7 +49,7 @@ RUN apt-get update && apt-get -y -q install \
 # shared library.
 ENV PKG_CONFIG_PATH=/usr/local/ssl/lib/pkgconfig
 RUN mkdir /tmp/openssl && cd /tmp/openssl && \
-    curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.tar.gz | \
+    curl -sL https://github.com/openssl/openssl/archive/OpenSSL_1_1_1t.tar.gz | \
         tar xzv --strip=1 && \
     ./config no-shared -fPIC --openssldir=/usr/local/ssl --prefix=/usr/local/ssl && \
     make && make install_sw && \

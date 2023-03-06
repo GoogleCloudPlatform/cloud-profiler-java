@@ -30,8 +30,7 @@ CFLAGS = \
 	-Wno-array-bounds \
 	-g0 \
 	-DSTANDALONE_BUILD \
-	-D_GNU_SOURCE \
-	-DENABLE_HEAP_SAMPLING
+	-D_GNU_SOURCE
 
 ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
   # Building on an ARM64 machine.
