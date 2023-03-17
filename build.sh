@@ -38,7 +38,7 @@ while getopts ":d:m:v:" opt; do
   m)
       TARGET=$OPTARG
       if [[ "${TARGET}" == "arm64" ]]; then
-        if [[ "${MACHINE_TYPE}" != "aarch64" ]] &&  [[ "${MACHINE_TYPE}" != "arm64" ]]; then
+        if [[ "${MACHINE_TYPE}" != "aarch64" ]] ||  [[ "${MACHINE_TYPE}" != "arm64" ]]; then
           echo "-m arm64 is supported only when running on an ARM64 system."
           exit;
         fi
