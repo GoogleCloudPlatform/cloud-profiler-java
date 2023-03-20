@@ -82,6 +82,8 @@ PROFILER_API_SOURCES = \
 	$(GENFILES_PATH)/google/api/client.pb.cc \
 	$(GENFILES_PATH)/google/api/http.pb.cc \
 	$(GENFILES_PATH)/google/api/launch_stage.pb.cc \
+	$(GENFILES_PATH)/google/api/resource.pb.cc \
+	$(GENFILES_PATH)/google/api/field_behavior.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.grpc.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.pb.cc \
 	$(GENFILES_PATH)/google/protobuf/duration.pb.cc \
@@ -232,6 +234,14 @@ $(GENFILES_PATH)/%annotations.pb.h $(GENFILES_PATH)/%annotations.pb.cc : third_p
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
 
 $(GENFILES_PATH)/%launch_stage.pb.h $(GENFILES_PATH)/%launch_stage.pb.cc : third_party/googleapis/%launch_stage.proto
+	mkdir -p $(dir $@)
+	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
+
+$(GENFILES_PATH)/%resource.pb.h $(GENFILES_PATH)/%resource.pb.cc : third_party/googleapis/%resource.proto
+	mkdir -p $(dir $@)
+	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
+
+$(GENFILES_PATH)/%field_behavior.pb.h $(GENFILES_PATH)/%field_behavior.pb.cc : third_party/googleapis/%field_behavior.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
 
