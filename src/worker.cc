@@ -14,6 +14,11 @@
 
 #include "src/worker.h"
 
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+
 #include "src/clock.h"
 #include "src/profiler.h"
 #include "src/throttler_api.h"

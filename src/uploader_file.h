@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_UPLOADER_FILE_H_
 
 #include <cstdio>
+#include <string>
 
 #include "src/uploader.h"
 

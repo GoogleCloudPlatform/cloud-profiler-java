@@ -17,6 +17,8 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_HTTP_H_
 #define CLOUD_PROFILER_AGENT_JAVA_HTTP_H_
 
+#include <string>
+
 #include "src/globals.h"
 
 typedef void CURL;

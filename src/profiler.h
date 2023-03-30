@@ -20,6 +20,7 @@
 #include <signal.h>
 
 #include <atomic>
+#include <string>
 
 #include "src/threads.h"
 #include "third_party/javaprofiler/stacktraces.h"

@@ -15,6 +15,7 @@
 #include <limits.h>
 
 #include <string>
+#include <vector>
 
 #include "src/globals.h"
 #include "src/string.h"

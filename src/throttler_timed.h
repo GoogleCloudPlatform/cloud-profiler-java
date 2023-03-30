@@ -20,6 +20,9 @@
 #include <atomic>
 #include <memory>
 #include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "src/clock.h"
 #include "src/throttler.h"

@@ -20,6 +20,10 @@
 
 #include <map>
 #include <string>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "perftools/profiles/proto/builder.h"
 #include "third_party/javaprofiler/display.h"

@@ -14,6 +14,8 @@
 
 #include "src/http.h"
 
+#include <string>
+
 #include "curl/curl.h"
 
 namespace cloud {

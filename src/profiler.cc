@@ -21,6 +21,8 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string>
+#include <vector>
 
 #include "src/clock.h"
 #include "src/globals.h"

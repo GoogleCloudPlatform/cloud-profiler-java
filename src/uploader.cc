@@ -15,6 +15,7 @@
 #include "src/uploader.h"
 
 #include <chrono>  // NOLINT(build/c++11)
+#include <string>
 
 namespace cloud {
 namespace profiler {

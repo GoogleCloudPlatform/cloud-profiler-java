@@ -14,7 +14,11 @@
 
 #include "src/string.h"
 
+#include <map>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace cloud {
 namespace profiler {

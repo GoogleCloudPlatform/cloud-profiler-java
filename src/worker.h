@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_WORKER_H_
 
 #include <atomic>
+#include <memory>
 #include <mutex>  // NOLINT
 
 #include "src/globals.h"

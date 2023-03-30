@@ -23,6 +23,7 @@
 #include <jvmti.h>
 #include <stdint.h>
 
+#include <string>
 #include <unordered_map>
 
 #include "third_party/javaprofiler/jvmti_error.h"

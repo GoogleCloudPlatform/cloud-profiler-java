@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_UPLOADER_GCS_H_
 
 #include <cstdio>
+#include <string>
 
 #include "src/cloud_env.h"
 #include "src/uploader.h"

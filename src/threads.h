@@ -21,6 +21,7 @@
 
 #include <mutex>  // NOLINT(build/c++11)
 #include <utility>
+#include <vector>
 
 #include "src/globals.h"
 
