@@ -21,7 +21,7 @@
 namespace google {
 namespace javaprofiler {
 
-int64 MethodInfo::Location(int line_number) {
+int64_t MethodInfo::Location(int line_number) {
   auto it = locations_.find(line_number);
   if (it == locations_.end()) {
     return kInvalidLocationId;

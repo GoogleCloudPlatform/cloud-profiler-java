@@ -20,7 +20,7 @@ namespace google {
 namespace javaprofiler {
 
 __thread JNIEnv *Accessors::env_;
-__thread int64 Accessors::attr_;
+__thread int64_t Accessors::attr_;
 __thread Tags *Accessors::tags_;
 
 void Accessors::InitTags() {

@@ -112,8 +112,8 @@ bool Tags::operator==(const Tags &other) const {
   return true;
 }
 
-uint64 Tags::Hash() const {
-  uint64 h = 0;
+uint64_t Tags::Hash() const {
+  uint64_t h = 0;
   for (const auto &val : values_) {
     h += val.Hash();
     h += h << 10;
@@ -142,13 +142,13 @@ std::vector<std::pair<std::string, AsyncRefCountedString>> Tags::GetAll()
   return all_pairs;
 }
 
-void Tags::SetAttribute(int64 value) {
+void Tags::SetAttribute(int64_t value) {
   // TODO: Check whether the conversion between integer and string is a
   // performance concern.
   Set(kAttrKey, AsyncRefCountedString(std::to_string(value)));
 }
 
-int64 Tags::GetAttribute() const {
+int64_t Tags::GetAttribute() const {
   const std::string *value = Get(kAttrKey).Get();
   if (value == nullptr) {
     return 0;

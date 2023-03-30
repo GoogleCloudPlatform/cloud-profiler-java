@@ -48,7 +48,7 @@ static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
                                 char** gsig_str) {
   JvmProfileTestLib::method_name_call_count++;
 
-  switch (reinterpret_cast<uint64>(method_id)) {
+  switch (reinterpret_cast<uint64_t>(method_id)) {
     case 1:
       CreateJvmtiString(jvmti, "methodName", name_str);
       CreateJvmtiString(jvmti, "(I)B", sig_str);
@@ -74,7 +74,7 @@ static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
 
 static jvmtiError GetClassSignature(jvmtiEnv* jvmti, jclass declaring_class,
                                     char** sig_str, char** gsig_str) {
-  switch (reinterpret_cast<uint64>(declaring_class)) {
+  switch (reinterpret_cast<uint64_t>(declaring_class)) {
     case 1:
       CreateJvmtiString(jvmti, "Lcom/google/SomeClass;", sig_str);
       break;
@@ -104,7 +104,7 @@ static jvmtiError GetMethodDeclaringClass(jvmtiEnv *env, jmethodID method,
 static jvmtiError GetSourceFileName(jvmtiEnv *env, jclass klass,
                                     char **source_name_ptr) {
   if (source_name_ptr) {
-    switch (reinterpret_cast<uint64>(klass)) {
+    switch (reinterpret_cast<uint64_t>(klass)) {
       case 1:
         *source_name_ptr = strdup("SomeClass.java");
         break;
@@ -151,7 +151,7 @@ static jvmtiError GetLineNumberTable(jvmtiEnv *env, jmethodID method,
 static jvmtiError GetStackTrace(jvmtiEnv* env, jthread thread, jint start_depth,
                                 jint max_frame_count,
                                 jvmtiFrameInfo* frame_buffer, jint* count_ptr) {
-  uint64 thread_num = reinterpret_cast<uint64>(thread);
+  uint64_t thread_num = reinterpret_cast<uint64_t>(thread);
 
   if (thread_num < 0 || thread_num >= JvmProfileTestLib::GetMaxThreads()) {
     *count_ptr = 0;
