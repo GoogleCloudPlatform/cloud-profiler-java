@@ -19,6 +19,7 @@
 #include <sys/time.h>
 #include <sys/ucontext.h>
 
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <string>

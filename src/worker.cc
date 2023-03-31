@@ -14,6 +14,7 @@
 
 #include "src/worker.h"
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <string>
