@@ -231,7 +231,7 @@ class HeapMonitor {
                      bool use_jvm_trace);
   static void Disable();
 
-  static bool Enabled() { return jvmti_ != nullptr; }
+  static bool Enabled() { return heap_monitor_ != nullptr; }
 
   // Returns a perftools::profiles::Profile with the objects provided by the
   // HeapEventStorage.
@@ -278,8 +278,6 @@ class HeapMonitor {
     GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::GC_FINISHED);
   }
 
-  static void ShutdownGCWaitingThread();
-
   // Not copyable or movable.
   HeapMonitor(const HeapMonitor &) = delete;
   HeapMonitor &operator=(const HeapMonitor &) = delete;
@@ -313,6 +311,7 @@ class HeapMonitor {
   };
 
   bool CreateGCWaitingThread(jvmtiEnv* jvmti, JNIEnv* jni);
+  void ShutdownGCWaitingThread();
   static void GCWaitingThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg);
   void GCWaitingThreadRun(JNIEnv* jni_env);
   GcEvent WaitForGC();
