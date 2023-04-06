@@ -275,7 +275,11 @@ class HeapMonitor {
   static void AddCallback(jvmtiEventCallbacks *callbacks);
 
   static void NotifyGCWaitingThread() {
-    GetInstance()->NotifyGCWaitingThreadInternal(GcEvent::GC_FINISHED);
+    HeapMonitor *monitor = TryGetInstance();
+    if (monitor == nullptr) {
+      return;
+    }
+    monitor->NotifyGCWaitingThreadInternal(GcEvent::GC_FINISHED);
   }
 
   // Not copyable or movable.
@@ -294,6 +298,12 @@ class HeapMonitor {
   // any call to this method.
   static HeapMonitor *GetInstance() {
     assert(heap_monitor_ != nullptr);
+    return heap_monitor_;
+  }
+
+  // A safe version of GetInstance() which can return a nullptr if heap_monitor_
+  // happens to be empty. Used when there is no guarantee heap_monitor_ exists.
+  static HeapMonitor *TryGetInstance() {
     return heap_monitor_;
   }
 

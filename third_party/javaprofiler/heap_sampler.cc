@@ -521,8 +521,9 @@ std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetHeapProfiles(
     JNIEnv* env, bool force_gc) {
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
-  if (jvmti_) {
-    return GetInstance()->storage_.GetHeapProfiles(env, sampling_interval_,
+  HeapMonitor *monitor = TryGetInstance();
+  if (monitor != nullptr) {
+    return monitor->storage_.GetHeapProfiles(env, sampling_interval_,
                                                    force_gc);
   }
   return EmptyHeapProfile(env);
@@ -532,8 +533,9 @@ std::unique_ptr<perftools::profiles::Profile> HeapMonitor::GetPeakHeapProfiles(
     JNIEnv* env, bool force_gc) {
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
-  if (jvmti_) {
-    return GetInstance()->storage_.GetPeakHeapProfiles(env, sampling_interval_);
+  HeapMonitor *monitor = TryGetInstance();
+  if (monitor != nullptr) {
+    return monitor->storage_.GetPeakHeapProfiles(env, sampling_interval_);
   }
   return EmptyHeapProfile(env);
 }
@@ -542,8 +544,9 @@ std::unique_ptr<perftools::profiles::Profile>
 HeapMonitor::GetGarbageHeapProfiles(JNIEnv* env, bool force_gc) {
   // Note: technically this means that you cannot disable the sampler and then
   // get the profile afterwards; this could be changed if needed.
-  if (jvmti_) {
-    return GetInstance()->storage_.GetGarbageHeapProfiles(
+  HeapMonitor *monitor = TryGetInstance();
+  if (monitor != nullptr) {
+    return monitor->storage_.GetGarbageHeapProfiles(
         env, sampling_interval_, force_gc);
   }
   return EmptyHeapProfile(env);
@@ -574,8 +577,9 @@ HeapMonitor::GcEvent HeapMonitor::WaitForGC() {
 
 void HeapMonitor::GCWaitingThread(jvmtiEnv* jvmti_env, JNIEnv* jni_env,
                                   void* arg) {
-  while( !Enabled()) {}
-  GetInstance()->GCWaitingThreadRun(jni_env);
+  HeapMonitor *monitor;
+  while ((monitor = TryGetInstance()) == nullptr) {}
+  monitor->GCWaitingThreadRun(jni_env);
 }
 
 void HeapMonitor::GCWaitingThreadRun(JNIEnv* jni_env) {
