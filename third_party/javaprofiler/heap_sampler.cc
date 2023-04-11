@@ -484,7 +484,7 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
   // Ensure this is really a singleton i.e. don't recreate it if sampling is
   // re-enabled.
   if (heap_monitor_ == nullptr) {
-    HeapMonitor* monitor = new HeapMonitor();
+    static HeapMonitor* monitor = new HeapMonitor();
     if (!monitor->CreateGCWaitingThread(jvmti, jni)) {
       return false;
     }
