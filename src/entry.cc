@@ -278,10 +278,6 @@ jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   LOG(INFO) << "Google Cloud Profiler Java agent version: "
             << CLOUD_PROFILER_AGENT_VERSION;
   LOG(INFO) << "Profiler agent loaded";
-  // TODO: Remove this log after the mentioned bug is closed
-  LOG(INFO) << "This release is used in internal DiRT Testing - It has no "
-            << "impact on the functionality of the release. Please ignore this "
-            << "log line - it will be removed in the next release.";
   google::javaprofiler::AttributeTable::Init();
 
   // Try to get the latest JVMTI_VERSION the agent was built with.
