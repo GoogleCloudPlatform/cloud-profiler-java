@@ -47,6 +47,21 @@ typedef std::unordered_set<uint64> IndexSet;
 namespace perftools {
 namespace profiles {
 
+void AddCallstackToSample(Sample *sample, const void *const *stack, int depth,
+                          CallstackType type) {
+  if (depth <= 0) return;
+  if (type == kInterrupt) {
+    sample->add_location_id(reinterpret_cast<uint64_t>(stack[0]));
+  } else {
+    sample->add_location_id(reinterpret_cast<uint64_t>(stack[0]) - 1);
+  }
+  // These are raw stack unwind addresses, so adjust them by -1 to land
+  // inside the call instruction (although potentially misaligned).
+  for (int i = 1; i < depth; i++) {
+    sample->add_location_id(reinterpret_cast<uint64_t>(stack[i]) - 1);
+  }
+}
+
 Builder::Builder() : profile_(new Profile()) {
   // string_table[0] must be ""
   profile_->add_string_table("");

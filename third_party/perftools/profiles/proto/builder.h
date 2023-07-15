@@ -58,6 +58,11 @@ typedef std::unordered_map<std::tuple<int64, int64, int64, int64>, int64,
 namespace perftools {
 namespace profiles {
 
+enum CallstackType { kRegular = 0, kInterrupt = 1 };
+
+void AddCallstackToSample(Sample *sample, const void *const *stack, int depth,
+                          CallstackType type);
+
 // Provides mechanisms to facilitate the generation of profiles
 // on a compressed protobuf:
 // - Manages the creation of the string table.
