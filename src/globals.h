@@ -104,6 +104,10 @@ class JvmtiScopedPtr {
 
   JvmtiScopedPtr(jvmtiEnv *jvmti, T *ref) : jvmti_(jvmti), ref_(ref) {}
 
+  // This type is neither copyable nor movable.
+  JvmtiScopedPtr(const JvmtiScopedPtr &) = delete;
+  JvmtiScopedPtr &operator=(const JvmtiScopedPtr &) = delete;
+
   ~JvmtiScopedPtr() {
     if (NULL != ref_) {
       JVMTI_ERROR(jvmti_->Deallocate((unsigned char *)ref_));
@@ -122,8 +126,6 @@ class JvmtiScopedPtr {
  private:
   jvmtiEnv *jvmti_;
   T *ref_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(JvmtiScopedPtr);
 };
 
 // Things that should probably be user-configurable
