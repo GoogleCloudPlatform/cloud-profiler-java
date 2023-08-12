@@ -44,6 +44,10 @@ const int kNumCallTraceErrors = 10;
 
 class Asgct {
  public:
+  // This type is neither copyable nor movable.
+  Asgct(const Asgct&) = delete;
+  Asgct& operator=(const Asgct&) = delete;
+
   static void SetAsgct(ASGCTType asgct) { asgct_ = asgct; }
 
   // AsyncGetCallTrace function, to be dlsym'd.
@@ -51,12 +55,14 @@ class Asgct {
 
  private:
   static ASGCTType asgct_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(Asgct);
 };
 
 class AttributeTable {
  public:
+  // This type is neither copyable nor movable.
+  AttributeTable(const AttributeTable&) = delete;
+  AttributeTable& operator=(const AttributeTable&) = delete;
+
   static void Init() {
     mutex_ = new (std::mutex);
     string_map_ = new (std::unordered_map<std::string, int>);
@@ -93,8 +99,6 @@ class AttributeTable {
   static std::mutex *mutex_;
   static std::unordered_map<std::string, int> *string_map_;
   static std::vector<std::string> *strings_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(AttributeTable);
 };
 
 // Multiset of stack traces. There is a maximum number of distinct
