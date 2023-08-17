@@ -52,12 +52,14 @@ namespace {
 class ErrnoRaii {
  public:
   ErrnoRaii() { stored_errno_ = errno; }
+
+  // This type is neither copyable nor movable.
+  ErrnoRaii(const ErrnoRaii &) = delete;
+  ErrnoRaii &operator=(const ErrnoRaii &) = delete;
   ~ErrnoRaii() { errno = stored_errno_; }
 
  private:
   int stored_errno_;
-
-  DISALLOW_COPY_AND_ASSIGN(ErrnoRaii);
 };
 
 }  // namespace

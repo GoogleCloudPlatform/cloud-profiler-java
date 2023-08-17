@@ -31,6 +31,11 @@ class HTTPRequest;
 class CloudEnv {
  public:
   CloudEnv();
+
+  // This type is neither copyable nor movable.
+  CloudEnv(const CloudEnv&) = delete;
+  CloudEnv& operator=(const CloudEnv&) = delete;
+
   virtual ~CloudEnv() {}
 
   // Returns the current cloud project ID.
@@ -70,7 +75,6 @@ class CloudEnv {
   std::string zone_name_;
   std::string service_;
   std::string service_version_;
-  DISALLOW_COPY_AND_ASSIGN(CloudEnv);
 };
 
 // Returns the default instance of a cloud env object. The returned

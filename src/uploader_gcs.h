@@ -40,6 +40,10 @@ class GcsUploader : public cloud::profiler::ProfileUploader {
   GcsUploader(CloudEnv* env, const std::string& prefix)
       : env_(env), prefix_(prefix) {}
 
+  // This type is neither copyable nor movable.
+  GcsUploader(const GcsUploader&) = delete;
+  GcsUploader& operator=(const GcsUploader&) = delete;
+
   // Implements ProfileUploader interface.
   bool Upload(const std::string& profile_type,
               const std::string& profile) override;
@@ -47,7 +51,6 @@ class GcsUploader : public cloud::profiler::ProfileUploader {
  private:
   CloudEnv* env_;
   std::string prefix_;
-  DISALLOW_COPY_AND_ASSIGN(GcsUploader);
 };
 
 }  // namespace profiler

@@ -45,6 +45,10 @@ class ProfileProtoBuilder {
     }
   }
 
+  // This type is neither copyable nor movable.
+  ProfileProtoBuilder(const ProfileProtoBuilder &) = delete;
+  ProfileProtoBuilder &operator=(const ProfileProtoBuilder &) = delete;
+
   // Populate the profile with a set of traces
   void Populate(JNIEnv *jni, const char *profile_type,
                 const google::javaprofiler::TraceMultiset &traces,
@@ -94,7 +98,6 @@ class ProfileProtoBuilder {
   std::unordered_map<uint64_t, uint64_t> address_location_;
 
   const google::javaprofiler::NativeProcessInfo &native_info_;
-  DISALLOW_COPY_AND_ASSIGN(ProfileProtoBuilder);
 };
 
 namespace {

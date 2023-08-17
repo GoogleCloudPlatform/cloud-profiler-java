@@ -29,6 +29,10 @@ class FileUploader : public cloud::profiler::ProfileUploader {
  public:
   explicit FileUploader(const std::string &prefix) : prefix_(prefix) {}
 
+  // This type is neither copyable nor movable.
+  FileUploader(const FileUploader &) = delete;
+  FileUploader &operator=(const FileUploader &) = delete;
+
   bool Upload(const std::string &profile_type,
               const std::string &profile) override {
     std::string filename = ProfilePath(prefix_, profile_type);
@@ -54,7 +58,6 @@ class FileUploader : public cloud::profiler::ProfileUploader {
 
  private:
   std::string prefix_;
-  DISALLOW_COPY_AND_ASSIGN(FileUploader);
 };
 
 }  // namespace profiler
