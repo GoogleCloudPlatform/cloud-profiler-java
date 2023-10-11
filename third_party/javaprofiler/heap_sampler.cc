@@ -159,8 +159,8 @@ HeapEventStorage::HeapEventStorage(jvmtiEnv *jvmti,
 
 void HeapEventStorage::Add(JNIEnv *jni, jthread thread, jobject object,
                            jclass klass, jlong size,
-                           const std::vector<JVMPI_CallFrame> &&frames,
-                           jbyte *name, jint name_len, jlong thread_id) {
+                           std::vector<JVMPI_CallFrame> frames, jbyte *name,
+                           jint name_len, jlong thread_id) {
   jweak weak_ref = jni->NewWeakGlobalRef(object);
   if (jni->ExceptionCheck()) {
     LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";

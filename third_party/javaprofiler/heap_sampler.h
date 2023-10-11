@@ -51,11 +51,14 @@ class HeapObjectTrace {
  public:
   // This object owns the jweak object parameter. It is freed when the object
   // is sent to the garbage list, and the object is set to nullptr.
-  HeapObjectTrace(jweak object, jlong size,
-                  const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
-                  int name_length, jlong thread_id)
-      : object_(object), size_(size), frames_(std::move(frames)),
-        name_(name), name_length_(name_length), thread_id_(thread_id) {}
+  HeapObjectTrace(jweak object, jlong size, std::vector<JVMPI_CallFrame> frames,
+                  jbyte *name, int name_length, jlong thread_id)
+      : object_(object),
+        size_(size),
+        frames_(std::move(frames)),
+        name_(name),
+        name_length_(name_length),
+        thread_id_(thread_id) {}
 
   HeapObjectTrace(jweak object, jlong size,
                   const std::vector<JVMPI_CallFrame> &frames)
@@ -132,7 +135,7 @@ class HeapEventStorage {
 
   // Adds an object to the storage system.
   void Add(JNIEnv *jni, jthread thread, jobject object, jclass klass,
-           jlong size, const std::vector<JVMPI_CallFrame> &&frames, jbyte *name,
+           jlong size, std::vector<JVMPI_CallFrame> frames, jbyte *name,
            jint name_len, jlong thread_id);
 
   // Returns a perftools::profiles::Profile with the objects stored via
