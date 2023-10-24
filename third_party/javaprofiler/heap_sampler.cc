@@ -361,9 +361,15 @@ void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
   if (trace == nullptr) {
     return;
   }
-
-  GetInstance()->storage_.Add(jni_env, thread, object, object_klass, size,
-                              std::move(*trace), name, name_len, thread_id);
+  // HeapMonitor is never deleted, but the pointer is cleared during
+  // disablement. Ensure we are not racing with disablement and check if the
+  // HeapMonitor is nullptr.
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  instance->storage_.Add(jni_env, thread, object, object_klass, size,
+                         std::move(*trace), name, name_len, thread_id);
 }
 
 void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong thread_id,
@@ -371,22 +377,38 @@ void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong thread_id,
                                               int name_length,
                                               int size,
                                               jlong gcontext) {
-  for (auto fn : GetInstance()->alloc_inst_functions_) {
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  for (auto fn : instance->alloc_inst_functions_) {
     fn(thread_id, name, name_length, size, gcontext);
   }
 }
 
 void HeapMonitor::AddAllocationInstrumentation(
     AllocationInstrumentationFunction fn) {
-  GetInstance()->alloc_inst_functions_.push_back(fn);
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  instance->alloc_inst_functions_.push_back(fn);
 }
 
 bool HeapMonitor::HasAllocationInstrumentation() {
-  return !GetInstance()->alloc_inst_functions_.empty();
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return false;
+  }
+  return !instance->alloc_inst_functions_.empty();
 }
 
 bool HeapMonitor::HasGarbageInstrumentation() {
-  return !GetInstance()->gc_inst_functions_.empty();
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return false;
+  }
+  return !instance->gc_inst_functions_.empty();
 }
 
 void HeapMonitor::InvokeGarbageInstrumentationFunctions(jlong thread_id,
@@ -394,14 +416,22 @@ void HeapMonitor::InvokeGarbageInstrumentationFunctions(jlong thread_id,
                                                         int name_length,
                                                         int size,
                                                         jlong gcontext) {
-  for (auto fn : GetInstance()->gc_inst_functions_) {
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  for (auto fn : instance->gc_inst_functions_) {
     fn(thread_id, name, name_length, size, gcontext);
   }
 }
 
 void HeapMonitor::AddGarbageInstrumentation(
     GarbageInstrumentationFunction fn) {
-  GetInstance()->gc_inst_functions_.push_back(fn);
+  HeapMonitor *instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  instance->gc_inst_functions_.push_back(fn);
 }
 
 void HeapMonitor::ShutdownGCWaitingThread() {

@@ -297,15 +297,8 @@ class HeapMonitor {
 
   static std::atomic<HeapMonitor *> heap_monitor_;
 
-  // We initialize heap_monitor_ in Enable, so ensure Enable is called before
-  // any call to this method.
-  static HeapMonitor *GetInstance() {
-    assert(heap_monitor_ != nullptr);
-    return heap_monitor_;
-  }
-
-  // A safe version of GetInstance() which can return a nullptr if heap_monitor_
-  // happens to be empty. Used when there is no guarantee heap_monitor_ exists.
+  // Return a nullptr if heap_monitor_ happens to be empty. You must check
+  // whether the return value is nullptr.
   static HeapMonitor *TryGetInstance() {
     return heap_monitor_;
   }
