@@ -525,17 +525,12 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv* jni, int sampling_interval,
 }
 
 void HeapMonitor::Disable() {
-  // Already disabled case
-  jvmtiEnv *jvmti = jvmti_.load();
-  if (!jvmti) {
-    return;
-  }
   HeapMonitor* monitor = heap_monitor_.load();
-  if (!monitor) {
-    LOG(ERROR) << "heap monitor not loaded";
+  if (monitor == nullptr) {
+    // Already disabled.
     return;
   }
-  jvmti_.store(nullptr);
+  jvmtiEnv *jvmti = jvmti_.load();
 
   jvmti->SetEventNotificationMode(JVMTI_DISABLE,
                                   JVMTI_EVENT_SAMPLED_OBJECT_ALLOC, nullptr);
