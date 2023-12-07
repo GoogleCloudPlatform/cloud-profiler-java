@@ -213,7 +213,9 @@ class HeapEventStorage {
 class HeapMonitor {
  public:
   static bool Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
-                     bool use_jvm_trace);
+                     // TODO: Remove 'use_jvm_trace' and associated
+                     // code after Q2 2024.
+                     bool use_jvm_trace = false);
   static void Disable();
 
   static bool Enabled() { return heap_monitor_ != nullptr; }
