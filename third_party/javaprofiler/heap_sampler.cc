@@ -448,7 +448,7 @@ void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 
 // Currently, we enable once and forget about it.
 bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
-                         bool use_jvm_trace) {
+                         int max_garbage_size, bool use_jvm_trace) {
   if (!Supported(jvmti)) {
     LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
                  << " heap sampling monitor";
@@ -504,7 +504,7 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
   // Ensure this is really a singleton i.e. don't recreate it if sampling is
   // re-enabled.
   if (heap_monitor_ == nullptr) {
-    static HeapMonitor *monitor = new HeapMonitor();
+    static HeapMonitor *monitor = new HeapMonitor(max_garbage_size);
     if (!monitor->CreateGCWaitingThread(jvmti, jni)) {
       return false;
     }

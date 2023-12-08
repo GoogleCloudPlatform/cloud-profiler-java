@@ -213,6 +213,7 @@ class HeapEventStorage {
 class HeapMonitor {
  public:
   static bool Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
+                     int max_garbage_size = 200,
                      // TODO: Remove 'use_jvm_trace' and associated
                      // code after Q2 2024.
                      bool use_jvm_trace = false);
@@ -272,7 +273,9 @@ class HeapMonitor {
  private:
   static const HeapEventStorage::GcCallback gc_callback_;
 
-  HeapMonitor() : storage_(jvmti_.load(), GetFrameCache(), 200, gc_callback_) {}
+  HeapMonitor(int max_garbage_size)
+      : storage_(jvmti_.load(), GetFrameCache(), max_garbage_size,
+                 gc_callback_) {}
 
   static std::atomic<HeapMonitor *> heap_monitor_;
 
