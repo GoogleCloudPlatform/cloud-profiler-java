@@ -162,7 +162,7 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
                                    int32_t count) {
   const TraceAndLabels &trace_and_labels = profile_trace.trace_and_labels;
   auto sample = trace_samples_.SampleFor(trace_and_labels);
-  jint metric_value = profile_trace.metric_value;
+  auto metric_value = profile_trace.metric_value;
 
   if (sample != nullptr) {
     UpdateSampleValues(sample, count, metric_value);

@@ -31,11 +31,11 @@
 #include "third_party/javaprofiler/profile_proto_builder.h"
 
 typedef void (*AllocationInstrumentationFunction)(jlong thread_id, jbyte *name,
-                                                  int name_length, int size,
+                                                  int name_length, jlong size,
                                                   jlong gcontext);
 
 typedef void (*GarbageInstrumentationFunction)(jlong thread_id, jbyte *name,
-                                               int name_length, int size,
+                                               int name_length, jlong size,
                                                jlong gcontext);
 
 namespace google {
@@ -70,7 +70,7 @@ class HeapObjectTrace {
 
   std::vector<JVMPI_CallFrame> &Frames() { return frames_; }
 
-  int Size() const { return size_; }
+  jlong Size() const { return size_; }
 
   jbyte *Name() const { return name_; }
 
@@ -95,7 +95,7 @@ class HeapObjectTrace {
 
  private:
   jweak object_;
-  int size_;
+  jlong size_;
   std::vector<JVMPI_CallFrame> frames_;
   jbyte *name_;
   int name_length_;
@@ -239,8 +239,11 @@ class HeapMonitor {
                         jclass object_klass, jlong size, jbyte *name,
                         jint name_len, jlong thread_id);
 
-  static void InvokeAllocationInstrumentationFunctions(
-      jlong thread_id, jbyte *name, int name_length, int size, jlong gcontext);
+  static void InvokeAllocationInstrumentationFunctions(jlong thread_id,
+                                                       jbyte *name,
+                                                       int name_length,
+                                                       jlong size,
+                                                       jlong gcontext);
 
   static void AddAllocationInstrumentation(
       AllocationInstrumentationFunction fn);
@@ -249,7 +252,7 @@ class HeapMonitor {
 
   static void InvokeGarbageInstrumentationFunctions(jlong thread_id,
                                                     jbyte *name,
-                                                    int name_length, int size,
+                                                    int name_length, jlong size,
                                                     jlong gcontext);
 
   static void AddGarbageInstrumentation(GarbageInstrumentationFunction fn);

@@ -371,7 +371,7 @@ void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
 }
 
 void HeapMonitor::InvokeAllocationInstrumentationFunctions(
-    jlong thread_id, jbyte *name, int name_length, int size, jlong gcontext) {
+    jlong thread_id, jbyte *name, int name_length, jlong size, jlong gcontext) {
   HeapMonitor *instance = TryGetInstance();
   if (instance == nullptr) {
     return;
@@ -407,7 +407,7 @@ bool HeapMonitor::HasGarbageInstrumentation() {
 }
 
 void HeapMonitor::InvokeGarbageInstrumentationFunctions(
-    jlong thread_id, jbyte *name, int name_length, int size, jlong gcontext) {
+    jlong thread_id, jbyte *name, int name_length, jlong size, jlong gcontext) {
   HeapMonitor *instance = TryGetInstance();
   if (instance == nullptr) {
     return;

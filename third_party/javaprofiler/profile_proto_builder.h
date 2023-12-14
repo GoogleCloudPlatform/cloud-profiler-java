@@ -21,6 +21,7 @@
 #include <link.h>
 
 #include <cmath>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -114,16 +115,16 @@ struct TraceAndLabels {
 // potential labels associated with this trace.
 struct ProfileStackTrace {
   // Constructor for a stack trace without any label.
-  ProfileStackTrace(const JVMPI_CallTrace *trace = nullptr, jint m_value = 0)
+  ProfileStackTrace(const JVMPI_CallTrace *trace = nullptr, int64_t m_value = 0)
       : metric_value(m_value), trace_and_labels(trace) {}
 
   // Constructor for a stack trace with labels.
-  ProfileStackTrace(const JVMPI_CallTrace *trace, jint m_value,
+  ProfileStackTrace(const JVMPI_CallTrace *trace, int64_t m_value,
                     const std::vector<SampleLabel> &labels)
       : metric_value(m_value), trace_and_labels(trace, labels) {}
 
   // Metric associated with the trace and labels.
-  jint metric_value;
+  int64_t metric_value;
 
   // Trace and labels associated with the metric collected.
   TraceAndLabels trace_and_labels;
