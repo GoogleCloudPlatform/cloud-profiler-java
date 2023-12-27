@@ -32,12 +32,13 @@ class SignalHandler {
  public:
   SignalHandler() {}
 
+  // This type is neither copyable nor movable.
+  SignalHandler(const SignalHandler &) = delete;
+  SignalHandler &operator=(const SignalHandler &) = delete;
+
   struct sigaction SetAction(void (*sigaction)(int, siginfo_t *, void *));
 
   bool SetSigprofInterval(int64_t period_usec);
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(SignalHandler);
 };
 
 class Profiler {
@@ -50,6 +51,11 @@ class Profiler {
         jvmti_(jvmti) {
     Reset();
   }
+
+  // This type is neither copyable nor movable.
+  Profiler(const Profiler &) = delete;
+  Profiler &operator=(const Profiler &) = delete;
+
   virtual ~Profiler() {}
 
   // Collect performance data.
@@ -95,8 +101,6 @@ class Profiler {
 
   // Number of samples where the stack aggregation failed.
   static std::atomic<int> unknown_stack_count_;
-
-  DISALLOW_COPY_AND_ASSIGN(Profiler);
 };
 
 // CPUProfiler collects cpu profiles by setting up a CPU timer and
@@ -104,6 +108,10 @@ class Profiler {
 class CPUProfiler : public Profiler {
  public:
   using Profiler::Profiler;
+
+  // This type is neither copyable nor movable.
+  CPUProfiler(const CPUProfiler &) = delete;
+  CPUProfiler &operator=(const CPUProfiler &) = delete;
 
   // Collect profiling data.
   bool Collect() override;
@@ -116,8 +124,6 @@ class CPUProfiler : public Profiler {
 
   // Stop data collection
   void Stop();
-
-  DISALLOW_COPY_AND_ASSIGN(CPUProfiler);
 };
 
 // WallProfiler collects wallclock profiles by explicitly sending
