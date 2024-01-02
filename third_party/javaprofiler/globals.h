@@ -29,9 +29,11 @@
 using std::hash;
 using std::string;
 
+#ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName &);              \
   void operator=(const TypeName &)
+#endif
 
 // Short version: reinterpret_cast produces undefined behavior in many
 // cases where memcpy doesn't.
