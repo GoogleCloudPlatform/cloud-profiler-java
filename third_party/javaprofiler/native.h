@@ -34,7 +34,7 @@ class NativeProcessInfo {
   explicit NativeProcessInfo(const std::string &procmaps_filename);
 
   struct Mapping {
-    uint64 start, limit;
+    uint64_t start, limit;
     std::string name;
   };
 

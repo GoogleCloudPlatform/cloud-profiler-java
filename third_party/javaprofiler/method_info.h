@@ -17,6 +17,7 @@
 #ifndef GOOGLE_JAVAPROFILER_METHOD_INFO_H_
 #define GOOGLE_JAVAPROFILER_METHOD_INFO_H_
 
+#include <cstdint>
 #include <unordered_map>
 
 #include "perftools/profiles/proto/builder.h"
@@ -41,14 +42,14 @@ class MethodInfo {
         start_line_(start_line) {}
 
   // An invalid location Id.
-  static const int64 kInvalidLocationId = 0;
+  static const int64_t kInvalidLocationId = 0;
 
   // Return the location representing info, returns kInvalidLocationId
   // if not found.
-  int64 Location(int line_number);
+  int64_t Location(int line_number);
 
   // Put a location ID assocated to a ByteCode Index (BCI).
-  void AddLocation(int bci, int64 location_id) {
+  void AddLocation(int bci, int64_t location_id) {
     locations_[bci] = location_id;
   }
 
@@ -67,7 +68,7 @@ class MethodInfo {
   int start_line_;
 
   // Cache of jlocation results.
-  std::unordered_map<int, int64> locations_;
+  std::unordered_map<int, int64_t> locations_;
 };
 
 }  // namespace javaprofiler
