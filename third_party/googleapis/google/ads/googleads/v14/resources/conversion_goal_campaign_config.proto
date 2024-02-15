@@ -1,0 +1,92 @@
+<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/conversion_goal_campaign_config.proto
+// Copyright 2022 Google LLC
+========
+// Copyright 2023 Google LLC
+>>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/conversion_goal_campaign_config.proto
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/conversion_goal_campaign_config.proto
+package google.ads.googleads.v13.resources;
+
+import "google/ads/googleads/v13/enums/goal_config_level.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
+option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
+option java_multiple_files = true;
+option java_outer_classname = "ConversionGoalCampaignConfigProto";
+option java_package = "com.google.ads.googleads.v13.resources";
+option objc_class_prefix = "GAA";
+option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
+option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
+========
+package google.ads.googleads.v14.resources;
+
+import "google/ads/googleads/v14/enums/goal_config_level.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option csharp_namespace = "Google.Ads.GoogleAds.V14.Resources";
+option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/resources;resources";
+option java_multiple_files = true;
+option java_outer_classname = "ConversionGoalCampaignConfigProto";
+option java_package = "com.google.ads.googleads.v14.resources";
+option objc_class_prefix = "GAA";
+option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
+option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
+>>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/conversion_goal_campaign_config.proto
+
+// Conversion goal settings for a Campaign.
+message ConversionGoalCampaignConfig {
+  option (google.api.resource) = {
+    type: "googleads.googleapis.com/ConversionGoalCampaignConfig"
+    pattern: "customers/{customer_id}/conversionGoalCampaignConfigs/{campaign_id}"
+  };
+
+  // Immutable. The resource name of the conversion goal campaign config.
+  // Conversion goal campaign config resource names have the form:
+  //
+  // `customers/{customer_id}/conversionGoalCampaignConfigs/{campaign_id}`
+  string resource_name = 1 [
+    (google.api.field_behavior) = IMMUTABLE,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/ConversionGoalCampaignConfig"
+    }
+  ];
+
+  // Immutable. The campaign with which this conversion goal campaign config is
+  // associated.
+  string campaign = 2 [
+    (google.api.field_behavior) = IMMUTABLE,
+    (google.api.resource_reference) = {
+      type: "googleads.googleapis.com/Campaign"
+    }
+  ];
+
+  // The level of goal config the campaign is using.
+<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/conversion_goal_campaign_config.proto
+  google.ads.googleads.v13.enums.GoalConfigLevelEnum.GoalConfigLevel
+========
+  google.ads.googleads.v14.enums.GoalConfigLevelEnum.GoalConfigLevel
+>>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/conversion_goal_campaign_config.proto
+      goal_config_level = 3;
+
+  // The custom conversion goal the campaign is using for optimization.
+  string custom_conversion_goal = 4 [(google.api.resource_reference) = {
+    type: "googleads.googleapis.com/CustomConversionGoal"
+  }];
+}

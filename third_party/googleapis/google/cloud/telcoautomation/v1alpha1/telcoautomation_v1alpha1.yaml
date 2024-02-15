@@ -1,0 +1,121 @@
+type: google.api.Service
+config_version: 3
+name: telcoautomation.googleapis.com
+title: Telco Automation API
+
+apis:
+- name: google.cloud.location.Locations
+<<<<<<<< HEAD:third_party/googleapis/google/cloud/tpu/v2alpha1/tpu_v2alpha1.yaml
+- name: google.cloud.tpu.v2alpha1.Tpu
+- name: google.longrunning.Operations
+
+types:
+- name: google.cloud.tpu.v2alpha1.OperationMetadata
+========
+- name: google.cloud.telcoautomation.v1alpha1.TelcoAutomation
+- name: google.longrunning.Operations
+
+types:
+- name: google.cloud.telcoautomation.v1alpha1.OperationMetadata
+>>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/cloud/telcoautomation/v1alpha1/telcoautomation_v1alpha1.yaml
+
+documentation:
+  summary: APIs to automate management of cloud infrastructure for network functions.
+  rules:
+  - selector: google.cloud.location.Locations.GetLocation
+    description: Gets information about a location.
+
+  - selector: google.cloud.location.Locations.ListLocations
+    description: Lists information about the supported locations for this service.
+
+http:
+  rules:
+  - selector: google.cloud.location.Locations.GetLocation
+<<<<<<<< HEAD:third_party/googleapis/google/cloud/tpu/v2alpha1/tpu_v2alpha1.yaml
+    get: '/v2alpha1/{name=projects/*/locations/*}'
+  - selector: google.cloud.location.Locations.ListLocations
+    get: '/v2alpha1/{name=projects/*}/locations'
+  - selector: google.longrunning.Operations.CancelOperation
+    post: '/v2alpha1/{name=projects/*/locations/*/operations/*}:cancel'
+  - selector: google.longrunning.Operations.DeleteOperation
+    delete: '/v2alpha1/{name=projects/*/locations/*/operations/*}'
+  - selector: google.longrunning.Operations.GetOperation
+    get: '/v2alpha1/{name=projects/*/locations/*/operations/*}'
+  - selector: google.longrunning.Operations.ListOperations
+    get: '/v2alpha1/{name=projects/*/locations/*}/operations'
+========
+    get: '/v1alpha1/{name=projects/*/locations/*}'
+  - selector: google.cloud.location.Locations.ListLocations
+    get: '/v1alpha1/{name=projects/*}/locations'
+  - selector: google.longrunning.Operations.CancelOperation
+    post: '/v1alpha1/{name=projects/*/locations/*/operations/*}:cancel'
+    body: '*'
+  - selector: google.longrunning.Operations.DeleteOperation
+    delete: '/v1alpha1/{name=projects/*/locations/*/operations/*}'
+  - selector: google.longrunning.Operations.GetOperation
+    get: '/v1alpha1/{name=projects/*/locations/*/operations/*}'
+  - selector: google.longrunning.Operations.ListOperations
+    get: '/v1alpha1/{name=projects/*/locations/*}/operations'
+>>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/cloud/telcoautomation/v1alpha1/telcoautomation_v1alpha1.yaml
+
+authentication:
+  rules:
+  - selector: google.cloud.location.Locations.GetLocation
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.location.Locations.ListLocations
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.telcoautomation.v1alpha1.TelcoAutomation.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.longrunning.Operations.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+
+publishing:
+  new_issue_uri: https://issuetracker.google.com/issues/new?component=190865&template=1161103
+  documentation_uri: https://cloud.google.com/telecom-network-automation
+  api_short_name: telcoautomation
+  github_label: 'api: telcoautomation'
+  doc_tag_prefix: telcoautomation
+  organization: CLOUD
+  library_settings:
+  - version: google.cloud.telcoautomation.v1alpha1
+    launch_stage: EARLY_ACCESS
+    java_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    cpp_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    php_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    python_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    node_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    dotnet_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    ruby_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    go_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
