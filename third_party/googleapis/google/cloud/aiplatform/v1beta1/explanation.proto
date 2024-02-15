@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,6 +43,14 @@ message Explanation {
   // specific item.
   // [Attribution.output_index][google.cloud.aiplatform.v1beta1.Attribution.output_index]
   // can be used to identify which output this attribution is explaining.
+  //
+  // By default, we provide Shapley values for the predicted class. However,
+  // you can configure the explanation request to generate Shapley values for
+  // any other classes too. For example, if a model predicts a probability of
+  // `0.4` for approving a loan application, the model's decision is to reject
+  // the application since `p(reject) = 0.6 > p(approve) = 0.4`, and the default
+  // Shapley values would be computed for rejection decision and not approval,
+  // even though the latter might be the positive class.
   //
   // If users set
   // [ExplanationParameters.top_k][google.cloud.aiplatform.v1beta1.ExplanationParameters.top_k],
@@ -425,21 +433,47 @@ message BlurBaselineConfig {
 // Example-based explainability that returns the nearest neighbors from the
 // provided dataset.
 message Examples {
+  // The Cloud Storage input instances.
+  message ExampleGcsSource {
+    // The format of the input example instances.
+    enum DataFormat {
+      // Format unspecified, used when unset.
+      DATA_FORMAT_UNSPECIFIED = 0;
+
+      // Examples are stored in JSONL files.
+      JSONL = 1;
+    }
+
+    // The format in which instances are given, if not specified, assume it's
+    // JSONL format. Currently only JSONL format is supported.
+    DataFormat data_format = 1;
+
+    // The Cloud Storage location for the input instances.
+    GcsSource gcs_source = 2;
+  }
+
+  oneof source {
+    // The Cloud Storage input instances.
+    ExampleGcsSource example_gcs_source = 5;
+  }
+
   oneof config {
-    // The configuration for the generated index, the semantics are the same as
-    // [metadata][google.cloud.aiplatform.v1beta1.Index.metadata] and should
-    // match NearestNeighborSearchConfig.
+    // The full configuration for the generated index, the semantics are the
+    // same as [metadata][google.cloud.aiplatform.v1beta1.Index.metadata] and
+    // should match
+    // [NearestNeighborSearchConfig](https://cloud.google.com/vertex-ai/docs/explainable-ai/configuring-explanations-example-based#nearest-neighbor-search-config).
     google.protobuf.Value nearest_neighbor_search_config = 2;
 
-    // Preset config based on the desired query speed-precision trade-off
-    // and modality
+    // Simplified preset configuration, which automatically sets configuration
+    // values based on the desired query speed-precision trade-off and modality.
     Presets presets = 4;
   }
 
-  // The Cloud Storage location for the input instances.
+  // The Cloud Storage locations that contain the instances to be
+  // indexed for approximate nearest neighbor search.
   GcsSource gcs_source = 1;
 
-  // The number of neighbors to return.
+  // The number of neighbors to return when querying for examples.
   int32 neighbor_count = 3;
 }
 
@@ -448,7 +482,6 @@ message Presets {
   // Preset option controlling parameters for query speed-precision trade-off
   enum Query {
     // More precise neighbors as a trade-off against slower response.
-    // This is also the default value (field-number 0).
     PRECISE = 0;
 
     // Faster response as a trade-off against less precise neighbors.
@@ -470,10 +503,14 @@ message Presets {
     TABULAR = 3;
   }
 
-  // Preset option controlling parameters for query speed-precision trade-off
+  // Preset option controlling parameters for speed-precision trade-off when
+  // querying for examples. If omitted, defaults to `PRECISE`.
   optional Query query = 1;
 
-  // Preset option controlling parameters for different modalities
+  // The modality of the uploaded model, which automatically configures the
+  // distance measurement and feature normalization for the underlying example
+  // index and queries. If your model does not precisely fit one of these types,
+  // it is okay to choose the closest type.
   Modality modality = 2;
 }
 
@@ -482,8 +519,8 @@ message Presets {
 // explanation][google.cloud.aiplatform.v1beta1.PredictionService.Explain] time.
 message ExplanationSpecOverride {
   // The parameters to be overridden. Note that the
-  // [method][google.cloud.aiplatform.v1beta1.ExplanationParameters.method]
-  // cannot be changed. If not specified, no parameter is overridden.
+  // attribution method cannot be changed. If not specified,
+  // no parameter is overridden.
   ExplanationParameters parameters = 1;
 
   // The metadata to be overridden. If not specified, no metadata is overridden.

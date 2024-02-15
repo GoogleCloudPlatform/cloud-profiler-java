@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed_item_set.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed_item_set.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed_item_set.proto
-package google.ads.googleads.v13.resources;
-
-import "google/ads/googleads/v13/common/feed_item_set_filter_type_infos.proto";
-import "google/ads/googleads/v13/enums/feed_item_set_status.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "FeedItemSetProto";
-option java_package = "com.google.ads.googleads.v13.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/common/feed_item_set_filter_type_infos.proto";
@@ -50,7 +29,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed_item_set.proto
 
 // Represents a set of feed items. The set can be used and shared among certain
 // feed item features. For instance, the set can be referenced within the
@@ -86,11 +64,7 @@ message FeedItemSet {
 
   // Output only. Status of the feed item set.
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed_item_set.proto
-  google.ads.googleads.v13.enums.FeedItemSetStatusEnum.FeedItemSetStatus
-========
   google.ads.googleads.v14.enums.FeedItemSetStatusEnum.FeedItemSetStatus
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed_item_set.proto
       status = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Represents a filter on locations in a feed item set.
@@ -98,21 +72,13 @@ message FeedItemSet {
   oneof dynamic_set_filter {
     // Filter for dynamic location set.
     // It is only used for sets of locations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed_item_set.proto
-    google.ads.googleads.v13.common.DynamicLocationSetFilter
-========
     google.ads.googleads.v14.common.DynamicLocationSetFilter
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed_item_set.proto
         dynamic_location_set_filter = 5;
 
     // Filter for dynamic affiliate location set.
     // This field doesn't apply generally to feed item sets. It is only used for
     // sets of affiliate locations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed_item_set.proto
-    google.ads.googleads.v13.common.DynamicAffiliateLocationSetFilter
-========
     google.ads.googleads.v14.common.DynamicAffiliateLocationSetFilter
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed_item_set.proto
         dynamic_affiliate_location_set_filter = 6;
   }
 }

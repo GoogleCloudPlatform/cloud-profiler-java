@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-package google.ads.googleads.v13.common;
-
-import "google/ads/googleads/v13/enums/policy_topic_entry_type.proto";
-import "google/ads/googleads/v13/enums/policy_topic_evidence_destination_mismatch_url_type.proto";
-import "google/ads/googleads/v13/enums/policy_topic_evidence_destination_not_working_device.proto";
-import "google/ads/googleads/v13/enums/policy_topic_evidence_destination_not_working_dns_error_type.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "PolicyProto";
-option java_package = "com.google.ads.googleads.v13.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V13::Common";
-========
 package google.ads.googleads.v14.common;
 
 import "google/ads/googleads/v14/enums/policy_topic_entry_type.proto";
@@ -50,7 +29,6 @@ option java_package = "com.google.ads.googleads.v14.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V14::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
 
 // Proto file describing policy information.
 
@@ -108,11 +86,7 @@ message PolicyTopicEntry {
   optional string topic = 5;
 
   // Describes the negative or positive effect this policy will have on serving.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-  google.ads.googleads.v13.enums.PolicyTopicEntryTypeEnum.PolicyTopicEntryType
-========
   google.ads.googleads.v14.enums.PolicyTopicEntryTypeEnum.PolicyTopicEntryType
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
       type = 2;
 
   // Additional information that explains policy finding
@@ -151,11 +125,7 @@ message PolicyTopicEvidence {
   // Evidence of mismatches between the URLs of a resource.
   message DestinationMismatch {
     // The set of URLs that did not match each other.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-    repeated google.ads.googleads.v13.enums
-========
     repeated google.ads.googleads.v14.enums
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
         .PolicyTopicEvidenceDestinationMismatchUrlTypeEnum
         .PolicyTopicEvidenceDestinationMismatchUrlType url_types = 1;
   }
@@ -167,11 +137,7 @@ message PolicyTopicEvidence {
     optional string expanded_url = 7;
 
     // The type of device that failed to load the URL.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-    google.ads.googleads.v13.enums
-========
     google.ads.googleads.v14.enums
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
         .PolicyTopicEvidenceDestinationNotWorkingDeviceEnum
         .PolicyTopicEvidenceDestinationNotWorkingDevice device = 4;
 
@@ -183,11 +149,7 @@ message PolicyTopicEvidence {
     // Indicates the reason of the DESTINATION_NOT_WORKING policy finding.
     oneof reason {
       // The type of DNS error.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/policy.proto
-      google.ads.googleads.v13.enums
-========
       google.ads.googleads.v14.enums
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/policy.proto
           .PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum
           .PolicyTopicEvidenceDestinationNotWorkingDnsErrorType dns_error_type =
           1;

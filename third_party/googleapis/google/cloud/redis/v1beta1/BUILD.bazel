@@ -116,7 +116,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -151,19 +150,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "redis_go_gapic_test",
-    srcs = [":redis_go_gapic_srcjar_test"],
-    embed = [":redis_go_gapic"],
-    importpath = "cloud.google.com/go/redis/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-redis-v1beta1-go",
     deps = [
         ":redis_go_gapic",
         ":redis_go_gapic_srcjar-metadata.srcjar",
+        ":redis_go_gapic_srcjar-snippets.srcjar",
         ":redis_go_gapic_srcjar-test.srcjar",
         ":redis_go_proto",
     ],
@@ -213,19 +206,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "redis_php_proto",
     deps = [":redis_proto"],
-)
-
-php_grpc_library(
-    name = "redis_php_grpc",
-    srcs = [":redis_proto"],
-    deps = [":redis_php_proto"],
 )
 
 php_gapic_library(
@@ -235,10 +221,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "redis_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":redis_php_grpc",
-        ":redis_php_proto",
-    ],
+    deps = [":redis_php_proto"],
 )
 
 # Open Source Packages
@@ -246,7 +229,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-redis-v1beta1-php",
     deps = [
         ":redis_php_gapic",
-        ":redis_php_grpc",
         ":redis_php_proto",
     ],
 )
@@ -318,6 +300,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Creates and manages Redis instances on the Google Cloud Platform.",
     ruby_cloud_title = "Google Cloud Memorystore for Redis V1beta1",
     service_yaml = "redis_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":redis_ruby_grpc",
         ":redis_ruby_proto",

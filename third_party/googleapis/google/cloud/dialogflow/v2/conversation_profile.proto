@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import "google/api/resource.proto";
 import "google/cloud/dialogflow/v2/audio_config.proto";
 import "google/cloud/dialogflow/v2/participant.proto";
 import "google/longrunning/operations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -381,6 +382,13 @@ message AutomatedAgentConfig {
       type: "dialogflow.googleapis.com/Agent"
     }
   ];
+
+  // Optional. Configure lifetime of the Dialogflow session.
+  // By default, a Dialogflow CX session remains active and its data is stored
+  // for 30 minutes after the last request is sent for the session.
+  // This value should be no longer than 1 day.
+  google.protobuf.Duration session_ttl = 3
+      [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Defines the Human Agent Assist to connect to a conversation.
@@ -403,8 +411,21 @@ message HumanAgentAssistantConfig {
     // Automatically iterates all participants and tries to compile
     // suggestions.
     //
-    // Supported features: ARTICLE_SUGGESTION, FAQ, DIALOGFLOW_ASSIST.
+    // Supported features: ARTICLE_SUGGESTION, FAQ, DIALOGFLOW_ASSIST,
+    // KNOWLEDGE_ASSIST.
     bool enable_event_based_suggestion = 3;
+
+    // Optional. Disable the logging of search queries sent by human agents. It
+    // can prevent those queries from being stored at answer records.
+    //
+    // Supported features: KNOWLEDGE_SEARCH.
+    bool disable_agent_query_logging = 14
+        [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Enable including conversation context during query answer
+    // generation. Supported features: KNOWLEDGE_SEARCH.
+    bool enable_conversation_augmented_query = 16
+        [(google.api.field_behavior) = OPTIONAL];
 
     // Settings of suggestion trigger.
     //
@@ -478,8 +499,22 @@ message HumanAgentAssistantConfig {
     //
     // Supported feature: DIALOGFLOW_ASSIST.
     message DialogflowQuerySource {
+      // The configuration used for human agent side Dialogflow assist
+      // suggestion.
+      message HumanAgentSideConfig {
+        // Optional. The name of a dialogflow virtual agent used for intent
+        // detection and suggestion triggered by human agent.
+        // Format: `projects/<Project ID>/locations/<Location ID>/agent`.
+        string agent = 1 [
+          (google.api.field_behavior) = OPTIONAL,
+          (google.api.resource_reference) = {
+            type: "dialogflow.googleapis.com/Agent"
+          }
+        ];
+      }
+
       // Required. The name of a Dialogflow virtual agent used for end user side
-      // intent detection and suggestion. Format: `projects/<Project Number/
+      // intent detection and suggestion. Format: `projects/<Project
       // ID>/locations/<Location ID>/agent`. When multiple agents are allowed in
       // the same Dialogflow project.
       string agent = 1 [
@@ -488,6 +523,10 @@ message HumanAgentAssistantConfig {
           type: "dialogflow.googleapis.com/Agent"
         }
       ];
+
+      // Optional. The Dialogflow assist configuration for human agent.
+      HumanAgentSideConfig human_agent_side_config = 3
+          [(google.api.field_behavior) = OPTIONAL];
     }
 
     // Settings that determine how to filter recent conversation context when
@@ -502,6 +541,54 @@ message HumanAgentAssistantConfig {
 
       // If set to true, all messages from ivr stage are dropped.
       bool drop_ivr_messages = 3;
+    }
+
+    // Custom sections to return when requesting a summary of a conversation.
+    // This is only supported when `baseline_model_version` == '2.0'.
+    //
+    // Supported features: CONVERSATION_SUMMARIZATION,
+    // CONVERSATION_SUMMARIZATION_VOICE.
+    message Sections {
+      // Selectable sections to return when requesting a summary of a
+      // conversation.
+      enum SectionType {
+        // Undefined section type, does not return anything.
+        SECTION_TYPE_UNSPECIFIED = 0;
+
+        // What the customer needs help with or has question about.
+        // Section name: "situation".
+        SITUATION = 1;
+
+        // What the agent does to help the customer.
+        // Section name: "action".
+        ACTION = 2;
+
+        // Result of the customer service. A single word describing the result
+        // of the conversation.
+        // Section name: "resolution".
+        RESOLUTION = 3;
+
+        // Reason for cancellation if the customer requests for a cancellation.
+        // "N/A" otherwise.
+        // Section name: "reason_for_cancellation".
+        REASON_FOR_CANCELLATION = 4;
+
+        // "Unsatisfied" or "Satisfied" depending on the customer's feelings at
+        // the end of the conversation.
+        // Section name: "customer_satisfaction".
+        CUSTOMER_SATISFACTION = 5;
+
+        // Key entities extracted from the conversation, such as ticket number,
+        // order number, dollar amount, etc.
+        // Section names are prefixed by "entities/".
+        ENTITIES = 6;
+      }
+
+      // The selected sections chosen to return when requesting a summary of a
+      // conversation. A duplicate selected section will be treated as a single
+      // selected section. If section types are not provided, the default will
+      // be {SITUATION, ACTION, RESULT}.
+      repeated SectionType section_types = 1;
     }
 
     // Source of query.
@@ -540,12 +627,17 @@ message HumanAgentAssistantConfig {
     // If this field is not set, it defaults to 0.0, which means that all
     // suggestions are returned.
     //
-    // Supported features: ARTICLE_SUGGESTION, FAQ, SMART_REPLY, SMART_COMPOSE.
+    // Supported features: ARTICLE_SUGGESTION, FAQ, SMART_REPLY, SMART_COMPOSE,
+    // KNOWLEDGE_SEARCH, KNOWLEDGE_ASSIST, ENTITY_EXTRACTION.
     float confidence_threshold = 5;
 
     // Determines how recent conversation context is filtered when generating
     // suggestions. If unspecified, no messages will be dropped.
     ContextFilterSettings context_filter_settings = 7;
+
+    // Optional. The customized sections chosen to return when requesting a
+    // summary of a conversation.
+    Sections sections = 8 [(google.api.field_behavior) = OPTIONAL];
   }
 
   // Custom conversation models used in agent assist feature.
@@ -558,6 +650,16 @@ message HumanAgentAssistantConfig {
     string model = 1 [(google.api.resource_reference) = {
       type: "dialogflow.googleapis.com/ConversationModel"
     }];
+
+    // Version of current baseline model. It will be ignored if
+    // [model][google.cloud.dialogflow.v2.HumanAgentAssistantConfig.ConversationModelConfig.model]
+    // is set. Valid versions are:
+    //   Article Suggestion baseline model:
+    //     - 0.9
+    //     - 1.0 (default)
+    //   Summarization baseline model:
+    //     - 1.0
+    string baseline_model_version = 8;
   }
 
   // Config to process conversation.
@@ -719,6 +821,9 @@ message SuggestionFeature {
 
     // Run smart reply model for chat.
     SMART_REPLY = 3;
+
+    // Run knowledge search with text input from agent or text generated query.
+    KNOWLEDGE_SEARCH = 14;
   }
 
   // Type of Human Agent Assistant API feature to request.

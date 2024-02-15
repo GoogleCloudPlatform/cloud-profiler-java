@@ -14,164 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-package google.ads.googleads.v12.errors;
-
-import "google/ads/googleads/v12/common/policy.proto";
-import "google/ads/googleads/v12/common/value.proto";
-import "google/ads/googleads/v12/enums/resource_limit_type.proto";
-import "google/ads/googleads/v12/errors/access_invitation_error.proto";
-import "google/ads/googleads/v12/errors/account_budget_proposal_error.proto";
-import "google/ads/googleads/v12/errors/account_link_error.proto";
-import "google/ads/googleads/v12/errors/ad_customizer_error.proto";
-import "google/ads/googleads/v12/errors/ad_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_ad_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_bid_modifier_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_criterion_customizer_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_criterion_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_customizer_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_error.proto";
-import "google/ads/googleads/v12/errors/ad_group_feed_error.proto";
-import "google/ads/googleads/v12/errors/ad_parameter_error.proto";
-import "google/ads/googleads/v12/errors/ad_sharing_error.proto";
-import "google/ads/googleads/v12/errors/adx_error.proto";
-import "google/ads/googleads/v12/errors/asset_error.proto";
-import "google/ads/googleads/v12/errors/asset_group_asset_error.proto";
-import "google/ads/googleads/v12/errors/asset_group_error.proto";
-import "google/ads/googleads/v12/errors/asset_group_listing_group_filter_error.proto";
-import "google/ads/googleads/v12/errors/asset_link_error.proto";
-import "google/ads/googleads/v12/errors/asset_set_asset_error.proto";
-import "google/ads/googleads/v12/errors/asset_set_error.proto";
-import "google/ads/googleads/v12/errors/asset_set_link_error.proto";
-import "google/ads/googleads/v12/errors/audience_error.proto";
-import "google/ads/googleads/v12/errors/audience_insights_error.proto";
-import "google/ads/googleads/v12/errors/authentication_error.proto";
-import "google/ads/googleads/v12/errors/authorization_error.proto";
-import "google/ads/googleads/v12/errors/batch_job_error.proto";
-import "google/ads/googleads/v12/errors/bidding_error.proto";
-import "google/ads/googleads/v12/errors/bidding_strategy_error.proto";
-import "google/ads/googleads/v12/errors/billing_setup_error.proto";
-import "google/ads/googleads/v12/errors/campaign_budget_error.proto";
-import "google/ads/googleads/v12/errors/campaign_conversion_goal_error.proto";
-import "google/ads/googleads/v12/errors/campaign_criterion_error.proto";
-import "google/ads/googleads/v12/errors/campaign_customizer_error.proto";
-import "google/ads/googleads/v12/errors/campaign_draft_error.proto";
-import "google/ads/googleads/v12/errors/campaign_error.proto";
-import "google/ads/googleads/v12/errors/campaign_experiment_error.proto";
-import "google/ads/googleads/v12/errors/campaign_feed_error.proto";
-import "google/ads/googleads/v12/errors/campaign_shared_set_error.proto";
-import "google/ads/googleads/v12/errors/change_event_error.proto";
-import "google/ads/googleads/v12/errors/change_status_error.proto";
-import "google/ads/googleads/v12/errors/collection_size_error.proto";
-import "google/ads/googleads/v12/errors/context_error.proto";
-import "google/ads/googleads/v12/errors/conversion_action_error.proto";
-import "google/ads/googleads/v12/errors/conversion_adjustment_upload_error.proto";
-import "google/ads/googleads/v12/errors/conversion_custom_variable_error.proto";
-import "google/ads/googleads/v12/errors/conversion_goal_campaign_config_error.proto";
-import "google/ads/googleads/v12/errors/conversion_upload_error.proto";
-import "google/ads/googleads/v12/errors/conversion_value_rule_error.proto";
-import "google/ads/googleads/v12/errors/conversion_value_rule_set_error.proto";
-import "google/ads/googleads/v12/errors/country_code_error.proto";
-import "google/ads/googleads/v12/errors/criterion_error.proto";
-import "google/ads/googleads/v12/errors/currency_code_error.proto";
-import "google/ads/googleads/v12/errors/custom_audience_error.proto";
-import "google/ads/googleads/v12/errors/custom_conversion_goal_error.proto";
-import "google/ads/googleads/v12/errors/custom_interest_error.proto";
-import "google/ads/googleads/v12/errors/customer_client_link_error.proto";
-import "google/ads/googleads/v12/errors/customer_customizer_error.proto";
-import "google/ads/googleads/v12/errors/customer_error.proto";
-import "google/ads/googleads/v12/errors/customer_feed_error.proto";
-import "google/ads/googleads/v12/errors/customer_manager_link_error.proto";
-import "google/ads/googleads/v12/errors/customer_user_access_error.proto";
-import "google/ads/googleads/v12/errors/customizer_attribute_error.proto";
-import "google/ads/googleads/v12/errors/database_error.proto";
-import "google/ads/googleads/v12/errors/date_error.proto";
-import "google/ads/googleads/v12/errors/date_range_error.proto";
-import "google/ads/googleads/v12/errors/distinct_error.proto";
-import "google/ads/googleads/v12/errors/enum_error.proto";
-import "google/ads/googleads/v12/errors/experiment_arm_error.proto";
-import "google/ads/googleads/v12/errors/experiment_error.proto";
-import "google/ads/googleads/v12/errors/extension_feed_item_error.proto";
-import "google/ads/googleads/v12/errors/extension_setting_error.proto";
-import "google/ads/googleads/v12/errors/feed_attribute_reference_error.proto";
-import "google/ads/googleads/v12/errors/feed_error.proto";
-import "google/ads/googleads/v12/errors/feed_item_error.proto";
-import "google/ads/googleads/v12/errors/feed_item_set_error.proto";
-import "google/ads/googleads/v12/errors/feed_item_set_link_error.proto";
-import "google/ads/googleads/v12/errors/feed_item_target_error.proto";
-import "google/ads/googleads/v12/errors/feed_item_validation_error.proto";
-import "google/ads/googleads/v12/errors/feed_mapping_error.proto";
-import "google/ads/googleads/v12/errors/field_error.proto";
-import "google/ads/googleads/v12/errors/field_mask_error.proto";
-import "google/ads/googleads/v12/errors/function_error.proto";
-import "google/ads/googleads/v12/errors/function_parsing_error.proto";
-import "google/ads/googleads/v12/errors/geo_target_constant_suggestion_error.proto";
-import "google/ads/googleads/v12/errors/header_error.proto";
-import "google/ads/googleads/v12/errors/id_error.proto";
-import "google/ads/googleads/v12/errors/image_error.proto";
-import "google/ads/googleads/v12/errors/internal_error.proto";
-import "google/ads/googleads/v12/errors/invoice_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_ad_group_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_ad_group_keyword_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_campaign_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_campaign_keyword_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_error.proto";
-import "google/ads/googleads/v12/errors/keyword_plan_idea_error.proto";
-import "google/ads/googleads/v12/errors/label_error.proto";
-import "google/ads/googleads/v12/errors/language_code_error.proto";
-import "google/ads/googleads/v12/errors/list_operation_error.proto";
-import "google/ads/googleads/v12/errors/manager_link_error.proto";
-import "google/ads/googleads/v12/errors/media_bundle_error.proto";
-import "google/ads/googleads/v12/errors/media_file_error.proto";
-import "google/ads/googleads/v12/errors/media_upload_error.proto";
-import "google/ads/googleads/v12/errors/merchant_center_error.proto";
-import "google/ads/googleads/v12/errors/multiplier_error.proto";
-import "google/ads/googleads/v12/errors/mutate_error.proto";
-import "google/ads/googleads/v12/errors/new_resource_creation_error.proto";
-import "google/ads/googleads/v12/errors/not_allowlisted_error.proto";
-import "google/ads/googleads/v12/errors/not_empty_error.proto";
-import "google/ads/googleads/v12/errors/null_error.proto";
-import "google/ads/googleads/v12/errors/offline_user_data_job_error.proto";
-import "google/ads/googleads/v12/errors/operation_access_denied_error.proto";
-import "google/ads/googleads/v12/errors/operator_error.proto";
-import "google/ads/googleads/v12/errors/partial_failure_error.proto";
-import "google/ads/googleads/v12/errors/payments_account_error.proto";
-import "google/ads/googleads/v12/errors/policy_finding_error.proto";
-import "google/ads/googleads/v12/errors/policy_validation_parameter_error.proto";
-import "google/ads/googleads/v12/errors/policy_violation_error.proto";
-import "google/ads/googleads/v12/errors/query_error.proto";
-import "google/ads/googleads/v12/errors/quota_error.proto";
-import "google/ads/googleads/v12/errors/range_error.proto";
-import "google/ads/googleads/v12/errors/reach_plan_error.proto";
-import "google/ads/googleads/v12/errors/recommendation_error.proto";
-import "google/ads/googleads/v12/errors/region_code_error.proto";
-import "google/ads/googleads/v12/errors/request_error.proto";
-import "google/ads/googleads/v12/errors/resource_access_denied_error.proto";
-import "google/ads/googleads/v12/errors/resource_count_limit_exceeded_error.proto";
-import "google/ads/googleads/v12/errors/setting_error.proto";
-import "google/ads/googleads/v12/errors/shared_criterion_error.proto";
-import "google/ads/googleads/v12/errors/shared_set_error.proto";
-import "google/ads/googleads/v12/errors/size_limit_error.proto";
-import "google/ads/googleads/v12/errors/smart_campaign_error.proto";
-import "google/ads/googleads/v12/errors/string_format_error.proto";
-import "google/ads/googleads/v12/errors/string_length_error.proto";
-import "google/ads/googleads/v12/errors/third_party_app_analytics_link_error.proto";
-import "google/ads/googleads/v12/errors/time_zone_error.proto";
-import "google/ads/googleads/v12/errors/url_field_error.proto";
-import "google/ads/googleads/v12/errors/user_data_error.proto";
-import "google/ads/googleads/v12/errors/user_list_error.proto";
-import "google/ads/googleads/v12/errors/youtube_video_registration_error.proto";
-import "google/protobuf/duration.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Errors";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/errors;errors";
-option java_multiple_files = true;
-option java_outer_classname = "ErrorsProto";
-option java_package = "com.google.ads.googleads.v12.errors";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Errors";
-option ruby_package = "Google::Ads::GoogleAds::V12::Errors";
-========
 package google.ads.googleads.v14.errors;
 
 import "google/ads/googleads/v14/common/policy.proto";
@@ -331,7 +173,6 @@ option java_package = "com.google.ads.googleads.v14.errors";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Errors";
 option ruby_package = "Google::Ads::GoogleAds::V14::Errors";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
 
 // Proto file describing the common error protos
 
@@ -354,11 +195,7 @@ message GoogleAdsError {
   string message = 2;
 
   // The value that triggered the error.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-  google.ads.googleads.v12.common.Value trigger = 3;
-========
   google.ads.googleads.v14.common.Value trigger = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
 
   // Describes the part of the request proto that caused the error.
   ErrorLocation location = 4;
@@ -829,13 +666,10 @@ message ErrorCode {
     // The reasons for the audience error
     AudienceErrorEnum.AudienceError audience_error = 164;
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-========
     // The reasons for the Search term insight error
     SearchTermInsightErrorEnum.SearchTermInsightError
         search_term_insight_error = 174;
 
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
     // The reasons for the Smart campaign error
     SmartCampaignErrorEnum.SmartCampaignError smart_campaign_error = 147;
 
@@ -843,9 +677,6 @@ message ErrorCode {
     ExperimentArmErrorEnum.ExperimentArmError experiment_arm_error = 156;
 
     // The reasons for the Audience Insights error
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-    AudienceInsightsErrorEnum.AudienceInsightsError audience_insights_error = 167;
-========
     AudienceInsightsErrorEnum.AudienceInsightsError audience_insights_error =
         167;
 
@@ -856,7 +687,6 @@ message ErrorCode {
 
     // The reasons for the currency errors.
     CurrencyErrorEnum.CurrencyError currency_error = 171;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
   }
 }
 
@@ -904,11 +734,7 @@ message PolicyViolationDetails {
 
   // Unique identifier for this violation.
   // If policy is exemptible, this key may be used to request exemption.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-  google.ads.googleads.v12.common.PolicyViolationKey key = 4;
-========
   google.ads.googleads.v14.common.PolicyViolationKey key = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
 
   // Human readable name of the policy.
   string external_policy_name = 5;
@@ -924,12 +750,8 @@ message PolicyFindingDetails {
   // The list of policy topics for the resource. Contains the PROHIBITED or
   // FULLY_LIMITED policy topic entries that prevented the resource from being
   // saved (among any other entries the resource may also have).
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-  repeated google.ads.googleads.v12.common.PolicyTopicEntry policy_topic_entries = 1;
-========
   repeated google.ads.googleads.v14.common.PolicyTopicEntry
       policy_topic_entries = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
 }
 
 // Additional quota error details when there is QuotaError.
@@ -974,12 +796,8 @@ message ResourceCountDetails {
   int32 limit = 2;
 
   // The resource limit type which was exceeded.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/errors/errors.proto
-  google.ads.googleads.v12.enums.ResourceLimitTypeEnum.ResourceLimitType limit_type = 3;
-========
   google.ads.googleads.v14.enums.ResourceLimitTypeEnum.ResourceLimitType
       limit_type = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/errors/errors.proto
 
   // The count of existing entities.
   int32 existing_count = 4;

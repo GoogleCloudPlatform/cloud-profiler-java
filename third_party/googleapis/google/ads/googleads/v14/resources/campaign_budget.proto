@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,25 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-package google.ads.googleads.v13.resources;
-
-import "google/ads/googleads/v13/enums/budget_delivery_method.proto";
-import "google/ads/googleads/v13/enums/budget_period.proto";
-import "google/ads/googleads/v13/enums/budget_status.proto";
-import "google/ads/googleads/v13/enums/budget_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CampaignBudgetProto";
-option java_package = "com.google.ads.googleads.v13.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/enums/budget_delivery_method.proto";
@@ -54,7 +31,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
 
 // Proto file describing the Budget resource.
 
@@ -106,22 +82,14 @@ message CampaignBudget {
   optional int64 total_amount_micros = 22;
 
   // Output only. The status of this campaign budget. This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-  google.ads.googleads.v13.enums.BudgetStatusEnum.BudgetStatus status = 6
-========
   google.ads.googleads.v14.enums.BudgetStatusEnum.BudgetStatus status = 6
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The delivery method that determines the rate at which the campaign budget
   // is spent.
   //
   // Defaults to STANDARD if unspecified in a create operation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-  google.ads.googleads.v13.enums.BudgetDeliveryMethodEnum.BudgetDeliveryMethod
-========
   google.ads.googleads.v14.enums.BudgetDeliveryMethodEnum.BudgetDeliveryMethod
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
       delivery_method = 7;
 
   // Specifies whether the budget is explicitly shared. Defaults to true if
@@ -164,11 +132,7 @@ message CampaignBudget {
 
   // Immutable. Period over which to spend the budget. Defaults to DAILY if not
   // specified.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-  google.ads.googleads.v13.enums.BudgetPeriodEnum.BudgetPeriod period = 13
-========
   google.ads.googleads.v14.enums.BudgetPeriodEnum.BudgetPeriod period = 13
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
       [(google.api.field_behavior) = IMMUTABLE];
 
   // Output only. The estimated change in weekly clicks if the recommended
@@ -201,11 +165,7 @@ message CampaignBudget {
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Immutable. The type of the campaign budget.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_budget.proto
-  google.ads.googleads.v13.enums.BudgetTypeEnum.BudgetType type = 18
-========
   google.ads.googleads.v14.enums.BudgetTypeEnum.BudgetType type = 18
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_budget.proto
       [(google.api.field_behavior) = IMMUTABLE];
 
   // ID of the portfolio bidding strategy that this shared campaign budget

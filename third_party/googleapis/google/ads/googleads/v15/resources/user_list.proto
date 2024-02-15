@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,28 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-package google.ads.googleads.v13.resources;
-
-import "google/ads/googleads/v13/common/user_lists.proto";
-import "google/ads/googleads/v13/enums/access_reason.proto";
-import "google/ads/googleads/v13/enums/user_list_access_status.proto";
-import "google/ads/googleads/v13/enums/user_list_closing_reason.proto";
-import "google/ads/googleads/v13/enums/user_list_membership_status.proto";
-import "google/ads/googleads/v13/enums/user_list_size_range.proto";
-import "google/ads/googleads/v13/enums/user_list_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "UserListProto";
-option java_package = "com.google.ads.googleads.v13.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/user_lists.proto";
@@ -60,7 +34,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
 
 // Proto file describing the User List resource.
 
@@ -102,11 +75,7 @@ message UserList {
   // Membership status of this user list. Indicates whether a user list is open
   // or active. Only open user lists can accumulate more users and can be
   // targeted to.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListMembershipStatusEnum
-========
   google.ads.googleads.v15.enums.UserListMembershipStatusEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       .UserListMembershipStatus membership_status = 6;
 
   // An ID from external system. It is used by user list sellers to correlate
@@ -133,11 +102,7 @@ message UserList {
   // Google Display Network.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListSizeRangeEnum.UserListSizeRange
-========
   google.ads.googleads.v15.enums.UserListSizeRangeEnum.UserListSizeRange
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       size_range_for_display = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Estimated number of users in this user list in the google.com
@@ -152,53 +117,33 @@ message UserList {
   // Search ads.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListSizeRangeEnum.UserListSizeRange
-========
   google.ads.googleads.v15.enums.UserListSizeRangeEnum.UserListSizeRange
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       size_range_for_search = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Type of this list.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListTypeEnum.UserListType type = 13
-========
   google.ads.googleads.v15.enums.UserListTypeEnum.UserListType type = 13
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Indicating the reason why this user list membership status is closed. It is
   // only populated on lists that were automatically closed due to inactivity,
   // and will be cleared once the list membership status becomes open.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListClosingReasonEnum.UserListClosingReason
-========
   google.ads.googleads.v15.enums.UserListClosingReasonEnum.UserListClosingReason
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       closing_reason = 14;
 
   // Output only. Indicates the reason this account has been granted access to
   // the list. The reason can be SHARED, OWNED, LICENSED or SUBSCRIBED.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.AccessReasonEnum.AccessReason access_reason =
-========
   google.ads.googleads.v15.enums.AccessReasonEnum.AccessReason access_reason =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       15 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Indicates if this share is still enabled. When a UserList is shared with
   // the user this field is set to ENABLED. Later the userList owner can decide
   // to revoke the share and make it DISABLED.
   // The default value of this field is set to ENABLED.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-  google.ads.googleads.v13.enums.UserListAccessStatusEnum.UserListAccessStatus
-========
   google.ads.googleads.v15.enums.UserListAccessStatusEnum.UserListAccessStatus
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
       account_user_list_status = 16;
 
   // Indicates if this user list is eligible for Google Search Network.
@@ -224,29 +169,11 @@ message UserList {
   // Exactly one must be set.
   oneof user_list {
     // User list of CRM users provided by the advertiser.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-    google.ads.googleads.v13.common.CrmBasedUserListInfo crm_based_user_list =
-========
     google.ads.googleads.v15.common.CrmBasedUserListInfo crm_based_user_list =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
         19;
 
     // Output only. User list which are similar to users from another UserList.
     // These lists are readonly and automatically created by google.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/user_list.proto
-    google.ads.googleads.v13.common.SimilarUserListInfo similar_user_list = 20
-        [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // User list generated by a rule.
-    google.ads.googleads.v13.common.RuleBasedUserListInfo rule_based_user_list =
-        21;
-
-    // User list that is a custom combination of user lists and user interests.
-    google.ads.googleads.v13.common.LogicalUserListInfo logical_user_list = 22;
-
-    // User list targeting as a collection of conversion or remarketing actions.
-    google.ads.googleads.v13.common.BasicUserListInfo basic_user_list = 23;
-========
     google.ads.googleads.v15.common.SimilarUserListInfo similar_user_list = 20
         [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -263,6 +190,5 @@ message UserList {
     // Immutable. Lookalike User List.
     google.ads.googleads.v15.common.LookalikeUserListInfo lookalike_user_list =
         36 [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/user_list.proto
   }
 }

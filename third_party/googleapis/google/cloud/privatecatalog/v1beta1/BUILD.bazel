@@ -73,6 +73,7 @@ java_gapic_library(
     srcs = [":privatecatalog_proto_with_info"],
     grpc_service_config = "cloudprivatecatalog_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "cloudprivatecatalog_v1beta1.yaml",
     test_deps = [
         ":privatecatalog_java_grpc",
     ],
@@ -112,7 +113,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -146,19 +146,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "privatecatalog_go_gapic_test",
-    srcs = [":privatecatalog_go_gapic_srcjar_test"],
-    embed = [":privatecatalog_go_gapic"],
-    importpath = "cloud.google.com/go/privatecatalog/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-privatecatalog-v1beta1-go",
     deps = [
         ":privatecatalog_go_gapic",
         ":privatecatalog_go_gapic_srcjar-metadata.srcjar",
+        ":privatecatalog_go_gapic_srcjar-snippets.srcjar",
         ":privatecatalog_go_gapic_srcjar-test.srcjar",
         ":privatecatalog_go_proto",
     ],
@@ -212,7 +206,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -221,23 +214,15 @@ php_proto_library(
     deps = [":privatecatalog_proto"],
 )
 
-php_grpc_library(
-    name = "privatecatalog_php_grpc",
-    srcs = [":privatecatalog_proto"],
-    deps = [":privatecatalog_php_proto"],
-)
-
 php_gapic_library(
     name = "privatecatalog_php_gapic",
     srcs = [":privatecatalog_proto_with_info"],
     grpc_service_config = "cloudprivatecatalog_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "cloudprivatecatalog_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":privatecatalog_php_grpc",
-        ":privatecatalog_php_proto",
-    ],
+    deps = [":privatecatalog_php_proto"],
 )
 
 # Open Source Packages
@@ -245,7 +230,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-privatecatalog-v1beta1-php",
     deps = [
         ":privatecatalog_php_gapic",
-        ":privatecatalog_php_grpc",
         ":privatecatalog_php_proto",
     ],
 )
@@ -318,6 +302,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "With Private Catalog, developers and cloud admins can make their solutions discoverable to their internal enterprise users. Cloud admins can manage their solutions and ensure their users are always launching the latest versions.",
     ruby_cloud_title = "Private Catalog V1beta1",
     service_yaml = "cloudprivatecatalog_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":privatecatalog_ruby_grpc",
         ":privatecatalog_ruby_proto",

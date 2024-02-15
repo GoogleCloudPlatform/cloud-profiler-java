@@ -12,6 +12,7 @@ apis:
 
 types:
 - name: google.cloud.metastore.v1beta.AlterMetadataResourceLocationResponse
+- name: google.cloud.metastore.v1beta.ErrorDetails
 - name: google.cloud.metastore.v1beta.LocationMetadata
 - name: google.cloud.metastore.v1beta.MoveTableToDatabaseResponse
 - name: google.cloud.metastore.v1beta.OperationMetadata
@@ -103,6 +104,9 @@ http:
       body: '*'
     - post: '/v1beta/{resource=projects/*/locations/*/federations/*}:testIamPermissions'
       body: '*'
+  - selector: google.longrunning.Operations.CancelOperation
+    post: '/v1beta/{name=projects/*/locations/*/operations/*}:cancel'
+    body: '*'
   - selector: google.longrunning.Operations.DeleteOperation
     delete: '/v1beta/{name=projects/*/locations/*/operations/*}'
   - selector: google.longrunning.Operations.GetOperation

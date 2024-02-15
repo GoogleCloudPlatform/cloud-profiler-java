@@ -22,6 +22,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/cloud/discoveryengine/v1beta/document.proto";
 import "google/cloud/discoveryengine/v1beta/import_config.proto";
+import "google/cloud/discoveryengine/v1beta/purge_config.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/empty.proto";
 
@@ -46,6 +47,9 @@ service DocumentService {
   rpc GetDocument(GetDocumentRequest) returns (Document) {
     option (google.api.http) = {
       get: "/v1beta/{name=projects/*/locations/*/dataStores/*/branches/*/documents/*}"
+      additional_bindings {
+        get: "/v1beta/{name=projects/*/locations/*/collections/*/dataStores/*/branches/*/documents/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -54,6 +58,9 @@ service DocumentService {
   rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse) {
     option (google.api.http) = {
       get: "/v1beta/{parent=projects/*/locations/*/dataStores/*/branches/*}/documents"
+      additional_bindings {
+        get: "/v1beta/{parent=projects/*/locations/*/collections/*/dataStores/*/branches/*}/documents"
+      }
     };
     option (google.api.method_signature) = "parent";
   }
@@ -63,6 +70,10 @@ service DocumentService {
     option (google.api.http) = {
       post: "/v1beta/{parent=projects/*/locations/*/dataStores/*/branches/*}/documents"
       body: "document"
+      additional_bindings {
+        post: "/v1beta/{parent=projects/*/locations/*/collections/*/dataStores/*/branches/*}/documents"
+        body: "document"
+      }
     };
     option (google.api.method_signature) = "parent,document,document_id";
   }
@@ -72,6 +83,10 @@ service DocumentService {
     option (google.api.http) = {
       patch: "/v1beta/{document.name=projects/*/locations/*/dataStores/*/branches/*/documents/*}"
       body: "document"
+      additional_bindings {
+        patch: "/v1beta/{document.name=projects/*/locations/*/collections/*/dataStores/*/branches/*/documents/*}"
+        body: "document"
+      }
     };
   }
 
@@ -79,6 +94,9 @@ service DocumentService {
   rpc DeleteDocument(DeleteDocumentRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1beta/{name=projects/*/locations/*/dataStores/*/branches/*/documents/*}"
+      additional_bindings {
+        delete: "/v1beta/{name=projects/*/locations/*/collections/*/dataStores/*/branches/*/documents/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -95,10 +113,47 @@ service DocumentService {
     option (google.api.http) = {
       post: "/v1beta/{parent=projects/*/locations/*/dataStores/*/branches/*}/documents:import"
       body: "*"
+      additional_bindings {
+        post: "/v1beta/{parent=projects/*/locations/*/collections/*/dataStores/*/branches/*}/documents:import"
+        body: "*"
+      }
     };
     option (google.longrunning.operation_info) = {
       response_type: "google.cloud.discoveryengine.v1beta.ImportDocumentsResponse"
       metadata_type: "google.cloud.discoveryengine.v1beta.ImportDocumentsMetadata"
+    };
+  }
+
+  // Permanently deletes all selected
+  // [Document][google.cloud.discoveryengine.v1beta.Document]s in a branch.
+  //
+  // This process is asynchronous. Depending on the number of
+  // [Document][google.cloud.discoveryengine.v1beta.Document]s to be deleted,
+  // this operation can take hours to complete. Before the delete operation
+  // completes, some [Document][google.cloud.discoveryengine.v1beta.Document]s
+  // might still be returned by
+  // [DocumentService.GetDocument][google.cloud.discoveryengine.v1beta.DocumentService.GetDocument]
+  // or
+  // [DocumentService.ListDocuments][google.cloud.discoveryengine.v1beta.DocumentService.ListDocuments].
+  //
+  // To get a list of the
+  // [Document][google.cloud.discoveryengine.v1beta.Document]s to be deleted,
+  // set
+  // [PurgeDocumentsRequest.force][google.cloud.discoveryengine.v1beta.PurgeDocumentsRequest.force]
+  // to false.
+  rpc PurgeDocuments(PurgeDocumentsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1beta/{parent=projects/*/locations/*/dataStores/*/branches/*}/documents:purge"
+      body: "*"
+      additional_bindings {
+        post: "/v1beta/{parent=projects/*/locations/*/collections/*/dataStores/*/branches/*}/documents:purge"
+        body: "*"
+      }
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "google.cloud.discoveryengine.v1beta.PurgeDocumentsResponse"
+      metadata_type: "google.cloud.discoveryengine.v1beta.PurgeDocumentsMetadata"
     };
   }
 }
@@ -109,14 +164,14 @@ service DocumentService {
 message GetDocumentRequest {
   // Required. Full resource name of
   // [Document][google.cloud.discoveryengine.v1beta.Document], such as
-  // `projects/{project}/locations/{location}/dataStores/{data_store}/branches/{branch}/documents/{document}`.
+  // `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}/branches/{branch}/documents/{document}`.
   //
   // If the caller does not have permission to access the
   // [Document][google.cloud.discoveryengine.v1beta.Document], regardless of
-  // whether or not it exists, a PERMISSION_DENIED error is returned.
+  // whether or not it exists, a `PERMISSION_DENIED` error is returned.
   //
   // If the requested [Document][google.cloud.discoveryengine.v1beta.Document]
-  // does not exist, a NOT_FOUND error is returned.
+  // does not exist, a `NOT_FOUND` error is returned.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -130,13 +185,14 @@ message GetDocumentRequest {
 // method.
 message ListDocumentsRequest {
   // Required. The parent branch resource name, such as
-  // `projects/{project}/locations/{location}/dataStores/{data_store}/branches/{branch}`.
+  // `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}/branches/{branch}`.
   // Use `default_branch` as the branch ID, to list documents under the default
   // branch.
   //
-  // If the caller does not have permission to list [Documents][]s under this
+  // If the caller does not have permission to list
+  // [Document][google.cloud.discoveryengine.v1beta.Document]s under this
   // branch, regardless of whether or not this branch exists, a
-  // PERMISSION_DENIED error is returned.
+  // `PERMISSION_DENIED` error is returned.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -148,7 +204,7 @@ message ListDocumentsRequest {
   // to return. If unspecified, defaults to 100. The maximum allowed value is
   // 1000. Values above 1000 will be coerced to 1000.
   //
-  // If this field is negative, an INVALID_ARGUMENT error is returned.
+  // If this field is negative, an `INVALID_ARGUMENT` error is returned.
   int32 page_size = 2;
 
   // A page token
@@ -160,7 +216,7 @@ message ListDocumentsRequest {
   // When paginating, all other parameters provided to
   // [DocumentService.ListDocuments][google.cloud.discoveryengine.v1beta.DocumentService.ListDocuments]
   // must match the call that provided the page token. Otherwise, an
-  // INVALID_ARGUMENT error is returned.
+  // `INVALID_ARGUMENT` error is returned.
   string page_token = 3;
 }
 
@@ -183,7 +239,7 @@ message ListDocumentsResponse {
 // method.
 message CreateDocumentRequest {
   // Required. The parent resource name, such as
-  // `projects/{project}/locations/{location}/dataStores/{data_store}/branches/{branch}`.
+  // `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}/branches/{branch}`.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -202,16 +258,16 @@ message CreateDocumentRequest {
   //
   // If the caller does not have permission to create the
   // [Document][google.cloud.discoveryengine.v1beta.Document], regardless of
-  // whether or not it exists, a PERMISSION_DENIED error is returned.
+  // whether or not it exists, a `PERMISSION_DENIED` error is returned.
   //
   // This field must be unique among all
   // [Document][google.cloud.discoveryengine.v1beta.Document]s with the same
   // [parent][google.cloud.discoveryengine.v1beta.CreateDocumentRequest.parent].
-  // Otherwise, an ALREADY_EXISTS error is returned.
+  // Otherwise, an `ALREADY_EXISTS` error is returned.
   //
   // This field must conform to [RFC-1034](https://tools.ietf.org/html/rfc1034)
   // standard with a length limit of 63 characters. Otherwise, an
-  // INVALID_ARGUMENT error is returned.
+  // `INVALID_ARGUMENT` error is returned.
   string document_id = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -223,12 +279,12 @@ message UpdateDocumentRequest {
   //
   // If the caller does not have permission to update the
   // [Document][google.cloud.discoveryengine.v1beta.Document], regardless of
-  // whether or not it exists, a PERMISSION_DENIED error is returned.
+  // whether or not it exists, a `PERMISSION_DENIED` error is returned.
   //
   // If the [Document][google.cloud.discoveryengine.v1beta.Document] to update
   // does not exist and
   // [allow_missing][google.cloud.discoveryengine.v1beta.UpdateDocumentRequest.allow_missing]
-  // is not set, a NOT_FOUND error is returned.
+  // is not set, a `NOT_FOUND` error is returned.
   Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
   // If set to true, and the
@@ -244,14 +300,14 @@ message UpdateDocumentRequest {
 message DeleteDocumentRequest {
   // Required. Full resource name of
   // [Document][google.cloud.discoveryengine.v1beta.Document], such as
-  // `projects/{project}/locations/{location}/dataStores/{data_store}/branches/{branch}/documents/{document}`.
+  // `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}/branches/{branch}/documents/{document}`.
   //
   // If the caller does not have permission to delete the
   // [Document][google.cloud.discoveryengine.v1beta.Document], regardless of
-  // whether or not it exists, a PERMISSION_DENIED error is returned.
+  // whether or not it exists, a `PERMISSION_DENIED` error is returned.
   //
   // If the [Document][google.cloud.discoveryengine.v1beta.Document] to delete
-  // does not exist, a NOT_FOUND error is returned.
+  // does not exist, a `NOT_FOUND` error is returned.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {

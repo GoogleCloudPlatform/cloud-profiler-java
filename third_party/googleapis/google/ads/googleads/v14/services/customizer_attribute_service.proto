@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,17 +14,10 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/enums/response_content_type.proto";
-import "google/ads/googleads/v13/resources/customizer_attribute.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/enums/response_content_type.proto";
 import "google/ads/googleads/v14/resources/customizer_attribute.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -36,16 +25,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "CustomizerAttributeServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -54,7 +33,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
 
 // Proto file describing the CustomizerAttribute service.
 
@@ -68,11 +46,7 @@ service CustomizerAttributeService {
   rpc MutateCustomizerAttributes(MutateCustomizerAttributesRequest)
       returns (MutateCustomizerAttributesResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-      post: "/v13/customers/{customer_id=*}/customizerAttributes:mutate"
-========
       post: "/v14/customers/{customer_id=*}/customizerAttributes:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -80,11 +54,7 @@ service CustomizerAttributeService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-// [CustomizerAttributeService.MutateCustomizerAttributes][google.ads.googleads.v13.services.CustomizerAttributeService.MutateCustomizerAttributes].
-========
 // [CustomizerAttributeService.MutateCustomizerAttributes][google.ads.googleads.v14.services.CustomizerAttributeService.MutateCustomizerAttributes].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
 message MutateCustomizerAttributesRequest {
   // Required. The ID of the customer whose customizer attributes are being
   // modified.
@@ -107,11 +77,7 @@ message MutateCustomizerAttributesRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-  google.ads.googleads.v13.enums.ResponseContentTypeEnum.ResponseContentType
-========
   google.ads.googleads.v14.enums.ResponseContentTypeEnum.ResponseContentType
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
       response_content_type = 5;
 }
 
@@ -124,11 +90,7 @@ message CustomizerAttributeOperation {
   oneof operation {
     // Create operation: No resource name is expected for the new customizer
     // attribute
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-    google.ads.googleads.v13.resources.CustomizerAttribute create = 1;
-========
     google.ads.googleads.v14.resources.CustomizerAttribute create = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
 
     // Remove operation: A resource name for the removed customizer attribute is
     // expected, in this format:
@@ -161,10 +123,6 @@ message MutateCustomizerAttributeResult {
   // The mutated CustomizerAttribute with only mutable fields after mutate.
   // The field will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customizer_attribute_service.proto
-  google.ads.googleads.v13.resources.CustomizerAttribute customizer_attribute =
-========
   google.ads.googleads.v14.resources.CustomizerAttribute customizer_attribute =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customizer_attribute_service.proto
       2;
 }

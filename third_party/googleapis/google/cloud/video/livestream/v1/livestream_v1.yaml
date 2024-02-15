@@ -4,7 +4,9 @@ name: livestream.googleapis.com
 title: Live Stream API
 
 apis:
+- name: google.cloud.location.Locations
 - name: google.cloud.video.livestream.v1.LivestreamService
+- name: google.longrunning.Operations
 
 types:
 - name: google.cloud.video.livestream.v1.ChannelOperationResponse

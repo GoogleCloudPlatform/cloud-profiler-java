@@ -14,25 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/feed_item_target.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/enums/feed_item_target_device.proto";
-import "google/ads/googleads/v12/enums/feed_item_target_status.proto";
-import "google/ads/googleads/v12/enums/feed_item_target_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "FeedItemTargetProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -50,7 +31,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/feed_item_target.proto
 
 // Proto file describing the FeedItemTarget resource.
 
@@ -79,15 +59,10 @@ message FeedItemTarget {
     }
   ];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/feed_item_target.proto
-  // Output only. The target type of this feed item target. This field is read-only.
-  google.ads.googleads.v12.enums.FeedItemTargetTypeEnum.FeedItemTargetType feed_item_target_type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   // Output only. The target type of this feed item target. This field is
   // read-only.
   google.ads.googleads.v15.enums.FeedItemTargetTypeEnum.FeedItemTargetType
       feed_item_target_type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/feed_item_target.proto
 
   // Output only. The ID of the targeted resource. This field is read-only.
   optional int64 feed_item_target_id = 13
@@ -95,12 +70,8 @@ message FeedItemTarget {
 
   // Output only. Status of the feed item target.
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/feed_item_target.proto
-  google.ads.googleads.v12.enums.FeedItemTargetStatusEnum.FeedItemTargetStatus status = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.FeedItemTargetStatusEnum.FeedItemTargetStatus
       status = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/feed_item_target.proto
 
   // The targeted resource.
   oneof target {
@@ -121,12 +92,8 @@ message FeedItemTarget {
     ];
 
     // Immutable. The targeted keyword.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/feed_item_target.proto
-    google.ads.googleads.v12.common.KeywordInfo keyword = 7 [(google.api.field_behavior) = IMMUTABLE];
-========
     google.ads.googleads.v15.common.KeywordInfo keyword = 7
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/feed_item_target.proto
 
     // Immutable. The targeted geo target constant resource name.
     string geo_target_constant = 16 [
@@ -137,18 +104,11 @@ message FeedItemTarget {
     ];
 
     // Immutable. The targeted device.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/feed_item_target.proto
-    google.ads.googleads.v12.enums.FeedItemTargetDeviceEnum.FeedItemTargetDevice device = 9 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. The targeted schedule.
-    google.ads.googleads.v12.common.AdScheduleInfo ad_schedule = 10 [(google.api.field_behavior) = IMMUTABLE];
-========
     google.ads.googleads.v15.enums.FeedItemTargetDeviceEnum.FeedItemTargetDevice
         device = 9 [(google.api.field_behavior) = IMMUTABLE];
 
     // Immutable. The targeted schedule.
     google.ads.googleads.v15.common.AdScheduleInfo ad_schedule = 10
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/feed_item_target.proto
   }
 }

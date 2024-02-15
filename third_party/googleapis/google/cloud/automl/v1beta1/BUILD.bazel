@@ -93,12 +93,14 @@ java_gapic_library(
     srcs = [":automl_proto_with_info"],
     grpc_service_config = "automl_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "automl_v1beta1.yaml",
     test_deps = [
         ":automl_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":automl_java_proto",
+        "//google/api:api_java_proto",
     ],
 )
 
@@ -134,7 +136,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -170,18 +171,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "automl_go_gapic_test",
-    srcs = [":automl_go_gapic_srcjar_test"],
-    embed = [":automl_go_gapic"],
-    importpath = "cloud.google.com/go/automl/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-automl-v1beta1-go",
     deps = [
         ":automl_go_gapic",
+        ":automl_go_gapic_srcjar-snippets.srcjar",
         ":automl_go_gapic_srcjar-test.srcjar",
         ":automl_go_proto",
     ],
@@ -231,19 +226,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "automl_php_proto",
     deps = [":automl_proto"],
-)
-
-php_grpc_library(
-    name = "automl_php_grpc",
-    srcs = [":automl_proto"],
-    deps = [":automl_php_proto"],
 )
 
 php_gapic_library(
@@ -253,10 +241,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "automl_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":automl_php_grpc",
-        ":automl_php_proto",
-    ],
+    deps = [":automl_php_proto"],
 )
 
 # Open Source Packages
@@ -264,7 +249,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-automl-v1beta1-php",
     deps = [
         ":automl_php_gapic",
-        ":automl_php_grpc",
         ":automl_php_proto",
     ],
 )
@@ -339,6 +323,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "AutoML makes the power of machine learning available to you even if you have limited knowledge of machine learning. You can use AutoML to build on Google's machine learning capabilities to create your own custom machine learning models that are tailored to your business needs, and then integrate those models into your applications and web sites.",
     ruby_cloud_title = "Cloud AutoML V1beta1",
     service_yaml = "automl_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":automl_ruby_grpc",
         ":automl_ruby_proto",

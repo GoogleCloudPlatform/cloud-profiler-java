@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_bid_modifier.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/enums/bid_modifier_source.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "AdGroupBidModifierProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_bid_modifier.proto
 
 // Proto file describing the ad group bid modifier resource.
 
@@ -99,39 +81,13 @@ message AdGroupBidModifier {
   ];
 
   // Output only. Bid modifier source.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_bid_modifier.proto
-  google.ads.googleads.v12.enums.BidModifierSourceEnum.BidModifierSource bid_modifier_source = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.BidModifierSourceEnum.BidModifierSource
       bid_modifier_source = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_bid_modifier.proto
 
   // The criterion of this ad group bid modifier.
   //
   // Required in create operations starting in V5.
   oneof criterion {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_bid_modifier.proto
-    // Immutable. Criterion for hotel date selection (default dates versus user selected).
-    google.ads.googleads.v12.common.HotelDateSelectionTypeInfo hotel_date_selection_type = 5 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Criterion for number of days prior to the stay the booking is being made.
-    google.ads.googleads.v12.common.HotelAdvanceBookingWindowInfo hotel_advance_booking_window = 6 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Criterion for length of hotel stay in nights.
-    google.ads.googleads.v12.common.HotelLengthOfStayInfo hotel_length_of_stay = 7 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Criterion for day of the week the booking is for.
-    google.ads.googleads.v12.common.HotelCheckInDayInfo hotel_check_in_day = 8 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. A device criterion.
-    google.ads.googleads.v12.common.DeviceInfo device = 11 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. A preferred content criterion.
-    google.ads.googleads.v12.common.PreferredContentInfo preferred_content = 12 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Criterion for a hotel check-in date range.
-    google.ads.googleads.v12.common.HotelCheckInDateRangeInfo hotel_check_in_date_range = 17 [(google.api.field_behavior) = IMMUTABLE];
-========
     // Immutable. Criterion for hotel date selection (default dates versus user
     // selected).
     google.ads.googleads.v15.common.HotelDateSelectionTypeInfo
@@ -159,6 +115,5 @@ message AdGroupBidModifier {
     google.ads.googleads.v15.common.HotelCheckInDateRangeInfo
         hotel_check_in_date_range = 17
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_bid_modifier.proto
   }
 }

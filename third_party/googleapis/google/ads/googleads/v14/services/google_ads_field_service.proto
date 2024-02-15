@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,30 +14,14 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/resources/google_ads_field.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/resources/google_ads_field.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "GoogleAdsFieldServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -50,7 +30,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 
 // Proto file describing the GoogleAdsFieldService.
 
@@ -69,15 +48,9 @@ service GoogleAdsFieldService {
   //   [QuotaError]()
   //   [RequestError]()
   rpc GetGoogleAdsField(GetGoogleAdsFieldRequest)
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-      returns (google.ads.googleads.v13.resources.GoogleAdsField) {
-    option (google.api.http) = {
-      get: "/v13/{resource_name=googleAdsFields/*}"
-========
       returns (google.ads.googleads.v14.resources.GoogleAdsField) {
     option (google.api.http) = {
       get: "/v14/{resource_name=googleAdsFields/*}"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
     };
     option (google.api.method_signature) = "resource_name";
   }
@@ -95,11 +68,7 @@ service GoogleAdsFieldService {
   rpc SearchGoogleAdsFields(SearchGoogleAdsFieldsRequest)
       returns (SearchGoogleAdsFieldsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-      post: "/v13/googleAdsFields:search"
-========
       post: "/v14/googleAdsFields:search"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "query";
@@ -107,11 +76,7 @@ service GoogleAdsFieldService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-// [GoogleAdsFieldService.GetGoogleAdsField][google.ads.googleads.v13.services.GoogleAdsFieldService.GetGoogleAdsField].
-========
 // [GoogleAdsFieldService.GetGoogleAdsField][google.ads.googleads.v14.services.GoogleAdsFieldService.GetGoogleAdsField].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 message GetGoogleAdsFieldRequest {
   // Required. The resource name of the field to get.
   string resource_name = 1 [
@@ -123,11 +88,7 @@ message GetGoogleAdsFieldRequest {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-// [GoogleAdsFieldService.SearchGoogleAdsFields][google.ads.googleads.v13.services.GoogleAdsFieldService.SearchGoogleAdsFields].
-========
 // [GoogleAdsFieldService.SearchGoogleAdsFields][google.ads.googleads.v14.services.GoogleAdsFieldService.SearchGoogleAdsFields].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 message SearchGoogleAdsFieldsRequest {
   // Required. The query string.
   string query = 1 [(google.api.field_behavior) = REQUIRED];
@@ -144,17 +105,10 @@ message SearchGoogleAdsFieldsRequest {
 }
 
 // Response message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/google_ads_field_service.proto
-// [GoogleAdsFieldService.SearchGoogleAdsFields][google.ads.googleads.v13.services.GoogleAdsFieldService.SearchGoogleAdsFields].
-message SearchGoogleAdsFieldsResponse {
-  // The list of fields that matched the query.
-  repeated google.ads.googleads.v13.resources.GoogleAdsField results = 1;
-========
 // [GoogleAdsFieldService.SearchGoogleAdsFields][google.ads.googleads.v14.services.GoogleAdsFieldService.SearchGoogleAdsFields].
 message SearchGoogleAdsFieldsResponse {
   // The list of fields that matched the query.
   repeated google.ads.googleads.v14.resources.GoogleAdsField results = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/google_ads_field_service.proto
 
   // Pagination token used to retrieve the next page of results. Pass the
   // content of this string as the `page_token` attribute of the next request.

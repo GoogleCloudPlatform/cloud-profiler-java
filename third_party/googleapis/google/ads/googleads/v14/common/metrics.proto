@@ -14,21 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/interaction_event_type.proto";
-import "google/ads/googleads/v12/enums/quality_score_bucket.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "MetricsProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v14.common;
 
 import "google/ads/googleads/v14/enums/interaction_event_type.proto";
@@ -42,7 +27,6 @@ option java_package = "com.google.ads.googleads.v14.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V14::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
 // Proto file describing metrics.
 
@@ -167,24 +151,16 @@ message Metrics {
   // organic search results.
   // This percentage is computed only over the auctions that you appeared in
   // the page.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  // This metric is not publicly available.
-  optional double auction_insight_search_absolute_top_impression_percentage = 258;
-========
   //
   // This metric is not publicly available.
   optional double auction_insight_search_absolute_top_impression_percentage =
       258;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // This metric is part of the Auction Insights report, and tells the
   // percentage of impressions that another participant obtained, over the total
   // number of impressions that your ads were eligible for.
   // Any value below 0.1 is reported as 0.0999.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
   //
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
   // This metric is not publicly available.
   optional double auction_insight_search_impression_share = 259;
 
@@ -193,30 +169,21 @@ message Metrics {
   // another participant in the auction, compared to the total number of
   // impressions that your ads were eligible for.
   // Any value below 0.1 is reported as 0.0999.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
   //
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
   // This metric is not publicly available.
   optional double auction_insight_search_outranking_share = 260;
 
   // This metric is part of the Auction Insights report, and tells how often
   // another participant's ad received an impression when your ad also received
   // an impression.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
   //
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
   // This metric is not publicly available.
   optional double auction_insight_search_overlap_rate = 261;
 
   // This metric is part of the Auction Insights report, and tells how often
   // another participant's ad was shown in a higher position than yours, when
   // both of your ads were shown at the same page.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
   //
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
   // This metric is not publicly available.
   optional double auction_insight_search_position_above_rate = 262;
 
@@ -224,10 +191,7 @@ message Metrics {
   // the ads of another participant showed above the organic search results.
   // This percentage is computed only over the auctions that you appeared in
   // the page.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
   //
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
   // This metric is not publicly available.
   optional double auction_insight_search_top_impression_percentage = 263;
 
@@ -479,30 +443,19 @@ message Metrics {
   optional int64 hotel_eligible_impressions = 215;
 
   // The creative historical quality score.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  google.ads.googleads.v12.enums.QualityScoreBucketEnum.QualityScoreBucket historical_creative_quality_score = 80;
-
-  // The quality of historical landing page experience.
-  google.ads.googleads.v12.enums.QualityScoreBucketEnum.QualityScoreBucket historical_landing_page_quality_score = 81;
-========
   google.ads.googleads.v14.enums.QualityScoreBucketEnum.QualityScoreBucket
       historical_creative_quality_score = 80;
 
   // The quality of historical landing page experience.
   google.ads.googleads.v14.enums.QualityScoreBucketEnum.QualityScoreBucket
       historical_landing_page_quality_score = 81;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // The historical quality score.
   optional int64 historical_quality_score = 216;
 
   // The historical search predicted click through rate (CTR).
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  google.ads.googleads.v12.enums.QualityScoreBucketEnum.QualityScoreBucket historical_search_predicted_ctr = 83;
-========
   google.ads.googleads.v14.enums.QualityScoreBucketEnum.QualityScoreBucket
       historical_search_predicted_ctr = 83;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // The number of times the ad was forwarded to someone else as a message.
   optional int64 gmail_forwards = 217;
@@ -535,12 +488,8 @@ message Metrics {
   optional int64 interactions = 223;
 
   // The types of payable and free interactions.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  repeated google.ads.googleads.v12.enums.InteractionEventTypeEnum.InteractionEventType interaction_event_types = 100;
-========
   repeated google.ads.googleads.v14.enums.InteractionEventTypeEnum
       .InteractionEventType interaction_event_types = 100;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // The percentage of clicks filtered out of your total number of clicks
   // (filtered + non-filtered clicks) during the reporting period.
@@ -829,12 +778,8 @@ message Metrics {
 
   // Number of call button clicks on any location surface after an impression.
   // This measure is coming from Asset based location.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  optional double view_through_conversions_from_location_asset_click_to_call = 275;
-========
   optional double view_through_conversions_from_location_asset_click_to_call =
       275;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // Number of driving directions clicks on any location surface after an
   // impression. This measure is coming from Asset based location.
@@ -850,13 +795,6 @@ message Metrics {
 
   // Number of other types of local action clicks on any location surface after
   // an impression. This measure is coming from Asset based location.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-  optional double view_through_conversions_from_location_asset_other_engagement = 279;
-
-  // Estimated number of visits to the store after an impression.
-  // This measure is coming from Asset based location.
-  optional double view_through_conversions_from_location_asset_store_visits = 280;
-========
   optional double
       view_through_conversions_from_location_asset_other_engagement = 279;
 
@@ -864,13 +802,10 @@ message Metrics {
   // This measure is coming from Asset based location.
   optional double view_through_conversions_from_location_asset_store_visits =
       280;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 
   // Number of website URL clicks on any location surface after an impression.
   // This measure is coming from Asset based location.
   optional double view_through_conversions_from_location_asset_website = 281;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/metrics.proto
-========
 }
 
 // Search volume range.
@@ -881,5 +816,4 @@ message SearchVolumeRange {
 
   // Upper bound of search volume.
   optional int64 max = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/metrics.proto
 }

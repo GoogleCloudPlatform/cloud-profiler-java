@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -167,7 +167,23 @@ message ConversionActionTypeEnum {
     // Conversions that occur when a user visits an advertiser's retail store.
     // Read only.
     STORE_VISITS = 36;
+
+    // Conversions created from website events (such as form submissions or page
+    // loads), that don't use individually coded event snippets. Read only.
+    WEBPAGE_CODELESS = 37;
+
+    // Conversions that come from linked Universal Analytics goals.
+    UNIVERSAL_ANALYTICS_GOAL = 38;
+
+    // Conversions that come from linked Universal Analytics transactions.
+    UNIVERSAL_ANALYTICS_TRANSACTION = 39;
+
+    // Conversions that come from linked Google Analytics 4 custom event
+    // conversions.
+    GOOGLE_ANALYTICS_4_CUSTOM = 40;
+
+    // Conversions that come from linked Google Analytics 4 purchase
+    // conversions.
+    GOOGLE_ANALYTICS_4_PURCHASE = 41;
   }
-
-
 }

@@ -31,6 +31,8 @@ proto_library(
         "document_service_request.proto",
         "filters.proto",
         "histogram.proto",
+        "pipeline_service.proto",
+        "pipelines.proto",
         "rule_engine.proto",
         "ruleset_service.proto",
         "ruleset_service_request.proto",
@@ -45,9 +47,10 @@ proto_library(
         "//google/api:resource_proto",
         "//google/cloud/documentai/v1:documentai_proto",
         "//google/iam/v1:policy_proto",
+        "//google/longrunning:operations_proto",
+        "//google/rpc:status_proto",
         "//google/type:datetime_proto",
         "//google/type:interval_proto",
-        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
@@ -93,8 +96,8 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "contentwarehouse_v1.yaml",
     test_deps = [
-        ":contentwarehouse_java_grpc",
         "//google/iam/v1:iam_java_grpc",
+        ":contentwarehouse_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -104,19 +107,20 @@ java_gapic_library(
     ],
 )
 
-# TODO(b/246642734): Re-enable the failed json tests
 java_gapic_test(
     name = "contentwarehouse_java_gapic_test_suite",
     test_classes = [
         "com.google.cloud.contentwarehouse.v1.DocumentLinkServiceClientHttpJsonTest",
         "com.google.cloud.contentwarehouse.v1.DocumentLinkServiceClientTest",
-        #        "com.google.cloud.contentwarehouse.v1.DocumentSchemaServiceClientHttpJsonTest",
+        "com.google.cloud.contentwarehouse.v1.DocumentSchemaServiceClientHttpJsonTest",
         "com.google.cloud.contentwarehouse.v1.DocumentSchemaServiceClientTest",
-        #        "com.google.cloud.contentwarehouse.v1.DocumentServiceClientHttpJsonTest",
+        "com.google.cloud.contentwarehouse.v1.DocumentServiceClientHttpJsonTest",
         "com.google.cloud.contentwarehouse.v1.DocumentServiceClientTest",
-        #        "com.google.cloud.contentwarehouse.v1.RuleSetServiceClientHttpJsonTest",
+        "com.google.cloud.contentwarehouse.v1.PipelineServiceClientHttpJsonTest",
+        "com.google.cloud.contentwarehouse.v1.PipelineServiceClientTest",
+        "com.google.cloud.contentwarehouse.v1.RuleSetServiceClientHttpJsonTest",
         "com.google.cloud.contentwarehouse.v1.RuleSetServiceClientTest",
-        #        "com.google.cloud.contentwarehouse.v1.SynonymSetServiceClientHttpJsonTest",
+        "com.google.cloud.contentwarehouse.v1.SynonymSetServiceClientHttpJsonTest",
         "com.google.cloud.contentwarehouse.v1.SynonymSetServiceClientTest",
     ],
     runtime_deps = [":contentwarehouse_java_gapic_test"],
@@ -143,7 +147,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -155,6 +158,8 @@ go_proto_library(
         "//google/api:annotations_go_proto",
         "//google/cloud/documentai/v1:documentai_go_proto",
         "//google/iam/v1:iam_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "//google/rpc:status_go_proto",
         "//google/type:datetime_go_proto",
         "//google/type:interval_go_proto",
     ],
@@ -173,15 +178,10 @@ go_gapic_library(
     deps = [
         ":contentwarehouse_go_proto",
         "//google/iam/v1:iam_go_proto",
-        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "contentwarehouse_go_gapic_test",
-    srcs = [":contentwarehouse_go_gapic_srcjar_test"],
-    embed = [":contentwarehouse_go_gapic"],
-    importpath = "cloud.google.com/go/contentwarehouse/apiv1",
 )
 
 # Open Source Packages
@@ -190,6 +190,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":contentwarehouse_go_gapic",
         ":contentwarehouse_go_gapic_srcjar-metadata.srcjar",
+        ":contentwarehouse_go_gapic_srcjar-snippets.srcjar",
         ":contentwarehouse_go_gapic_srcjar-test.srcjar",
         ":contentwarehouse_go_proto",
     ],
@@ -202,18 +203,27 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_import",
     "py_test",
+)
+
+py_import(
+    name = "documentai",
+    srcs = [
+        "//google/cloud/documentai/v1:documentai_py_gapic",
+    ],
 )
 
 py_gapic_library(
     name = "contentwarehouse_py_gapic",
     srcs = [":contentwarehouse_proto"],
     grpc_service_config = "contentwarehouse_grpc_service_config.json",
+    opt_args = ["proto-plus-deps=google.cloud.documentai.v1"],
     rest_numeric_enums = True,
     service_yaml = "contentwarehouse_v1.yaml",
     transport = "grpc+rest",
     deps = [
-        "//google/cloud/documentai/v1:documentai_py_proto",
+        ":documentai",
         "//google/iam/v1:iam_policy_py_proto",
     ],
 )
@@ -225,9 +235,7 @@ py_test(
         "contentwarehouse_py_gapic_test.py",
     ],
     legacy_create_init = False,
-    deps = [
-        ":contentwarehouse_py_gapic",
-    ],
+    deps = [":contentwarehouse_py_gapic"],
 )
 
 # Open Source Packages
@@ -245,7 +253,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -254,21 +261,15 @@ php_proto_library(
     deps = [":contentwarehouse_proto"],
 )
 
-php_grpc_library(
-    name = "contentwarehouse_php_grpc",
-    srcs = [":contentwarehouse_proto"],
-    deps = [":contentwarehouse_php_proto"],
-)
-
 php_gapic_library(
     name = "contentwarehouse_php_gapic",
     srcs = [":contentwarehouse_proto_with_info"],
     grpc_service_config = "contentwarehouse_grpc_service_config.json",
+    migration_mode = "PRE_MIGRATION_SURFACE_ONLY",
     rest_numeric_enums = True,
     service_yaml = "contentwarehouse_v1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":contentwarehouse_php_grpc",
         ":contentwarehouse_php_proto",
     ],
 )
@@ -278,7 +279,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-contentwarehouse-v1-php",
     deps = [
         ":contentwarehouse_php_gapic",
-        ":contentwarehouse_php_grpc",
         ":contentwarehouse_php_proto",
     ],
 )
@@ -310,7 +310,6 @@ nodejs_gapic_assembly_pkg(
     deps = [
         ":contentwarehouse_nodejs_gapic",
         ":contentwarehouse_proto",
-        # Cross-API dependency requires adding this explicitly to pack protos
         "//google/cloud/documentai/v1:documentai_proto",
     ],
 )
@@ -340,12 +339,11 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "contentwarehouse_ruby_gapic",
     srcs = [":contentwarehouse_proto_with_info"],
-    extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-contentwarehouse-v1",
-    ],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-contentwarehouse-v1"],
     grpc_service_config = "contentwarehouse_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "contentwarehouse_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":contentwarehouse_ruby_grpc",
         ":contentwarehouse_ruby_proto",
@@ -375,6 +373,7 @@ load(
 
 csharp_proto_library(
     name = "contentwarehouse_csharp_proto",
+    extra_opts = [],
     deps = [":contentwarehouse_proto"],
 )
 

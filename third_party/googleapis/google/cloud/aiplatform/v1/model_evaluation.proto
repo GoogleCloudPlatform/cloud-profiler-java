@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,8 +71,9 @@ message ModelEvaluation {
   google.protobuf.Timestamp create_time = 4
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // All possible [dimensions][ModelEvaluationSlice.slice.dimension] of
-  // ModelEvaluationSlices. The dimensions can be used as the filter of the
+  // All possible
+  // [dimensions][google.cloud.aiplatform.v1.ModelEvaluationSlice.Slice.dimension]
+  // of ModelEvaluationSlices. The dimensions can be used as the filter of the
   // [ModelService.ListModelEvaluationSlices][google.cloud.aiplatform.v1.ModelService.ListModelEvaluationSlices]
   // request, in the form of `slice.dimension = <dimension>`.
   repeated string slice_dimensions = 5;
@@ -114,6 +115,6 @@ message ModelEvaluation {
   // The metadata of the ModelEvaluation.
   // For the ModelEvaluation uploaded from Managed Pipeline, metadata contains a
   // structured value with keys of "pipeline_job_id", "evaluation_dataset_type",
-  // "evaluation_dataset_path".
+  // "evaluation_dataset_path", "row_based_metrics_path".
   google.protobuf.Value metadata = 11;
 }

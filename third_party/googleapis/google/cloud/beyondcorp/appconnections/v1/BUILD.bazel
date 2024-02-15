@@ -24,7 +24,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -34,7 +33,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -146,7 +144,7 @@ go_gapic_library(
     grpc_service_config = "beyondcorp-appconnections_grpc_service_config.json",
     importpath = "cloud.google.com/go/beyondcorp/appconnections/apiv1;appconnections",
     metadata = True,
-    release_level = "beta",
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     deps = [
@@ -159,19 +157,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "appconnections_go_gapic_test",
-    srcs = [":appconnections_go_gapic_srcjar_test"],
-    embed = [":appconnections_go_gapic"],
-    importpath = "cloud.google.com/go/beyondcorp/appconnections/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-beyondcorp-appconnections-v1-go",
     deps = [
         ":appconnections_go_gapic",
         ":appconnections_go_gapic_srcjar-metadata.srcjar",
+        ":appconnections_go_gapic_srcjar-snippets.srcjar",
         ":appconnections_go_gapic_srcjar-test.srcjar",
         ":appconnections_go_proto",
     ],
@@ -217,23 +209,15 @@ php_proto_library(
     deps = [":appconnections_proto"],
 )
 
-php_grpc_library(
-    name = "appconnections_php_grpc",
-    srcs = [":appconnections_proto"],
-    deps = [":appconnections_php_proto"],
-)
-
 php_gapic_library(
     name = "appconnections_php_gapic",
     srcs = [":appconnections_proto_with_info"],
     grpc_service_config = "beyondcorp-appconnections_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "beyondcorp_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":appconnections_php_grpc",
-        ":appconnections_php_proto",
-    ],
+    deps = [":appconnections_php_proto"],
 )
 
 # Open Source Packages
@@ -241,7 +225,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-beyondcorp-appconnections-v1-php",
     deps = [
         ":appconnections_php_gapic",
-        ":appconnections_php_grpc",
         ":appconnections_php_proto",
     ],
 )
@@ -293,6 +276,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Beyondcorp Enterprise provides identity and context aware access controls for enterprise resources and enables zero-trust access. Using the Beyondcorp Enterprise APIs, enterprises can set up multi-cloud and on-prem connectivity using the App Connector hybrid connectivity solution.",
     ruby_cloud_title = "BeyondCorp AppConnections V1",
     service_yaml = "beyondcorp_v1.yaml",
+    transport = "grpc",
     deps = [
         ":appconnections_ruby_grpc",
         ":appconnections_ruby_proto",

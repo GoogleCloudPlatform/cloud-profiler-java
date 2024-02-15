@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/type/latlng.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/delivery/v1;delivery";
+option csharp_namespace = "Google.Maps.FleetEngine.Delivery.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/delivery/apiv1/deliverypb;deliverypb";
 option java_multiple_files = true;
 option java_outer_classname = "TaskTrackingInfoProto";
 option java_package = "google.maps.fleetengine.delivery.v1";
@@ -91,4 +92,7 @@ message TaskTrackingInfo {
 
   // The time window during which the task should be completed.
   TimeWindow target_time_window = 13;
+
+  // The custom attributes set on the task.
+  repeated TaskAttribute attributes = 14;
 }

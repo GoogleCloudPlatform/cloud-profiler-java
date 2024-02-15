@@ -14,19 +14,11 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/common/policy.proto";
-import "google/ads/googleads/v12/enums/response_content_type.proto";
-import "google/ads/googleads/v12/resources/ad_group_criterion.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/common/policy.proto";
 import "google/ads/googleads/v15/enums/response_content_type.proto";
 import "google/ads/googleads/v15/resources/ad_group_criterion.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -34,16 +26,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "AdGroupCriterionServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -52,7 +34,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 
 // Proto file describing the Ad Group Criterion service.
 
@@ -100,23 +81,15 @@ service AdGroupCriterionService {
   rpc MutateAdGroupCriteria(MutateAdGroupCriteriaRequest)
       returns (MutateAdGroupCriteriaResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-      post: "/v12/customers/{customer_id=*}/adGroupCriteria:mutate"
-========
       post: "/v15/customers/{customer_id=*}/adGroupCriteria:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-// Request message for [AdGroupCriterionService.MutateAdGroupCriteria][google.ads.googleads.v12.services.AdGroupCriterionService.MutateAdGroupCriteria].
-========
 // Request message for
 // [AdGroupCriterionService.MutateAdGroupCriteria][google.ads.googleads.v15.services.AdGroupCriterionService.MutateAdGroupCriteria].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 message MutateAdGroupCriteriaRequest {
   // Required. ID of the customer whose criteria are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -137,12 +110,8 @@ message MutateAdGroupCriteriaRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-  google.ads.googleads.v12.enums.ResponseContentTypeEnum.ResponseContentType response_content_type = 5;
-========
   google.ads.googleads.v15.enums.ResponseContentTypeEnum.ResponseContentType
       response_content_type = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 }
 
 // A single operation (create, remove, update) on an ad group criterion.
@@ -159,29 +128,17 @@ message AdGroupCriterionOperation {
   // to serve. They may begin serving at a later time due to a change in
   // policies, re-review of the resource, or a change in advertiser
   // certificates.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-  repeated google.ads.googleads.v12.common.PolicyViolationKey exempt_policy_violation_keys = 5;
-========
   repeated google.ads.googleads.v15.common.PolicyViolationKey
       exempt_policy_violation_keys = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 
   // The mutate operation.
   oneof operation {
     // Create operation: No resource name is expected for the new criterion.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-    google.ads.googleads.v12.resources.AdGroupCriterion create = 1;
-
-    // Update operation: The criterion is expected to have a valid resource
-    // name.
-    google.ads.googleads.v12.resources.AdGroupCriterion update = 2;
-========
     google.ads.googleads.v15.resources.AdGroupCriterion create = 1;
 
     // Update operation: The criterion is expected to have a valid resource
     // name.
     google.ads.googleads.v15.resources.AdGroupCriterion update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 
     // Remove operation: A resource name for the removed criterion is expected,
     // in this format:
@@ -215,9 +172,5 @@ message MutateAdGroupCriterionResult {
   // The mutated ad group criterion with only mutable fields after mutate. The
   // field will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/ad_group_criterion_service.proto
-  google.ads.googleads.v12.resources.AdGroupCriterion ad_group_criterion = 2;
-========
   google.ads.googleads.v15.resources.AdGroupCriterion ad_group_criterion = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/ad_group_criterion_service.proto
 }

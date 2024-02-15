@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,15 +100,6 @@ message Field {
 
   // Options for the Text field type.
   message TextOptions {
-    // Output only. The minimum valid length of values for the text field.
-    int32 min_length = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. The maximum valid length of values for the text field.
-    int32 max_length = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
-  }
-
-  // Options the Long Text field type.
-  message LongTextOptions {
     // Output only. The minimum valid length of values for the text field.
     int32 min_length = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 

@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/bidding_strategy_type.proto";
-import "google/ads/googleads/v12/enums/target_impression_share_location.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "AccessibleBiddingStrategyProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/enums/bidding_strategy_type.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
 
 // Represents a view of BiddingStrategies owned by and shared with the customer.
 //
@@ -74,13 +56,8 @@ message AccessibleBiddingStrategy {
   // An automated bidding strategy to help get the most conversions for your
   // campaigns while spending your budget.
   message MaximizeConversions {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-    // Output only. The target cost per acquisition (CPA) option. This is the average amount
-    // that you would like to spend per acquisition.
-========
     // Output only. The target cost per acquisition (CPA) option. This is the
     // average amount that you would like to spend per acquisition.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
     int64 target_cpa_micros = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
@@ -99,13 +76,9 @@ message AccessibleBiddingStrategy {
   // location).
   message TargetImpressionShare {
     // Output only. The targeted location on the search results page.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-    google.ads.googleads.v12.enums.TargetImpressionShareLocationEnum.TargetImpressionShareLocation location = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
     google.ads.googleads.v15.enums.TargetImpressionShareLocationEnum
         .TargetImpressionShareLocation location = 1
         [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
 
     // The chosen fraction of ads to be shown in the targeted location in
     // micros. For example, 1% equals 10,000.
@@ -121,12 +94,8 @@ message AccessibleBiddingStrategy {
   // An automated bidding strategy that helps you maximize revenue while
   // averaging a specific target return on ad spend (ROAS).
   message TargetRoas {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-    // Output only. The chosen revenue (based on conversion data) per unit of spend.
-========
     // Output only. The chosen revenue (based on conversion data) per unit of
     // spend.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
     optional double target_roas = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
@@ -167,12 +136,8 @@ message AccessibleBiddingStrategy {
   string name = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The type of the bidding strategy.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-  google.ads.googleads.v12.enums.BiddingStrategyTypeEnum.BiddingStrategyType type = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.BiddingStrategyTypeEnum.BiddingStrategyType
       type = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
 
   // Output only. The ID of the Customer which owns the bidding strategy.
   int64 owner_customer_id = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -199,16 +164,10 @@ message AccessibleBiddingStrategy {
     // conversions as possible at the target cost-per-acquisition (CPA) you set.
     TargetCpa target_cpa = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/accessible_bidding_strategy.proto
-    // Output only. A bidding strategy that automatically optimizes towards a chosen
-    // percentage of impressions.
-    TargetImpressionShare target_impression_share = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
     // Output only. A bidding strategy that automatically optimizes towards a
     // chosen percentage of impressions.
     TargetImpressionShare target_impression_share = 10
         [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/accessible_bidding_strategy.proto
 
     // Output only. A bidding strategy that helps you maximize revenue while
     // averaging a specific target Return On Ad Spend (ROAS).

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,35 +14,17 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/enums/access_role.proto";
-import "google/ads/googleads/v13/enums/response_content_type.proto";
-import "google/ads/googleads/v13/resources/customer.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/enums/access_role.proto";
 import "google/ads/googleads/v14/enums/response_content_type.proto";
 import "google/ads/googleads/v14/resources/customer.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "CustomerServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -55,7 +33,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 
 // Proto file describing the Customer service.
 
@@ -78,11 +55,7 @@ service CustomerService {
   //   [UrlFieldError]()
   rpc MutateCustomer(MutateCustomerRequest) returns (MutateCustomerResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-      post: "/v13/customers/{customer_id=*}:mutate"
-========
       post: "/v14/customers/{customer_id=*}:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operation";
@@ -101,11 +74,7 @@ service CustomerService {
   rpc ListAccessibleCustomers(ListAccessibleCustomersRequest)
       returns (ListAccessibleCustomersResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-      get: "/v13/customers:listAccessibleCustomers"
-========
       get: "/v14/customers:listAccessibleCustomers"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
     };
   }
 
@@ -126,11 +95,7 @@ service CustomerService {
   rpc CreateCustomerClient(CreateCustomerClientRequest)
       returns (CreateCustomerClientResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-      post: "/v13/customers/{customer_id=*}:createCustomerClient"
-========
       post: "/v14/customers/{customer_id=*}:createCustomerClient"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,customer_client";
@@ -138,11 +103,7 @@ service CustomerService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-// [CustomerService.MutateCustomer][google.ads.googleads.v13.services.CustomerService.MutateCustomer].
-========
 // [CustomerService.MutateCustomer][google.ads.googleads.v14.services.CustomerService.MutateCustomer].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 message MutateCustomerRequest {
   // Required. The ID of the customer being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -156,20 +117,12 @@ message MutateCustomerRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-  google.ads.googleads.v13.enums.ResponseContentTypeEnum.ResponseContentType
-========
   google.ads.googleads.v14.enums.ResponseContentTypeEnum.ResponseContentType
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
       response_content_type = 6;
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-// [CustomerService.CreateCustomerClient][google.ads.googleads.v13.services.CustomerService.CreateCustomerClient].
-========
 // [CustomerService.CreateCustomerClient][google.ads.googleads.v14.services.CustomerService.CreateCustomerClient].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 message CreateCustomerClientRequest {
   // Required. The ID of the Manager under whom client customer is being
   // created.
@@ -177,11 +130,7 @@ message CreateCustomerClientRequest {
 
   // Required. The new client customer to create. The resource name on this
   // customer will be ignored.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-  google.ads.googleads.v13.resources.Customer customer_client = 2
-========
   google.ads.googleads.v14.resources.Customer customer_client = 2
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
       [(google.api.field_behavior) = REQUIRED];
 
   // Email address of the user who should be invited on the created client
@@ -190,11 +139,7 @@ message CreateCustomerClientRequest {
 
   // The proposed role of user on the created client customer.
   // Accessible only to customers on the allow-list.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-  google.ads.googleads.v13.enums.AccessRoleEnum.AccessRole access_role = 4;
-========
   google.ads.googleads.v14.enums.AccessRoleEnum.AccessRole access_role = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 
   // If true, the request is validated but not executed. Only errors are
   // returned, not results.
@@ -204,11 +149,7 @@ message CreateCustomerClientRequest {
 // A single update on a customer.
 message CustomerOperation {
   // Mutate operation. Only updates are supported for customer.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-  google.ads.googleads.v13.resources.Customer update = 1;
-========
   google.ads.googleads.v14.resources.Customer update = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 
   // FieldMask that determines which resource fields are modified in an update.
   google.protobuf.FieldMask update_mask = 2;
@@ -242,17 +183,6 @@ message MutateCustomerResult {
 
   // The mutated customer with only mutable fields after mutate. The fields will
   // only be returned when response_content_type is set to "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/customer_service.proto
-  google.ads.googleads.v13.resources.Customer customer = 2;
-}
-
-// Request message for
-// [CustomerService.ListAccessibleCustomers][google.ads.googleads.v13.services.CustomerService.ListAccessibleCustomers].
-message ListAccessibleCustomersRequest {}
-
-// Response message for
-// [CustomerService.ListAccessibleCustomers][google.ads.googleads.v13.services.CustomerService.ListAccessibleCustomers].
-========
   google.ads.googleads.v14.resources.Customer customer = 2;
 }
 
@@ -262,7 +192,6 @@ message ListAccessibleCustomersRequest {}
 
 // Response message for
 // [CustomerService.ListAccessibleCustomers][google.ads.googleads.v14.services.CustomerService.ListAccessibleCustomers].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/customer_service.proto
 message ListAccessibleCustomersResponse {
   // Resource name of customers directly accessible by the
   // user authenticating the call.

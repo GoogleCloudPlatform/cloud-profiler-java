@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +14,9 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/resources/user_list.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/resources/user_list.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -34,16 +24,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "UserListServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -52,7 +32,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
 
 // Proto file describing the User List service.
 
@@ -87,11 +66,7 @@ service UserListService {
   rpc MutateUserLists(MutateUserListsRequest)
       returns (MutateUserListsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-      post: "/v13/customers/{customer_id=*}/userLists:mutate"
-========
       post: "/v14/customers/{customer_id=*}/userLists:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -99,11 +74,7 @@ service UserListService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-// [UserListService.MutateUserLists][google.ads.googleads.v13.services.UserListService.MutateUserLists].
-========
 // [UserListService.MutateUserLists][google.ads.googleads.v14.services.UserListService.MutateUserLists].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
 message MutateUserListsRequest {
   // Required. The ID of the customer whose user lists are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -131,19 +102,11 @@ message UserListOperation {
   // The mutate operation.
   oneof operation {
     // Create operation: No resource name is expected for the new user list.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/user_list_service.proto
-    google.ads.googleads.v13.resources.UserList create = 1;
-
-    // Update operation: The user list is expected to have a valid resource
-    // name.
-    google.ads.googleads.v13.resources.UserList update = 2;
-========
     google.ads.googleads.v14.resources.UserList create = 1;
 
     // Update operation: The user list is expected to have a valid resource
     // name.
     google.ads.googleads.v14.resources.UserList update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/user_list_service.proto
 
     // Remove operation: A resource name for the removed user list is expected,
     // in this format:

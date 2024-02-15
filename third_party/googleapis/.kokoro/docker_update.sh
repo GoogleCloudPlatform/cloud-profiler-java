@@ -4,17 +4,28 @@
 # PHP and Ruby runtimes binaries to use in GAPIC generators for these
 # languages.
 #
+# Historically, PHP and Ruby keep their compiled runtimes in the generators'
+# repositories:
+# https://github.com/googleapis/gapic-generator-php/tree/main/rules_php_gapic/resources
+# https://github.com/googleapis/gapic-generator-ruby/tree/main/rules_ruby_gapic/prebuilt
+# They are needed to prevent rebuilding of PHP and Ruby runtime (each taking
+# several minutes) every time the build is executed from a clean workspace.
+#
+# Sometimes these binaries need to be updated: they are dynamically linked,
+# and may stop working if some dependency changes in an incompatible way.
+# Use this script to update both the googleapis Docker image, and those
+# binaries.
+#
 # Run from any local working directory where you have write access.
 #
 # Usage:
 # $ mkdir workdir
 # $ cd workdir
-# $ sh /google/src/head/depot/google3/third_party/googleapis/stable/.kokoro/docker_update.sh
+# $ sh /path/to/.kokoro/docker_update.sh
 #
 # After the script completes, it should print out commands to push the new
 # Docker image and to create pull requests against Ruby and PHP generators.
-# Whenever the image is published, tag it here:
-# https://pantheon.corp.google.com/gcr/images/gapic-images/global/googleapis?project=gapic-images
+# Whenever the image is published, tag it in Google Cloud Console,
 # then release new versions of the generators and update the image tag in
 # start.sh scripts in Kokoro folders in all googleapis workspaces.
 

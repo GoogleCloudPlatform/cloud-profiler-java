@@ -14,43 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/age_range_type.proto";
-import "google/ads/googleads/v12/enums/app_payment_model_type.proto";
-import "google/ads/googleads/v12/enums/content_label_type.proto";
-import "google/ads/googleads/v12/enums/day_of_week.proto";
-import "google/ads/googleads/v12/enums/device.proto";
-import "google/ads/googleads/v12/enums/gender_type.proto";
-import "google/ads/googleads/v12/enums/hotel_date_selection_type.proto";
-import "google/ads/googleads/v12/enums/income_range_type.proto";
-import "google/ads/googleads/v12/enums/interaction_type.proto";
-import "google/ads/googleads/v12/enums/keyword_match_type.proto";
-import "google/ads/googleads/v12/enums/listing_group_type.proto";
-import "google/ads/googleads/v12/enums/location_group_radius_units.proto";
-import "google/ads/googleads/v12/enums/minute_of_hour.proto";
-import "google/ads/googleads/v12/enums/parental_status_type.proto";
-import "google/ads/googleads/v12/enums/preferred_content_type.proto";
-import "google/ads/googleads/v12/enums/product_bidding_category_level.proto";
-import "google/ads/googleads/v12/enums/product_channel.proto";
-import "google/ads/googleads/v12/enums/product_channel_exclusivity.proto";
-import "google/ads/googleads/v12/enums/product_condition.proto";
-import "google/ads/googleads/v12/enums/product_custom_attribute_index.proto";
-import "google/ads/googleads/v12/enums/product_type_level.proto";
-import "google/ads/googleads/v12/enums/proximity_radius_units.proto";
-import "google/ads/googleads/v12/enums/webpage_condition_operand.proto";
-import "google/ads/googleads/v12/enums/webpage_condition_operator.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "CriteriaProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v14.common;
 
 import "google/ads/googleads/v14/enums/age_range_type.proto";
@@ -85,7 +48,6 @@ option java_package = "com.google.ads.googleads.v14.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V14::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
 // Proto file describing criteria types.
 
@@ -95,12 +57,8 @@ message KeywordInfo {
   optional string text = 3;
 
   // The match type of the keyword.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.KeywordMatchTypeEnum.KeywordMatchType match_type = 2;
-========
   google.ads.googleads.v14.enums.KeywordMatchTypeEnum.KeywordMatchType
       match_type = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A placement criterion. This can be used to modify bids for sites when
@@ -158,27 +116,13 @@ message LocationInfo {
 // A device criterion.
 message DeviceInfo {
   // Type of the device.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.DeviceEnum.Device type = 1;
-}
-
-// A preferred content criterion.
-message PreferredContentInfo {
-  // Type of the preferred content.
-  google.ads.googleads.v12.enums.PreferredContentTypeEnum.PreferredContentType type = 2;
-========
   google.ads.googleads.v14.enums.DeviceEnum.Device type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A listing group criterion.
 message ListingGroupInfo {
   // Type of the listing group.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ListingGroupTypeEnum.ListingGroupType type = 1;
-========
   google.ads.googleads.v14.enums.ListingGroupTypeEnum.ListingGroupType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // Dimension value with which this listing group is refining its parent.
   // Undefined for the root group.
@@ -317,12 +261,8 @@ message ProductBiddingCategoryInfo {
   optional int64 id = 4;
 
   // Level of the product bidding category.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductBiddingCategoryLevelEnum.ProductBiddingCategoryLevel level = 3;
-========
   google.ads.googleads.v14.enums.ProductBiddingCategoryLevelEnum
       .ProductBiddingCategoryLevel level = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Brand of the product.
@@ -334,33 +274,21 @@ message ProductBrandInfo {
 // Locality of a product offer.
 message ProductChannelInfo {
   // Value of the locality.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductChannelEnum.ProductChannel channel = 1;
-========
   google.ads.googleads.v14.enums.ProductChannelEnum.ProductChannel channel = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Availability of a product offer.
 message ProductChannelExclusivityInfo {
   // Value of the availability.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductChannelExclusivityEnum.ProductChannelExclusivity channel_exclusivity = 1;
-========
   google.ads.googleads.v14.enums.ProductChannelExclusivityEnum
       .ProductChannelExclusivity channel_exclusivity = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Condition of a product offer.
 message ProductConditionInfo {
   // Value of the condition.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductConditionEnum.ProductCondition condition = 1;
-========
   google.ads.googleads.v14.enums.ProductConditionEnum.ProductCondition
       condition = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Custom attribute of a product offer.
@@ -369,12 +297,8 @@ message ProductCustomAttributeInfo {
   optional string value = 3;
 
   // Indicates the index of the custom attribute.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductCustomAttributeIndexEnum.ProductCustomAttributeIndex index = 2;
-========
   google.ads.googleads.v14.enums.ProductCustomAttributeIndexEnum
       .ProductCustomAttributeIndex index = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Item id of a product offer.
@@ -389,12 +313,8 @@ message ProductTypeInfo {
   optional string value = 3;
 
   // Level of the type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProductTypeLevelEnum.ProductTypeLevel level = 2;
-========
   google.ads.googleads.v14.enums.ProductTypeLevelEnum.ProductTypeLevel level =
       2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Grouping of a product offer. This listing dimension is deprecated and it is
@@ -428,20 +348,11 @@ message ProductTypeFullInfo {
 // Unknown listing dimension.
 message UnknownListingDimensionInfo {}
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-}
-
-// Criterion for hotel date selection (default dates versus user selected).
-message HotelDateSelectionTypeInfo {
-  // Type of the hotel date selection
-  google.ads.googleads.v12.enums.HotelDateSelectionTypeEnum.HotelDateSelectionType type = 1;
-========
 // Criterion for hotel date selection (default dates versus user selected).
 message HotelDateSelectionTypeInfo {
   // Type of the hotel date selection
   google.ads.googleads.v14.enums.HotelDateSelectionTypeEnum
       .HotelDateSelectionType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Criterion for number of days prior to the stay the booking is being made.
@@ -474,9 +385,6 @@ message HotelCheckInDateRangeInfo {
 // Criterion for day of the week the booking is for.
 message HotelCheckInDayInfo {
   // The day of the week.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek day_of_week = 1;
-========
   google.ads.googleads.v14.enums.DayOfWeekEnum.DayOfWeek day_of_week = 1;
 }
 
@@ -497,17 +405,12 @@ message ActivityCountryInfo {
   // String value of the activity country. The Geo Target Constant resource
   // name.
   optional string value = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Criterion for Interaction Type.
 message InteractionTypeInfo {
   // The interaction type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.InteractionTypeEnum.InteractionType type = 1;
-========
   google.ads.googleads.v14.enums.InteractionTypeEnum.InteractionType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Represents an AdSchedule criterion.
@@ -521,22 +424,14 @@ message AdScheduleInfo {
   //
   // This field is required for CREATE operations and is prohibited on UPDATE
   // operations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.MinuteOfHourEnum.MinuteOfHour start_minute = 1;
-========
   google.ads.googleads.v14.enums.MinuteOfHourEnum.MinuteOfHour start_minute = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // Minutes after the end hour at which this schedule ends. The schedule is
   // exclusive of the end minute.
   //
   // This field is required for CREATE operations and is prohibited on UPDATE
   // operations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.MinuteOfHourEnum.MinuteOfHour end_minute = 2;
-========
   google.ads.googleads.v14.enums.MinuteOfHourEnum.MinuteOfHour end_minute = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // Starting hour in 24 hour time.
   // This field must be between 0 and 23, inclusive.
@@ -556,52 +451,32 @@ message AdScheduleInfo {
   //
   // This field is required for CREATE operations and is prohibited on UPDATE
   // operations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek day_of_week = 5;
-========
   google.ads.googleads.v14.enums.DayOfWeekEnum.DayOfWeek day_of_week = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // An age range criterion.
 message AgeRangeInfo {
   // Type of the age range.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.AgeRangeTypeEnum.AgeRangeType type = 1;
-========
   google.ads.googleads.v14.enums.AgeRangeTypeEnum.AgeRangeType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A gender criterion.
 message GenderInfo {
   // Type of the gender.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.GenderTypeEnum.GenderType type = 1;
-========
   google.ads.googleads.v14.enums.GenderTypeEnum.GenderType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // An income range criterion.
 message IncomeRangeInfo {
   // Type of the income range.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.IncomeRangeTypeEnum.IncomeRangeType type = 1;
-========
   google.ads.googleads.v14.enums.IncomeRangeTypeEnum.IncomeRangeType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A parental status criterion.
 message ParentalStatusInfo {
   // Type of the parental status.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ParentalStatusTypeEnum.ParentalStatusType type = 1;
-========
   google.ads.googleads.v14.enums.ParentalStatusTypeEnum.ParentalStatusType
       type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A YouTube Video criterion.
@@ -639,12 +514,8 @@ message ProximityInfo {
   optional double radius = 5;
 
   // The unit of measurement of the radius. Default is KILOMETERS.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ProximityRadiusUnitsEnum.ProximityRadiusUnits radius_units = 3;
-========
   google.ads.googleads.v14.enums.ProximityRadiusUnitsEnum.ProximityRadiusUnits
       radius_units = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // Full address.
   AddressInfo address = 4;
@@ -718,11 +589,7 @@ message IpBlockInfo {
 // Content Label for category exclusion.
 message ContentLabelInfo {
   // Content label type, required for CREATE operations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.ContentLabelTypeEnum.ContentLabelType type = 1;
-========
   google.ads.googleads.v14.enums.ContentLabelTypeEnum.ContentLabelType type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // Represents a Carrier Criterion.
@@ -770,12 +637,6 @@ message WebpageInfo {
 // Logical expression for targeting webpages of an advertiser's website.
 message WebpageConditionInfo {
   // Operand of webpage targeting condition.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.WebpageConditionOperandEnum.WebpageConditionOperand operand = 1;
-
-  // Operator of webpage targeting condition.
-  google.ads.googleads.v12.enums.WebpageConditionOperatorEnum.WebpageConditionOperator operator = 2;
-========
   google.ads.googleads.v14.enums.WebpageConditionOperandEnum
       .WebpageConditionOperand operand = 1;
 
@@ -783,7 +644,6 @@ message WebpageConditionInfo {
   google.ads.googleads.v14.enums.WebpageConditionOperatorEnum
       .WebpageConditionOperator
       operator = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // Argument of webpage targeting condition.
   optional string argument = 4;
@@ -804,12 +664,8 @@ message OperatingSystemVersionInfo {
 // An app payment model criterion.
 message AppPaymentModelInfo {
   // Type of the app payment model.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.AppPaymentModelTypeEnum.AppPaymentModelType type = 1;
-========
   google.ads.googleads.v14.enums.AppPaymentModelTypeEnum.AppPaymentModelType
       type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 }
 
 // A mobile device criterion.
@@ -850,12 +706,8 @@ message LocationGroupInfo {
   // Unit of the radius. Miles and meters are supported for geo target
   // constants. Milli miles and meters are supported for feed item sets and
   // asset sets. This is required and must be set in CREATE operations.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/criteria.proto
-  google.ads.googleads.v12.enums.LocationGroupRadiusUnitsEnum.LocationGroupRadiusUnits radius_units = 4;
-========
   google.ads.googleads.v14.enums.LocationGroupRadiusUnitsEnum
       .LocationGroupRadiusUnits radius_units = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/criteria.proto
 
   // FeedItemSets whose FeedItems are targeted. If multiple IDs are specified,
   // then all items that appear in at least one set are targeted. This field

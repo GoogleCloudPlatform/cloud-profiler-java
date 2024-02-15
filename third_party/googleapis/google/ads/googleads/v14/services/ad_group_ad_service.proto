@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,19 +14,11 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/common/policy.proto";
-import "google/ads/googleads/v13/enums/response_content_type.proto";
-import "google/ads/googleads/v13/resources/ad_group_ad.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/common/policy.proto";
 import "google/ads/googleads/v14/enums/response_content_type.proto";
 import "google/ads/googleads/v14/resources/ad_group_ad.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -38,16 +26,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "AdGroupAdServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -56,7 +34,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 
 // Proto file describing the Ad Group Ad service.
 
@@ -114,11 +91,7 @@ service AdGroupAdService {
   rpc MutateAdGroupAds(MutateAdGroupAdsRequest)
       returns (MutateAdGroupAdsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-      post: "/v13/customers/{customer_id=*}/adGroupAds:mutate"
-========
       post: "/v14/customers/{customer_id=*}/adGroupAds:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -126,11 +99,7 @@ service AdGroupAdService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-// [AdGroupAdService.MutateAdGroupAds][google.ads.googleads.v13.services.AdGroupAdService.MutateAdGroupAds].
-========
 // [AdGroupAdService.MutateAdGroupAds][google.ads.googleads.v14.services.AdGroupAdService.MutateAdGroupAds].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 message MutateAdGroupAdsRequest {
   // Required. The ID of the customer whose ads are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -151,11 +120,7 @@ message MutateAdGroupAdsRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-  google.ads.googleads.v13.enums.ResponseContentTypeEnum.ResponseContentType
-========
   google.ads.googleads.v14.enums.ResponseContentTypeEnum.ResponseContentType
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
       response_content_type = 5;
 }
 
@@ -165,27 +130,16 @@ message AdGroupAdOperation {
   google.protobuf.FieldMask update_mask = 4;
 
   // Configuration for how policies are validated.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-  google.ads.googleads.v13.common.PolicyValidationParameter
-========
   google.ads.googleads.v14.common.PolicyValidationParameter
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
       policy_validation_parameter = 5;
 
   // The mutate operation.
   oneof operation {
     // Create operation: No resource name is expected for the new ad.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-    google.ads.googleads.v13.resources.AdGroupAd create = 1;
-
-    // Update operation: The ad is expected to have a valid resource name.
-    google.ads.googleads.v13.resources.AdGroupAd update = 2;
-========
     google.ads.googleads.v14.resources.AdGroupAd create = 1;
 
     // Update operation: The ad is expected to have a valid resource name.
     google.ads.googleads.v14.resources.AdGroupAd update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 
     // Remove operation: A resource name for the removed ad is expected,
     // in this format:
@@ -219,9 +173,5 @@ message MutateAdGroupAdResult {
   // The mutated ad group ad with only mutable fields after mutate. The field
   // will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/ad_group_ad_service.proto
-  google.ads.googleads.v13.resources.AdGroupAd ad_group_ad = 2;
-========
   google.ads.googleads.v14.resources.AdGroupAd ad_group_ad = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/ad_group_ad_service.proto
 }

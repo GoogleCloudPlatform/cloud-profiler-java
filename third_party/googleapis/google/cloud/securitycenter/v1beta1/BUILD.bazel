@@ -72,6 +72,7 @@ java_gapic_library(
     srcs = [":securitycenter_proto_with_info"],
     grpc_service_config = "securitycenter_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "securitycenter_v1beta1.yaml",
     test_deps = [
         ":securitycenter_java_grpc",
         "//google/iam/v1:iam_java_grpc",
@@ -79,6 +80,7 @@ java_gapic_library(
     transport = "grpc+rest",
     deps = [
         ":securitycenter_java_proto",
+        "//google/api:api_java_proto",
         "//google/iam/v1:iam_java_proto",
     ],
 )
@@ -113,7 +115,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -149,18 +150,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "securitycenter_go_gapic_test",
-    srcs = [":securitycenter_go_gapic_srcjar_test"],
-    embed = [":securitycenter_go_gapic"],
-    importpath = "cloud.google.com/go/securitycenter/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-securitycenter-v1beta1-go",
     deps = [
         ":securitycenter_go_gapic",
+        ":securitycenter_go_gapic_srcjar-snippets.srcjar",
         ":securitycenter_go_gapic_srcjar-test.srcjar",
         ":securitycenter_go_proto",
     ],
@@ -213,19 +208,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "securitycenter_php_proto",
     deps = [":securitycenter_proto"],
-)
-
-php_grpc_library(
-    name = "securitycenter_php_grpc",
-    srcs = [":securitycenter_proto"],
-    deps = [":securitycenter_php_proto"],
 )
 
 php_gapic_library(
@@ -235,10 +223,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "securitycenter_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":securitycenter_php_grpc",
-        ":securitycenter_php_proto",
-    ],
+    deps = [":securitycenter_php_proto"],
 )
 
 # Open Source Packages
@@ -246,7 +231,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-securitycenter-v1beta1-php",
     deps = [
         ":securitycenter_php_gapic",
-        ":securitycenter_php_grpc",
         ":securitycenter_php_proto",
     ],
 )
@@ -309,6 +293,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-securitycenter-v1beta1"],
     rest_numeric_enums = True,
     service_yaml = "securitycenter_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":securitycenter_ruby_grpc",
         ":securitycenter_ruby_proto",

@@ -39,6 +39,7 @@ proto_library(
         "slsa_provenance.proto",
         "slsa_provenance_zero_two.proto",
         "upgrade.proto",
+        "vex.proto",
         "vulnerability.proto",
     ],
     deps = [
@@ -201,7 +202,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -229,19 +229,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "grafeas_go_gapic_test",
-    srcs = [":grafeas_go_gapic_srcjar_test"],
-    embed = [":grafeas_go_gapic"],
-    importpath = "cloud.google.com/go/grafeas/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-grafeas-v1-go",
     deps = [
         ":grafeas_go_gapic",
         ":grafeas_go_gapic_srcjar-metadata.srcjar",
+        ":grafeas_go_gapic_srcjar-snippets.srcjar",
         ":grafeas_go_gapic_srcjar-test.srcjar",
         ":grafeas_go_proto",
     ],
@@ -345,7 +339,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -354,23 +347,15 @@ php_proto_library(
     deps = [":grafeas_proto"],
 )
 
-php_grpc_library(
-    name = "grafeas_php_grpc",
-    srcs = [":grafeas_proto"],
-    deps = [":grafeas_php_proto"],
-)
-
 php_gapic_library(
     name = "grafeas_php_gapic",
     srcs = [":grafeas_proto_with_info"],
     grpc_service_config = "grafeas_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "grafeas_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":grafeas_php_grpc",
-        ":grafeas_php_proto",
-    ],
+    deps = [":grafeas_php_proto"],
 )
 
 # Open Source Packages
@@ -378,7 +363,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-grafeas-v1-php",
     deps = [
         ":grafeas_php_gapic",
-        ":grafeas_php_grpc",
         ":grafeas_php_proto",
     ],
 )

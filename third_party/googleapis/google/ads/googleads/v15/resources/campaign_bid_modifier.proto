@@ -14,22 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_bid_modifier.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CampaignBidModifierProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -44,7 +28,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_bid_modifier.proto
 
 // Proto file describing the Campaign Bid Modifier resource.
 
@@ -86,14 +69,9 @@ message CampaignBidModifier {
   //
   // Required in create operations starting in V5.
   oneof criterion {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_bid_modifier.proto
-    // Immutable. Criterion for interaction type. Only supported for search campaigns.
-    google.ads.googleads.v12.common.InteractionTypeInfo interaction_type = 5 [(google.api.field_behavior) = IMMUTABLE];
-========
     // Immutable. Criterion for interaction type. Only supported for search
     // campaigns.
     google.ads.googleads.v15.common.InteractionTypeInfo interaction_type = 5
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_bid_modifier.proto
   }
 }

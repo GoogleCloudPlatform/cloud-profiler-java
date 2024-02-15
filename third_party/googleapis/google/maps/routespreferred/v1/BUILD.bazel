@@ -9,7 +9,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -34,6 +33,7 @@ java_gapic_library(
     gapic_yaml = "routespreferred_gapic.yaml",
     grpc_service_config = "//google/maps/routes/v1:routes_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "routespreferred_v1.yaml",
     test_deps = [
         "//google/maps/routes/v1:routes_java_grpc",
     ],
@@ -82,18 +82,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "routespreferred_go_gapic_test",
-    srcs = [":routespreferred_go_gapic_srcjar_test"],
-    embed = [":routespreferred_go_gapic"],
-    importpath = "developers.google.com/maps/go/routespreferred/v1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapic-maps-routespreferred-v1-go",
     deps = [
         ":routespreferred_go_gapic",
+        ":routespreferred_go_gapic_srcjar-snippets.srcjar",
         ":routespreferred_go_gapic_srcjar-test.srcjar",
         "//google/maps/routes/v1:routes_go_proto",
     ],

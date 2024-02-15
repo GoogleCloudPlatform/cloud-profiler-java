@@ -78,9 +78,9 @@ go_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "py_gapic_assembly_pkg",
     "py_gapic_library",
     "py_proto_library",
+    "py_gapic_assembly_pkg",
 )
 
 py_gapic_library(
@@ -95,12 +95,19 @@ py_proto_library(
     deps = [":common_proto"],
 )
 
+# Open Source Packages
+py_gapic_assembly_pkg(
+    name = "common-py",
+    deps = [
+        ":common_py_gapic",
+    ],
+)
+
 ##############################################################################
 # PHP
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -109,20 +116,9 @@ php_proto_library(
     deps = [":common_proto"],
 )
 
-php_grpc_library(
-    name = "common_php_grpc",
-    srcs = [":common_proto"],
-    deps = [":common_php_proto"],
-)
-
 ##############################################################################
 # Node.js
 ##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-)
 
 ##############################################################################
 # Ruby

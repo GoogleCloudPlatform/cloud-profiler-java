@@ -28,6 +28,7 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
+        "//google/longrunning:operations_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -110,7 +111,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -120,6 +120,7 @@ go_proto_library(
     protos = [":webrisk_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+        "//google/longrunning:longrunning_go_proto",
     ],
 )
 
@@ -135,14 +136,10 @@ go_gapic_library(
     transport = "grpc+rest",
     deps = [
         ":webrisk_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "webrisk_go_gapic_test",
-    srcs = [":webrisk_go_gapic_srcjar_test"],
-    embed = [":webrisk_go_gapic"],
-    importpath = "cloud.google.com/go/webrisk/apiv1",
 )
 
 # Open Source Packages
@@ -151,6 +148,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":webrisk_go_gapic",
         ":webrisk_go_gapic_srcjar-metadata.srcjar",
+        ":webrisk_go_gapic_srcjar-snippets.srcjar",
         ":webrisk_go_gapic_srcjar-test.srcjar",
         ":webrisk_go_proto",
     ],
@@ -202,7 +200,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -211,23 +208,15 @@ php_proto_library(
     deps = [":webrisk_proto"],
 )
 
-php_grpc_library(
-    name = "webrisk_php_grpc",
-    srcs = [":webrisk_proto"],
-    deps = [":webrisk_php_proto"],
-)
-
 php_gapic_library(
     name = "webrisk_php_gapic",
     srcs = [":webrisk_proto_with_info"],
     grpc_service_config = "webrisk_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "webrisk_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":webrisk_php_grpc",
-        ":webrisk_php_proto",
-    ],
+    deps = [":webrisk_php_proto"],
 )
 
 # Open Source Packages
@@ -235,7 +224,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-webrisk-v1-php",
     deps = [
         ":webrisk_php_gapic",
-        ":webrisk_php_grpc",
         ":webrisk_php_proto",
     ],
 )
@@ -307,6 +295,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Web Risk is an enterprise security product that lets your client applications check URLs against Google's constantly updated lists of unsafe web resources.",
     ruby_cloud_title = "Web Risk V1",
     service_yaml = "webrisk_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":webrisk_ruby_grpc",
         ":webrisk_ruby_proto",

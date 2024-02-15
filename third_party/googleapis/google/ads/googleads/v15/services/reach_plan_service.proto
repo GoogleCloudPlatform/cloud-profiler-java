@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/common/criteria.proto";
-import "google/ads/googleads/v13/common/dates.proto";
-import "google/ads/googleads/v13/enums/frequency_cap_time_unit.proto";
-import "google/ads/googleads/v13/enums/reach_plan_age_range.proto";
-import "google/ads/googleads/v13/enums/reach_plan_network.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -36,21 +23,10 @@ import "google/ads/googleads/v15/enums/reach_plan_age_range.proto";
 import "google/ads/googleads/v15/enums/reach_plan_network.proto";
 import "google/ads/googleads/v15/enums/reach_plan_surface.proto";
 import "google/ads/googleads/v15/enums/target_frequency_time_unit.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "ReachPlanServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -59,7 +35,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 
 // Proto file describing the reach plan service.
 
@@ -84,11 +59,7 @@ service ReachPlanService {
   rpc ListPlannableLocations(ListPlannableLocationsRequest)
       returns (ListPlannableLocationsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-      post: "/v13:listPlannableLocations"
-========
       post: "/v15:listPlannableLocations"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       body: "*"
     };
   }
@@ -106,11 +77,7 @@ service ReachPlanService {
   rpc ListPlannableProducts(ListPlannableProductsRequest)
       returns (ListPlannableProductsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-      post: "/v13:listPlannableProducts"
-========
       post: "/v15:listPlannableProducts"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "plannable_location_id";
@@ -131,11 +98,7 @@ service ReachPlanService {
   rpc GenerateReachForecast(GenerateReachForecastRequest)
       returns (GenerateReachForecastResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-      post: "/v13/customers/{customer_id=*}:generateReachForecast"
-========
       post: "/v15/customers/{customer_id=*}:generateReachForecast"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       body: "*"
     };
     option (google.api.method_signature) =
@@ -144,11 +107,7 @@ service ReachPlanService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-// [ReachPlanService.ListPlannableLocations][google.ads.googleads.v13.services.ReachPlanService.ListPlannableLocations].
-========
 // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v15.services.ReachPlanService.ListPlannableLocations].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 message ListPlannableLocationsRequest {}
 
 // The list of plannable locations.
@@ -171,24 +130,15 @@ message PlannableLocation {
   // The parent country (not present if location is a country).
   // If present, will always be a GeoTargetConstant ID. Additional information
   // such as country name is provided by
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v13.services.ReachPlanService.ListPlannableLocations]
-  // or [GoogleAdsService.Search/SearchStream][].
-========
   // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v15.services.ReachPlanService.ListPlannableLocations]
   // or GoogleAdsService.Search/SearchStream.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   optional int64 parent_country_id = 6;
 
   // The ISO-3166-1 alpha-2 country code that is associated with the location.
   optional string country_code = 7;
 
   // The location's type. Location types correspond to target_type returned by
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // searching location type in [GoogleAdsService.Search/SearchStream][].
-========
   // searching location type in GoogleAdsService.Search/SearchStream.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   optional string location_type = 8;
 }
 
@@ -196,11 +146,7 @@ message PlannableLocation {
 message ListPlannableProductsRequest {
   // Required. The ID of the selected location for planning. To list the
   // available plannable location IDs use
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v13.services.ReachPlanService.ListPlannableLocations].
-========
   // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v15.services.ReachPlanService.ListPlannableLocations].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   string plannable_location_id = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -215,11 +161,7 @@ message ProductMetadata {
   // The code associated with the ad product (for example: BUMPER,
   // TRUEVIEW_IN_STREAM).
   // To list the available plannable product codes use
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v13.services.ReachPlanService.ListPlannableProducts].
-========
   // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v15.services.ReachPlanService.ListPlannableProducts].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   optional string plannable_product_code = 4;
 
   // The name associated with the ad product.
@@ -235,45 +177,24 @@ message PlannableTargeting {
   // reported. Actual targeting is computed by mapping this age range onto
   // standard Google common.AgeRangeInfo values.
   repeated
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-      google.ads.googleads.v13.enums.ReachPlanAgeRangeEnum.ReachPlanAgeRange
-          age_ranges = 1;
-
-  // Targetable genders for the ad product.
-  repeated google.ads.googleads.v13.common.GenderInfo genders = 2;
-========
       google.ads.googleads.v15.enums.ReachPlanAgeRangeEnum.ReachPlanAgeRange
           age_ranges = 1;
 
   // Targetable genders for the ad product.
   repeated google.ads.googleads.v15.common.GenderInfo genders = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 
   // Targetable devices for the ad product.
   // TABLET device targeting is automatically applied to reported metrics
   // when MOBILE targeting is selected for CPM_MASTHEAD,
   // GOOGLE_PREFERRED_BUMPER, and GOOGLE_PREFERRED_SHORT products.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  repeated google.ads.googleads.v13.common.DeviceInfo devices = 3;
-
-  // Targetable networks for the ad product.
-  repeated google.ads.googleads.v13.enums.ReachPlanNetworkEnum.ReachPlanNetwork
-========
   repeated google.ads.googleads.v15.common.DeviceInfo devices = 3;
 
   // Targetable networks for the ad product.
   repeated google.ads.googleads.v15.enums.ReachPlanNetworkEnum.ReachPlanNetwork
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       networks = 4;
 
   // Targetable YouTube Select Lineups for the ad product.
   repeated YouTubeSelectLineUp youtube_select_lineups = 5;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-}
-
-// Request message for
-// [ReachPlanService.GenerateReachForecast][google.ads.googleads.v13.services.ReachPlanService.GenerateReachForecast].
-========
 
   // Targetable surface combinations for the ad product.
   SurfaceTargetingCombinations surface_targeting = 6;
@@ -281,7 +202,6 @@ message PlannableTargeting {
 
 // Request message for
 // [ReachPlanService.GenerateReachForecast][google.ads.googleads.v15.services.ReachPlanService.GenerateReachForecast].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 message GenerateReachForecastRequest {
   // Required. The ID of the customer.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -350,10 +270,6 @@ message GenerateReachForecastRequest {
   ForecastMetricOptions forecast_metric_options = 13;
 
   // The name of the customer being planned for. This is a user-defined value.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // Required if targeting.audience_targeting is set.
-========
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   optional string customer_reach_group = 14;
 }
 
@@ -372,11 +288,7 @@ message FrequencyCap {
   int32 impressions = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The type of time unit.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  google.ads.googleads.v13.enums.FrequencyCapTimeUnitEnum.FrequencyCapTimeUnit
-========
   google.ads.googleads.v15.enums.FrequencyCapTimeUnitEnum.FrequencyCapTimeUnit
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       time_unit = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -384,11 +296,7 @@ message FrequencyCap {
 message Targeting {
   // The ID of the selected location. Plannable location IDs can be
   // obtained from
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v13.services.ReachPlanService.ListPlannableLocations].
-========
   // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v15.services.ReachPlanService.ListPlannableLocations].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   //
   // Requests must set either this field or `plannable_location_ids`.
   //
@@ -402,53 +310,31 @@ message Targeting {
   // `parent_country_id`. Planning for more than `parent_county` is not
   // supported. Plannable location IDs and their `parent_country_id` can be
   // obtained from
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v13.services.ReachPlanService.ListPlannableLocations].
-========
   // [ReachPlanService.ListPlannableLocations][google.ads.googleads.v15.services.ReachPlanService.ListPlannableLocations].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   //
   // Requests must set either this field or `plannable_location_id`.
   repeated string plannable_location_ids = 8;
 
   // Targeted age range.
   // An unset value is equivalent to targeting all ages.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  google.ads.googleads.v13.enums.ReachPlanAgeRangeEnum.ReachPlanAgeRange
-========
   google.ads.googleads.v15.enums.ReachPlanAgeRangeEnum.ReachPlanAgeRange
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       age_range = 2;
 
   // Targeted genders.
   // An unset value is equivalent to targeting MALE and FEMALE.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  repeated google.ads.googleads.v13.common.GenderInfo genders = 3;
-========
   repeated google.ads.googleads.v15.common.GenderInfo genders = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 
   // Targeted devices.
   // If not specified, targets all applicable devices. Applicable devices vary
   // by product and region and can be obtained from
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v13.services.ReachPlanService.ListPlannableProducts].
-  repeated google.ads.googleads.v13.common.DeviceInfo devices = 4;
-========
   // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v15.services.ReachPlanService.ListPlannableProducts].
   repeated google.ads.googleads.v15.common.DeviceInfo devices = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 
   // Targetable network for the ad product.
   // If not specified, targets all applicable networks. Applicable networks vary
   // by product and region and can be obtained from
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v13.services.ReachPlanService.ListPlannableProducts].
-  google.ads.googleads.v13.enums.ReachPlanNetworkEnum.ReachPlanNetwork network =
-========
   // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v15.services.ReachPlanService.ListPlannableProducts].
   google.ads.googleads.v15.enums.ReachPlanNetworkEnum.ReachPlanNetwork network =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
       5;
 
   // Targeted audiences.
@@ -469,11 +355,7 @@ message CampaignDuration {
   // date range must be <= 92 days long.
   //
   // This field cannot be combined with the duration_in_days field.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  google.ads.googleads.v13.common.DateRange date_range = 3;
-========
   google.ads.googleads.v15.common.DateRange date_range = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 }
 
 // A product being planned for reach.
@@ -481,31 +363,18 @@ message PlannedProduct {
   // Required. Selected product for planning.
   // The code associated with the ad product (for example: Trueview, Bumper).
   // To list the available plannable product codes use
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v13.services.ReachPlanService.ListPlannableProducts].
-  optional string plannable_product_code = 3;
-========
   // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v15.services.ReachPlanService.ListPlannableProducts].
   optional string plannable_product_code = 3
       [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 
   // Required. Maximum budget allocation in micros for the selected product.
   // The value is specified in the selected planning currency_code.
   // For example: 1 000 000$ = 1 000 000 000 000 micros.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  optional int64 budget_micros = 4;
-
-  // Targeting settings for the selected product.
-  // To list the available targeting for each product use
-  // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v13.services.ReachPlanService.ListPlannableProducts].
-========
   optional int64 budget_micros = 4 [(google.api.field_behavior) = REQUIRED];
 
   // Targeting settings for the selected product.
   // To list the available targeting for each product use
   // [ReachPlanService.ListPlannableProducts][google.ads.googleads.v15.services.ReachPlanService.ListPlannableProducts].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   AdvancedProductTargeting advanced_product_targeting = 5;
 }
 
@@ -595,8 +464,6 @@ message Forecast {
   // impressions that may fall outside the specified Targeting, due to
   // insufficient information on signed-in users.
   optional int64 total_coview_impressions = 14;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-========
 
   // Number of ad views forecasted for the specified product and targeting.
   // A view is counted when a viewer views a larger portion or the entirety of
@@ -605,7 +472,6 @@ message Forecast {
   // See https://support.google.com/google-ads/answer/2375431 for
   // more information on views.
   optional int64 views = 15;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 }
 
 // The forecasted allocation and traffic metrics for a specific product
@@ -672,8 +538,6 @@ message PlannedProductForecast {
   // impressions that may fall outside the specified Targeting, due to
   // insufficient information on signed-in users.
   optional int64 total_coview_impressions = 9;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-========
 
   // The number of times per selected time unit a user will see an ad, averaged
   // over the number of time units in the forecast length. This field will only
@@ -690,7 +554,6 @@ message PlannedProductForecast {
   // See https://support.google.com/google-ads/answer/2375431 for
   // more information on views.
   optional int64 views = 11;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 }
 
 // Audience metrics for the planned products.
@@ -747,17 +610,11 @@ message ForecastMetricOptions {
 // Audience targeting for reach forecast.
 message AudienceTargeting {
   // List of audiences based on user interests to be targeted.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-  repeated google.ads.googleads.v13.common.UserInterestInfo user_interest = 1;
-========
   repeated google.ads.googleads.v15.common.UserInterestInfo user_interest = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 }
 
 // Advanced targeting settings for products.
 message AdvancedProductTargeting {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-========
   // Surface targeting settings for this product.
   SurfaceTargeting surface_targeting_settings = 2;
 
@@ -768,7 +625,6 @@ message AdvancedProductTargeting {
   // information about Target Frequency campaigns.
   TargetFrequencySettings target_frequency_settings = 3;
 
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
   // Targeting options for this product.
   oneof advanced_targeting {
     // Settings for YouTube Select targeting.
@@ -789,8 +645,6 @@ message YouTubeSelectLineUp {
 
   // The unique name of the YouTube Select Lineup.
   string lineup_name = 2;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/reach_plan_service.proto
-========
 }
 
 // The surface targeting combinations available for an ad product.
@@ -820,5 +674,4 @@ message TargetFrequencySettings {
 
   // Required. The target frequency goal per selected time unit.
   int32 target_frequency = 2 [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/reach_plan_service.proto
 }

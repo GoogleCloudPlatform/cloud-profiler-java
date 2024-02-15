@@ -122,7 +122,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -159,19 +158,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "vmmigration_go_gapic_test",
-    srcs = [":vmmigration_go_gapic_srcjar_test"],
-    embed = [":vmmigration_go_gapic"],
-    importpath = "cloud.google.com/go/vmmigration/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-vmmigration-v1-go",
     deps = [
         ":vmmigration_go_gapic",
         ":vmmigration_go_gapic_srcjar-metadata.srcjar",
+        ":vmmigration_go_gapic_srcjar-snippets.srcjar",
         ":vmmigration_go_gapic_srcjar-test.srcjar",
         ":vmmigration_go_proto",
     ],
@@ -225,7 +218,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -234,23 +226,15 @@ php_proto_library(
     deps = [":vmmigration_proto"],
 )
 
-php_grpc_library(
-    name = "vmmigration_php_grpc",
-    srcs = [":vmmigration_proto"],
-    deps = [":vmmigration_php_proto"],
-)
-
 php_gapic_library(
     name = "vmmigration_php_gapic",
     srcs = [":vmmigration_proto_with_info"],
     grpc_service_config = "vmmigration_v1_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "vmmigration_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":vmmigration_php_grpc",
-        ":vmmigration_php_proto",
-    ],
+    deps = [":vmmigration_php_proto"],
 )
 
 # Open Source Packages
@@ -258,7 +242,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-vmmigration-v1-php",
     deps = [
         ":vmmigration_php_gapic",
-        ":vmmigration_php_grpc",
         ":vmmigration_php_proto",
     ],
 )
@@ -330,6 +313,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Migrate for Compute Engine enables you to migrate (Lift and Shift) your virtual machines (VMs), with minor automatic modifications, from your source environment to Google Compute Engine.",
     ruby_cloud_title = "Migrate for Compute Engine V1",
     service_yaml = "vmmigration_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":vmmigration_ruby_grpc",
         ":vmmigration_ruby_proto",

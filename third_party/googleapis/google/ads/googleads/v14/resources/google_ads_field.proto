@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/search_ads360_field.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/google_ads_field.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/search_ads360_field.proto
-package google.ads.searchads360.v0.resources;
-
-import "google/ads/searchads360/v0/enums/search_ads360_field_category.proto";
-import "google/ads/searchads360/v0/enums/search_ads360_field_data_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.SearchAds360.V0.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/searchads360/v0/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "SearchAds360FieldProto";
-option java_package = "com.google.ads.searchads360.v0.resources";
-option objc_class_prefix = "GASA360";
-option php_namespace = "Google\\Ads\\SearchAds360\\V0\\Resources";
-option ruby_package = "Google::Ads::SearchAds360::V0::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/enums/google_ads_field_category.proto";
@@ -50,25 +29,24 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/google_ads_field.proto
 
-// Proto file describing the Search Ads 360 Field resource.
+// Proto file describing the Google Ads Field resource.
 
-// A field or resource (artifact) used by SearchAds360Service.
-message SearchAds360Field {
+// A field or resource (artifact) used by GoogleAdsService.
+message GoogleAdsField {
   option (google.api.resource) = {
-    type: "searchads360.googleapis.com/SearchAds360Field"
-    pattern: "searchAds360Fields/{search_ads_360_field}"
+    type: "googleads.googleapis.com/GoogleAdsField"
+    pattern: "googleAdsFields/{google_ads_field}"
   };
 
   // Output only. The resource name of the artifact.
   // Artifact resource names have the form:
   //
-  // `SearchAds360Fields/{name}`
+  // `googleAdsFields/{name}`
   string resource_name = 1 [
     (google.api.field_behavior) = OUTPUT_ONLY,
     (google.api.resource_reference) = {
-      type: "searchads360.googleapis.com/SearchAds360Field"
+      type: "googleads.googleapis.com/GoogleAdsField"
     }
   ];
 
@@ -76,13 +54,9 @@ message SearchAds360Field {
   optional string name = 21 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The category of the artifact.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/search_ads360_field.proto
-  google.ads.searchads360.v0.enums.SearchAds360FieldCategoryEnum.SearchAds360FieldCategory category = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v14.enums.GoogleAdsFieldCategoryEnum
       .GoogleAdsFieldCategory category = 3
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/google_ads_field.proto
 
   // Output only. Whether the artifact can be used in a SELECT clause in search
   // queries.
@@ -125,17 +99,11 @@ message SearchAds360Field {
   // This field is only set for artifacts of category SEGMENT or ATTRIBUTE.
   repeated string enum_values = 29 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/search_ads360_field.proto
-  // Output only. This field determines the operators that can be used with the artifact
-  // in WHERE clauses.
-  google.ads.searchads360.v0.enums.SearchAds360FieldDataTypeEnum.SearchAds360FieldDataType data_type = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   // Output only. This field determines the operators that can be used with the
   // artifact in WHERE clauses.
   google.ads.googleads.v14.enums.GoogleAdsFieldDataTypeEnum
       .GoogleAdsFieldDataType data_type = 12
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/google_ads_field.proto
 
   // Output only. The URL of proto describing the artifact's data type.
   optional string type_url = 30 [(google.api.field_behavior) = OUTPUT_ONLY];

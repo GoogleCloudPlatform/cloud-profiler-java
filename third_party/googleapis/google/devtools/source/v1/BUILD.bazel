@@ -13,7 +13,7 @@ load(
     "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
-    "php_grpc_library",
+    "php_gapic_assembly_pkg",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -102,10 +102,12 @@ php_proto_library(
     deps = [":source_proto"],
 )
 
-php_grpc_library(
-    name = "source_php_grpc",
-    srcs = [":source_proto"],
-    deps = [":source_php_proto"],
+# Open Source Packages
+php_gapic_assembly_pkg(
+    name = "google-cloud-source-v1-php",
+    deps = [
+        ":source_php_proto",
+    ],
 )
 
 ruby_proto_library(

@@ -43,8 +43,8 @@ proto_library(
 proto_library_with_info(
     name = "containeranalysis_proto_with_info",
     deps = [
-        "//google/cloud:common_resources_proto",
         ":containeranalysis_proto",
+        "//google/cloud:common_resources_proto",
     ] + _PROTO_SUBPACKAGE_DEPS,
 )
 
@@ -105,6 +105,7 @@ java_gapic_library(
     gapic_yaml = "containeranalysis_gapic.yaml",
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "containeranalysis_v1beta1.yaml",
     test_deps = [
         ":containeranalysis_java_grpc",
     ] + _JAVA_GRPC_SUBPACKAGE_DEPS,
@@ -146,13 +147,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "containeranalysis_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1beta1",
+    importpath = "cloud.google.com/go/containeranalysis/apiv1beta1/containeranalysispb",
     protos = [":containeranalysis_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -165,6 +165,7 @@ go_gapic_library(
     srcs = [":containeranalysis_proto_with_info"],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     importpath = "cloud.google.com/go/containeranalysis/apiv1beta1;containeranalysis",
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "containeranalysis_v1beta1.yaml",
     transport = "grpc+rest",
@@ -185,18 +186,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "containeranalysis_go_gapic_test",
-    srcs = [":containeranalysis_go_gapic_srcjar_test"],
-    embed = [":containeranalysis_go_gapic"],
-    importpath = "cloud.google.com/go/containeranalysis/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-devtools-containeranalysis-v1beta1-go",
     deps = [
         ":containeranalysis_go_gapic",
+        ":containeranalysis_go_gapic_srcjar-snippets.srcjar",
         ":containeranalysis_go_gapic_srcjar-test.srcjar",
         ":containeranalysis_go_proto",
         "//google/devtools/containeranalysis/v1beta1/attestation:attestation_go_proto",

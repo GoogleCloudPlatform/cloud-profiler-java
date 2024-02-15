@@ -118,7 +118,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -148,19 +147,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "recommender_go_gapic_test",
-    srcs = [":recommender_go_gapic_srcjar_test"],
-    embed = [":recommender_go_gapic"],
-    importpath = "cloud.google.com/go/recommender/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-recommender-v1-go",
     deps = [
         ":recommender_go_gapic",
         ":recommender_go_gapic_srcjar-metadata.srcjar",
+        ":recommender_go_gapic_srcjar-snippets.srcjar",
         ":recommender_go_gapic_srcjar-test.srcjar",
         ":recommender_go_proto",
     ],
@@ -210,7 +203,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -219,23 +211,15 @@ php_proto_library(
     deps = [":recommender_proto"],
 )
 
-php_grpc_library(
-    name = "recommender_php_grpc",
-    srcs = [":recommender_proto"],
-    deps = [":recommender_php_proto"],
-)
-
 php_gapic_library(
     name = "recommender_php_gapic",
     srcs = [":recommender_proto_with_info"],
     grpc_service_config = "recommender_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "recommender_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":recommender_php_grpc",
-        ":recommender_php_proto",
-    ],
+    deps = [":recommender_php_proto"],
 )
 
 # Open Source Packages
@@ -243,7 +227,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-recommender-v1-php",
     deps = [
         ":recommender_php_gapic",
-        ":recommender_php_grpc",
         ":recommender_php_proto",
     ],
 )
@@ -315,6 +298,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Recommender is a service on Google Cloud that provides usage recommendations for Cloud products and services.",
     ruby_cloud_title = "Recommender V1",
     service_yaml = "recommender_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":recommender_ruby_grpc",
         ":recommender_ruby_proto",

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -313,7 +313,7 @@ message Node {
     DELETING = 5;
 
     // TPU node is being repaired and may be unusable. Details can be
-    // found in the `help_description` field.
+    // found in the 'help_description' field.
     REPAIRING = 6;
 
     // TPU node is stopped.
@@ -389,8 +389,8 @@ message Node {
   // The user-supplied description of the TPU. Maximum of 512 characters.
   string description = 3;
 
-  // Required. The type of hardware accelerators associated with this node.
-  string accelerator_type = 5 [(google.api.field_behavior) = REQUIRED];
+  // Optional. The type of hardware accelerators associated with this node.
+  string accelerator_type = 5 [(google.api.field_behavior) = OPTIONAL];
 
   // Output only. The current state for the TPU Node.
   State state = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -460,6 +460,16 @@ message Node {
 
   // Shielded Instance options.
   ShieldedInstanceConfig shielded_instance_config = 45;
+
+  // The AccleratorConfig for the TPU Node.
+  AcceleratorConfig accelerator_config = 46;
+
+  // Output only. The qualified name of the QueuedResource that requested this
+  // Node.
+  string queued_resource = 47 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Whether the Node belongs to a Multislice group.
+  bool multislice_node = 48 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Request for [ListNodes][google.cloud.tpu.v2.Tpu.ListNodes].
@@ -589,8 +599,11 @@ message AcceleratorType {
   // The resource name.
   string name = 1;
 
-  // the accelerator type.
+  // The accelerator type.
   string type = 2;
+
+  // The accelerator config.
+  repeated AcceleratorConfig accelerator_configs = 3;
 }
 
 // Request for [GetAcceleratorType][google.cloud.tpu.v2.Tpu.GetAcceleratorType].
@@ -790,6 +803,30 @@ message GetGuestAttributesRequest {
 message GetGuestAttributesResponse {
   // The guest attributes for the TPU workers.
   repeated GuestAttributes guest_attributes = 1;
+}
+
+// A TPU accelerator configuration.
+message AcceleratorConfig {
+  // TPU type.
+  enum Type {
+    // Unspecified version.
+    TYPE_UNSPECIFIED = 0;
+
+    // TPU v2.
+    V2 = 2;
+
+    // TPU v3.
+    V3 = 4;
+
+    // TPU v4.
+    V4 = 7;
+  }
+
+  // Required. Type of TPU.
+  Type type = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Topology of TPU in chips.
+  string topology = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // A set of Shielded Instance options.

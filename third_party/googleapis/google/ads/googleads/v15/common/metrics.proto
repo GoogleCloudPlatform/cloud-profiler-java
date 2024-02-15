@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,21 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-package google.ads.googleads.v13.common;
-
-import "google/ads/googleads/v13/enums/interaction_event_type.proto";
-import "google/ads/googleads/v13/enums/quality_score_bucket.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "MetricsProto";
-option java_package = "com.google.ads.googleads.v13.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V13::Common";
-========
 package google.ads.googleads.v15.common;
 
 import "google/ads/googleads/v15/enums/interaction_event_type.proto";
@@ -46,7 +27,6 @@ option java_package = "com.google.ads.googleads.v15.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V15::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
 
 // Proto file describing metrics.
 
@@ -466,30 +446,18 @@ message Metrics {
   optional int64 hotel_eligible_impressions = 215;
 
   // The creative historical quality score.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-  google.ads.googleads.v13.enums.QualityScoreBucketEnum.QualityScoreBucket
-      historical_creative_quality_score = 80;
-
-  // The quality of historical landing page experience.
-  google.ads.googleads.v13.enums.QualityScoreBucketEnum.QualityScoreBucket
-========
   google.ads.googleads.v15.enums.QualityScoreBucketEnum.QualityScoreBucket
       historical_creative_quality_score = 80;
 
   // The quality of historical landing page experience.
   google.ads.googleads.v15.enums.QualityScoreBucketEnum.QualityScoreBucket
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
       historical_landing_page_quality_score = 81;
 
   // The historical quality score.
   optional int64 historical_quality_score = 216;
 
   // The historical search predicted click through rate (CTR).
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-  google.ads.googleads.v13.enums.QualityScoreBucketEnum.QualityScoreBucket
-========
   google.ads.googleads.v15.enums.QualityScoreBucketEnum.QualityScoreBucket
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
       historical_search_predicted_ctr = 83;
 
   // The number of times the ad was forwarded to someone else as a message.
@@ -523,11 +491,7 @@ message Metrics {
   optional int64 interactions = 223;
 
   // The types of payable and free interactions.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-  repeated google.ads.googleads.v13.enums.InteractionEventTypeEnum
-========
   repeated google.ads.googleads.v15.enums.InteractionEventTypeEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
       .InteractionEventType interaction_event_types = 100;
 
   // The percentage of clicks filtered out of your total number of clicks
@@ -761,14 +725,10 @@ message Metrics {
   optional int64 view_through_conversions = 155;
 
   // The number of iOS Store Kit Ad Network conversions.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-  int64 sk_ad_network_conversions = 246;
-========
   int64 sk_ad_network_installs = 246;
 
   // The total number of iOS Store Kit Ad Network conversions.
   int64 sk_ad_network_total_conversions = 292;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
 
   // Clicks from properties not owned by the publisher for which the traffic
   // the publisher has paid for or acquired through incentivized activity
@@ -852,8 +812,6 @@ message Metrics {
   // Number of website URL clicks on any location surface after an impression.
   // This measure is coming from Asset based location.
   optional double view_through_conversions_from_location_asset_website = 281;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/common/metrics.proto
-========
 
   // Orders is the total number of purchase conversions you received attributed
   // to your ads.
@@ -1088,5 +1046,4 @@ message SearchVolumeRange {
 
   // Upper bound of search volume.
   optional int64 max = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/metrics.proto
 }

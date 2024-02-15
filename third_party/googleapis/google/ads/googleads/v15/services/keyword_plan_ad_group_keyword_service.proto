@@ -14,15 +14,9 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/keyword_plan_ad_group_keyword_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/resources/keyword_plan_ad_group_keyword.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/resources/keyword_plan_ad_group_keyword.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/keyword_plan_ad_group_keyword_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -30,16 +24,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/keyword_plan_ad_group_keyword_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "KeywordPlanAdGroupKeywordServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -48,7 +32,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/keyword_plan_ad_group_keyword_service.proto
 
 // Proto file describing the keyword plan ad group keyword service.
 
@@ -80,11 +63,7 @@ service KeywordPlanAdGroupKeywordService {
   rpc MutateKeywordPlanAdGroupKeywords(MutateKeywordPlanAdGroupKeywordsRequest)
       returns (MutateKeywordPlanAdGroupKeywordsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/keyword_plan_ad_group_keyword_service.proto
-      post: "/v12/customers/{customer_id=*}/keywordPlanAdGroupKeywords:mutate"
-========
       post: "/v15/customers/{customer_id=*}/keywordPlanAdGroupKeywords:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/keyword_plan_ad_group_keyword_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -92,11 +71,7 @@ service KeywordPlanAdGroupKeywordService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/keyword_plan_ad_group_keyword_service.proto
-// [KeywordPlanAdGroupKeywordService.MutateKeywordPlanAdGroupKeywords][google.ads.googleads.v12.services.KeywordPlanAdGroupKeywordService.MutateKeywordPlanAdGroupKeywords].
-========
 // [KeywordPlanAdGroupKeywordService.MutateKeywordPlanAdGroupKeywords][google.ads.googleads.v15.services.KeywordPlanAdGroupKeywordService.MutateKeywordPlanAdGroupKeywords].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/keyword_plan_ad_group_keyword_service.proto
 message MutateKeywordPlanAdGroupKeywordsRequest {
   // Required. The ID of the customer whose Keyword Plan ad group keywords are
   // being modified.
@@ -129,19 +104,11 @@ message KeywordPlanAdGroupKeywordOperation {
   oneof operation {
     // Create operation: No resource name is expected for the new Keyword Plan
     // ad group keyword.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/keyword_plan_ad_group_keyword_service.proto
-    google.ads.googleads.v12.resources.KeywordPlanAdGroupKeyword create = 1;
-
-    // Update operation: The Keyword Plan ad group keyword is expected to have a
-    // valid resource name.
-    google.ads.googleads.v12.resources.KeywordPlanAdGroupKeyword update = 2;
-========
     google.ads.googleads.v15.resources.KeywordPlanAdGroupKeyword create = 1;
 
     // Update operation: The Keyword Plan ad group keyword is expected to have a
     // valid resource name.
     google.ads.googleads.v15.resources.KeywordPlanAdGroupKeyword update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/keyword_plan_ad_group_keyword_service.proto
 
     // Remove operation: A resource name for the removed Keyword Plan ad group
     // keyword is expected, in this format:

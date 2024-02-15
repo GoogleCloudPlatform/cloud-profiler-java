@@ -85,7 +85,6 @@ java_gapic_library(
     deps = [
         ":gkehub_java_proto",
         "//google/api:api_java_proto",
-        "//google/cloud/location:location_java_grpc",
         "//google/cloud/location:location_java_proto",
         "//google/iam/v1:iam_java_proto",
     ],
@@ -110,9 +109,6 @@ java_gapic_assembly_gradle_pkg(
         ":gkehub_java_grpc",
         ":gkehub_java_proto",
         ":gkehub_proto",
-        "//google/cloud/location:location_java_grpc",
-        "//google/cloud/location:location_java_proto",
-        "//google/cloud/location:location_proto",
     ],
 )
 
@@ -124,7 +120,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -159,19 +154,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "gkehub_go_gapic_test",
-    srcs = [":gkehub_go_gapic_srcjar_test"],
-    embed = [":gkehub_go_gapic"],
-    importpath = "cloud.google.com/go/gkehub/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-gkehub-v1beta1-go",
     deps = [
         ":gkehub_go_gapic",
         ":gkehub_go_gapic_srcjar-metadata.srcjar",
+        ":gkehub_go_gapic_srcjar-snippets.srcjar",
         ":gkehub_go_gapic_srcjar-test.srcjar",
         ":gkehub_go_proto",
     ],
@@ -225,19 +214,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "gkehub_php_proto",
     deps = [":gkehub_proto"],
-)
-
-php_grpc_library(
-    name = "gkehub_php_grpc",
-    srcs = [":gkehub_proto"],
-    deps = [":gkehub_php_proto"],
 )
 
 php_gapic_library(
@@ -247,10 +229,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":gkehub_php_grpc",
-        ":gkehub_php_proto",
-    ],
+    deps = [":gkehub_php_proto"],
 )
 
 # Open Source Packages
@@ -258,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-gkehub-v1beta1-php",
     deps = [
         ":gkehub_php_gapic",
-        ":gkehub_php_grpc",
         ":gkehub_php_proto",
     ],
 )
@@ -330,6 +308,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "The GKE Hub API centrally manages features and services on all your Kubernetes clusters running in a variety of environments, including Google cloud, on premises in customer datacenters, or other third party clouds.",
     ruby_cloud_title = "GKE Hub V1beta1",
     service_yaml = "gkehub_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":gkehub_ruby_grpc",
         ":gkehub_ruby_proto",

@@ -16,7 +16,6 @@ load(
     "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
-    "php_grpc_library",
     "php_proto_library",
     "ruby_grpc_library",
     "ruby_proto_library",
@@ -89,11 +88,14 @@ py_gapic_library(
     srcs = [":drive_proto"],
     rest_numeric_enums = False,
     transport = "grpc",
+    opt_args = [
+        "proto-plus-deps=google.apps.script.type",
+    ],
 )
 
 # Open Source Packages
 py_gapic_assembly_pkg(
-    name = "drive-gapic",
+    name = "drive-py",
     deps = [
         ":drive_py_gapic",
     ],
@@ -105,12 +107,6 @@ py_gapic_assembly_pkg(
 php_proto_library(
     name = "drive_php_proto",
     deps = [":drive_proto"],
-)
-
-php_grpc_library(
-    name = "drive_php_grpc",
-    srcs = [":drive_proto"],
-    deps = [":drive_php_proto"],
 )
 
 ruby_proto_library(

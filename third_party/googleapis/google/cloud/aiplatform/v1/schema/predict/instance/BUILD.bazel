@@ -131,7 +131,6 @@ py_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -140,20 +139,9 @@ php_proto_library(
     deps = [":instance_proto"],
 )
 
-php_grpc_library(
-    name = "instance_php_grpc",
-    srcs = [":instance_proto"],
-    deps = [":instance_php_proto"],
-)
-
 ##############################################################################
 # Node.js
 ##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-)
 
 ##############################################################################
 # Ruby
@@ -186,6 +174,9 @@ load(
 
 csharp_proto_library(
     name = "instance_csharp_proto",
+    extra_opts = [
+        "base_namespace=Google.Cloud.AIPlatform.V1",
+    ],
     deps = [":instance_proto"],
 )
 

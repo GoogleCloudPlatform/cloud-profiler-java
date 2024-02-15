@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_negative_criterion.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/enums/criterion_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CustomerNegativeCriterionProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_negative_criterion.proto
 
 // Proto file describing the Customer Negative Criterion resource.
 
@@ -72,36 +54,14 @@ message CustomerNegativeCriterion {
   optional int64 id = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The type of the criterion.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_negative_criterion.proto
-  google.ads.googleads.v12.enums.CriterionTypeEnum.CriterionType type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.CriterionTypeEnum.CriterionType type = 3
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_negative_criterion.proto
 
   // The customer negative criterion.
   //
   // Exactly one must be set.
   oneof criterion {
     // Immutable. ContentLabel.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_negative_criterion.proto
-    google.ads.googleads.v12.common.ContentLabelInfo content_label = 4 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. MobileApplication.
-    google.ads.googleads.v12.common.MobileApplicationInfo mobile_application = 5 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. MobileAppCategory.
-    google.ads.googleads.v12.common.MobileAppCategoryInfo mobile_app_category = 6 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Placement.
-    google.ads.googleads.v12.common.PlacementInfo placement = 7 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. YouTube Video.
-    google.ads.googleads.v12.common.YouTubeVideoInfo youtube_video = 8 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. YouTube Channel.
-    google.ads.googleads.v12.common.YouTubeChannelInfo youtube_channel = 9 [(google.api.field_behavior) = IMMUTABLE];
-========
     google.ads.googleads.v15.common.ContentLabelInfo content_label = 4
         [(google.api.field_behavior) = IMMUTABLE];
 
@@ -128,6 +88,5 @@ message CustomerNegativeCriterion {
     // Immutable. NegativeKeywordList.
     google.ads.googleads.v15.common.NegativeKeywordListInfo
         negative_keyword_list = 11 [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_negative_criterion.proto
   }
 }

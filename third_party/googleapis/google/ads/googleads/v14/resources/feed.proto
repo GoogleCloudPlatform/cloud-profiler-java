@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,25 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-package google.ads.googleads.v13.resources;
-
-import "google/ads/googleads/v13/enums/affiliate_location_feed_relationship_type.proto";
-import "google/ads/googleads/v13/enums/feed_attribute_type.proto";
-import "google/ads/googleads/v13/enums/feed_origin.proto";
-import "google/ads/googleads/v13/enums/feed_status.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "FeedProto";
-option java_package = "com.google.ads.googleads.v13.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/enums/affiliate_location_feed_relationship_type.proto";
@@ -54,7 +31,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
 
 // Proto file describing the Feed resource.
 
@@ -120,11 +96,7 @@ message Feed {
     repeated int64 chain_ids = 3;
 
     // The relationship the chains have with the advertiser.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-    google.ads.googleads.v13.enums.AffiliateLocationFeedRelationshipTypeEnum
-========
     google.ads.googleads.v14.enums.AffiliateLocationFeedRelationshipTypeEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
         .AffiliateLocationFeedRelationshipType relationship_type = 2;
   }
 
@@ -155,20 +127,12 @@ message Feed {
   repeated FeedAttributeOperation attribute_operations = 9;
 
   // Immutable. Specifies who manages the FeedAttributes for the Feed.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-  google.ads.googleads.v13.enums.FeedOriginEnum.FeedOrigin origin = 5
-========
   google.ads.googleads.v14.enums.FeedOriginEnum.FeedOrigin origin = 5
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
       [(google.api.field_behavior) = IMMUTABLE];
 
   // Output only. Status of the feed.
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-  google.ads.googleads.v13.enums.FeedStatusEnum.FeedStatus status = 8
-========
   google.ads.googleads.v14.enums.FeedStatusEnum.FeedStatus status = 8
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The system data for the Feed. This data specifies information for
@@ -195,11 +159,7 @@ message FeedAttribute {
   optional string name = 6;
 
   // Data type for feed attribute. Required.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/feed.proto
-  google.ads.googleads.v13.enums.FeedAttributeTypeEnum.FeedAttributeType type =
-========
   google.ads.googleads.v14.enums.FeedAttributeTypeEnum.FeedAttributeType type =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/feed.proto
       3;
 
   // Indicates that data corresponding to this attribute is part of a

@@ -114,7 +114,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -134,7 +133,7 @@ go_gapic_library(
     grpc_service_config = "lineage_grpc_service_config.json",
     importpath = "cloud.google.com/go/datacatalog/lineage/apiv1;lineage",
     metadata = True,
-    release_level = "beta",
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "datalineage_v1.yaml",
     transport = "grpc+rest",
@@ -147,19 +146,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "lineage_go_gapic_test",
-    srcs = [":lineage_go_gapic_srcjar_test"],
-    embed = [":lineage_go_gapic"],
-    importpath = "cloud.google.com/go/datacatalog/lineage/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-datacatalog-lineage-v1-go",
     deps = [
         ":lineage_go_gapic",
         ":lineage_go_gapic_srcjar-metadata.srcjar",
+        ":lineage_go_gapic_srcjar-snippets.srcjar",
         ":lineage_go_gapic_srcjar-test.srcjar",
         ":lineage_go_proto",
     ],
@@ -183,6 +176,10 @@ py_gapic_library(
     service_yaml = "datalineage_v1.yaml",
     transport = "grpc+rest",
     deps = [
+    ],
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "python-gapic-name=datacatalog_lineage",
     ],
 )
 
@@ -211,7 +208,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -220,23 +216,15 @@ php_proto_library(
     deps = [":lineage_proto"],
 )
 
-php_grpc_library(
-    name = "lineage_php_grpc",
-    srcs = [":lineage_proto"],
-    deps = [":lineage_php_proto"],
-)
-
 php_gapic_library(
     name = "lineage_php_gapic",
     srcs = [":lineage_proto_with_info"],
     grpc_service_config = "lineage_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = False,
     service_yaml = "datalineage_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":lineage_php_grpc",
-        ":lineage_php_proto",
-    ],
+    deps = [":lineage_php_proto"],
 )
 
 # Open Source Packages
@@ -244,7 +232,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-datacatalog-lineage-v1-php",
     deps = [
         ":lineage_php_gapic",
-        ":lineage_php_grpc",
         ":lineage_php_proto",
     ],
 )
@@ -315,6 +302,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "DataCatalog is a centralized and unified data catalog service for all your Cloud resources, where users and systems can discover data, explore and curate its semantics, understand how to act on it, and help govern its usage. Lineage is used to track data flows between assets over time. You can create Lineage Events to record lineage between multiple sources and a single target, for example, when table data is based on data from multiple tables.",
     ruby_cloud_title = "Data Lineage V1",
     service_yaml = "datalineage_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":lineage_ruby_grpc",
         ":lineage_ruby_proto",

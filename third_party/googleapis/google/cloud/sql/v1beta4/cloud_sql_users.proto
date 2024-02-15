@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,6 @@ option java_multiple_files = true;
 option java_outer_classname = "CloudSqlUsersProto";
 option java_package = "com.google.cloud.sql.v1beta4";
 
-// NOTE: No sensitive PII logging is allowed. If you are adding a field/enum
-// value that is sensitive PII, please add corresponding datapol annotation to
-// it. For more information, please see
-// https://g3doc.corp.google.com/storage/speckle/g3doc/purple_team/data_pol_annotations.md?cl=head
-
 service SqlUsersService {
   option (google.api.default_host) = "sqladmin.googleapis.com";
   option (google.api.oauth_scopes) =
@@ -43,6 +38,13 @@ service SqlUsersService {
   rpc Delete(SqlUsersDeleteRequest) returns (Operation) {
     option (google.api.http) = {
       delete: "/sql/v1beta4/projects/{project}/instances/{instance}/users"
+    };
+  }
+
+  // Retrieves a resource containing information about a user.
+  rpc Get(SqlUsersGetRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/sql/v1beta4/projects/{project}/instances/{instance}/users/{name}"
     };
   }
 
@@ -82,6 +84,21 @@ message SqlUsersDeleteRequest {
 
   // Project ID of the project that contains the instance.
   string project = 4;
+}
+
+// Request message for Users Get RPC
+message SqlUsersGetRequest {
+  // Database instance ID. This does not include the project ID.
+  string instance = 1;
+
+  // User of the instance.
+  string name = 2;
+
+  // Project ID of the project that contains the instance.
+  string project = 3;
+
+  // Host of a user of the instance.
+  string host = 4;
 }
 
 message SqlUsersInsertRequest {
@@ -131,6 +148,10 @@ message UserPasswordValidationPolicy {
 
   // Output only. Read-only password status.
   PasswordStatus status = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // If true, the user must specify the current password before changing the
+  // password. This flag is supported only for MySQL.
+  bool enable_password_verification = 5;
 }
 
 // Read-only password status.
@@ -154,6 +175,30 @@ message User {
 
     // Cloud IAM service account.
     CLOUD_IAM_SERVICE_ACCOUNT = 2;
+
+    // Cloud IAM group non-login user.
+    CLOUD_IAM_GROUP = 3;
+
+    // Cloud IAM group login user.
+    CLOUD_IAM_GROUP_USER = 4;
+
+    // Cloud IAM group service account.
+    CLOUD_IAM_GROUP_SERVICE_ACCOUNT = 5;
+  }
+
+  // The type of retained password.
+  enum DualPasswordType {
+    // The default value.
+    DUAL_PASSWORD_TYPE_UNSPECIFIED = 0;
+
+    // Do not update the user's dual password status.
+    NO_MODIFY_DUAL_PASSWORD = 1;
+
+    // No dual password usable for connecting using this user.
+    NO_DUAL_PASSWORD = 2;
+
+    // Dual password usable for connecting using this user.
+    DUAL_PASSWORD = 3;
   }
 
   // This is always `sql#user`.
@@ -198,6 +243,9 @@ message User {
 
   // User level password validation policy.
   UserPasswordValidationPolicy password_policy = 12;
+
+  // Dual password status for the user.
+  optional DualPasswordType dual_password_type = 13;
 }
 
 // Represents a Sql Server user on the Cloud SQL instance.
@@ -217,8 +265,6 @@ message UsersListResponse {
   // List of user resources in the instance.
   repeated User items = 2;
 
-  // An identifier that uniquely identifies the operation. You can use this
-  // identifier to retrieve the Operations resource that has information about
-  // the operation.
-  string next_page_token = 3;
+  // Unused.
+  string next_page_token = 3 [deprecated = true];
 }

@@ -14,24 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_simulation.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/simulation.proto";
-import "google/ads/googleads/v12/enums/simulation_modification_method.proto";
-import "google/ads/googleads/v12/enums/simulation_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CampaignSimulationProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/simulation.proto";
@@ -48,7 +30,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_simulation.proto
 
 // Proto file describing the campaign simulation resource.
 
@@ -68,12 +49,9 @@ option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
 // * MULTI_CHANNEL - TARGET_CPA - UNIFORM
 // * DISCOVERY - TARGET_CPA - DEFAULT
 // * DISPLAY - TARGET_CPA - UNIFORM
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_simulation.proto
-========
 // * PERFORMANCE_MAX - TARGET_CPA - UNIFORM
 // * PERFORMANCE_MAX - TARGET_ROAS - UNIFORM
 // * PERFORMANCE_MAX - BUDGET - UNIFORM
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_simulation.proto
 message CampaignSimulation {
   option (google.api.resource) = {
     type: "googleads.googleapis.com/CampaignSimulation"
@@ -95,12 +73,6 @@ message CampaignSimulation {
   int64 campaign_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The field that the simulation modifies.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_simulation.proto
-  google.ads.googleads.v12.enums.SimulationTypeEnum.SimulationType type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. How the simulation modifies the field.
-  google.ads.googleads.v12.enums.SimulationModificationMethodEnum.SimulationModificationMethod modification_method = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.SimulationTypeEnum.SimulationType type = 3
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -108,7 +80,6 @@ message CampaignSimulation {
   google.ads.googleads.v15.enums.SimulationModificationMethodEnum
       .SimulationModificationMethod modification_method = 4
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_simulation.proto
 
   // Output only. First day on which the simulation is based, in YYYY-MM-DD
   // format.
@@ -121,21 +92,6 @@ message CampaignSimulation {
   // List of simulation points.
   oneof point_list {
     // Output only. Simulation points if the simulation type is CPC_BID.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/campaign_simulation.proto
-    google.ads.googleads.v12.common.CpcBidSimulationPointList cpc_bid_point_list = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is TARGET_CPA.
-    google.ads.googleads.v12.common.TargetCpaSimulationPointList target_cpa_point_list = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is TARGET_ROAS.
-    google.ads.googleads.v12.common.TargetRoasSimulationPointList target_roas_point_list = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is TARGET_IMPRESSION_SHARE.
-    google.ads.googleads.v12.common.TargetImpressionShareSimulationPointList target_impression_share_point_list = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is BUDGET.
-    google.ads.googleads.v12.common.BudgetSimulationPointList budget_point_list = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
     google.ads.googleads.v15.common.CpcBidSimulationPointList
         cpc_bid_point_list = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -156,6 +112,5 @@ message CampaignSimulation {
     // Output only. Simulation points if the simulation type is BUDGET.
     google.ads.googleads.v15.common.BudgetSimulationPointList
         budget_point_list = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/campaign_simulation.proto
   }
 }

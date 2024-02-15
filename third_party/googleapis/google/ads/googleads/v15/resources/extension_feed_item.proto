@@ -14,26 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/extension_feed_item.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/common/extensions.proto";
-import "google/ads/googleads/v12/enums/extension_type.proto";
-import "google/ads/googleads/v12/enums/feed_item_status.proto";
-import "google/ads/googleads/v12/enums/feed_item_target_device.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "ExtensionFeedItemProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -52,7 +32,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/extension_feed_item.proto
 
 // Proto file describing the ExtensionFeedItem resource.
 
@@ -79,12 +58,8 @@ message ExtensionFeedItem {
 
   // Output only. The extension type of the extension feed item.
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/extension_feed_item.proto
-  google.ads.googleads.v12.enums.ExtensionTypeEnum.ExtensionType extension_type = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v15.enums.ExtensionTypeEnum.ExtensionType
       extension_type = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/extension_feed_item.proto
 
   // Start time in which this feed item is effective and can begin serving. The
   // time is in the customer's time zone.
@@ -101,18 +76,11 @@ message ExtensionFeedItem {
   // List of non-overlapping schedules specifying all time intervals
   // for which the feed item may serve. There can be a maximum of 6 schedules
   // per day.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/extension_feed_item.proto
-  repeated google.ads.googleads.v12.common.AdScheduleInfo ad_schedules = 16;
-
-  // The targeted device.
-  google.ads.googleads.v12.enums.FeedItemTargetDeviceEnum.FeedItemTargetDevice device = 17;
-========
   repeated google.ads.googleads.v15.common.AdScheduleInfo ad_schedules = 16;
 
   // The targeted device.
   google.ads.googleads.v15.enums.FeedItemTargetDeviceEnum.FeedItemTargetDevice
       device = 17;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/extension_feed_item.proto
 
   // The targeted geo target constant.
   optional string targeted_geo_target_constant = 30
@@ -121,54 +89,6 @@ message ExtensionFeedItem {
       }];
 
   // The targeted keyword.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/extension_feed_item.proto
-  google.ads.googleads.v12.common.KeywordInfo targeted_keyword = 22;
-
-  // Output only. Status of the feed item.
-  // This field is read-only.
-  google.ads.googleads.v12.enums.FeedItemStatusEnum.FeedItemStatus status = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Extension type.
-  oneof extension {
-    // Sitelink extension.
-    google.ads.googleads.v12.common.SitelinkFeedItem sitelink_feed_item = 2;
-
-    // Structured snippet extension.
-    google.ads.googleads.v12.common.StructuredSnippetFeedItem structured_snippet_feed_item = 3;
-
-    // App extension.
-    google.ads.googleads.v12.common.AppFeedItem app_feed_item = 7;
-
-    // Call extension.
-    google.ads.googleads.v12.common.CallFeedItem call_feed_item = 8;
-
-    // Callout extension.
-    google.ads.googleads.v12.common.CalloutFeedItem callout_feed_item = 9;
-
-    // Text message extension.
-    google.ads.googleads.v12.common.TextMessageFeedItem text_message_feed_item = 10;
-
-    // Price extension.
-    google.ads.googleads.v12.common.PriceFeedItem price_feed_item = 11;
-
-    // Promotion extension.
-    google.ads.googleads.v12.common.PromotionFeedItem promotion_feed_item = 12;
-
-    // Output only. Location extension. Locations are synced from a Business Profile into a
-    // feed. This field is read-only.
-    google.ads.googleads.v12.common.LocationFeedItem location_feed_item = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Affiliate location extension. Feed locations are populated by Google Ads
-    // based on a chain ID.
-    // This field is read-only.
-    google.ads.googleads.v12.common.AffiliateLocationFeedItem affiliate_location_feed_item = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Hotel Callout extension.
-    google.ads.googleads.v12.common.HotelCalloutFeedItem hotel_callout_feed_item = 23;
-
-    // Immutable. Advertiser provided image extension.
-    google.ads.googleads.v12.common.ImageFeedItem image_feed_item = 31 [(google.api.field_behavior) = IMMUTABLE];
-========
   google.ads.googleads.v15.common.KeywordInfo targeted_keyword = 22;
 
   // Output only. Status of the feed item.
@@ -222,7 +142,6 @@ message ExtensionFeedItem {
     // Immutable. Advertiser provided image extension.
     google.ads.googleads.v15.common.ImageFeedItem image_feed_item = 31
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/extension_feed_item.proto
   }
 
   // Targeting at either the campaign or ad group level. Feed items that target

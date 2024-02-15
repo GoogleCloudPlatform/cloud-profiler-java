@@ -30,6 +30,8 @@ proto_library(
         "destination_config.proto",
         "provider.proto",
         "runtime.proto",
+        "settings.proto",
+        "ssl_config.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -128,7 +130,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -163,19 +164,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "connectors_go_gapic_test",
-    srcs = [":connectors_go_gapic_srcjar_test"],
-    embed = [":connectors_go_gapic"],
-    importpath = "cloud.google.com/go/connectors/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-connectors-v1-go",
     deps = [
         ":connectors_go_gapic",
         ":connectors_go_gapic_srcjar-metadata.srcjar",
+        ":connectors_go_gapic_srcjar-snippets.srcjar",
         ":connectors_go_gapic_srcjar-test.srcjar",
         ":connectors_go_proto",
     ],
@@ -228,19 +223,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "connectors_php_proto",
     deps = [":connectors_proto"],
-)
-
-php_grpc_library(
-    name = "connectors_php_grpc",
-    srcs = [":connectors_proto"],
-    deps = [":connectors_php_proto"],
 )
 
 php_gapic_library(
@@ -250,10 +238,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "connectors_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":connectors_php_grpc",
-        ":connectors_php_proto",
-    ],
+    deps = [":connectors_php_proto"],
 )
 
 # Open Source Packages
@@ -261,7 +246,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-connectors-v1-php",
     deps = [
         ":connectors_php_gapic",
-        ":connectors_php_grpc",
         ":connectors_php_proto",
     ],
 )
@@ -321,12 +305,11 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "connectors_ruby_gapic",
     srcs = [":connectors_proto_with_info"],
-    extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-connectors-v1",
-    ],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-connectors-v1"],
     grpc_service_config = "connectors_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "connectors_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":connectors_ruby_grpc",
         ":connectors_ruby_proto",

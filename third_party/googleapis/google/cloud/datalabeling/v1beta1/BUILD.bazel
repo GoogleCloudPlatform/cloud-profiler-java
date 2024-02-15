@@ -73,6 +73,7 @@ java_gapic_library(
     srcs = [":datalabeling_proto_with_info"],
     grpc_service_config = "datalabeling_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "datalabeling_v1beta1.yaml",
     test_deps = [
         ":datalabeling_java_grpc",
     ],
@@ -111,7 +112,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -145,18 +145,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "datalabeling_go_gapic_test",
-    srcs = [":datalabeling_go_gapic_srcjar_test"],
-    embed = [":datalabeling_go_gapic"],
-    importpath = "cloud.google.com/go/datalabeling/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-datalabeling-v1beta1-go",
     deps = [
         ":datalabeling_go_gapic",
+        ":datalabeling_go_gapic_srcjar-snippets.srcjar",
         ":datalabeling_go_gapic_srcjar-test.srcjar",
         ":datalabeling_go_proto",
     ],
@@ -205,7 +199,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -214,23 +207,15 @@ php_proto_library(
     deps = [":datalabeling_proto"],
 )
 
-php_grpc_library(
-    name = "datalabeling_php_grpc",
-    srcs = [":datalabeling_proto"],
-    deps = [":datalabeling_php_proto"],
-)
-
 php_gapic_library(
     name = "datalabeling_php_gapic",
     srcs = [":datalabeling_proto_with_info"],
     grpc_service_config = "datalabeling_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "datalabeling_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":datalabeling_php_grpc",
-        ":datalabeling_php_proto",
-    ],
+    deps = [":datalabeling_php_proto"],
 )
 
 # Open Source Packages
@@ -238,7 +223,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-datalabeling-v1beta1-php",
     deps = [
         ":datalabeling_php_gapic",
-        ":datalabeling_php_grpc",
         ":datalabeling_php_proto",
     ],
 )
@@ -311,6 +295,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "AI Platform Data Labeling Service lets you work with human labelers to generate highly accurate labels for a collection of data that you can use in machine learning models.",
     ruby_cloud_title = "AI Platform Data Labeling Service V1beta1",
     service_yaml = "datalabeling_v1beta1.yaml",
+    transport = "grpc",
     deps = [
         ":datalabeling_ruby_grpc",
         ":datalabeling_ruby_proto",

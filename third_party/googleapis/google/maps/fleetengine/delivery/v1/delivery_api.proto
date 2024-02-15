@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ import "google/maps/fleetengine/delivery/v1/task_tracking_info.proto";
 import "google/maps/fleetengine/delivery/v1/tasks.proto";
 import "google/protobuf/field_mask.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/delivery/v1;delivery";
+option csharp_namespace = "Google.Maps.FleetEngine.Delivery.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/delivery/apiv1/deliverypb;deliverypb";
 option java_multiple_files = true;
 option java_outer_classname = "DeliveryApi";
 option java_package = "google.maps.fleetengine.delivery.v1";
@@ -41,6 +42,8 @@ option (google.api.resource_definition) = {
 // The Last Mile Delivery service.
 service DeliveryService {
   option (google.api.default_host) = "fleetengine.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
 
   // Creates and returns a new `DeliveryVehicle`.
   rpc CreateDeliveryVehicle(CreateDeliveryVehicleRequest)
@@ -139,8 +142,9 @@ service DeliveryService {
     option (google.api.method_signature) = "name";
   }
 
-  // Gets all `Task`s with a particular `tracking_id`.
+  // Deprecated: Use `GetTaskTrackingInfo` instead.
   rpc SearchTasks(SearchTasksRequest) returns (SearchTasksResponse) {
+    option deprecated = true;
     option (google.api.http) = {
       get: "/v1/{parent=providers/*}/tasks:search"
     };
@@ -245,7 +249,6 @@ message CreateDeliveryVehicleRequest {
 }
 
 // The `GetDeliveryVehicle` request message.
-// Next id: 4
 message GetDeliveryVehicleRequest {
   // Optional. The standard Delivery API request header.
   DeliveryRequestHeader header = 1 [(google.api.field_behavior) = OPTIONAL];
@@ -309,10 +312,8 @@ message ListDeliveryVehiclesRequest {
   // is 1 restriction.
   string filter = 6 [(google.api.field_behavior) = OPTIONAL];
 
-  // Optional. A filter that limits the search area to a rectangle defined by
-  // the northeast and southwest corner points.
-  //
-  // When defined, only vehicles located within the search area are returned.
+  // Optional. A filter that limits the vehicles returned to those whose last
+  // known location was in the rectangular area defined by the viewport.
   google.geo.type.Viewport viewport = 7
       [(google.api.field_behavior) = OPTIONAL];
 }
@@ -438,8 +439,11 @@ message GetTaskRequest {
   ];
 }
 
-// The `SearchTasks` request message that contains the `tracking_id`.
+// Deprecated: Issue `GetTaskTrackingInfoRequest`s to `GetTaskTrackingInfo`
+// instead.
 message SearchTasksRequest {
+  option deprecated = true;
+
   // Optional. The standard Delivery API request header.
   DeliveryRequestHeader header = 1 [(google.api.field_behavior) = OPTIONAL];
 
@@ -475,6 +479,8 @@ message SearchTasksRequest {
 // The `SearchTasks` response. It contains the set of Tasks that meet the search
 // criteria in the `SearchTasksRequest`.
 message SearchTasksResponse {
+  option deprecated = true;
+
   // The set of Tasks for the requested `tracking_id`. A successful response can
   // also be empty. An empty response indicates that no Tasks are associated
   // with the supplied `tracking_id`.

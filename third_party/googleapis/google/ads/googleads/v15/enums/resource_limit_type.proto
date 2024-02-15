@@ -14,18 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/enums/resource_limit_type.proto
-package google.ads.googleads.v13.enums;
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Enums";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/enums;enums";
-option java_multiple_files = true;
-option java_outer_classname = "ResourceLimitTypeProto";
-option java_package = "com.google.ads.googleads.v13.enums";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Enums";
-option ruby_package = "Google::Ads::GoogleAds::V13::Enums";
-========
 package google.ads.googleads.v15.enums;
 
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Enums";
@@ -36,7 +24,6 @@ option java_package = "com.google.ads.googleads.v15.enums";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Enums";
 option ruby_package = "Google::Ads::GoogleAds::V15::Enums";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/enums/resource_limit_type.proto
 
 // Container for enum describing possible resource limit types.
 message ResourceLimitTypeEnum {
@@ -481,8 +468,6 @@ message ResourceLimitTypeEnum {
     // Number of hotel check-in date range bid modifiers per ad agroup.
     HOTEL_CHECK_IN_DATE_RANGE_BID_MODIFIERS_PER_AD_GROUP = 132;
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/enums/resource_limit_type.proto
-========
     // Number of shared sets of type ACCOUNT_LEVEL_NEGATIVE_KEYWORDS per
     // account.
     SHARED_SETS_PER_ACCOUNT_FOR_ACCOUNT_LEVEL_NEGATIVE_KEYWORDS = 177;
@@ -490,14 +475,11 @@ message ResourceLimitTypeEnum {
     // Number of keywords per ACCOUNT_LEVEL_NEGATIVE_KEYWORDS shared set.
     ACCOUNT_LEVEL_NEGATIVE_KEYWORDS_PER_SHARED_SET = 178;
 
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/enums/resource_limit_type.proto
     // Maximum number of asset per hotel property asset set.
     ENABLED_ASSET_PER_HOTEL_PROPERTY_ASSET_SET = 181;
 
     // Maximum number of enabled hotel property assets per asset group.
     ENABLED_HOTEL_PROPERTY_ASSET_LINKS_PER_ASSET_GROUP = 182;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/enums/resource_limit_type.proto
-========
 
     // Number of criteria per brand shared set.
     BRANDS_PER_SHARED_SET = 183;
@@ -507,6 +489,5 @@ message ResourceLimitTypeEnum {
 
     // Maximum number of shared sets of brand type for an account.
     SHARED_SETS_PER_ACCOUNT_FOR_BRAND = 185;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/enums/resource_limit_type.proto
   }
 }

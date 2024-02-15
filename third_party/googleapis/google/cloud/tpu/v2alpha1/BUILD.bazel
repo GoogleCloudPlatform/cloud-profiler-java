@@ -118,7 +118,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -154,19 +153,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "tpu_go_gapic_test",
-    srcs = [":tpu_go_gapic_srcjar_test"],
-    embed = [":tpu_go_gapic"],
-    importpath = "cloud.google.com/go/tpu/apiv2alpha1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-tpu-v2alpha1-go",
     deps = [
         ":tpu_go_gapic",
         ":tpu_go_gapic_srcjar-metadata.srcjar",
+        ":tpu_go_gapic_srcjar-snippets.srcjar",
         ":tpu_go_gapic_srcjar-test.srcjar",
         ":tpu_go_proto",
     ],
@@ -218,19 +211,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "tpu_php_proto",
     deps = [":tpu_proto"],
-)
-
-php_grpc_library(
-    name = "tpu_php_grpc",
-    srcs = [":tpu_proto"],
-    deps = [":tpu_php_proto"],
 )
 
 php_gapic_library(
@@ -240,10 +226,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "tpu_v2alpha1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":tpu_php_grpc",
-        ":tpu_php_proto",
-    ],
+    deps = [":tpu_php_proto"],
 )
 
 # Open Source Packages
@@ -251,7 +234,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-tpu-v2alpha1-php",
     deps = [
         ":tpu_php_gapic",
-        ":tpu_php_grpc",
         ":tpu_php_proto",
     ],
 )
@@ -315,6 +297,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "tpu_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "tpu_v2alpha1.yaml",
+    transport = "grpc",
     deps = [
         ":tpu_ruby_grpc",
         ":tpu_ruby_proto",

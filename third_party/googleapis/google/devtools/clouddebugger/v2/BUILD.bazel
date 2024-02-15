@@ -15,7 +15,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -25,7 +24,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -82,6 +80,7 @@ java_gapic_library(
     gapic_yaml = "clouddebugger_gapic.yaml",
     grpc_service_config = "clouddebugger_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "clouddebugger_v2.yaml",
     test_deps = [
         ":clouddebugger_java_grpc",
     ],
@@ -118,7 +117,7 @@ java_gapic_assembly_gradle_pkg(
 go_proto_library(
     name = "clouddebugger_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/devtools/clouddebugger/v2",
+    importpath = "cloud.google.com/go/debugger/apiv2/debuggerpb",
     protos = [":clouddebugger_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -130,7 +129,7 @@ go_gapic_library(
     name = "clouddebugger_go_gapic",
     srcs = [":clouddebugger_proto_with_info"],
     grpc_service_config = "clouddebugger_grpc_service_config.json",
-    importpath = "cloud.google.com/go/debugger/apiv2;clouddebugger",
+    importpath = "cloud.google.com/go/debugger/apiv2;debugger",
     rest_numeric_enums = True,
     service_yaml = "clouddebugger_v2.yaml",
     transport = "grpc+rest",
@@ -139,18 +138,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "clouddebugger_go_gapic_test",
-    srcs = [":clouddebugger_go_gapic_srcjar_test"],
-    embed = [":clouddebugger_go_gapic"],
-    importpath = "cloud.google.com/go/debugger/apiv2",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-devtools-clouddebugger-v2-go",
     deps = [
         ":clouddebugger_go_gapic",
+        ":clouddebugger_go_gapic_srcjar-snippets.srcjar",
         ":clouddebugger_go_gapic_srcjar-test.srcjar",
         ":clouddebugger_go_proto",
     ],
@@ -195,23 +188,16 @@ php_proto_library(
     deps = [":clouddebugger_proto"],
 )
 
-php_grpc_library(
-    name = "clouddebugger_php_grpc",
-    srcs = [":clouddebugger_proto"],
-    deps = [":clouddebugger_php_proto"],
-)
-
 php_gapic_library(
     name = "clouddebugger_php_gapic",
     srcs = [":clouddebugger_proto_with_info"],
     grpc_service_config = "clouddebugger_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "clouddebugger_v2.yaml",
     transport = "grpc+rest",
     deps = [
-        ":clouddebugger_php_grpc",
         ":clouddebugger_php_proto",
-        "//google/devtools/source/v1:source_php_grpc",
         "//google/devtools/source/v1:source_php_proto",
     ],
 )
@@ -221,9 +207,7 @@ php_gapic_assembly_pkg(
     name = "google-cloud-devtools-clouddebugger-v2-php",
     deps = [
         ":clouddebugger_php_gapic",
-        ":clouddebugger_php_grpc",
         ":clouddebugger_php_proto",
-        "//google/devtools/source/v1:source_php_grpc",
         "//google/devtools/source/v1:source_php_proto",
     ],
 )
@@ -276,6 +260,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "The Cloud Debugger API allows applications to interact with the Google Cloud Debugger backends. It provides two interfaces: the Debugger interface and the Controller interface. The Controller interface allows you to implement an agent that sends state data -- for example, the value of program variables and the call stack -- to Cloud Debugger when the application is running. The Debugger interface allows you to implement a Cloud Debugger client that allows users to set and delete the breakpoints at which the state data is collected, as well as read the data that is captured.",
     ruby_cloud_title = "Cloud Debugger V2",
     service_yaml = "clouddebugger_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":clouddebugger_ruby_grpc",
         ":clouddebugger_ruby_proto",

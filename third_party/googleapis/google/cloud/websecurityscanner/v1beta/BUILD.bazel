@@ -70,6 +70,7 @@ java_gapic_library(
     srcs = [":websecurityscanner_proto_with_info"],
     grpc_service_config = "websecurityscanner_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "websecurityscanner_v1beta.yaml",
     test_deps = [
         ":websecurityscanner_java_grpc",
     ],
@@ -109,7 +110,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -136,18 +136,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "websecurityscanner_go_gapic_test",
-    srcs = [":websecurityscanner_go_gapic_srcjar_test"],
-    embed = [":websecurityscanner_go_gapic"],
-    importpath = "cloud.google.com/go/websecurityscanner/apiv1beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-websecurityscanner-v1beta-go",
     deps = [
         ":websecurityscanner_go_gapic",
+        ":websecurityscanner_go_gapic_srcjar-snippets.srcjar",
         ":websecurityscanner_go_gapic_srcjar-test.srcjar",
         ":websecurityscanner_go_proto",
     ],
@@ -196,19 +190,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "websecurityscanner_php_proto",
     deps = [":websecurityscanner_proto"],
-)
-
-php_grpc_library(
-    name = "websecurityscanner_php_grpc",
-    srcs = [":websecurityscanner_proto"],
-    deps = [":websecurityscanner_php_proto"],
 )
 
 php_gapic_library(
@@ -218,10 +205,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "websecurityscanner_v1beta.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":websecurityscanner_php_grpc",
-        ":websecurityscanner_php_proto",
-    ],
+    deps = [":websecurityscanner_php_proto"],
 )
 
 # Open Source Packages
@@ -229,7 +213,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-websecurityscanner-v1beta-php",
     deps = [
         ":websecurityscanner_php_gapic",
-        ":websecurityscanner_php_grpc",
         ":websecurityscanner_php_proto",
     ],
 )
@@ -301,6 +284,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Web Security Scanner scans your Compute and App Engine apps for common web vulnerabilities.",
     ruby_cloud_title = "Web Security Scanner V1beta",
     service_yaml = "websecurityscanner_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":websecurityscanner_ruby_grpc",
         ":websecurityscanner_ruby_proto",

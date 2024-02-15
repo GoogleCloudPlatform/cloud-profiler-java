@@ -82,9 +82,9 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "alloydb_v1beta.yaml",
     test_deps = [
+        ":alloydb_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
-        ":alloydb_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -125,7 +125,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -163,19 +162,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "alloydb_go_gapic_test",
-    srcs = [":alloydb_go_gapic_srcjar_test"],
-    embed = [":alloydb_go_gapic"],
-    importpath = "cloud.google.com/go/alloydb/apiv1beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-alloydb-v1beta-go",
     deps = [
         ":alloydb_go_gapic",
         ":alloydb_go_gapic_srcjar-metadata.srcjar",
+        ":alloydb_go_gapic_srcjar-snippets.srcjar",
         ":alloydb_go_gapic_srcjar-test.srcjar",
         ":alloydb_go_proto",
     ],
@@ -228,19 +221,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "alloydb_php_proto",
     deps = [":alloydb_proto"],
-)
-
-php_grpc_library(
-    name = "alloydb_php_grpc",
-    srcs = [":alloydb_proto"],
-    deps = [":alloydb_php_proto"],
 )
 
 php_gapic_library(
@@ -250,10 +236,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "alloydb_v1beta.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":alloydb_php_grpc",
-        ":alloydb_php_proto",
-    ],
+    deps = [":alloydb_php_proto"],
 )
 
 # Open Source Packages
@@ -261,7 +244,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-alloydb-v1beta-php",
     deps = [
         ":alloydb_php_gapic",
-        ":alloydb_php_grpc",
         ":alloydb_php_proto",
     ],
 )
@@ -322,11 +304,13 @@ ruby_cloud_gapic_library(
     name = "alloydb_ruby_gapic",
     srcs = [":alloydb_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-alloydb-v1beta",
+        "ruby-cloud-gem-name=google-cloud-alloy_db-v1beta",
+        "ruby-cloud-gem-namespace=Google::Cloud::AlloyDB::V1beta",
     ],
     grpc_service_config = "alloydb_v1beta_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "alloydb_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":alloydb_ruby_grpc",
         ":alloydb_ruby_proto",

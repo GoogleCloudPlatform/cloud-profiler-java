@@ -59,6 +59,7 @@ java_gapic_library(
     srcs = [":executions_proto_with_info"],
     grpc_service_config = "executions_grpc_service_config.json",
     rest_numeric_enums = False,
+    service_yaml = "workflowexecutions_v1beta.yaml",
     test_deps = [
         ":executions_java_grpc",
     ],
@@ -98,7 +99,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -126,18 +126,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "executions_go_gapic_test",
-    srcs = [":executions_go_gapic_srcjar_test"],
-    embed = [":executions_go_gapic"],
-    importpath = "cloud.google.com/go/workflows/executions/apiv1beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-workflows-executions-v1beta-go",
     deps = [
         ":executions_go_gapic",
+        ":executions_go_gapic_srcjar-snippets.srcjar",
         ":executions_go_gapic_srcjar-test.srcjar",
         ":executions_go_proto",
     ],
@@ -177,8 +171,6 @@ py_gapic_assembly_pkg(
     name = "workflows-executions-v1beta-py",
     deps = [
         ":executions_py_gapic",
-        ":executions_py_grpc",
-        ":executions_py_proto",
     ],
 )
 
@@ -189,7 +181,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -198,22 +189,13 @@ php_proto_library(
     deps = [":executions_proto"],
 )
 
-php_grpc_library(
-    name = "executions_php_grpc",
-    srcs = [":executions_proto"],
-    deps = [":executions_php_proto"],
-)
-
 php_gapic_library(
     name = "executions_php_gapic",
     srcs = [":executions_proto_with_info"],
     rest_numeric_enums = False,
     service_yaml = "workflowexecutions_v1beta.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":executions_php_grpc",
-        ":executions_php_proto",
-    ],
+    deps = [":executions_php_proto"],
 )
 
 # Open Source Packages
@@ -221,7 +203,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-workflows-executions-v1beta-php",
     deps = [
         ":executions_php_gapic",
-        ":executions_php_grpc",
         ":executions_php_proto",
     ],
 )

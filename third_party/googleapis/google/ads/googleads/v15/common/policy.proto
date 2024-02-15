@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/policy.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/policy_topic_entry_type.proto";
-import "google/ads/googleads/v12/enums/policy_topic_evidence_destination_mismatch_url_type.proto";
-import "google/ads/googleads/v12/enums/policy_topic_evidence_destination_not_working_device.proto";
-import "google/ads/googleads/v12/enums/policy_topic_evidence_destination_not_working_dns_error_type.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "PolicyProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v15.common;
 
 import "google/ads/googleads/v15/enums/policy_topic_entry_type.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V15::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/policy.proto
 
 // Proto file describing policy information.
 
@@ -104,12 +86,8 @@ message PolicyTopicEntry {
   optional string topic = 5;
 
   // Describes the negative or positive effect this policy will have on serving.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/policy.proto
-  google.ads.googleads.v12.enums.PolicyTopicEntryTypeEnum.PolicyTopicEntryType type = 2;
-========
   google.ads.googleads.v15.enums.PolicyTopicEntryTypeEnum.PolicyTopicEntryType
       type = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/policy.proto
 
   // Additional information that explains policy finding
   // (for example, the brand name for a trademark finding).
@@ -147,13 +125,9 @@ message PolicyTopicEvidence {
   // Evidence of mismatches between the URLs of a resource.
   message DestinationMismatch {
     // The set of URLs that did not match each other.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/policy.proto
-    repeated google.ads.googleads.v12.enums.PolicyTopicEvidenceDestinationMismatchUrlTypeEnum.PolicyTopicEvidenceDestinationMismatchUrlType url_types = 1;
-========
     repeated google.ads.googleads.v15.enums
         .PolicyTopicEvidenceDestinationMismatchUrlTypeEnum
         .PolicyTopicEvidenceDestinationMismatchUrlType url_types = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/policy.proto
   }
 
   // Evidence details when the destination is returning an HTTP error
@@ -163,13 +137,9 @@ message PolicyTopicEvidence {
     optional string expanded_url = 7;
 
     // The type of device that failed to load the URL.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/policy.proto
-    google.ads.googleads.v12.enums.PolicyTopicEvidenceDestinationNotWorkingDeviceEnum.PolicyTopicEvidenceDestinationNotWorkingDevice device = 4;
-========
     google.ads.googleads.v15.enums
         .PolicyTopicEvidenceDestinationNotWorkingDeviceEnum
         .PolicyTopicEvidenceDestinationNotWorkingDevice device = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/policy.proto
 
     // The time the URL was last checked.
     // The format is "YYYY-MM-DD HH:MM:SS".
@@ -179,14 +149,10 @@ message PolicyTopicEvidence {
     // Indicates the reason of the DESTINATION_NOT_WORKING policy finding.
     oneof reason {
       // The type of DNS error.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/policy.proto
-      google.ads.googleads.v12.enums.PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum.PolicyTopicEvidenceDestinationNotWorkingDnsErrorType dns_error_type = 1;
-========
       google.ads.googleads.v15.enums
           .PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum
           .PolicyTopicEvidenceDestinationNotWorkingDnsErrorType dns_error_type =
           1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/policy.proto
 
       // The HTTP error code.
       int64 http_error_code = 6;

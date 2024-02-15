@@ -101,8 +101,8 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "dialogflow_v2.yaml",
     test_deps = [
-        "//google/cloud/location:location_java_grpc",
         ":dialogflow_java_grpc",
+        "//google/cloud/location:location_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -174,7 +174,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -211,19 +210,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "dialogflow_go_gapic_test",
-    srcs = [":dialogflow_go_gapic_srcjar_test"],
-    embed = [":dialogflow_go_gapic"],
-    importpath = "cloud.google.com/go/dialogflow/apiv2",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-dialogflow-v2-go",
     deps = [
         ":dialogflow_go_gapic",
         ":dialogflow_go_gapic_srcjar-metadata.srcjar",
+        ":dialogflow_go_gapic_srcjar-snippets.srcjar",
         ":dialogflow_go_gapic_srcjar-test.srcjar",
         ":dialogflow_go_proto",
     ],
@@ -275,7 +268,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -284,21 +276,15 @@ php_proto_library(
     deps = [":dialogflow_proto"],
 )
 
-php_grpc_library(
-    name = "dialogflow_php_grpc",
-    srcs = [":dialogflow_proto"],
-    deps = [":dialogflow_php_proto"],
-)
-
 php_gapic_library(
     name = "dialogflow_php_gapic",
     srcs = [":dialogflow_proto_with_info"],
     grpc_service_config = "dialogflow_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "dialogflow_v2.yaml",
     transport = "grpc+rest",
     deps = [
-        ":dialogflow_php_grpc",
         ":dialogflow_php_proto",
     ],
 )
@@ -308,7 +294,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-dialogflow-v2-php",
     deps = [
         ":dialogflow_php_gapic",
-        ":dialogflow_php_grpc",
         ":dialogflow_php_proto",
     ],
 )
@@ -381,6 +366,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Dialogflow is an end-to-end, build-once deploy-everywhere development suite for creating conversational interfaces for websites, mobile applications, popular messaging platforms, and IoT devices. You can use it to build interfaces (such as chatbots and conversational IVR) that enable natural and rich interactions between your users and your business. This client is for Dialogflow ES, providing the standard agent type suitable for small and simple agents.",
     ruby_cloud_title = "Dialogflow V2",
     service_yaml = "dialogflow_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":dialogflow_ruby_grpc",
         ":dialogflow_ruby_proto",
@@ -410,6 +396,7 @@ load(
 
 csharp_proto_library(
     name = "dialogflow_csharp_proto",
+    extra_opts = [],
     deps = [":dialogflow_proto"],
 )
 

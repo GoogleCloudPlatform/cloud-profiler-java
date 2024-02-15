@@ -14,33 +14,16 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/enums/response_content_type.proto";
-import "google/ads/googleads/v12/resources/feed_mapping.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/enums/response_content_type.proto";
 import "google/ads/googleads/v15/resources/feed_mapping.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "FeedMappingServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -49,7 +32,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 
 // Proto file describing the FeedMapping service.
 
@@ -84,23 +66,15 @@ service FeedMappingService {
   rpc MutateFeedMappings(MutateFeedMappingsRequest)
       returns (MutateFeedMappingsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-      post: "/v12/customers/{customer_id=*}/feedMappings:mutate"
-========
       post: "/v15/customers/{customer_id=*}/feedMappings:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-// Request message for [FeedMappingService.MutateFeedMappings][google.ads.googleads.v12.services.FeedMappingService.MutateFeedMappings].
-========
 // Request message for
 // [FeedMappingService.MutateFeedMappings][google.ads.googleads.v15.services.FeedMappingService.MutateFeedMappings].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 message MutateFeedMappingsRequest {
   // Required. The ID of the customer whose feed mappings are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -121,12 +95,8 @@ message MutateFeedMappingsRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-  google.ads.googleads.v12.enums.ResponseContentTypeEnum.ResponseContentType response_content_type = 5;
-========
   google.ads.googleads.v15.enums.ResponseContentTypeEnum.ResponseContentType
       response_content_type = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 }
 
 // A single operation (create, remove) on a feed mapping.
@@ -134,11 +104,7 @@ message FeedMappingOperation {
   // The mutate operation.
   oneof operation {
     // Create operation: No resource name is expected for the new feed mapping.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-    google.ads.googleads.v12.resources.FeedMapping create = 1;
-========
     google.ads.googleads.v15.resources.FeedMapping create = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 
     // Remove operation: A resource name for the removed feed mapping is
     // expected, in this format:
@@ -172,9 +138,5 @@ message MutateFeedMappingResult {
   // The mutated feed mapping with only mutable fields after mutate. The field
   // will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/feed_mapping_service.proto
-  google.ads.googleads.v12.resources.FeedMapping feed_mapping = 2;
-========
   google.ads.googleads.v15.resources.FeedMapping feed_mapping = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/feed_mapping_service.proto
 }

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ message AccountReference {
   // IFSC of the account's bank branch.
   string ifsc = 1;
 
-  // Type of account. Examples include SAVINGS, CURRENT, etc.
-  string account_type = 2;
+  // Output only. Type of account. Examples include SAVINGS, CURRENT, etc.
+  string account_type = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Unique number for an account in a bank and branch.
   string account_number = 3;
@@ -75,7 +75,8 @@ message SettlementParticipant {
   MerchantInfo merchant_info = 2;
 
   // Output only. The mobile number of the participant.
-  string mobile = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string mobile = 3
+      [deprecated = true, (google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Additional details about the payment settlement. Values will
   // be populated depending on whether the settlement transaction succeeded or
@@ -143,6 +144,9 @@ message Participant {
 
   // Output only. The device info of the participant.
   DeviceDetails device_details = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The mobile number of the participant.
+  string mobile_number = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // A merchant entity participating in a payment settlement transaction.
@@ -321,6 +325,9 @@ enum ApiType {
 
   // Voucher confirmation API. Maps to UPI's `VoucherConfirmation` API.
   VOUCHER_CONFIRMATION = 14;
+
+  // Activation API. Maps to UPI's `Activation` API.
+  ACTIVATION = 15;
 }
 
 // The type of a transaction. Every transaction processed by the issuer switch
@@ -429,6 +436,14 @@ enum TransactionType {
   // Validate customer transaction type. This is associated with
   // `VALIDATE_CUSTOMER` API type. Maps to UPI's `ValCust` type.
   TRANSACTION_TYPE_VALIDATE_CUSTOMER = 25;
+
+  // Activation international transaction type. This is associated with
+  // 'ACTIVATION' API type. Maps to UPI's `International` type.
+  TRANSACTION_TYPE_ACTIVATION_INTERNATIONAL = 26;
+
+  // Activation UPI services transaction type. This is associated with
+  // 'ACTIVATION' API type. Maps to UPI's `UPI Services` type.
+  TRANSACTION_TYPE_ACTIVATION_UPI_SERVICES = 27;
 }
 
 // XmlApiType specifies the API type of the request or response as specified in
@@ -532,4 +547,10 @@ enum XmlApiType {
   // Transaction confirmation response API type. Maps to UPI's
   // `RespTxnConfirmation` API.
   RESP_TXN_CONFIRMATION = 30;
+
+  // Activation request API type. Maps to UPI's `ReqActivation` API.
+  REQ_ACTIVATION = 31;
+
+  // Activation response API type. Maps to UPI's `RespActivation` API.
+  RESP_ACTIVATION = 32;
 }

@@ -14,48 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/enums/ad_destination_type.proto";
-import "google/ads/googleads/v12/enums/ad_network_type.proto";
-import "google/ads/googleads/v12/enums/budget_campaign_association_status.proto";
-import "google/ads/googleads/v12/enums/click_type.proto";
-import "google/ads/googleads/v12/enums/conversion_action_category.proto";
-import "google/ads/googleads/v12/enums/conversion_attribution_event_type.proto";
-import "google/ads/googleads/v12/enums/conversion_lag_bucket.proto";
-import "google/ads/googleads/v12/enums/conversion_or_adjustment_lag_bucket.proto";
-import "google/ads/googleads/v12/enums/conversion_value_rule_primary_dimension.proto";
-import "google/ads/googleads/v12/enums/day_of_week.proto";
-import "google/ads/googleads/v12/enums/device.proto";
-import "google/ads/googleads/v12/enums/external_conversion_source.proto";
-import "google/ads/googleads/v12/enums/hotel_date_selection_type.proto";
-import "google/ads/googleads/v12/enums/hotel_price_bucket.proto";
-import "google/ads/googleads/v12/enums/hotel_rate_type.proto";
-import "google/ads/googleads/v12/enums/month_of_year.proto";
-import "google/ads/googleads/v12/enums/placeholder_type.proto";
-import "google/ads/googleads/v12/enums/product_channel.proto";
-import "google/ads/googleads/v12/enums/product_channel_exclusivity.proto";
-import "google/ads/googleads/v12/enums/product_condition.proto";
-import "google/ads/googleads/v12/enums/recommendation_type.proto";
-import "google/ads/googleads/v12/enums/search_engine_results_page_type.proto";
-import "google/ads/googleads/v12/enums/search_term_match_type.proto";
-import "google/ads/googleads/v12/enums/sk_ad_network_ad_event_type.proto";
-import "google/ads/googleads/v12/enums/sk_ad_network_attribution_credit.proto";
-import "google/ads/googleads/v12/enums/sk_ad_network_user_type.proto";
-import "google/ads/googleads/v12/enums/slot.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "SegmentsProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v14.common;
 
 import "google/ads/googleads/v14/common/criteria.proto";
@@ -97,7 +55,6 @@ option java_package = "com.google.ads.googleads.v14.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V14::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
 // Proto file describing segment only fields.
 
@@ -113,12 +70,6 @@ message Segments {
   optional string external_activity_id = 150;
 
   // Ad Destination type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.AdDestinationTypeEnum.AdDestinationType ad_destination_type = 136;
-
-  // Ad network type.
-  google.ads.googleads.v12.enums.AdNetworkTypeEnum.AdNetworkType ad_network_type = 3;
-========
   google.ads.googleads.v14.enums.AdDestinationTypeEnum.AdDestinationType
       ad_destination_type = 136;
 
@@ -131,7 +82,6 @@ message Segments {
 
   // Resource name of the asset group.
   optional string asset_group = 159;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Domain (visible URL) of a participant in the Auction Insights report.
   optional string auction_insight_domain = 145;
@@ -143,17 +93,6 @@ message Segments {
   optional string campaign = 157;
 
   // Click type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.ClickTypeEnum.ClickType click_type = 26;
-
-  // Resource name of the conversion action.
-  optional string conversion_action = 113 [(google.api.resource_reference) = {
-                                             type: "googleads.googleapis.com/ConversionAction"
-                                           }];
-
-  // Conversion action category.
-  google.ads.googleads.v12.enums.ConversionActionCategoryEnum.ConversionActionCategory conversion_action_category = 53;
-========
   google.ads.googleads.v14.enums.ClickTypeEnum.ClickType click_type = 26;
 
   // Resource name of the conversion action.
@@ -164,7 +103,6 @@ message Segments {
   // Conversion action category.
   google.ads.googleads.v14.enums.ConversionActionCategoryEnum
       .ConversionActionCategory conversion_action_category = 53;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Conversion action name.
   optional string conversion_action_name = 114;
@@ -177,17 +115,6 @@ message Segments {
   optional bool conversion_adjustment = 115;
 
   // Conversion attribution event type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.ConversionAttributionEventTypeEnum.ConversionAttributionEventType conversion_attribution_event_type = 2;
-
-  // An enum value representing the number of days between the impression and
-  // the conversion.
-  google.ads.googleads.v12.enums.ConversionLagBucketEnum.ConversionLagBucket conversion_lag_bucket = 50;
-
-  // An enum value representing the number of days between the impression and
-  // the conversion or between the impression and adjustments to the conversion.
-  google.ads.googleads.v12.enums.ConversionOrAdjustmentLagBucketEnum.ConversionOrAdjustmentLagBucket conversion_or_adjustment_lag_bucket = 51;
-========
   google.ads.googleads.v14.enums.ConversionAttributionEventTypeEnum
       .ConversionAttributionEventType conversion_attribution_event_type = 2;
 
@@ -200,22 +127,12 @@ message Segments {
   // the conversion or between the impression and adjustments to the conversion.
   google.ads.googleads.v14.enums.ConversionOrAdjustmentLagBucketEnum
       .ConversionOrAdjustmentLagBucket conversion_or_adjustment_lag_bucket = 51;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Date to which metrics apply.
   // yyyy-MM-dd format, for example, 2018-04-17.
   optional string date = 79;
 
   // Day of the week, for example, MONDAY.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek day_of_week = 5;
-
-  // Device to which metrics apply.
-  google.ads.googleads.v12.enums.DeviceEnum.Device device = 1;
-
-  // External conversion source.
-  google.ads.googleads.v12.enums.ExternalConversionSourceEnum.ExternalConversionSource external_conversion_source = 55;
-========
   google.ads.googleads.v14.enums.DayOfWeekEnum.DayOfWeek day_of_week = 5;
 
   // Device to which metrics apply.
@@ -224,7 +141,6 @@ message Segments {
   // External conversion source.
   google.ads.googleads.v14.enums.ExternalConversionSourceEnum
       .ExternalConversionSource external_conversion_source = 55;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Resource name of the geo target constant that represents an airport.
   optional string geo_target_airport = 116;
@@ -273,12 +189,8 @@ message Segments {
   optional string hotel_check_in_date = 81;
 
   // Hotel check-in day of week.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek hotel_check_in_day_of_week = 9;
-========
   google.ads.googleads.v14.enums.DayOfWeekEnum.DayOfWeek
       hotel_check_in_day_of_week = 9;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Hotel city.
   optional string hotel_city = 82;
@@ -290,12 +202,8 @@ message Segments {
   optional string hotel_country = 84;
 
   // Hotel date selection type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.HotelDateSelectionTypeEnum.HotelDateSelectionType hotel_date_selection_type = 13;
-========
   google.ads.googleads.v14.enums.HotelDateSelectionTypeEnum
       .HotelDateSelectionType hotel_date_selection_type = 13;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Hotel length of stay.
   optional int32 hotel_length_of_stay = 85;
@@ -304,19 +212,12 @@ message Segments {
   optional string hotel_rate_rule_id = 86;
 
   // Hotel rate type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.HotelRateTypeEnum.HotelRateType hotel_rate_type = 74;
-
-  // Hotel price bucket.
-  google.ads.googleads.v12.enums.HotelPriceBucketEnum.HotelPriceBucket hotel_price_bucket = 78;
-========
   google.ads.googleads.v14.enums.HotelRateTypeEnum.HotelRateType
       hotel_rate_type = 74;
 
   // Hotel price bucket.
   google.ads.googleads.v14.enums.HotelPriceBucketEnum.HotelPriceBucket
       hotel_price_bucket = 78;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Hotel state.
   optional string hotel_state = 87;
@@ -337,22 +238,14 @@ message Segments {
   optional string month = 90;
 
   // Month of the year, for example, January.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.MonthOfYearEnum.MonthOfYear month_of_year = 18;
-========
   google.ads.googleads.v14.enums.MonthOfYearEnum.MonthOfYear month_of_year = 18;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Partner hotel ID.
   optional string partner_hotel_id = 91;
 
   // Placeholder type. This is only used with feed item metrics.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.PlaceholderTypeEnum.PlaceholderType placeholder_type = 20;
-========
   google.ads.googleads.v14.enums.PlaceholderTypeEnum.PlaceholderType
       placeholder_type = 20;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Aggregator ID of the product.
   optional int64 product_aggregator_id = 132;
@@ -376,15 +269,6 @@ message Segments {
   optional string product_brand = 97;
 
   // Channel of the product.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.ProductChannelEnum.ProductChannel product_channel = 30;
-
-  // Channel exclusivity of the product.
-  google.ads.googleads.v12.enums.ProductChannelExclusivityEnum.ProductChannelExclusivity product_channel_exclusivity = 31;
-
-  // Condition of the product.
-  google.ads.googleads.v12.enums.ProductConditionEnum.ProductCondition product_condition = 32;
-========
   google.ads.googleads.v14.enums.ProductChannelEnum.ProductChannel
       product_channel = 30;
 
@@ -395,7 +279,6 @@ message Segments {
   // Condition of the product.
   google.ads.googleads.v14.enums.ProductConditionEnum.ProductCondition
       product_condition = 32;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Resource name of the geo target constant for the country of sale of the
   // product.
@@ -455,18 +338,6 @@ message Segments {
   optional string quarter = 128;
 
   // Recommendation type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.RecommendationTypeEnum.RecommendationType recommendation_type = 140;
-
-  // Type of the search engine results page.
-  google.ads.googleads.v12.enums.SearchEngineResultsPageTypeEnum.SearchEngineResultsPageType search_engine_results_page_type = 70;
-
-  // Match type of the keyword that triggered the ad, including variants.
-  google.ads.googleads.v12.enums.SearchTermMatchTypeEnum.SearchTermMatchType search_term_match_type = 22;
-
-  // Position of the ad.
-  google.ads.googleads.v12.enums.SlotEnum.Slot slot = 23;
-========
   google.ads.googleads.v14.enums.RecommendationTypeEnum.RecommendationType
       recommendation_type = 140;
 
@@ -487,7 +358,6 @@ message Segments {
 
   // Position of the ad.
   google.ads.googleads.v14.enums.SlotEnum.Slot slot = 23;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Primary dimension of applied conversion value rules.
   // NO_RULE_APPLIED shows the total recorded value of conversions that
@@ -496,13 +366,9 @@ message Segments {
   // has been applied.
   // GEO_LOCATION, DEVICE, AUDIENCE show the net adjustment after value
   // rules were applied.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.ConversionValueRulePrimaryDimensionEnum.ConversionValueRulePrimaryDimension conversion_value_rule_primary_dimension = 138;
-========
   google.ads.googleads.v14.enums.ConversionValueRulePrimaryDimensionEnum
       .ConversionValueRulePrimaryDimension
           conversion_value_rule_primary_dimension = 138;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Resource name of the ad group criterion that represents webpage criterion.
   optional string webpage = 129;
@@ -520,19 +386,12 @@ message Segments {
   optional int64 sk_ad_network_conversion_value = 137;
 
   // iOS Store Kit Ad Network user type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.SkAdNetworkUserTypeEnum.SkAdNetworkUserType sk_ad_network_user_type = 141;
-
-  // iOS Store Kit Ad Network ad event type.
-  google.ads.googleads.v12.enums.SkAdNetworkAdEventTypeEnum.SkAdNetworkAdEventType sk_ad_network_ad_event_type = 142;
-========
   google.ads.googleads.v14.enums.SkAdNetworkUserTypeEnum.SkAdNetworkUserType
       sk_ad_network_user_type = 141;
 
   // iOS Store Kit Ad Network ad event type.
   google.ads.googleads.v14.enums.SkAdNetworkAdEventTypeEnum
       .SkAdNetworkAdEventType sk_ad_network_ad_event_type = 142;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // App where the ad that drove the iOS Store Kit Ad Network install was
   // shown. Null value means this segment is not applicable, for example,
@@ -540,12 +399,8 @@ message Segments {
   optional SkAdNetworkSourceApp sk_ad_network_source_app = 143;
 
   // iOS Store Kit Ad Network attribution credit
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.SkAdNetworkAttributionCreditEnum.SkAdNetworkAttributionCredit sk_ad_network_attribution_credit = 144;
-========
   google.ads.googleads.v14.enums.SkAdNetworkAttributionCreditEnum
       .SkAdNetworkAttributionCredit sk_ad_network_attribution_credit = 144;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 
   // Only used with CustomerAsset, CampaignAsset and AdGroupAsset metrics.
   // Indicates whether the interaction metrics occurred on the asset itself
@@ -583,12 +438,8 @@ message BudgetCampaignAssociationStatus {
   optional string campaign = 1;
 
   // Budget campaign association status.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/segments.proto
-  google.ads.googleads.v12.enums.BudgetCampaignAssociationStatusEnum.BudgetCampaignAssociationStatus status = 2;
-========
   google.ads.googleads.v14.enums.BudgetCampaignAssociationStatusEnum
       .BudgetCampaignAssociationStatus status = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/segments.proto
 }
 
 // An AssetInteractionTarget segment.

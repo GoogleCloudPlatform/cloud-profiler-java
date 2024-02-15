@@ -24,7 +24,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -34,7 +33,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -127,7 +125,7 @@ java_gapic_assembly_gradle_pkg(
 go_proto_library(
     name = "admin_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/datastore/admin/v1",
+    importpath = "cloud.google.com/go/datastore/admin/apiv1/adminpb",
     protos = [":admin_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -141,6 +139,7 @@ go_gapic_library(
     grpc_service_config = "datastore_admin_grpc_service_config.json",
     importpath = "cloud.google.com/go/datastore/admin/apiv1;admin",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "datastore_v1.yaml",
     transport = "grpc+rest",
@@ -152,19 +151,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "admin_go_gapic_test",
-    srcs = [":admin_go_gapic_srcjar_test"],
-    embed = [":admin_go_gapic"],
-    importpath = "cloud.google.com/go/datastore/admin/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-datastore-admin-v1-go",
     deps = [
         ":admin_go_gapic",
         ":admin_go_gapic_srcjar-metadata.srcjar",
+        ":admin_go_gapic_srcjar-snippets.srcjar",
         ":admin_go_gapic_srcjar-test.srcjar",
         ":admin_go_proto",
     ],
@@ -174,7 +167,11 @@ py_gapic_library(
     name = "admin_py_gapic",
     srcs = [":admin_proto"],
     grpc_service_config = "datastore_admin_grpc_service_config.json",
-    opt_args = ["python-gapic-namespace=google.cloud, python-gapic-name=datastore-admin"],
+    opt_args = [
+        "python-gapic-name=datastore_admin",
+        "python-gapic-namespace=google.cloud",
+        "warehouse-package-name=google-cloud-datastore",
+    ],
     rest_numeric_enums = True,
     service_yaml = "datastore_v1.yaml",
     transport = "grpc+rest",
@@ -203,23 +200,15 @@ php_proto_library(
     deps = [":admin_proto"],
 )
 
-php_grpc_library(
-    name = "admin_php_grpc",
-    srcs = [":admin_proto"],
-    deps = [":admin_php_proto"],
-)
-
 php_gapic_library(
     name = "admin_php_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "datastore_admin_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "datastore_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":admin_php_grpc",
-        ":admin_php_proto",
-    ],
+    deps = [":admin_php_proto"],
 )
 
 # Open Source Packages
@@ -227,7 +216,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-datastore-admin-v1-php",
     deps = [
         ":admin_php_gapic",
-        ":admin_php_grpc",
         ":admin_php_proto",
     ],
 )
@@ -279,6 +267,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Firestore in Datastore mode is a NoSQL document database built for automatic scaling, high performance, and ease of application development.",
     ruby_cloud_title = "Firestore in Datastore mode Admin V1",
     service_yaml = "datastore_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_ruby_grpc",
         ":admin_ruby_proto",

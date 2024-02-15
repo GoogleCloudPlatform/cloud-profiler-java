@@ -14,25 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/account_budget_proposal_status.proto";
-import "google/ads/googleads/v12/enums/account_budget_proposal_type.proto";
-import "google/ads/googleads/v12/enums/spending_limit_type.proto";
-import "google/ads/googleads/v12/enums/time_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "AccountBudgetProposalProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/enums/account_budget_proposal_status.proto";
@@ -50,7 +31,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
 
 // Proto file describing the AccountBudgetProposal resource.
 
@@ -101,15 +81,6 @@ message AccountBudgetProposal {
     }
   ];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-  // Immutable. The type of this proposal, for example, END to end the budget associated
-  // with this proposal.
-  google.ads.googleads.v12.enums.AccountBudgetProposalTypeEnum.AccountBudgetProposalType proposal_type = 4 [(google.api.field_behavior) = IMMUTABLE];
-
-  // Output only. The status of this proposal.
-  // When a new proposal is created, the status defaults to PENDING.
-  google.ads.googleads.v12.enums.AccountBudgetProposalStatusEnum.AccountBudgetProposalStatus status = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   // Immutable. The type of this proposal, for example, END to end the budget
   // associated with this proposal.
   google.ads.googleads.v15.enums.AccountBudgetProposalTypeEnum
@@ -121,7 +92,6 @@ message AccountBudgetProposal {
   google.ads.googleads.v15.enums.AccountBudgetProposalStatusEnum
       .AccountBudgetProposalStatus status = 15
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
 
   // Immutable. The name to assign to the account-level budget.
   optional string proposed_name = 28 [(google.api.field_behavior) = IMMUTABLE];
@@ -155,15 +125,10 @@ message AccountBudgetProposal {
     string proposed_start_date_time = 29
         [(google.api.field_behavior) = IMMUTABLE];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-    // Immutable. The proposed start date time as a well-defined type, for example, NOW.
-    google.ads.googleads.v12.enums.TimeTypeEnum.TimeType proposed_start_time_type = 7 [(google.api.field_behavior) = IMMUTABLE];
-========
     // Immutable. The proposed start date time as a well-defined type, for
     // example, NOW.
     google.ads.googleads.v15.enums.TimeTypeEnum.TimeType
         proposed_start_time_type = 7 [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
   }
 
   // The proposed end date time of the account-level budget, which cannot be in
@@ -173,15 +138,10 @@ message AccountBudgetProposal {
     string proposed_end_date_time = 31
         [(google.api.field_behavior) = IMMUTABLE];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-    // Immutable. The proposed end date time as a well-defined type, for example, FOREVER.
-    google.ads.googleads.v12.enums.TimeTypeEnum.TimeType proposed_end_time_type = 9 [(google.api.field_behavior) = IMMUTABLE];
-========
     // Immutable. The proposed end date time as a well-defined type, for
     // example, FOREVER.
     google.ads.googleads.v15.enums.TimeTypeEnum.TimeType
         proposed_end_time_type = 9 [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
   }
 
   // The approved end date time of the account-level budget.
@@ -190,15 +150,10 @@ message AccountBudgetProposal {
     string approved_end_date_time = 32
         [(google.api.field_behavior) = OUTPUT_ONLY];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-    // Output only. The approved end date time as a well-defined type, for example, FOREVER.
-    google.ads.googleads.v12.enums.TimeTypeEnum.TimeType approved_end_time_type = 22 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
     // Output only. The approved end date time as a well-defined type, for
     // example, FOREVER.
     google.ads.googleads.v15.enums.TimeTypeEnum.TimeType
         approved_end_time_type = 22 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
   }
 
   // The proposed spending limit.
@@ -208,17 +163,11 @@ message AccountBudgetProposal {
     int64 proposed_spending_limit_micros = 33
         [(google.api.field_behavior) = IMMUTABLE];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-    // Immutable. The proposed spending limit as a well-defined type, for example,
-    // INFINITE.
-    google.ads.googleads.v12.enums.SpendingLimitTypeEnum.SpendingLimitType proposed_spending_limit_type = 11 [(google.api.field_behavior) = IMMUTABLE];
-========
     // Immutable. The proposed spending limit as a well-defined type, for
     // example, INFINITE.
     google.ads.googleads.v15.enums.SpendingLimitTypeEnum.SpendingLimitType
         proposed_spending_limit_type = 11
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
   }
 
   // The approved spending limit.
@@ -228,16 +177,10 @@ message AccountBudgetProposal {
     int64 approved_spending_limit_micros = 34
         [(google.api.field_behavior) = OUTPUT_ONLY];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/account_budget_proposal.proto
-    // Output only. The approved spending limit as a well-defined type, for example,
-    // INFINITE.
-    google.ads.googleads.v12.enums.SpendingLimitTypeEnum.SpendingLimitType approved_spending_limit_type = 24 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
     // Output only. The approved spending limit as a well-defined type, for
     // example, INFINITE.
     google.ads.googleads.v15.enums.SpendingLimitTypeEnum.SpendingLimitType
         approved_spending_limit_type = 24
         [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/account_budget_proposal.proto
   }
 }

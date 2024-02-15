@@ -77,9 +77,9 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "workstations_v1beta.yaml",
     test_deps = [
+        ":workstations_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
-        ":workstations_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -120,7 +120,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -156,19 +155,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "workstations_go_gapic_test",
-    srcs = [":workstations_go_gapic_srcjar_test"],
-    embed = [":workstations_go_gapic"],
-    importpath = "cloud.google.com/go/workstations/apiv1beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-workstations-v1beta-go",
     deps = [
         ":workstations_go_gapic",
         ":workstations_go_gapic_srcjar-metadata.srcjar",
+        ":workstations_go_gapic_srcjar-snippets.srcjar",
         ":workstations_go_gapic_srcjar-test.srcjar",
         ":workstations_go_proto",
     ],
@@ -221,19 +214,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "workstations_php_proto",
     deps = [":workstations_proto"],
-)
-
-php_grpc_library(
-    name = "workstations_php_grpc",
-    srcs = [":workstations_proto"],
-    deps = [":workstations_php_proto"],
 )
 
 php_gapic_library(
@@ -243,10 +229,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "workstations_v1beta.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":workstations_php_grpc",
-        ":workstations_php_proto",
-    ],
+    deps = [":workstations_php_proto"],
 )
 
 # Open Source Packages
@@ -254,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-workstations-v1beta-php",
     deps = [
         ":workstations_php_gapic",
-        ":workstations_php_grpc",
         ":workstations_php_proto",
     ],
 )
@@ -318,6 +300,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "workstations_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "workstations_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":workstations_ruby_grpc",
         ":workstations_ruby_proto",
