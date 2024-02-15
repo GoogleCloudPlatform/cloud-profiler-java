@@ -22,10 +22,26 @@ proto_library(
     name = "discoveryengine_proto",
     srcs = [
         "common.proto",
+        "completion.proto",
+        "completion_service.proto",
+        "conversation.proto",
+        "conversational_search_service.proto",
+        "data_store.proto",
+        "data_store_service.proto",
         "document.proto",
         "document_service.proto",
+        "engine.proto",
+        "engine_service.proto",
         "import_config.proto",
+        "purge_config.proto",
         "recommendation_service.proto",
+        "schema.proto",
+        "schema_service.proto",
+        "search_service.proto",
+        "serving_config.proto",
+        "serving_config_service.proto",
+        "site_search_engine.proto",
+        "site_search_engine_service.proto",
         "user_event.proto",
         "user_event_service.proto",
     ],
@@ -40,6 +56,7 @@ proto_library(
         "//google/type:date_proto",
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
+        "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:struct_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -81,7 +98,7 @@ java_gapic_library(
     srcs = [":discoveryengine_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "discoveryengine_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
     test_deps = [
         ":discoveryengine_java_grpc",
@@ -96,10 +113,26 @@ java_gapic_library(
 java_gapic_test(
     name = "discoveryengine_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.discoveryengine.v1beta.CompletionServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.CompletionServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.ConversationalSearchServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.ConversationalSearchServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.DataStoreServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.DataStoreServiceClientTest",
         "com.google.cloud.discoveryengine.v1beta.DocumentServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1beta.DocumentServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.EngineServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.EngineServiceClientTest",
         "com.google.cloud.discoveryengine.v1beta.RecommendationServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1beta.RecommendationServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.SchemaServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.SchemaServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.SearchServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.SearchServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.ServingConfigServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.ServingConfigServiceClientTest",
+        "com.google.cloud.discoveryengine.v1beta.SiteSearchEngineServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1beta.SiteSearchEngineServiceClientTest",
         "com.google.cloud.discoveryengine.v1beta.UserEventServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1beta.UserEventServiceClientTest",
     ],
@@ -127,13 +160,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "discoveryengine_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/discoveryengine/v1beta",
+    importpath = "cloud.google.com/go/discoveryengine/apiv1beta/discoveryenginepb",
     protos = [":discoveryengine_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -150,6 +182,7 @@ go_gapic_library(
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     importpath = "cloud.google.com/go/discoveryengine/apiv1beta;discoveryengine",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
     transport = "grpc+rest",
@@ -157,18 +190,11 @@ go_gapic_library(
         ":discoveryengine_go_proto",
         "//google/api:httpbody_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
         "@io_bazel_rules_go//proto/wkt:struct_go_proto",
     ],
-)
-
-go_test(
-    name = "discoveryengine_go_gapic_test",
-    srcs = [":discoveryengine_go_gapic_srcjar_test"],
-    embed = [":discoveryengine_go_gapic"],
-    importpath = "cloud.google.com/go/discoveryengine/apiv1beta",
 )
 
 # Open Source Packages
@@ -177,6 +203,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":discoveryengine_go_gapic",
         ":discoveryengine_go_gapic_srcjar-metadata.srcjar",
+        ":discoveryengine_go_gapic_srcjar-snippets.srcjar",
         ":discoveryengine_go_gapic_srcjar-test.srcjar",
         ":discoveryengine_go_proto",
     ],
@@ -196,7 +223,7 @@ py_gapic_library(
     name = "discoveryengine_py_gapic",
     srcs = [":discoveryengine_proto"],
     grpc_service_config = "discoveryengine_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
     transport = "grpc+rest",
     deps = [
@@ -228,7 +255,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -237,20 +263,15 @@ php_proto_library(
     deps = [":discoveryengine_proto"],
 )
 
-php_grpc_library(
-    name = "discoveryengine_php_grpc",
-    srcs = [":discoveryengine_proto"],
-    deps = [":discoveryengine_php_proto"],
-)
-
 php_gapic_library(
     name = "discoveryengine_php_gapic",
     srcs = [":discoveryengine_proto_with_info"],
     grpc_service_config = "discoveryengine_grpc_service_config.json",
-    rest_numeric_enums = False,
+    migration_mode = "NEW_SURFACE_ONLY",
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":discoveryengine_php_grpc",
         ":discoveryengine_php_proto",
     ],
 )
@@ -260,7 +281,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-discoveryengine-v1beta-php",
     deps = [
         ":discoveryengine_php_gapic",
-        ":discoveryengine_php_grpc",
         ":discoveryengine_php_proto",
     ],
 )
@@ -281,8 +301,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     package = "google.cloud.discoveryengine.v1beta",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -319,10 +340,11 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "discoveryengine_ruby_gapic",
     srcs = [":discoveryengine_proto_with_info"],
-    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-discoveryengine-v1beta"],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-discovery_engine-v1beta"],
     grpc_service_config = "discoveryengine_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":discoveryengine_ruby_grpc",
         ":discoveryengine_ruby_proto",
@@ -366,8 +388,9 @@ csharp_gapic_library(
     srcs = [":discoveryengine_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "discoveryengine_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":discoveryengine_csharp_grpc",
         ":discoveryengine_csharp_proto",

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ syntax = "proto3";
 package google.cloud.bigquery.migration.v2;
 
 option csharp_namespace = "Google.Cloud.BigQuery.Migration.V2";
-option go_package = "google.golang.org/genproto/googleapis/cloud/bigquery/migration/v2;migration";
+option go_package = "cloud.google.com/go/bigquery/migration/apiv2/migrationpb;migrationpb";
 option java_multiple_files = true;
 option java_outer_classname = "TranslationConfigProto";
 option java_package = "com.google.cloud.bigquery.migration.v2";
@@ -38,12 +38,6 @@ message TranslationConfigDetails {
     string gcs_target_path = 2;
   }
 
-  // The dialect of the input files.
-  Dialect source_dialect = 3;
-
-  // The target dialect for the engine to translate the input to.
-  Dialect target_dialect = 4;
-
   // The mapping of full SQL object names from their current state to the
   // desired output.
   oneof output_name_mapping {
@@ -51,8 +45,17 @@ message TranslationConfigDetails {
     ObjectNameMappingList name_mapping_list = 5;
   }
 
+  // The dialect of the input files.
+  Dialect source_dialect = 3;
+
+  // The target dialect for the engine to translate the input to.
+  Dialect target_dialect = 4;
+
   // The default source environment values for the translation.
   SourceEnv source_env = 6;
+
+  // The indicator to show translation request initiator.
+  string request_source = 8;
 }
 
 // The possible dialect options for translation.

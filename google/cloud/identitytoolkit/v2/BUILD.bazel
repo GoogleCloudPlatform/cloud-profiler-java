@@ -69,6 +69,7 @@ java_gapic_library(
     srcs = [":identitytoolkit_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "identitytoolkit_v2.yaml",
     test_deps = [
         ":identitytoolkit_java_grpc",
@@ -112,13 +113,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "identitytoolkit_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/identitytoolkit/v2",
+    importpath = "cloud.google.com/go/identitytoolkit/apiv2/identitytoolkitpb",
     protos = [":identitytoolkit_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -131,18 +131,13 @@ go_gapic_library(
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
     importpath = "cloud.google.com/go/identitytoolkit/apiv2;identitytoolkit",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "identitytoolkit_v2.yaml",
     transport = "grpc+rest",
     deps = [
         ":identitytoolkit_go_proto",
     ],
-)
-
-go_test(
-    name = "identitytoolkit_go_gapic_test",
-    srcs = [":identitytoolkit_go_gapic_srcjar_test"],
-    embed = [":identitytoolkit_go_gapic"],
-    importpath = "cloud.google.com/go/identitytoolkit/apiv2",
 )
 
 # Open Source Packages
@@ -151,6 +146,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":identitytoolkit_go_gapic",
         ":identitytoolkit_go_gapic_srcjar-metadata.srcjar",
+        ":identitytoolkit_go_gapic_srcjar-snippets.srcjar",
         ":identitytoolkit_go_gapic_srcjar-test.srcjar",
         ":identitytoolkit_go_proto",
     ],
@@ -175,7 +171,9 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "python-gapic-name=identity_toolkit",
     ],
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "identitytoolkit_v2.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -203,7 +201,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -212,21 +209,14 @@ php_proto_library(
     deps = [":identitytoolkit_proto"],
 )
 
-php_grpc_library(
-    name = "identitytoolkit_php_grpc",
-    srcs = [":identitytoolkit_proto"],
-    deps = [":identitytoolkit_php_proto"],
-)
-
 php_gapic_library(
     name = "identitytoolkit_php_gapic",
     srcs = [":identitytoolkit_proto_with_info"],
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "identitytoolkit_v2.yaml",
-    deps = [
-        ":identitytoolkit_php_grpc",
-        ":identitytoolkit_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":identitytoolkit_php_proto"],
 )
 
 # Open Source Packages
@@ -234,7 +224,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-identitytoolkit-v2-php",
     deps = [
         ":identitytoolkit_php_gapic",
-        ":identitytoolkit_php_grpc",
         ":identitytoolkit_php_proto",
     ],
 )
@@ -255,7 +244,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
     package = "google.cloud.identitytoolkit.v2",
+    rest_numeric_enums = True,
     service_yaml = "identitytoolkit_v2.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -299,8 +290,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/identity-platform/docs/reference/rest",
     ],
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Google Identity Toolkit API lets you use open standards to verify a user's identity.",
     ruby_cloud_title = "Identity Platform V2",
+    service_yaml = "identitytoolkit_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":identitytoolkit_ruby_grpc",
         ":identitytoolkit_ruby_proto",
@@ -344,7 +338,9 @@ csharp_gapic_library(
     srcs = [":identitytoolkit_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "identitytoolkit_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "identitytoolkit_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":identitytoolkit_csharp_grpc",
         ":identitytoolkit_csharp_proto",

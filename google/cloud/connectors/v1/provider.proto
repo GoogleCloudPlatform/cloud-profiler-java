@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import "google/api/resource.proto";
 import "google/cloud/connectors/v1/common.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/connectors/v1;connectors";
+option go_package = "cloud.google.com/go/connectors/apiv1/connectorspb;connectorspb";
 option java_multiple_files = true;
 option java_outer_classname = "ProviderProto";
 option java_package = "com.google.cloud.connectors.v1";
@@ -39,10 +39,12 @@ message Provider {
   string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Created time.
-  google.protobuf.Timestamp create_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Updated time.
-  google.protobuf.Timestamp update_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp update_time = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Resource labels to represent user-provided metadata.
   // Refer to cloud documentation on labels for more details.

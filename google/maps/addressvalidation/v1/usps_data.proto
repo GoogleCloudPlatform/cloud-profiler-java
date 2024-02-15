@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package google.maps.addressvalidation.v1;
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Maps.AddressValidation.V1";
-option go_package = "google.golang.org/genproto/googleapis/maps/addressvalidation/v1;addressvalidation";
+option go_package = "cloud.google.com/go/maps/addressvalidation/apiv1/addressvalidationpb;addressvalidationpb";
 option java_multiple_files = true;
 option java_outer_classname = "UspsDataProto";
 option java_package = "com.google.maps.addressvalidation.v1";
 option objc_class_prefix = "GMPAVV1";
 option php_namespace = "Google\\Maps\\AddressValidation\\V1";
 option ruby_package = "Google::Maps::AddressValidation::V1";
-
 
 // USPS representation of a US address.
 message UspsAddress {
@@ -57,7 +56,10 @@ message UspsAddress {
   string zip_code_extension = 9;
 }
 
-// The USPS data for the address.
+// The USPS data for the address. `uspsData` is not guaranteed to be fully
+// populated for every US or PR address sent to the Address Validation API. It's
+// recommended to integrate the backup address fields in the response if you
+// utilize uspsData as the primary part of the response.
 message UspsData {
   // USPS standardized address.
   UspsAddress standardized_address = 1;
@@ -124,6 +126,19 @@ message UspsData {
   // * `Y`: The address is not active
   // * `N`: The address is active
   string dpv_no_stat = 8;
+
+  // The carrier route code.
+  // A four character code consisting of a one letter prefix and a three digit
+  // route designator.
+  //
+  // Prefixes:
+  //
+  // * `C`: Carrier route (or city route)
+  // * `R`: Rural route
+  // * `H`: Highway Contract Route
+  // * `B`: Post Office Box Section
+  // * `G`: General delivery unit
+  string carrier_route = 9;
 
   // Carrier route rate sort indicator.
   string carrier_route_indicator = 10;
@@ -194,9 +209,13 @@ message UspsData {
   // exists.
   bool default_address = 26;
 
-  // Error message for USPS data retrieval. If this field is populated, other
-  // USPS data response fields - with the possible exception of
-  // carrier_route - are not populated. Otherwise, fields with data are
-  // populated.
+  // Error message for USPS data retrieval. This is populated when USPS
+  // processing is suspended because of the detection of artificially created
+  // addresses.
+  //
+  // The USPS data fields might not be populated when this error is present.
   string error_message = 27;
+
+  // Indicator that the request has been CASS processed.
+  bool cass_processed = 28;
 }

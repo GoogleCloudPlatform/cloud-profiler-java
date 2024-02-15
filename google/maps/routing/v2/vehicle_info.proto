@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import "google/maps/routing/v2/vehicle_emission_type.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Maps.Routing.V2";
-option go_package = "google.golang.org/genproto/googleapis/maps/routing/v2;routing";
+option go_package = "cloud.google.com/go/maps/routing/apiv2/routingpb;routingpb";
 option java_multiple_files = true;
 option java_outer_classname = "VehicleInfoProto";
 option java_package = "com.google.maps.routing.v2";
@@ -28,10 +28,10 @@ option objc_class_prefix = "GMRV2";
 option php_namespace = "Google\\Maps\\Routing\\V2";
 option ruby_package = "Google::Maps::Routing::V2";
 
-// Encapsulates the vehicle information, such as the license plate last
-// character.
+// Contains the vehicle information, such as the vehicle emission type.
 message VehicleInfo {
   // Describes the vehicle's emission type.
-  // Applies only to the DRIVE travel mode.
+  // Applies only to the `DRIVE`
+  // [RouteTravelMode][google.maps.routing.v2.RouteTravelMode].
   VehicleEmissionType emission_type = 2;
 }

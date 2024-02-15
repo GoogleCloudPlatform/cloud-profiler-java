@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/type/latlng.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/delivery/v1;delivery";
+option csharp_namespace = "Google.Maps.FleetEngine.Delivery.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/delivery/apiv1/deliverypb;deliverypb";
 option java_multiple_files = true;
 option java_outer_classname = "Common";
 option java_package = "google.maps.fleetengine.delivery.v1";
@@ -30,11 +31,29 @@ option objc_class_prefix = "CFED";
 // Describes a vehicle attribute as a key-value pair. The "key:value" string
 // length cannot exceed 256 characters.
 message DeliveryVehicleAttribute {
-  // The attribute's key. Keys may not contain the colon character (:).
+  // The attribute's key.
   string key = 1;
 
   // The attribute's value.
   string value = 2;
+
+  // The attribute's value, can be in string, bool, or double type.
+  oneof delivery_vehicle_attribute_value {
+    // String typed attribute value.
+    //
+    // Note: This is identical to the `value` field which will eventually be
+    // deprecated. For create or update methods, either field can be used, but
+    // it's strongly recommended to use `string_value`. If both `string_value`
+    // and `value` are set, they must be identical or an error will be thrown.
+    // Both fields are populated in responses.
+    string string_value = 3;
+
+    // Boolean typed attribute value.
+    bool bool_value = 4;
+
+    // Double typed attribute value.
+    double number_value = 5;
+  }
 }
 
 // The location, speed, and heading of a vehicle at a point in time.
@@ -86,7 +105,8 @@ message DeliveryVehicleLocation {
   google.protobuf.Timestamp update_time = 4;
 
   // Output only. The time when the server received the location information.
-  google.protobuf.Timestamp server_time = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp server_time = 13
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Provider of location data (for example, `GPS`).
   DeliveryVehicleLocationSensor location_sensor = 11;
@@ -94,41 +114,46 @@ message DeliveryVehicleLocation {
   // Whether `location` is snapped to a road.
   google.protobuf.BoolValue is_road_snapped = 27;
 
-  // Input only. Indicates whether the GPS sensor is enabled on the mobile device.
-  google.protobuf.BoolValue is_gps_sensor_enabled = 12 [(google.api.field_behavior) = INPUT_ONLY];
+  // Input only. Indicates whether the GPS sensor is enabled on the mobile
+  // device.
+  google.protobuf.BoolValue is_gps_sensor_enabled = 12
+      [(google.api.field_behavior) = INPUT_ONLY];
 
-  // Input only. Time (in seconds) since this location was first sent to the server.
-  // This will be zero for the first update. If the time is unknown
-  // (for example, when the app restarts), this value resets to zero.
-  google.protobuf.Int32Value time_since_update = 14 [(google.api.field_behavior) = INPUT_ONLY];
+  // Input only. Time (in seconds) since this location was first sent to the
+  // server. This will be zero for the first update. If the time is unknown (for
+  // example, when the app restarts), this value resets to zero.
+  google.protobuf.Int32Value time_since_update = 14
+      [(google.api.field_behavior) = INPUT_ONLY];
 
-  // Input only. Number of additional attempts to send this location to the server.
-  // If this value is zero, then it is not stale.
-  google.protobuf.Int32Value num_stale_updates = 15 [(google.api.field_behavior) = INPUT_ONLY];
+  // Input only. Deprecated: Other signals are now used to determine if a
+  // location is stale.
+  google.protobuf.Int32Value num_stale_updates = 15
+      [deprecated = true, (google.api.field_behavior) = INPUT_ONLY];
 
   // Raw vehicle location (unprocessed by road-snapper).
   google.type.LatLng raw_location = 16;
 
-  // Input only. Timestamp associated with the raw location.
-  google.protobuf.Timestamp raw_location_time = 17 [(google.api.field_behavior) = INPUT_ONLY];
+  // Timestamp associated with the raw location.
+  google.protobuf.Timestamp raw_location_time = 17;
 
-  // Input only. Source of the raw location.
-  DeliveryVehicleLocationSensor raw_location_sensor = 28 [(google.api.field_behavior) = INPUT_ONLY];
+  // Source of the raw location. Defaults to `GPS`.
+  DeliveryVehicleLocationSensor raw_location_sensor = 28;
 
-  // Input only. Accuracy of `raw_location` as a radius, in meters.
-  google.protobuf.DoubleValue raw_location_accuracy = 25 [(google.api.field_behavior) = INPUT_ONLY];
+  // Accuracy of `raw_location` as a radius, in meters.
+  google.protobuf.DoubleValue raw_location_accuracy = 25;
 
-  // Input only. Supplemental location provided by the integrating app.
-  google.type.LatLng supplemental_location = 18 [(google.api.field_behavior) = INPUT_ONLY];
+  // Supplemental location provided by the integrating app.
+  google.type.LatLng supplemental_location = 18;
 
-  // Input only. Timestamp associated with the supplemental location.
-  google.protobuf.Timestamp supplemental_location_time = 19 [(google.api.field_behavior) = INPUT_ONLY];
+  // Timestamp associated with the supplemental location.
+  google.protobuf.Timestamp supplemental_location_time = 19;
 
-  // Input only. Source of the supplemental location.
-  DeliveryVehicleLocationSensor supplemental_location_sensor = 20 [(google.api.field_behavior) = INPUT_ONLY];
+  // Source of the supplemental location. Defaults to
+  // `CUSTOMER_SUPPLIED_LOCATION`.
+  DeliveryVehicleLocationSensor supplemental_location_sensor = 20;
 
-  // Input only. Accuracy of `supplemental_location` as a radius, in meters.
-  google.protobuf.DoubleValue supplemental_location_accuracy = 21 [(google.api.field_behavior) = INPUT_ONLY];
+  // Accuracy of `supplemental_location` as a radius, in meters.
+  google.protobuf.DoubleValue supplemental_location_accuracy = 21;
 
   // Deprecated: Use `is_road_snapped` instead.
   bool road_snapped = 26 [deprecated = true];
@@ -148,10 +173,23 @@ enum DeliveryVehicleLocationSensor {
   // Cell tower ID or WiFi access point.
   PASSIVE = 3;
 
-  // A location signal snapped to the best road position.
+  // A location determined by the mobile device to be the most likely
+  // road position.
   ROAD_SNAPPED_LOCATION_PROVIDER = 4;
 
-  // The fused location provider in Google Play services.
+  // A customer-supplied location from an independent source.  Typically, this
+  // value is used for a location provided from sources other than the mobile
+  // device running Driver SDK.  If the original source is described by one of
+  // the other enum values, use that value. Locations marked
+  // CUSTOMER_SUPPLIED_LOCATION are typically provided via a DeliveryVehicle's
+  // `last_location.supplemental_location_sensor`.
+  CUSTOMER_SUPPLIED_LOCATION = 5;
+
+  // A location calculated by Fleet Engine based on the signals available to it.
+  // Output only. This value will be rejected if it is received in a request.
+  FLEET_ENGINE_LOCATION = 6;
+
+  // Android's Fused Location Provider.
   FUSED_LOCATION_PROVIDER = 100;
 
   // The location provider on Apple operating systems.
@@ -175,4 +213,35 @@ enum DeliveryVehicleNavigationStatus {
 
   // The vehicle is within approximately 50m of the destination.
   ARRIVED_AT_DESTINATION = 4;
+}
+
+// A time range.
+message TimeWindow {
+  // Required. The start time of the time window (inclusive).
+  google.protobuf.Timestamp start_time = 1
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The end time of the time window (inclusive).
+  google.protobuf.Timestamp end_time = 2
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Describes a task attribute as a key-value pair. The "key:value" string length
+// cannot exceed 256 characters.
+message TaskAttribute {
+  // The attribute's key. Keys may not contain the colon character (:).
+  string key = 1;
+
+  // The attribute's value, can be in string, bool, or double type. If none are
+  // set the TaskAttribute string_value will be stored as the empty string "".
+  oneof task_attribute_value {
+    // String typed attribute value.
+    string string_value = 2;
+
+    // Boolean typed attribute value.
+    bool bool_value = 3;
+
+    // Double typed attribute value.
+    double number_value = 4;
+  }
 }

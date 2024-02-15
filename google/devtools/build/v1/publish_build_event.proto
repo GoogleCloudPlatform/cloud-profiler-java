@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,14 +51,14 @@ service PublishBuildEvent {
       "https://www.googleapis.com/auth/cloud-platform";
 
   // Publish a build event stating the new state of a build (typically from the
-  // build queue). The BuildEnqueued event must be publishd before all other
+  // build queue). The BuildEnqueued event must be published before all other
   // events for the same build ID.
   //
   // The backend will persist the event and deliver it to registered frontend
   // jobs immediately without batching.
   //
   // The commit status of the request is reported by the RPC's util_status()
-  // function. The error code is the canoncial error code defined in
+  // function. The error code is the canonical error code defined in
   // //util/task/codes.proto.
   rpc PublishLifecycleEvent(PublishLifecycleEventRequest)
       returns (google.protobuf.Empty) {

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "TensorboardRunProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -50,10 +50,12 @@ message TensorboardRun {
   string description = 3;
 
   // Output only. Timestamp when this TensorboardRun was created.
-  google.protobuf.Timestamp create_time = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 6
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Timestamp when this TensorboardRun was last updated.
-  google.protobuf.Timestamp update_time = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp update_time = 7
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The labels with user-defined metadata to organize your TensorboardRuns.
   //

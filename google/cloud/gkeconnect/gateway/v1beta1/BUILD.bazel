@@ -65,9 +65,12 @@ java_gapic_library(
     name = "gateway_java_gapic",
     srcs = [":gateway_proto_with_info"],
     grpc_service_config = "connectgw_grpc_service_config.json",
+    rest_numeric_enums = False,
+    service_yaml = "connectgateway_v1beta1.yaml",
     test_deps = [
         ":gateway_java_grpc",
     ],
+    transport = "grpc",
     deps = [
         ":gateway_java_proto",
         "//google/api:api_java_proto",
@@ -86,6 +89,7 @@ java_gapic_test(
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-gkeconnect-gateway-v1beta1-java",
     include_samples = True,
+    transport = "grpc",
     deps = [
         ":gateway_java_gapic",
         ":gateway_java_grpc",
@@ -102,13 +106,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "gateway_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/gkeconnect/gateway/v1beta1",
+    importpath = "cloud.google.com/go/gkeconnect/gateway/apiv1beta1/gatewaypb",
     protos = [":gateway_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -122,18 +125,14 @@ go_gapic_library(
     grpc_service_config = "connectgw_grpc_service_config.json",
     importpath = "cloud.google.com/go/gkeconnect/gateway/apiv1beta1;gateway",
     metadata = True,
+    release_level = "beta",
+    rest_numeric_enums = False,
     service_yaml = "connectgateway_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":gateway_go_proto",
         "//google/api:httpbody_go_proto",
     ],
-)
-
-go_test(
-    name = "gateway_go_gapic_test",
-    srcs = [":gateway_go_gapic_srcjar_test"],
-    embed = [":gateway_go_gapic"],
-    importpath = "cloud.google.com/go/gkeconnect/gateway/apiv1beta1",
 )
 
 # Open Source Packages
@@ -142,6 +141,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":gateway_go_gapic",
         ":gateway_go_gapic_srcjar-metadata.srcjar",
+        ":gateway_go_gapic_srcjar-snippets.srcjar",
         ":gateway_go_gapic_srcjar-test.srcjar",
         ":gateway_go_proto",
     ],
@@ -162,6 +162,8 @@ py_gapic_library(
     srcs = [":gateway_proto"],
     grpc_service_config = "connectgw_grpc_service_config.json",
     opt_args = ["warehouse-package-name=google-cloud-gke-connect-gateway"],
+    rest_numeric_enums = False,
+    service_yaml = "connectgateway_v1beta1.yaml",
     transport = "grpc",
 )
 
@@ -190,7 +192,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -199,21 +200,15 @@ php_proto_library(
     deps = [":gateway_proto"],
 )
 
-php_grpc_library(
-    name = "gateway_php_grpc",
-    srcs = [":gateway_proto"],
-    deps = [":gateway_php_proto"],
-)
-
 php_gapic_library(
     name = "gateway_php_gapic",
     srcs = [":gateway_proto_with_info"],
     grpc_service_config = "connectgw_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = False,
     service_yaml = "connectgateway_v1beta1.yaml",
-    deps = [
-        ":gateway_php_grpc",
-        ":gateway_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":gateway_php_proto"],
 )
 
 # Open Source Packages
@@ -221,7 +216,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-gkeconnect-gateway-v1beta1-php",
     deps = [
         ":gateway_php_gapic",
-        ":gateway_php_grpc",
         ":gateway_php_proto",
     ],
 )
@@ -242,7 +236,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "connectgw_grpc_service_config.json",
     package = "google.cloud.gkeconnect.gateway.v1beta1",
+    rest_numeric_enums = False,
     service_yaml = "connectgateway_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -287,8 +283,10 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-shortname=connectgateway",
     ],
     grpc_service_config = "connectgw_grpc_service_config.json",
+    rest_numeric_enums = False,
     ruby_cloud_description = "The Connect gateway builds on the power of fleets to let Anthos users connect to and run commands against registered Anthos clusters in a simple, consistent, and secured way, whether the clusters are on Google Cloud, other public clouds, or on premises, and makes it easier to automate DevOps processes across all your clusters.",
     ruby_cloud_title = "Connect Gateway V1beta1",
+    service_yaml = "connectgateway_v1beta1.yaml",
     deps = [
         ":gateway_ruby_grpc",
         ":gateway_ruby_proto",
@@ -332,6 +330,7 @@ csharp_gapic_library(
     srcs = [":gateway_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "connectgw_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "connectgateway_v1beta1.yaml",
     deps = [
         ":gateway_csharp_grpc",

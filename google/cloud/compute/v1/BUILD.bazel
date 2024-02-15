@@ -42,25 +42,25 @@ _SERVICE_IGNORELIST = [
 proto_from_disco(
     name = "compute_gen",
     src = "compute.v1.json",
-    previous_proto = "compute.proto",
     enums_as_strings = True,
     message_ignorelist = _MESSAGE_IGNORE_LIST,
+    previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
 )
 
 grpc_service_config_from_disco(
     name = "compute_grpc_service_config_gen",
     src = "compute.v1.json",
-    previous_proto = "compute.proto",
     message_ignorelist = _MESSAGE_IGNORE_LIST,
+    previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
 )
 
 gapic_yaml_from_disco(
     name = "compute_gapic_gen",
     src = "compute.v1.json",
-    previous_proto = "compute.proto",
     message_ignorelist = _MESSAGE_IGNORE_LIST,
+    previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
 )
 
@@ -81,6 +81,7 @@ proto_library(
         "@com_google_googleapis//google/api:field_behavior_proto",
         "@com_google_googleapis//google/api:resource_proto",
         "@com_google_googleapis//google/cloud:extended_operations_proto",
+        "@com_google_protobuf//:any_proto",
         "@com_google_protobuf//:descriptor_proto",
     ],
 )
@@ -212,6 +213,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-compute-v1-java",
+    include_samples = True,
     transport = "rest",
     deps = [
         ":compute_java_gapic",
@@ -237,7 +239,6 @@ py_gapic_library(
     ],
     opt_args = [
         "transport=rest",
-        "autogen-snippets=False",
     ],
 )
 
@@ -280,6 +281,7 @@ php_gapic_library(
     grpc_service_config = "compute_grpc_service_config.json",
     service_yaml = "compute_v1.yaml",
     transport = "rest",
+    migration_mode = "MIGRATION_MODE_UNSPECIFIED",
     deps = [
         ":compute_php_proto",
     ],
@@ -307,8 +309,8 @@ nodejs_gapic_library(
     name = "compute_nodejs_gapic",
     package_name = "@google-cloud/compute",
     src = ":compute_proto_with_info",
-    extra_protoc_parameters = ["metadata"],
     diregapic = True,
+    extra_protoc_parameters = ["metadata"],
     deps = [],
 )
 
@@ -317,6 +319,7 @@ nodejs_gapic_assembly_pkg(
     deps = [
         ":compute_nodejs_gapic",
         ":compute_proto",
+        "@com_google_googleapis//google/cloud:extended_operations_proto",
     ],
 )
 
@@ -365,7 +368,6 @@ ruby_gapic_assembly_pkg(
     ],
 )
 
-
 ##############################################################################
 # C#
 ##############################################################################
@@ -393,6 +395,7 @@ csharp_gapic_library(
     srcs = [":compute_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = ":compute_grpc_service_config.json",
+    service_yaml = "compute_v1.yaml",
     transport = "rest",
     deps = [
         ":compute_csharp_grpc",
@@ -407,5 +410,56 @@ csharp_gapic_assembly_pkg(
         ":compute_csharp_gapic",
         ":compute_csharp_grpc",
         ":compute_csharp_proto",
+    ],
+)
+
+##############################################################################
+# Go
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "go_gapic_assembly_pkg",
+    "go_gapic_library",
+    "go_proto_library",
+)
+
+go_proto_library(
+    name = "compute_go_proto",
+    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
+    importpath = "cloud.google.com/go/compute/apiv1/computepb",
+    protos = [":compute_proto"],
+    deps = [
+        "//google/api:annotations_go_proto",
+        "//google/cloud:extended_operations_go_proto",
+    ],
+)
+
+go_gapic_library(
+    name = "compute_go_gapic",
+    srcs = [":compute_proto_with_info"],
+    diregapic = True,
+    grpc_service_config = "compute_grpc_service_config.json",
+    importpath = "cloud.google.com/go/compute/apiv1;compute",
+    metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = False,
+    service_yaml = "compute_v1.yaml",
+    transport = "rest",
+    deps = [
+        ":compute_go_proto",
+        "@io_bazel_rules_go//proto/wkt:any_go_proto",
+        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
+    ],
+)
+
+# Open Source Packages
+go_gapic_assembly_pkg(
+    name = "gapi-cloud-compute-v1-go",
+    deps = [
+        ":compute_go_gapic",
+        ":compute_go_gapic_srcjar-metadata.srcjar",
+        ":compute_go_gapic_srcjar-snippets.srcjar",
+        ":compute_go_gapic_srcjar-test.srcjar",
+        ":compute_go_proto",
     ],
 )

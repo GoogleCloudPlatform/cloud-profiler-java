@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ package google.cloud.batch.v1alpha;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 import "google/api/resource.proto";
 import "google/cloud/batch/v1alpha/job.proto";
 import "google/cloud/batch/v1alpha/task.proto";
 import "google/longrunning/operations.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.Batch.V1Alpha";
-option go_package = "google.golang.org/genproto/googleapis/cloud/batch/v1alpha;batch";
+option go_package = "cloud.google.com/go/batch/apiv1alpha/batchpb;batchpb";
 option java_multiple_files = true;
 option java_outer_classname = "BatchProto";
 option java_package = "com.google.cloud.batch.v1alpha";
@@ -39,7 +41,8 @@ option ruby_package = "Google::Cloud::Batch::V1alpha";
 // Engine VM instances to run the jobs.
 service BatchService {
   option (google.api.default_host) = "batch.googleapis.com";
-  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/cloud-platform";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
 
   // Create a Job.
   rpc CreateJob(CreateJobRequest) returns (Job) {
@@ -101,14 +104,13 @@ message CreateJobRequest {
   // Pattern: "projects/{project}/locations/{location}"
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      child_type: "batch.googleapis.com/Job"
-    }
+    (google.api.resource_reference) = { child_type: "batch.googleapis.com/Job" }
   ];
 
   // ID used to uniquely identify the Job within its parent scope.
-  // This field should contain at most 63 characters.
-  // Only alphanumeric characters or '-' are accepted.
+  // This field should contain at most 63 characters and must start with
+  // lowercase characters.
+  // Only lowercase characters, numbers and '-' are accepted.
   // The '-' character cannot be the first or the last one.
   // A system generated ID will be used if the field is not set.
   //
@@ -119,13 +121,13 @@ message CreateJobRequest {
   // Required. The Job to create.
   Job job = 3 [(google.api.field_behavior) = REQUIRED];
 
-  // Optional. An optional request ID to identify requests. Specify a unique request ID
-  // so that if you must retry your request, the server will know to ignore
-  // the request if it has already been completed. The server will guarantee
-  // that for at least 60 minutes since the first request.
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes since the first request.
   //
-  // For example, consider a situation where you make an initial request and t
-  // he request times out. If you make the request again with the same request
+  // For example, consider a situation where you make an initial request and
+  // the request times out. If you make the request again with the same request
   // ID, the server can check if original operation with the same request ID
   // was received, and if so, will ignore the second request. This prevents
   // clients from accidentally creating duplicate commitments.
@@ -140,9 +142,7 @@ message GetJobRequest {
   // Required. Job name.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      type: "batch.googleapis.com/Job"
-    }
+    (google.api.resource_reference) = { type: "batch.googleapis.com/Job" }
   ];
 }
 
@@ -154,13 +154,13 @@ message DeleteJobRequest {
   // Optional. Reason for this deletion.
   string reason = 2 [(google.api.field_behavior) = OPTIONAL];
 
-  // Optional. An optional request ID to identify requests. Specify a unique request ID
-  // so that if you must retry your request, the server will know to ignore
-  // the request if it has already been completed. The server will guarantee
-  // that for at least 60 minutes after the first request.
+  // Optional. An optional request ID to identify requests. Specify a unique
+  // request ID so that if you must retry your request, the server will know to
+  // ignore the request if it has already been completed. The server will
+  // guarantee that for at least 60 minutes after the first request.
   //
-  // For example, consider a situation where you make an initial request and t
-  // he request times out. If you make the request again with the same request
+  // For example, consider a situation where you make an initial request and
+  // the request times out. If you make the request again with the same request
   // ID, the server can check if original operation with the same request ID
   // was received, and if so, will ignore the second request. This prevents
   // clients from accidentally creating duplicate commitments.
@@ -177,6 +177,10 @@ message ListJobsRequest {
 
   // List filter.
   string filter = 4;
+
+  // Optional. Sort results. Supported are "name", "name desc", "create_time",
+  // and "create_time desc".
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
 
   // Page size.
   int32 page_size = 2;
@@ -204,15 +208,16 @@ message ListTasksRequest {
   // "projects/{project}/locations/{location}/jobs/{job}/taskGroups/{task_group}"
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      type: "batch.googleapis.com/TaskGroup"
-    }
+    (google.api.resource_reference) = { type: "batch.googleapis.com/TaskGroup" }
   ];
 
   // Task filter, null filter matches all Tasks.
   // Filter string should be of the format State=TaskStatus.State e.g.
   // State=RUNNING
   string filter = 2;
+
+  // Not implemented.
+  string order_by = 5;
 
   // Page size.
   int32 page_size = 3;
@@ -238,19 +243,19 @@ message GetTaskRequest {
   // Required. Task name.
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      type: "batch.googleapis.com/Task"
-    }
+    (google.api.resource_reference) = { type: "batch.googleapis.com/Task" }
   ];
 }
 
 // Represents the metadata of the long-running operation.
 message OperationMetadata {
   // Output only. The time the operation was created.
-  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 1
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The time the operation finished running.
-  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp end_time = 2
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Server-defined resource path for the target of the operation.
   string target = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -263,8 +268,9 @@ message OperationMetadata {
 
   // Output only. Identifies whether the user has requested cancellation
   // of the operation. Operations that have successfully been cancelled
-  // have [Operation.error][] value with a [google.rpc.Status.code][google.rpc.Status.code] of 1,
-  // corresponding to `Code.CANCELLED`.
+  // have [Operation.error][] value with a
+  // [google.rpc.Status.code][google.rpc.Status.code] of 1, corresponding to
+  // `Code.CANCELLED`.
   bool requested_cancellation = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. API version used to start the operation.

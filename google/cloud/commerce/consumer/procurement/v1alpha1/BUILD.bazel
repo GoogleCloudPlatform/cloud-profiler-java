@@ -70,6 +70,7 @@ java_gapic_library(
     srcs = [":procurement_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
     test_deps = [
         ":procurement_java_grpc",
@@ -111,13 +112,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "procurement_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/commerce/consumer/procurement/v1alpha1",
+    importpath = "cloud.google.com/go/commerce/consumer/procurement/apiv1alpha1/procurementpb",
     protos = [":procurement_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -131,21 +131,16 @@ go_gapic_library(
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
     importpath = "cloud.google.com/go/commerce/consumer/procurement/apiv1alpha1;procurement",
     metadata = True,
+    release_level = "alpha",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
     transport = "grpc+rest",
     deps = [
         ":procurement_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "procurement_go_gapic_test",
-    srcs = [":procurement_go_gapic_srcjar_test"],
-    embed = [":procurement_go_gapic"],
-    importpath = "cloud.google.com/go/commerce/consumer/procurement/apiv1alpha1",
 )
 
 # Open Source Packages
@@ -154,6 +149,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":procurement_go_gapic",
         ":procurement_go_gapic_srcjar-metadata.srcjar",
+        ":procurement_go_gapic_srcjar-snippets.srcjar",
         ":procurement_go_gapic_srcjar-test.srcjar",
         ":procurement_go_proto",
     ],
@@ -173,8 +169,13 @@ py_gapic_library(
     name = "procurement_py_gapic",
     srcs = [":procurement_proto"],
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "python-gapic-name=commerce_consumer_procurement",
+    ],
 )
 
 py_test(
@@ -202,7 +203,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -211,21 +211,14 @@ php_proto_library(
     deps = [":procurement_proto"],
 )
 
-php_grpc_library(
-    name = "procurement_php_grpc",
-    srcs = [":procurement_proto"],
-    deps = [":procurement_php_proto"],
-)
-
 php_gapic_library(
     name = "procurement_php_gapic",
     srcs = [":procurement_proto_with_info"],
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
-    deps = [
-        ":procurement_php_grpc",
-        ":procurement_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":procurement_php_proto"],
 )
 
 # Open Source Packages
@@ -233,7 +226,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-consumer-procurement-v1alpha1-php",
     deps = [
         ":procurement_php_gapic",
-        ":procurement_php_grpc",
         ":procurement_php_proto",
     ],
 )
@@ -254,7 +246,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
     package = "google.cloud.commerce.consumer.procurement.v1alpha1",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -295,7 +289,9 @@ ruby_cloud_gapic_library(
         "ruby-cloud-gem-name=google-cloud-consumer-procurement-v1alpha1",
     ],
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":procurement_ruby_grpc",
         ":procurement_ruby_proto",
@@ -339,7 +335,9 @@ csharp_gapic_library(
     srcs = [":procurement_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "commerceconsumerprocurement_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudcommerceconsumerprocurement_v1alpha1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":procurement_csharp_grpc",
         ":procurement_csharp_proto",

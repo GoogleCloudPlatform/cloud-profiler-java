@@ -4,9 +4,12 @@ name: artifactregistry.googleapis.com
 title: Artifact Registry API
 
 apis:
+- name: google.cloud.location.Locations
 - name: google.devtools.artifactregistry.v1.ArtifactRegistry
+- name: google.longrunning.Operations
 
 types:
+- name: google.devtools.artifactregistry.v1.BatchDeleteVersionsMetadata
 - name: google.devtools.artifactregistry.v1.ImportAptArtifactsMetadata
 - name: google.devtools.artifactregistry.v1.ImportAptArtifactsResponse
 - name: google.devtools.artifactregistry.v1.ImportYumArtifactsMetadata
@@ -62,6 +65,10 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,
         https://www.googleapis.com/auth/cloud-platform.read-only
+  - selector: google.devtools.artifactregistry.v1.ArtifactRegistry.BatchDeleteVersions
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
   - selector: google.devtools.artifactregistry.v1.ArtifactRegistry.CreateRepository
     oauth:
       canonical_scopes: |-
@@ -107,6 +114,10 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
   - selector: google.devtools.artifactregistry.v1.ArtifactRegistry.UpdateTag
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.devtools.artifactregistry.v1.ArtifactRegistry.UpdateVPCSCConfig
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform

@@ -25,7 +25,7 @@ import "google/cloud/retail/v2/import_config.proto";
 import "google/longrunning/operations.proto";
 
 option csharp_namespace = "Google.Cloud.Retail.V2";
-option go_package = "google.golang.org/genproto/googleapis/cloud/retail/v2;retail";
+option go_package = "cloud.google.com/go/retail/apiv2/retailpb;retailpb";
 option java_multiple_files = true;
 option java_outer_classname = "CompletionServiceProto";
 option java_package = "com.google.cloud.retail.v2";
@@ -33,10 +33,10 @@ option objc_class_prefix = "RETAIL";
 option php_namespace = "Google\\Cloud\\Retail\\V2";
 option ruby_package = "Google::Cloud::Retail::V2";
 
-// Auto-completion service for retail.
+// Autocomplete service for retail.
 //
 // This feature is only available for users who have Retail Search enabled.
-// Please enable Retail Search on Cloud Console before using this feature.
+// Enable Retail Search on Cloud Console before using this feature.
 service CompletionService {
   option (google.api.default_host) = "retail.googleapis.com";
   option (google.api.oauth_scopes) =
@@ -45,7 +45,7 @@ service CompletionService {
   // Completes the specified prefix with keyword suggestions.
   //
   // This feature is only available for users who have Retail Search enabled.
-  // Please enable Retail Search on Cloud Console before using this feature.
+  // Enable Retail Search on Cloud Console before using this feature.
   rpc CompleteQuery(CompleteQueryRequest) returns (CompleteQueryResponse) {
     option (google.api.http) = {
       get: "/v2/{catalog=projects/*/locations/*/catalogs/*}:completeQuery"
@@ -60,7 +60,7 @@ service CompletionService {
   // are indexed successfully and ready for serving. The process takes hours.
   //
   // This feature is only available for users who have Retail Search enabled.
-  // Please enable Retail Search on Cloud Console before using this feature.
+  // Enable Retail Search on Cloud Console before using this feature.
   rpc ImportCompletionData(ImportCompletionDataRequest)
       returns (google.longrunning.Operation) {
     option (google.api.http) = {
@@ -74,7 +74,7 @@ service CompletionService {
   }
 }
 
-// Auto-complete parameters.
+// Autocomplete parameters.
 message CompleteQueryRequest {
   // Required. Catalog for which the completion is performed.
   //
@@ -110,8 +110,10 @@ message CompleteQueryRequest {
   // number of language codes is 3.
   repeated string language_codes = 3;
 
-  // The device type context for completion suggestions.
-  // It is useful to apply different suggestions on different device types, e.g.
+  // The device type context for completion suggestions. We recommend that you
+  // leave this field empty.
+  //
+  // It can apply different suggestions on different device types, e.g.
   // `DESKTOP`, `MOBILE`. If it is empty, the suggestions are across all device
   // types.
   //
@@ -148,9 +150,17 @@ message CompleteQueryRequest {
   // The maximum allowed max suggestions is 20. If it is set higher, it will be
   // capped by 20.
   int32 max_suggestions = 5;
+
+  // The entity for customers that may run multiple different entities, domains,
+  // sites or regions, for example, `Google US`, `Google Ads`, `Waymo`,
+  // `google.com`, `youtube.com`, etc.
+  // If this is set, it should be exactly matched with
+  // [UserEvent.entity][google.cloud.retail.v2.UserEvent.entity] to get
+  // per-entity autocomplete results.
+  string entity = 10;
 }
 
-// Response of the auto-complete query.
+// Response of the autocomplete query.
 message CompleteQueryResponse {
   // Resource that represents completion results.
   message CompletionResult {

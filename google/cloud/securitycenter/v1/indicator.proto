@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@ syntax = "proto3";
 package google.cloud.securitycenter.v1;
 
 option csharp_namespace = "Google.Cloud.SecurityCenter.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/securitycenter/v1;securitycenter";
+option go_package = "cloud.google.com/go/securitycenter/apiv1/securitycenterpb;securitycenterpb";
 option java_multiple_files = true;
 option java_outer_classname = "IndicatorProto";
 option java_package = "com.google.cloud.securitycenter.v1";
 option php_namespace = "Google\\Cloud\\SecurityCenter\\V1";
 option ruby_package = "Google::Cloud::SecurityCenter::V1";
 
-// Represents what's commonly known as an Indicator of compromise (IoC) in
+// Represents what's commonly known as an _indicator of compromise_ (IoC) in
 // computer forensics. This is an artifact observed on a network or in an
 // operating system that, with high confidence, indicates a computer intrusion.
-// Reference: https://en.wikipedia.org/wiki/Indicator_of_compromise
+// For more information, see [Indicator of
+// compromise](https://en.wikipedia.org/wiki/Indicator_of_compromise).
 message Indicator {
   // Indicates what signature matched this process.
   message ProcessSignature {
@@ -67,7 +68,7 @@ message Indicator {
     }
   }
 
-  // List of ip addresses associated to the Finding.
+  // The list of IP addresses that are associated with the finding.
   repeated string ip_addresses = 1;
 
   // List of domains associated to the Finding.

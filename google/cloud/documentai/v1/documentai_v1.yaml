@@ -19,10 +19,14 @@ types:
 - name: google.cloud.documentai.v1.DisableProcessorResponse
 - name: google.cloud.documentai.v1.EnableProcessorMetadata
 - name: google.cloud.documentai.v1.EnableProcessorResponse
+- name: google.cloud.documentai.v1.EvaluateProcessorVersionMetadata
+- name: google.cloud.documentai.v1.EvaluateProcessorVersionResponse
 - name: google.cloud.documentai.v1.ReviewDocumentOperationMetadata
 - name: google.cloud.documentai.v1.ReviewDocumentResponse
 - name: google.cloud.documentai.v1.SetDefaultProcessorVersionMetadata
 - name: google.cloud.documentai.v1.SetDefaultProcessorVersionResponse
+- name: google.cloud.documentai.v1.TrainProcessorVersionMetadata
+- name: google.cloud.documentai.v1.TrainProcessorVersionResponse
 - name: google.cloud.documentai.v1.UndeployProcessorVersionMetadata
 - name: google.cloud.documentai.v1.UndeployProcessorVersionResponse
 
@@ -80,3 +84,14 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+
+publishing:
+  documentation_uri: https://cloud.google.com/document-ai/docs
+  github_label: 'api: documentai'
+  organization: CLOUD
+  library_settings:
+  - version: google.cloud.documentai.v1
+    dotnet_settings:
+      ignored_resources:
+      - documentai.googleapis.com/Location
+  proto_reference_documentation_uri: https://cloud.google.com/document-ai/docs/reference/rpc

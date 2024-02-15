@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import "google/monitoring/dashboard/v1/dashboard.proto";
 import "google/protobuf/empty.proto";
 
 option csharp_namespace = "Google.Cloud.Monitoring.Dashboard.V1";
-option go_package = "google.golang.org/genproto/googleapis/monitoring/dashboard/v1;dashboard";
+option go_package = "cloud.google.com/go/monitoring/dashboard/apiv1/dashboardpb;dashboardpb";
 option java_multiple_files = true;
 option java_outer_classname = "DashboardsServiceProto";
 option java_package = "com.google.monitoring.dashboard.v1";
@@ -41,13 +41,18 @@ service DashboardsService {
       "https://www.googleapis.com/auth/monitoring.read,"
       "https://www.googleapis.com/auth/monitoring.write";
 
-  // Creates a new custom dashboard. For examples on how you can use this API to create dashboards, see [Managing dashboards by API](https://cloud.google.com/monitoring/dashboards/api-dashboard).
-  // This method requires the `monitoring.dashboards.create` permission on the specified project. For more information about permissions, see [Cloud Identity and Access Management](https://cloud.google.com/iam).
+  // Creates a new custom dashboard. For examples on how you can use this API to
+  // create dashboards, see [Managing dashboards by
+  // API](https://cloud.google.com/monitoring/dashboards/api-dashboard). This
+  // method requires the `monitoring.dashboards.create` permission on the
+  // specified project. For more information about permissions, see [Cloud
+  // Identity and Access Management](https://cloud.google.com/iam).
   rpc CreateDashboard(CreateDashboardRequest) returns (Dashboard) {
     option (google.api.http) = {
       post: "/v1/{parent=projects/*}/dashboards"
       body: "dashboard"
     };
+    option (google.api.method_signature) = "parent,dashboard";
   }
 
   // Lists the existing dashboards.
@@ -59,6 +64,7 @@ service DashboardsService {
     option (google.api.http) = {
       get: "/v1/{parent=projects/*}/dashboards"
     };
+    option (google.api.method_signature) = "parent";
   }
 
   // Fetches a specific dashboard.
@@ -70,6 +76,7 @@ service DashboardsService {
     option (google.api.http) = {
       get: "/v1/{name=projects/*/dashboards/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Deletes an existing custom dashboard.
@@ -81,6 +88,7 @@ service DashboardsService {
     option (google.api.http) = {
       delete: "/v1/{name=projects/*/dashboards/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Replaces an existing custom dashboard with a new definition.
@@ -103,7 +111,12 @@ message CreateDashboardRequest {
   //     projects/[PROJECT_ID_OR_NUMBER]
   //
   // The `[PROJECT_ID_OR_NUMBER]` must match the dashboard resource name.
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "cloudresourcemanager.googleapis.com/Project"
+    }
+  ];
 
   // Required. The initial dashboard specification.
   Dashboard dashboard = 2 [(google.api.field_behavior) = REQUIRED];
@@ -129,10 +142,11 @@ message ListDashboardsRequest {
   // If unspecified, a default of 1000 is used.
   int32 page_size = 2;
 
-  // If this field is not empty then it must contain the `nextPageToken` value
-  // returned by a previous call to this method.  Using this field causes the
-  // method to return additional results from the previous method call.
-  string page_token = 3;
+  // Optional. If this field is not empty then it must contain the
+  // `nextPageToken` value returned by a previous call to this method.  Using
+  // this field causes the method to return additional results from the previous
+  // method call.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The `ListDashboards` request.

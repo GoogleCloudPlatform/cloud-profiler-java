@@ -122,6 +122,7 @@ message CVSS {
     ATTACK_COMPLEXITY_UNSPECIFIED = 0;
     ATTACK_COMPLEXITY_LOW = 1;
     ATTACK_COMPLEXITY_HIGH = 2;
+    ATTACK_COMPLEXITY_MEDIUM = 3;
   }
 
   enum Authentication {
@@ -155,5 +156,14 @@ message CVSS {
     IMPACT_HIGH = 1;
     IMPACT_LOW = 2;
     IMPACT_NONE = 3;
+    IMPACT_PARTIAL = 4;
+    IMPACT_COMPLETE = 5;
   }
+}
+
+// CVSS Version.
+enum CVSSVersion {
+  CVSS_VERSION_UNSPECIFIED = 0;
+  CVSS_VERSION_2 = 1;
+  CVSS_VERSION_3 = 2;
 }

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import "google/cloud/recommender/v1/recommender_config.proto";
 import "google/protobuf/field_mask.proto";
 
 option csharp_namespace = "Google.Cloud.Recommender.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/recommender/v1;recommender";
+option go_package = "cloud.google.com/go/recommender/apiv1/recommenderpb;recommenderpb";
 option java_multiple_files = true;
 option java_outer_classname = "RecommenderProto";
 option java_package = "com.google.cloud.recommender.v1";
@@ -142,6 +142,35 @@ service Recommender {
     option (google.api.method_signature) = "name";
   }
 
+  // Mark the Recommendation State as Dismissed. Users can use this method to
+  // indicate to the Recommender API that an ACTIVE recommendation has to
+  // be marked back as DISMISSED.
+  //
+  // MarkRecommendationDismissed can be applied to recommendations in ACTIVE
+  // state.
+  //
+  // Requires the recommender.*.update IAM permission for the specified
+  // recommender.
+  rpc MarkRecommendationDismissed(MarkRecommendationDismissedRequest)
+      returns (Recommendation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/locations/*/recommenders/*/recommendations/*}:markDismissed"
+      body: "*"
+      additional_bindings {
+        post: "/v1/{name=billingAccounts/*/locations/*/recommenders/*/recommendations/*}:markDismissed"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/v1/{name=folders/*/locations/*/recommenders/*/recommendations/*}:markDismissed"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/v1/{name=organizations/*/locations/*/recommenders/*/recommendations/*}:markDismissed"
+        body: "*"
+      }
+    };
+  }
+
   // Marks the Recommendation State as Claimed. Users can use this method to
   // indicate to the Recommender API that they are starting to apply the
   // recommendation themselves. This stops the recommendation content from being
@@ -246,6 +275,9 @@ service Recommender {
       additional_bindings {
         get: "/v1/{name=organizations/*/locations/*/recommenders/*/config}"
       }
+      additional_bindings {
+        get: "/v1/{name=billingAccounts/*/locations/*/recommenders/*/config}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -261,6 +293,10 @@ service Recommender {
         patch: "/v1/{recommender_config.name=organizations/*/locations/*/recommenders/*/config}"
         body: "recommender_config"
       }
+      additional_bindings {
+        patch: "/v1/{recommender_config.name=billingAccounts/*/locations/*/recommenders/*/config}"
+        body: "recommender_config"
+      }
     };
     option (google.api.method_signature) = "recommender_config,update_mask";
   }
@@ -273,6 +309,9 @@ service Recommender {
       get: "/v1/{name=projects/*/locations/*/insightTypes/*/config}"
       additional_bindings {
         get: "/v1/{name=organizations/*/locations/*/insightTypes/*/config}"
+      }
+      additional_bindings {
+        get: "/v1/{name=billingAccounts/*/locations/*/insightTypes/*/config}"
       }
     };
     option (google.api.method_signature) = "name";
@@ -287,6 +326,10 @@ service Recommender {
       body: "insight_type_config"
       additional_bindings {
         patch: "/v1/{insight_type_config.name=organizations/*/locations/*/insightTypes/*/config}"
+        body: "insight_type_config"
+      }
+      additional_bindings {
+        patch: "/v1/{insight_type_config.name=billingAccounts/*/locations/*/insightTypes/*/config}"
         body: "insight_type_config"
       }
     };
@@ -340,6 +383,8 @@ message ListInsightsRequest {
   //
   // * `severity`
   //
+  // * `targetResources`
+  //
   // Examples:
   //
   // * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
@@ -348,7 +393,12 @@ message ListInsightsRequest {
   //
   // * `severity = CRITICAL OR severity = HIGH`
   //
+  // * `targetResources :
+  // //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
+  //
   // * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)`
+  //
+  // The max allowed filter length is 500 characters.
   //
   // (These expressions are based on the filter language described at
   // https://google.aip.dev/160)
@@ -441,6 +491,8 @@ message ListRecommendationsRequest {
   //
   // * `priority`
   //
+  // * `targetResources`
+  //
   // Examples:
   //
   // * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
@@ -449,7 +501,12 @@ message ListRecommendationsRequest {
   //
   // * `priority = P1 OR priority = P2`
   //
+  // * `targetResources :
+  // //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
+  //
   // * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+  //
+  // The max allowed filter length is 500 characters.
   //
   // (These expressions are based on the filter language described at
   // https://google.aip.dev/160)
@@ -475,6 +532,20 @@ message GetRecommendationRequest {
       type: "recommender.googleapis.com/Recommendation"
     }
   ];
+}
+
+// Request for the `MarkRecommendationDismissed` Method.
+message MarkRecommendationDismissedRequest {
+  // Required. Name of the recommendation.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "recommender.googleapis.com/Recommendation"
+    }
+  ];
+
+  // Fingerprint of the Recommendation. Provides optimistic locking.
+  string etag = 2;
 }
 
 // Request for the `MarkRecommendationClaimed` Method.
@@ -548,6 +619,8 @@ message GetRecommenderConfigRequest {
   // * `projects/[PROJECT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]/config`
   //
   // * `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]/config`
+  //
+  // * `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]/config`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -576,11 +649,13 @@ message GetInsightTypeConfigRequest {
   //
   // Acceptable formats:
   //
-  // * `projects/[PROJECT_NUMBER]/locations/global/recommenders/[INSIGHT_TYPE_ID]/config`
+  // * `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]/config`
   //
-  // * `projects/[PROJECT_ID]/locations/global/recommenders/[INSIGHT_TYPE_ID]/config`
+  // * `projects/[PROJECT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]/config`
   //
-  // * `organizations/[ORGANIZATION_ID]/locations/global/recommenders/[INSIGHT_TYPE_ID]/config`
+  // * `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]/config`
+  //
+  // * `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]/config`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {

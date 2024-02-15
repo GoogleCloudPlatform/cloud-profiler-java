@@ -82,11 +82,12 @@ java_gapic_library(
     srcs = [":networkservices_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "networkservices_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
     test_deps = [
-        ":networkservices_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
+        ":networkservices_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -127,13 +128,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "networkservices_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/networkservices/v1",
+    importpath = "cloud.google.com/go/networkservices/apiv1/networkservicespb",
     protos = [":networkservices_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -147,6 +147,8 @@ go_gapic_library(
     grpc_service_config = "networkservices_grpc_service_config.json",
     importpath = "cloud.google.com/go/networkservices/apiv1;networkservices",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -154,17 +156,10 @@ go_gapic_library(
         "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
-)
-
-go_test(
-    name = "networkservices_go_gapic_test",
-    srcs = [":networkservices_go_gapic_srcjar_test"],
-    embed = [":networkservices_go_gapic"],
-    importpath = "cloud.google.com/go/networkservices/apiv1",
 )
 
 # Open Source Packages
@@ -173,6 +168,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":networkservices_go_gapic",
         ":networkservices_go_gapic_srcjar-metadata.srcjar",
+        ":networkservices_go_gapic_srcjar-snippets.srcjar",
         ":networkservices_go_gapic_srcjar-test.srcjar",
         ":networkservices_go_proto",
     ],
@@ -185,6 +181,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -196,11 +193,12 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "warehouse-package-name=google-cloud-network-services",
     ],
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
-    ]
+    ],
 )
 
 py_test(
@@ -228,7 +226,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -237,19 +234,15 @@ php_proto_library(
     deps = [":networkservices_proto"],
 )
 
-php_grpc_library(
-    name = "networkservices_php_grpc",
-    srcs = [":networkservices_proto"],
-    deps = [":networkservices_php_proto"],
-)
-
 php_gapic_library(
     name = "networkservices_php_gapic",
     srcs = [":networkservices_proto_with_info"],
     grpc_service_config = "networkservices_grpc_service_config.json",
+    migration_mode = "PRE_MIGRATION_SURFACE_ONLY",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":networkservices_php_grpc",
         ":networkservices_php_proto",
     ],
 )
@@ -259,7 +252,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-networkservices-v1-php",
     deps = [
         ":networkservices_php_gapic",
-        ":networkservices_php_grpc",
         ":networkservices_php_proto",
     ],
 )
@@ -280,7 +272,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "networkservices_grpc_service_config.json",
     package = "google.cloud.networkservices.v1",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -319,7 +313,9 @@ ruby_cloud_gapic_library(
     srcs = [":networkservices_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-networkservices-v1"],
     grpc_service_config = "networkservices_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":networkservices_ruby_grpc",
         ":networkservices_ruby_proto",
@@ -363,7 +359,9 @@ csharp_gapic_library(
     srcs = [":networkservices_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "networkservices_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "networkservices_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":networkservices_csharp_grpc",
         ":networkservices_csharp_proto",

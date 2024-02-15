@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/v1;fleetengine";
+option csharp_namespace = "Google.Maps.FleetEngine.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/apiv1/fleetenginepb;fleetenginepb";
 option java_multiple_files = true;
 option java_outer_classname = "TripApi";
 option java_package = "google.maps.fleetengine.v1";
@@ -38,6 +39,8 @@ option objc_class_prefix = "CFE";
 // Trip management service.
 service TripService {
   option (google.api.default_host) = "fleetengine.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
 
   // Creates a trip in the Fleet Engine and returns the new trip.
   rpc CreateTrip(CreateTripRequest) returns (Trip) {
@@ -67,7 +70,8 @@ service TripService {
   }
 
   // Report billable trip usage.
-  rpc ReportBillableTrip(ReportBillableTripRequest) returns (google.protobuf.Empty) {
+  rpc ReportBillableTrip(ReportBillableTripRequest)
+      returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/{name=providers/*/billableTrips/*}:report"
       body: "*"
@@ -149,8 +153,13 @@ message CreateTripRequest {
   // * `vehicle_id`
   // * `dropoff_point`
   // * `intermediate_destinations`
+  // * `vehicle_waypoints`
   //
-  // Only `EXCLUSIVE` trips support multiple destinations.
+  // All other Trip fields are ignored. For example, all trips start with a
+  // `trip_status` of `NEW` even if you pass in a `trip_status` of `CANCELED` in
+  // the creation request.
+  //
+  // Only `EXCLUSIVE` trips support `intermediate_destinations`.
   //
   // When `vehicle_id` is set for a shared trip, you must supply
   // the list of `Trip.vehicle_waypoints` to specify the order of the remaining
@@ -166,8 +175,6 @@ message CreateTripRequest {
   //
   // The `trip_id`, `waypoint_type` and `location` fields are used, and all
   // other TripWaypoint fields in `vehicle_waypoints` are ignored.
-  //
-  // All other Trip fields are ignored.
   Trip trip = 4 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -244,8 +251,8 @@ message ReportBillableTripRequest {
   // member.
   string name = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Required. Two letter country code of the country where the trip takes place. Price is
-  // defined according to country code.
+  // Required. Two letter country code of the country where the trip takes
+  // place. Price is defined according to country code.
   string country_code = 3 [(google.api.field_behavior) = REQUIRED];
 
   // The platform upon which the request was issued.
@@ -318,7 +325,8 @@ message UpdateTripRequest {
 
   // Required. The field mask indicating which fields in Trip to update.
   // The `update_mask` must contain at least one field.
-  google.protobuf.FieldMask update_mask = 5 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 5
+      [(google.api.field_behavior) = REQUIRED];
 }
 
 // SearchTrips request message.
@@ -341,20 +349,19 @@ message SearchTripsRequest {
   // * `eta_to_first_waypoint`
   string vehicle_id = 4;
 
-  // If set to true, only Trips that influence the drivers route
-  // are included in the response.
+  // If set to true, the response includes Trips that influence a driver's
+  // route.
   bool active_trips_only = 5;
 
-  // If not set, the server will decide the number of
-  // results to return.
+  // If not set, the server decides the number of results to return.
   int32 page_size = 6;
 
-  // Set this to a value previously returned in the
-  // SearchTripsResponse to continue from previous results.
+  // Set this to a value previously returned in the `SearchTripsResponse` to
+  // continue from previous results.
   string page_token = 7;
 
-  // If specified, returns the trips that have not been updated after
-  // the time `(current - minimum_staleness)`.
+  // If specified, returns the trips that have not been updated after the time
+  // `(current - minimum_staleness)`.
   google.protobuf.Duration minimum_staleness = 8;
 }
 
@@ -363,8 +370,8 @@ message SearchTripsResponse {
   // The list of trips for the requested vehicle.
   repeated Trip trips = 1;
 
-  // Pass this token in the SearchTripsRequest to continue to
-  // list results. If all results have been returned, this field is an empty
-  // string or not present in the response.
+  // Pass this token in the SearchTripsRequest to page through list results. The
+  // API returns a trip list on each call, and when no more results remain the
+  // trip list is empty.
   string next_page_token = 2;
 }

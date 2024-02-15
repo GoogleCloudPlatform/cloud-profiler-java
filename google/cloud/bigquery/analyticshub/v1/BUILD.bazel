@@ -30,8 +30,10 @@ proto_library(
         "//google/api:resource_proto",
         "//google/iam/v1:iam_policy_proto",
         "//google/iam/v1:policy_proto",
+        "//google/longrunning:operations_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
+        "@com_google_protobuf//:timestamp_proto",
         "@com_google_protobuf//:wrappers_proto",
     ],
 )
@@ -72,10 +74,11 @@ java_gapic_library(
     srcs = [":analyticshub_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
     test_deps = [
-        ":analyticshub_java_grpc",
         "//google/iam/v1:iam_java_grpc",
+        ":analyticshub_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -115,17 +118,17 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "analyticshub_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/analyticshub/v1",
+    importpath = "cloud.google.com/go/bigquery/analyticshub/apiv1/analyticshubpb",
     protos = [":analyticshub_proto"],
     deps = [
         "//google/api:annotations_go_proto",
         "//google/iam/v1:iam_go_proto",
+        "//google/longrunning:longrunning_go_proto",
     ],
 )
 
@@ -135,20 +138,17 @@ go_gapic_library(
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/analyticshub/apiv1;analyticshub",
     metadata = True,
-    rest_numeric_enums = True,
+    release_level = "ga",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":analyticshub_go_proto",
         "//google/iam/v1:iam_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "analyticshub_go_gapic_test",
-    srcs = [":analyticshub_go_gapic_srcjar_test"],
-    embed = [":analyticshub_go_gapic"],
-    importpath = "cloud.google.com/go/bigquery/analyticshub/apiv1",
 )
 
 # Open Source Packages
@@ -157,6 +157,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":analyticshub_go_gapic",
         ":analyticshub_go_gapic_srcjar-metadata.srcjar",
+        ":analyticshub_go_gapic_srcjar-snippets.srcjar",
         ":analyticshub_go_gapic_srcjar-test.srcjar",
         ":analyticshub_go_proto",
     ],
@@ -176,6 +177,11 @@ py_gapic_library(
     name = "analyticshub_py_gapic",
     srcs = [":analyticshub_proto"],
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
+    opt_args = [
+        "python-gapic-name=bigquery_analyticshub",
+        "python-gapic-namespace=google.cloud",
+    ],
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
     transport = "grpc",
     deps = [
@@ -208,7 +214,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -217,19 +222,15 @@ php_proto_library(
     deps = [":analyticshub_proto"],
 )
 
-php_grpc_library(
-    name = "analyticshub_php_grpc",
-    srcs = [":analyticshub_proto"],
-    deps = [":analyticshub_php_proto"],
-)
-
 php_gapic_library(
     name = "analyticshub_php_gapic",
     srcs = [":analyticshub_proto_with_info"],
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":analyticshub_php_grpc",
         ":analyticshub_php_proto",
     ],
 )
@@ -239,7 +240,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-bigquery-analyticshub-v1-php",
     deps = [
         ":analyticshub_php_gapic",
-        ":analyticshub_php_grpc",
         ":analyticshub_php_proto",
     ],
 )
@@ -260,7 +260,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
     package = "google.cloud.bigquery.analyticshub.v1",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -298,10 +300,17 @@ ruby_cloud_gapic_library(
     name = "analyticshub_ruby_gapic",
     srcs = [":analyticshub_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-bigquery-analyticshub-v1",
+        "ruby-cloud-api-id=analyticshub.googleapis.com",
+        "ruby-cloud-api-shortname=analyticshub",
+        "ruby-cloud-gem-name=google-cloud-bigquery-analytics_hub-v1",
+        "ruby-cloud-product-url=https://cloud.google.com/bigquery/docs",
     ],
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
+    rest_numeric_enums = False,
+    ruby_cloud_description = "Analytics Hub is a data exchange platform that enables you to share data and insights at scale across organizational boundaries with a robust security and privacy framework. With Analytics Hub, you can discover and access a data library curated by various data providers.",
+    ruby_cloud_title = "Analytics Hub V1",
     service_yaml = "analyticshub_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":analyticshub_ruby_grpc",
         ":analyticshub_ruby_proto",
@@ -331,6 +340,7 @@ load(
 
 csharp_proto_library(
     name = "analyticshub_csharp_proto",
+    extra_opts = [],
     deps = [":analyticshub_proto"],
 )
 
@@ -345,6 +355,7 @@ csharp_gapic_library(
     srcs = [":analyticshub_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "analyticshub_v1_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1.yaml",
     deps = [
         ":analyticshub_csharp_grpc",

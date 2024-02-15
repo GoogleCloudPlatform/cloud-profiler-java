@@ -18,7 +18,6 @@ load(
     "java_grpc_library",
     "java_proto_library",
     "moved_proto_library",
-    "php_grpc_library",
     "php_proto_library",
     "py_grpc_library",
     "py_proto_library",
@@ -54,7 +53,7 @@ java_grpc_library(
 go_proto_library(
     name = "logging_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/sensitiveaction/logging/v1",
+    importpath = "cloud.google.com/go/sensitiveaction/logging/apiv1/loggingpb",
     protos = [":logging_proto"],
     deps = [
         "//google/cloud/securitycenter/v1:securitycenter_go_proto",
@@ -84,12 +83,6 @@ py_grpc_library(
 php_proto_library(
     name = "logging_php_proto",
     deps = [":logging_proto"],
-)
-
-php_grpc_library(
-    name = "logging_php_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_php_proto"],
 )
 
 ruby_proto_library(

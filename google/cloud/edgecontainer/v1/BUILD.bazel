@@ -31,6 +31,7 @@ proto_library(
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
         "//google/rpc:status_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -72,7 +73,8 @@ java_gapic_library(
     srcs = [":edgecontainer_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "edgecontainer_grpc_service_config.json",
-    service_yaml = None,
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
     test_deps = [
         ":edgecontainer_java_grpc",
     ],
@@ -113,13 +115,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "edgecontainer_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/edgecontainer/v1",
+    importpath = "cloud.google.com/go/edgecontainer/apiv1/edgecontainerpb",
     protos = [":edgecontainer_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -134,21 +135,17 @@ go_gapic_library(
     grpc_service_config = "edgecontainer_grpc_service_config.json",
     importpath = "cloud.google.com/go/edgecontainer/apiv1;edgecontainer",
     metadata = True,
-    service_yaml = None,
+    release_level = "ga",
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":edgecontainer_go_proto",
+        "//google/cloud/location:location_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "edgecontainer_go_gapic_test",
-    srcs = [":edgecontainer_go_gapic_srcjar_test"],
-    embed = [":edgecontainer_go_gapic"],
-    importpath = "cloud.google.com/go/edgecontainer/apiv1",
 )
 
 # Open Source Packages
@@ -157,6 +154,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":edgecontainer_go_gapic",
         ":edgecontainer_go_gapic_srcjar-metadata.srcjar",
+        ":edgecontainer_go_gapic_srcjar-snippets.srcjar",
         ":edgecontainer_go_gapic_srcjar-test.srcjar",
         ":edgecontainer_go_proto",
     ],
@@ -176,10 +174,10 @@ py_gapic_library(
     name = "edgecontainer_py_gapic",
     srcs = [":edgecontainer_proto"],
     grpc_service_config = "edgecontainer_grpc_service_config.json",
-    service_yaml = None,
-    transport = "grpc",
-    deps = [
-    ],
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
+    deps = ["//google/iam/v1:iam_policy_py_proto"],
 )
 
 py_test(
@@ -207,7 +205,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -216,21 +213,14 @@ php_proto_library(
     deps = [":edgecontainer_proto"],
 )
 
-php_grpc_library(
-    name = "edgecontainer_php_grpc",
-    srcs = [":edgecontainer_proto"],
-    deps = [":edgecontainer_php_proto"],
-)
-
 php_gapic_library(
     name = "edgecontainer_php_gapic",
     srcs = [":edgecontainer_proto_with_info"],
     grpc_service_config = "edgecontainer_grpc_service_config.json",
-    service_yaml = None,
-    deps = [
-        ":edgecontainer_php_grpc",
-        ":edgecontainer_php_proto",
-    ],
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
+    deps = [":edgecontainer_php_proto"],
 )
 
 # Open Source Packages
@@ -238,7 +228,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-edgecontainer-v1-php",
     deps = [
         ":edgecontainer_php_gapic",
-        ":edgecontainer_php_grpc",
         ":edgecontainer_php_proto",
     ],
 )
@@ -259,7 +248,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "edgecontainer_grpc_service_config.json",
     package = "google.cloud.edgecontainer.v1",
-    service_yaml = None,
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -298,7 +289,9 @@ ruby_cloud_gapic_library(
     srcs = [":edgecontainer_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-edgecontainer-v1"],
     grpc_service_config = "edgecontainer_grpc_service_config.json",
-    service_yaml = None,
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":edgecontainer_ruby_grpc",
         ":edgecontainer_ruby_proto",
@@ -342,7 +335,9 @@ csharp_gapic_library(
     srcs = [":edgecontainer_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "edgecontainer_grpc_service_config.json",
-    service_yaml = None,
+    rest_numeric_enums = True,
+    service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":edgecontainer_csharp_grpc",
         ":edgecontainer_csharp_proto",

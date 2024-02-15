@@ -75,7 +75,7 @@ java_gapic_library(
     # This was manually replaced - build_gen shouldn't have removed it.
     gapic_yaml = "iam_gapic.yaml",
     grpc_service_config = "iam_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
     test_deps = [
         ":admin_java_grpc",
@@ -121,13 +121,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "admin_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/iam/admin/v1",
+    importpath = "cloud.google.com/go/iam/admin/apiv1/adminpb",
     protos = [":admin_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -142,7 +141,7 @@ go_gapic_library(
     grpc_service_config = "iam_grpc_service_config.json",
     importpath = "cloud.google.com/go/iam/admin/apiv1;admin",
     metadata = True,
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
     transport = "grpc",
     deps = [
@@ -151,19 +150,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "admin_go_gapic_test",
-    srcs = [":admin_go_gapic_srcjar_test"],
-    embed = [":admin_go_gapic"],
-    importpath = "cloud.google.com/go/iam/admin/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-iam-admin-v1-go",
     deps = [
         ":admin_go_gapic",
         ":admin_go_gapic_srcjar-metadata.srcjar",
+        ":admin_go_gapic_srcjar-snippets.srcjar",
         ":admin_go_gapic_srcjar-test.srcjar",
         ":admin_go_proto",
     ],
@@ -183,6 +176,8 @@ py_gapic_library(
     name = "admin_py_gapic",
     srcs = [":admin_proto"],
     grpc_service_config = "iam_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "iam.yaml",
     transport = "grpc",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
@@ -214,7 +209,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -223,22 +217,14 @@ php_proto_library(
     deps = [":admin_proto"],
 )
 
-php_grpc_library(
-    name = "admin_php_grpc",
-    srcs = [":admin_proto"],
-    deps = [":admin_php_proto"],
-)
-
 php_gapic_library(
     name = "admin_php_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "iam_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
-    deps = [
-        ":admin_php_grpc",
-        ":admin_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":admin_php_proto"],
 )
 
 # Open Source Packages
@@ -246,7 +232,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-iam-admin-v1-php",
     deps = [
         ":admin_php_gapic",
-        ":admin_php_grpc",
         ":admin_php_proto",
     ],
 )
@@ -267,8 +252,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "iam_grpc_service_config.json",
     package = "google.iam.admin.v1",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -307,8 +293,9 @@ ruby_cloud_gapic_library(
     srcs = [":admin_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-iam-admin-v1"],
     grpc_service_config = "iam_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
+    transport = "grpc",
     deps = [
         ":admin_ruby_grpc",
         ":admin_ruby_proto",
@@ -352,8 +339,9 @@ csharp_gapic_library(
     srcs = [":admin_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "iam_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "iam.yaml",
+    transport = "grpc",
     deps = [
         ":admin_csharp_grpc",
         ":admin_csharp_proto",

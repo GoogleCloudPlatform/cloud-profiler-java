@@ -9,14 +9,18 @@ apis:
 - name: google.cloud.dialogflow.cx.v3beta1.Deployments
 - name: google.cloud.dialogflow.cx.v3beta1.EntityTypes
 - name: google.cloud.dialogflow.cx.v3beta1.Environments
+- name: google.cloud.dialogflow.cx.v3beta1.Examples
 - name: google.cloud.dialogflow.cx.v3beta1.Experiments
 - name: google.cloud.dialogflow.cx.v3beta1.Flows
+- name: google.cloud.dialogflow.cx.v3beta1.Generators
 - name: google.cloud.dialogflow.cx.v3beta1.Intents
 - name: google.cloud.dialogflow.cx.v3beta1.Pages
+- name: google.cloud.dialogflow.cx.v3beta1.Playbooks
 - name: google.cloud.dialogflow.cx.v3beta1.SecuritySettingsService
 - name: google.cloud.dialogflow.cx.v3beta1.SessionEntityTypes
 - name: google.cloud.dialogflow.cx.v3beta1.Sessions
 - name: google.cloud.dialogflow.cx.v3beta1.TestCases
+- name: google.cloud.dialogflow.cx.v3beta1.Tools
 - name: google.cloud.dialogflow.cx.v3beta1.TransitionRouteGroups
 - name: google.cloud.dialogflow.cx.v3beta1.Versions
 - name: google.cloud.dialogflow.cx.v3beta1.Webhooks
@@ -30,10 +34,18 @@ types:
 - name: google.cloud.dialogflow.cx.v3beta1.DeployFlowMetadata
 - name: google.cloud.dialogflow.cx.v3beta1.DeployFlowResponse
 - name: google.cloud.dialogflow.cx.v3beta1.ExportAgentResponse
+- name: google.cloud.dialogflow.cx.v3beta1.ExportEntityTypesMetadata
+- name: google.cloud.dialogflow.cx.v3beta1.ExportEntityTypesResponse
 - name: google.cloud.dialogflow.cx.v3beta1.ExportFlowResponse
+- name: google.cloud.dialogflow.cx.v3beta1.ExportIntentsMetadata
+- name: google.cloud.dialogflow.cx.v3beta1.ExportIntentsResponse
 - name: google.cloud.dialogflow.cx.v3beta1.ExportTestCasesMetadata
 - name: google.cloud.dialogflow.cx.v3beta1.ExportTestCasesResponse
+- name: google.cloud.dialogflow.cx.v3beta1.ImportEntityTypesMetadata
+- name: google.cloud.dialogflow.cx.v3beta1.ImportEntityTypesResponse
 - name: google.cloud.dialogflow.cx.v3beta1.ImportFlowResponse
+- name: google.cloud.dialogflow.cx.v3beta1.ImportIntentsMetadata
+- name: google.cloud.dialogflow.cx.v3beta1.ImportIntentsResponse
 - name: google.cloud.dialogflow.cx.v3beta1.ImportTestCasesMetadata
 - name: google.cloud.dialogflow.cx.v3beta1.ImportTestCasesResponse
 - name: google.cloud.dialogflow.cx.v3beta1.RunContinuousTestMetadata
@@ -69,59 +81,6 @@ documentation:
 
   - selector: google.cloud.location.Locations.ListLocations
     description: Lists information about the supported locations for this service.
-
-backend:
-  rules:
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Agents.*'
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Changelogs.GetChangelog
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Changelogs.ListChangelogs
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Deployments.GetDeployment
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Deployments.ListDeployments
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.EntityTypes.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Environments.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Experiments.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Flows.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Intents.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Pages.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.SecuritySettingsService.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.SessionEntityTypes.*'
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Sessions.DetectIntent
-    deadline: 220.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Sessions.FulfillIntent
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Sessions.MatchIntent
-    deadline: 60.0
-  - selector: google.cloud.dialogflow.cx.v3beta1.Sessions.StreamingDetectIntent
-    deadline: 220.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.TestCases.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.TransitionRouteGroups.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Versions.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dialogflow.cx.v3beta1.Webhooks.*'
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.GetLocation
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.ListLocations
-    deadline: 60.0
-  - selector: 'google.longrunning.Operations.*'
-    deadline: 60.0
-  - selector: google.longrunning.Operations.ListOperations
-    deadline: 180.0
 
 http:
   rules:
@@ -179,6 +138,11 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,
         https://www.googleapis.com/auth/dialogflow
+  - selector: 'google.cloud.dialogflow.cx.v3beta1.Examples.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform,
+        https://www.googleapis.com/auth/dialogflow
   - selector: 'google.cloud.dialogflow.cx.v3beta1.Experiments.*'
     oauth:
       canonical_scopes: |-
@@ -189,12 +153,22 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,
         https://www.googleapis.com/auth/dialogflow
+  - selector: 'google.cloud.dialogflow.cx.v3beta1.Generators.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform,
+        https://www.googleapis.com/auth/dialogflow
   - selector: 'google.cloud.dialogflow.cx.v3beta1.Intents.*'
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,
         https://www.googleapis.com/auth/dialogflow
   - selector: 'google.cloud.dialogflow.cx.v3beta1.Pages.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform,
+        https://www.googleapis.com/auth/dialogflow
+  - selector: 'google.cloud.dialogflow.cx.v3beta1.Playbooks.*'
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,
@@ -215,6 +189,11 @@ authentication:
         https://www.googleapis.com/auth/cloud-platform,
         https://www.googleapis.com/auth/dialogflow
   - selector: 'google.cloud.dialogflow.cx.v3beta1.TestCases.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform,
+        https://www.googleapis.com/auth/dialogflow
+  - selector: 'google.cloud.dialogflow.cx.v3beta1.Tools.*'
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform,

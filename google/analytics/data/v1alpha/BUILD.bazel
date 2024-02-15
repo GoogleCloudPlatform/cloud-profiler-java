@@ -27,7 +27,11 @@ proto_library(
     deps = [
         "//google/api:annotations_proto",
         "//google/api:client_proto",
+        "//google/api:field_behavior_proto",
+        "//google/api:resource_proto",
+        "//google/longrunning:operations_proto",
         "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:timestamp_proto",
     ],
 )
 
@@ -67,6 +71,7 @@ java_gapic_library(
     srcs = [":data_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "analytics_data_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
     test_deps = [
         ":data_java_grpc",
@@ -90,6 +95,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-analytics-data-v1alpha-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":data_java_gapic",
@@ -107,7 +113,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -117,6 +122,7 @@ go_proto_library(
     protos = [":data_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+        "//google/longrunning:longrunning_go_proto",
     ],
 )
 
@@ -126,19 +132,17 @@ go_gapic_library(
     grpc_service_config = "analytics_data_grpc_service_config.json",
     importpath = "google.golang.org/google/analytics/data/v1alpha;data",
     metadata = True,
+    release_level = "beta",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
         ":data_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
-)
-
-go_test(
-    name = "data_go_gapic_test",
-    srcs = [":data_go_gapic_srcjar_test"],
-    embed = [":data_go_gapic"],
-    importpath = "google.golang.org/google/analytics/data/v1alpha",
 )
 
 # Open Source Packages
@@ -147,6 +151,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":data_go_gapic",
         ":data_go_gapic_srcjar-metadata.srcjar",
+        ":data_go_gapic_srcjar-snippets.srcjar",
         ":data_go_gapic_srcjar-test.srcjar",
         ":data_go_proto",
     ],
@@ -166,8 +171,11 @@ py_gapic_library(
     name = "data_py_gapic",
     srcs = [":data_proto"],
     grpc_service_config = "analytics_data_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
     transport = "grpc+rest",
+    deps = [
+    ],
 )
 
 py_test(
@@ -195,7 +203,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -204,19 +211,15 @@ php_proto_library(
     deps = [":data_proto"],
 )
 
-php_grpc_library(
-    name = "data_php_grpc",
-    srcs = [":data_proto"],
-    deps = [":data_php_proto"],
-)
-
 php_gapic_library(
     name = "data_php_gapic",
     srcs = [":data_proto_with_info"],
     grpc_service_config = "analytics_data_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":data_php_grpc",
         ":data_php_proto",
     ],
 )
@@ -226,7 +229,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-analytics-data-v1alpha-php",
     deps = [
         ":data_php_gapic",
-        ":data_php_grpc",
         ":data_php_proto",
     ],
 )
@@ -247,7 +249,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "analytics_data_grpc_service_config.json",
     package = "google.analytics.data.v1alpha",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -284,10 +288,11 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "data_ruby_gapic",
     srcs = [":data_proto_with_info"],
-    extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-analytics-data-v1alpha",
-    ],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-analytics-data-v1alpha"],
     grpc_service_config = "analytics_data_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "analyticsdata_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":data_ruby_grpc",
         ":data_ruby_proto",
@@ -331,7 +336,9 @@ csharp_gapic_library(
     srcs = [":data_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "analytics_data_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "analyticsdata_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":data_csharp_grpc",
         ":data_csharp_proto",

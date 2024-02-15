@@ -20,7 +20,7 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.Retail.V2";
-option go_package = "google.golang.org/genproto/googleapis/cloud/retail/v2;retail";
+option go_package = "cloud.google.com/go/retail/apiv2/retailpb;retailpb";
 option java_multiple_files = true;
 option java_outer_classname = "CommonProto";
 option java_package = "com.google.cloud.retail.v2";
@@ -55,6 +55,20 @@ enum SolutionType {
   SOLUTION_TYPE_SEARCH = 2;
 }
 
+// If filtering for recommendations is enabled.
+enum RecommendationsFilteringOption {
+  // Value used when unset.
+  // In this case, server behavior defaults to
+  // [RECOMMENDATIONS_FILTERING_DISABLED][google.cloud.retail.v2.RecommendationsFilteringOption.RECOMMENDATIONS_FILTERING_DISABLED].
+  RECOMMENDATIONS_FILTERING_OPTION_UNSPECIFIED = 0;
+
+  // Recommendation filtering is disabled.
+  RECOMMENDATIONS_FILTERING_DISABLED = 1;
+
+  // Recommendation filtering is enabled.
+  RECOMMENDATIONS_FILTERING_ENABLED = 3;
+}
+
 // The use case of Cloud Retail Search.
 enum SearchSolutionUseCase {
   // The value when it's unspecified. In this case, server behavior defaults to
@@ -83,8 +97,8 @@ message Condition {
     // Value cannot be empty.
     // Value can have at most 3 terms if specified as a partial match. Each
     // space separated string is considered as one term.
-    // Example) "a b c" is 3 terms and allowed, " a b c d" is 4 terms and not
-    // allowed for partial match.
+    // For example, "a b c" is 3 terms and allowed, but " a b c d" is 4 terms
+    // and not allowed for a partial match.
     string value = 1;
 
     // Whether this is supposed to be a full or partial match.
@@ -113,6 +127,7 @@ message Condition {
 }
 
 // A rule is a condition-action pair
+//
 // * A condition defines when a rule is to be triggered.
 // * An action specifies what occurs on that trigger.
 // Currently rules only work for [controls][google.cloud.retail.v2.Control] with
@@ -201,7 +216,8 @@ message Rule {
   }
 
   // Creates a set of terms that will be treated as synonyms of each other.
-  // Example: synonyms of "sneakers" and "shoes".
+  // Example: synonyms of "sneakers" and "shoes":
+  //
   //  * "sneakers" will use a synonym of "shoes".
   //  * "shoes" will use a synonym of "sneakers".
   message TwowaySynonymsAction {
@@ -360,7 +376,7 @@ message ColorInfo {
   // it is expected to have only 1 color. May consider using single "Mixed"
   // instead of multiple values.
   //
-  // A maximum of 25 colors are allowed. Each value must be a UTF-8 encoded
+  // A maximum of 75 colors are allowed. Each value must be a UTF-8 encoded
   // string with a length limit of 128 characters. Otherwise, an
   // INVALID_ARGUMENT error is returned.
   //

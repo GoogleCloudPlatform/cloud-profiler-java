@@ -22,7 +22,7 @@ import "google/cloud/retail/v2beta/common.proto";
 import "google/cloud/retail/v2beta/search_service.proto";
 
 option csharp_namespace = "Google.Cloud.Retail.V2Beta";
-option go_package = "google.golang.org/genproto/googleapis/cloud/retail/v2beta;retail";
+option go_package = "cloud.google.com/go/retail/apiv2beta/retailpb;retailpb";
 option java_multiple_files = true;
 option java_outer_classname = "ServingConfigProto";
 option java_package = "com.google.cloud.retail.v2beta";
@@ -39,7 +39,6 @@ message ServingConfig {
   };
 
   // What type of diversity - data or rule based.
-  // If none is specified, default to rule based.
   enum DiversityType {
     // Default value.
     DIVERSITY_TYPE_UNSPECIFIED = 0;
@@ -83,7 +82,7 @@ message ServingConfig {
   //  Allowed values are:
   //
   // * `no-price-reranking`
-  // * `low-price-raranking`
+  // * `low-price-reranking`
   // * `medium-price-reranking`
   // * `high-price-reranking`
   //
@@ -234,7 +233,9 @@ message ServingConfig {
   // [SOLUTION_TYPE_RECOMMENDATION][google.cloud.retail.v2main.SolutionType.SOLUTION_TYPE_RECOMMENDATION].
   string diversity_level = 8;
 
-  // What kind of diversity to use - data driven or rule based.
+  // What kind of diversity to use - data driven or rule based. If unset, the
+  // server behavior defaults to
+  // [RULE_BASED_DIVERSITY][google.cloud.retail.v2beta.ServingConfig.DiversityType.RULE_BASED_DIVERSITY].
   DiversityType diversity_type = 20;
 
   // Whether to add additional category filters on the `similar-items` model.

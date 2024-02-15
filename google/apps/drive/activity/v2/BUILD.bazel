@@ -72,7 +72,7 @@ java_gapic_library(
     srcs = [":activity_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "driveactivity_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
     test_deps = [
         ":activity_java_grpc",
@@ -114,7 +114,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -133,19 +132,12 @@ go_gapic_library(
     grpc_service_config = "driveactivity_grpc_service_config.json",
     importpath = "google.golang.org/google/apps/drive/activity/v2;activity",
     metadata = True,
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
     transport = "grpc+rest",
     deps = [
         ":activity_go_proto",
     ],
-)
-
-go_test(
-    name = "activity_go_gapic_test",
-    srcs = [":activity_go_gapic_srcjar_test"],
-    embed = [":activity_go_gapic"],
-    importpath = "google.golang.org/google/apps/drive/activity/v2",
 )
 
 # Open Source Packages
@@ -154,6 +146,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":activity_go_gapic",
         ":activity_go_gapic_srcjar-metadata.srcjar",
+        ":activity_go_gapic_srcjar-snippets.srcjar",
         ":activity_go_gapic_srcjar-test.srcjar",
         ":activity_go_proto",
     ],
@@ -173,9 +166,9 @@ py_gapic_library(
     name = "activity_py_gapic",
     srcs = [":activity_proto"],
     grpc_service_config = "driveactivity_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
     ],
 )
@@ -205,7 +198,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -214,22 +206,14 @@ php_proto_library(
     deps = [":activity_proto"],
 )
 
-php_grpc_library(
-    name = "activity_php_grpc",
-    srcs = [":activity_proto"],
-    deps = [":activity_php_proto"],
-)
-
 php_gapic_library(
     name = "activity_php_gapic",
     srcs = [":activity_proto_with_info"],
     grpc_service_config = "driveactivity_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
-    deps = [
-        ":activity_php_grpc",
-        ":activity_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":activity_php_proto"],
 )
 
 # Open Source Packages
@@ -237,7 +221,6 @@ php_gapic_assembly_pkg(
     name = "google-apps-drive-activity-v2-php",
     deps = [
         ":activity_php_gapic",
-        ":activity_php_grpc",
         ":activity_php_proto",
     ],
 )
@@ -258,8 +241,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "driveactivity_grpc_service_config.json",
     package = "google.apps.drive.activity.v2",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -298,8 +282,9 @@ ruby_cloud_gapic_library(
     srcs = [":activity_proto_with_info"],
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-apps-drive-activity-v2"],
     grpc_service_config = "driveactivity_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":activity_ruby_grpc",
         ":activity_ruby_proto",
@@ -343,8 +328,9 @@ csharp_gapic_library(
     srcs = [":activity_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "driveactivity_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "driveactivity_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":activity_csharp_grpc",
         ":activity_csharp_proto",

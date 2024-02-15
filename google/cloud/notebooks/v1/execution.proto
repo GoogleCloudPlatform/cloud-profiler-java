@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/notebooks/v1;notebooks";
+option go_package = "cloud.google.com/go/notebooks/apiv1/notebookspb;notebookspb";
 option java_multiple_files = true;
 option java_outer_classname = "ExecutionProto";
 option java_package = "com.google.cloud.notebooks.v1";
@@ -129,20 +129,21 @@ message ExecutionTemplate {
   // Parameters used in Vertex AI JobType executions.
   message VertexAIParameters {
     // The full name of the Compute Engine
-    // [network](/compute/docs/networks-and-firewalls#networks) to which the Job
-    // should be peered. For example, `projects/12345/global/networks/myVPC`.
+    // [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks)
+    // to which the Job should be peered. For example,
+    // `projects/12345/global/networks/myVPC`.
     // [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
     // is of the form `projects/{project}/global/networks/{network}`.
-    // Where {project} is a project number, as in `12345`, and {network} is a
-    // network name.
+    // Where `{project}` is a project number, as in `12345`, and `{network}` is
+    // a network name.
     //
     // Private services access must already be configured for the network. If
     // left unspecified, the job is not peered with any network.
     string network = 1;
 
     // Environment variables.
-    //  At most 100 environment variables can be specified and unique.
-    // Example: GCP_BUCKET=gs://my-bucket/samples/
+    // At most 100 environment variables can be specified and unique.
+    // Example: `GCP_BUCKET=gs://my-bucket/samples/`
     map<string, string> env = 2;
   }
 

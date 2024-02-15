@@ -24,7 +24,11 @@ proto_library(
         "access_report.proto",
         "analytics_admin.proto",
         "audience.proto",
+        "channel_group.proto",
+        "event_create_and_edit.proto",
+        "expanded_data_set.proto",
         "resources.proto",
+        "subproperty_event_filter.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -75,6 +79,7 @@ java_gapic_library(
     srcs = [":admin_proto_with_info"],
     gapic_yaml = "analyticsadmin_gapic.yaml",
     grpc_service_config = "admin_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
     test_deps = [
         ":admin_java_grpc",
@@ -116,13 +121,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "admin_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/analytics/admin/v1alpha",
+    importpath = "cloud.google.com/go/analytics/admin/apiv1alpha/adminpb",
     protos = [":admin_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -133,8 +137,10 @@ go_gapic_library(
     name = "admin_go_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "admin_grpc_service_config.json",
-    importpath = "google.golang.org/google/analytics/admin/v1alpha;admin",
+    importpath = "cloud.google.com/go/analytics/admin/apiv1alpha;admin",
     metadata = True,
+    release_level = "alpha",
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
@@ -143,19 +149,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "admin_go_gapic_test",
-    srcs = [":admin_go_gapic_srcjar_test"],
-    embed = [":admin_go_gapic"],
-    importpath = "google.golang.org/google/analytics/admin/v1alpha",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-analytics-admin-v1alpha-go",
     deps = [
         ":admin_go_gapic",
         ":admin_go_gapic_srcjar-metadata.srcjar",
+        ":admin_go_gapic_srcjar-snippets.srcjar",
         ":admin_go_gapic_srcjar-test.srcjar",
         ":admin_go_proto",
     ],
@@ -175,6 +175,8 @@ py_gapic_library(
     name = "admin_py_gapic",
     srcs = [":admin_proto"],
     grpc_service_config = "admin_grpc_service_config.json",
+    opt_args = ["autogen-snippets=False"],
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
@@ -206,7 +208,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -215,19 +216,15 @@ php_proto_library(
     deps = [":admin_proto"],
 )
 
-php_grpc_library(
-    name = "admin_php_grpc",
-    srcs = [":admin_proto"],
-    deps = [":admin_php_proto"],
-)
-
 php_gapic_library(
     name = "admin_php_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "admin_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":admin_php_grpc",
         ":admin_php_proto",
     ],
 )
@@ -237,7 +234,6 @@ php_gapic_assembly_pkg(
     name = "google-analytics-admin-v1alpha-php",
     deps = [
         ":admin_php_gapic",
-        ":admin_php_grpc",
         ":admin_php_proto",
     ],
 )
@@ -258,7 +254,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "admin_grpc_service_config.json",
     package = "google.analytics.admin.v1alpha",
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -302,9 +300,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-gem-name=google-analytics-admin-v1alpha",
     ],
     grpc_service_config = "admin_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Analytics Admin API allows for programmatic access to the Google Analytics App+Web configuration data. You can use the Google Analytics Admin API to manage accounts and App+Web properties.",
     ruby_cloud_title = "Google Analytics Admin V1alpha",
     service_yaml = "analyticsadmin_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_ruby_grpc",
         ":admin_ruby_proto",
@@ -334,6 +334,7 @@ load(
 
 csharp_proto_library(
     name = "admin_csharp_proto",
+    extra_opts = [],
     deps = [":admin_proto"],
 )
 
@@ -348,7 +349,9 @@ csharp_gapic_library(
     srcs = [":admin_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "admin_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "analyticsadmin_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_csharp_grpc",
         ":admin_csharp_proto",

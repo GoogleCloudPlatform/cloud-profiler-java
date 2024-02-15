@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import "google/api/field_behavior.proto";
 import "google/cloud/aiplatform/v1/model.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "UnmanagedContainerModelProto";
 option java_package = "com.google.cloud.aiplatform.v1";
@@ -37,7 +37,8 @@ message UnmanagedContainerModel {
   // Contains the schemata used in Model's predictions and explanations
   PredictSchemata predict_schemata = 2;
 
-  // Input only. The specification of the container that is to be used when deploying
-  // this Model.
-  ModelContainerSpec container_spec = 3 [(google.api.field_behavior) = INPUT_ONLY];
+  // Input only. The specification of the container that is to be used when
+  // deploying this Model.
+  ModelContainerSpec container_spec = 3
+      [(google.api.field_behavior) = INPUT_ONLY];
 }

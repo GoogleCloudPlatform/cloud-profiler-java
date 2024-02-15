@@ -23,8 +23,8 @@ proto_library(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "java_grpc_library",
     "java_proto_library",
+    "java_gapic_assembly_gradle_pkg",
 )
 
 java_proto_library(
@@ -32,10 +32,13 @@ java_proto_library(
     deps = [":logging_proto"],
 )
 
-java_grpc_library(
-    name = "logging_java_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_java_proto"],
+# Open Source Packages
+java_gapic_assembly_gradle_pkg(
+    name = "google-cloud-notebooks-logging-v1-java",
+    deps = [
+        ":logging_proto",
+        ":logging_java_proto",
+    ],
 )
 
 ##############################################################################
@@ -44,15 +47,23 @@ java_grpc_library(
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_proto_library",
+    "go_gapic_assembly_pkg",
 )
 
 go_proto_library(
     name = "logging_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/notebooks/logging/v1",
+    importpath = "cloud.google.com/go/notebooks/logging/apiv1/loggingpb",
     protos = [":logging_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+    ],
+)
+
+go_gapic_assembly_pkg(
+    name = "google-cloud-notebooks-logging-v1-go",
+    deps = [
+        ":logging_go_proto",
     ],
 )
 
@@ -90,7 +101,7 @@ py_grpc_library(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "php_grpc_library",
+    "php_gapic_assembly_pkg",
     "php_proto_library",
 )
 
@@ -99,21 +110,12 @@ php_proto_library(
     deps = [":logging_proto"],
 )
 
-php_grpc_library(
-    name = "logging_php_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_php_proto"],
+php_gapic_assembly_pkg(
+    name = "google-cloud-notebooks-logging-v1-php",
+    deps = [
+        ":logging_php_proto",
+    ],
 )
-
-##############################################################################
-# Node.js
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-)
-
 
 ##############################################################################
 # Ruby
@@ -140,7 +142,7 @@ ruby_grpc_library(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "csharp_grpc_library",
+    "csharp_gapic_assembly_pkg",
     "csharp_proto_library",
 )
 
@@ -149,10 +151,14 @@ csharp_proto_library(
     deps = [":logging_proto"],
 )
 
-csharp_grpc_library(
-    name = "logging_csharp_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_csharp_proto"],
+# Open Source Packages
+csharp_gapic_assembly_pkg(
+    name = "google-cloud-notebooks-logging-v1-csharp",
+    package_name = "Google.Cloud.Notebooks.Logging.V1",
+    generate_nongapic_package = True,
+    deps = [
+        ":logging_csharp_proto",
+    ],
 )
 
 ##############################################################################

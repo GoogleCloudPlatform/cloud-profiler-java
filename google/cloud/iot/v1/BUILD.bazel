@@ -64,6 +64,8 @@ java_gapic_library(
     name = "iot_java_gapic",
     srcs = [":iot_proto_with_info"],
     grpc_service_config = "cloudiot_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "cloudiot_v1.yaml",
     test_deps = [
         ":iot_java_grpc",
         "//google/iam/v1:iam_java_grpc",
@@ -105,13 +107,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "iot_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/iot/v1",
+    importpath = "cloud.google.com/go/iot/apiv1/iotpb",
     protos = [":iot_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -125,6 +126,9 @@ go_gapic_library(
     srcs = [":iot_proto_with_info"],
     grpc_service_config = "cloudiot_grpc_service_config.json",
     importpath = "cloud.google.com/go/iot/apiv1;iot",
+    metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "cloudiot_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -133,18 +137,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "iot_go_gapic_test",
-    srcs = [":iot_go_gapic_srcjar_test"],
-    embed = [":iot_go_gapic"],
-    importpath = "cloud.google.com/go/iot/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-iot-v1-go",
     deps = [
         ":iot_go_gapic",
+        ":iot_go_gapic_srcjar-snippets.srcjar",
         ":iot_go_gapic_srcjar-test.srcjar",
         ":iot_go_proto",
     ],
@@ -164,7 +162,9 @@ py_gapic_library(
     name = "iot_py_gapic",
     srcs = [":iot_proto"],
     grpc_service_config = "cloudiot_grpc_service_config.json",
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "cloudiot_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -194,7 +194,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -203,20 +202,15 @@ php_proto_library(
     deps = [":iot_proto"],
 )
 
-php_grpc_library(
-    name = "iot_php_grpc",
-    srcs = [":iot_proto"],
-    deps = [":iot_php_proto"],
-)
-
 php_gapic_library(
     name = "iot_php_gapic",
     srcs = [":iot_proto_with_info"],
     grpc_service_config = "cloudiot_grpc_service_config.json",
-    deps = [
-        ":iot_php_grpc",
-        ":iot_php_proto",
-    ],
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
+    service_yaml = "cloudiot_v1.yaml",
+    transport = "grpc+rest",
+    deps = [":iot_php_proto"],
 )
 
 # Open Source Packages
@@ -224,7 +218,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-iot-v1-php",
     deps = [
         ":iot_php_gapic",
-        ":iot_php_grpc",
         ":iot_php_proto",
     ],
 )
@@ -246,7 +239,9 @@ nodejs_gapic_library(
     grpc_service_config = "cloudiot_grpc_service_config.json",
     main_service = "iot",
     package = "google.cloud.iot.v1",
+    rest_numeric_enums = True,
     service_yaml = "cloudiot_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -291,8 +286,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-shortname=cloudiot",
     ],
     grpc_service_config = "cloudiot_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.",
     ruby_cloud_title = "Cloud IoT V1",
+    service_yaml = "cloudiot_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iot_ruby_grpc",
         ":iot_ruby_proto",
@@ -336,7 +334,9 @@ csharp_gapic_library(
     srcs = [":iot_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "cloudiot_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudiot_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iot_csharp_grpc",
         ":iot_csharp_proto",
