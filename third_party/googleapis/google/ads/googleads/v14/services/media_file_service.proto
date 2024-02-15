@@ -14,33 +14,16 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/enums/response_content_type.proto";
-import "google/ads/googleads/v12/resources/media_file.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/enums/response_content_type.proto";
 import "google/ads/googleads/v14/resources/media_file.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "MediaFileServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -49,7 +32,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
 
 // Proto file describing the Media File service.
 
@@ -85,23 +67,15 @@ service MediaFileService {
   rpc MutateMediaFiles(MutateMediaFilesRequest)
       returns (MutateMediaFilesResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-      post: "/v12/customers/{customer_id=*}/mediaFiles:mutate"
-========
       post: "/v14/customers/{customer_id=*}/mediaFiles:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-// Request message for [MediaFileService.MutateMediaFiles][google.ads.googleads.v12.services.MediaFileService.MutateMediaFiles]
-========
 // Request message for
 // [MediaFileService.MutateMediaFiles][google.ads.googleads.v14.services.MediaFileService.MutateMediaFiles]
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
 message MutateMediaFilesRequest {
   // Required. The ID of the customer whose media files are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -122,12 +96,8 @@ message MutateMediaFilesRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-  google.ads.googleads.v12.enums.ResponseContentTypeEnum.ResponseContentType response_content_type = 5;
-========
   google.ads.googleads.v14.enums.ResponseContentTypeEnum.ResponseContentType
       response_content_type = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
 }
 
 // A single operation to create media file.
@@ -135,11 +105,7 @@ message MediaFileOperation {
   // The mutate operation.
   oneof operation {
     // Create operation: No resource name is expected for the new media file.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-    google.ads.googleads.v12.resources.MediaFile create = 1;
-========
     google.ads.googleads.v14.resources.MediaFile create = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
   }
 }
 
@@ -165,9 +131,5 @@ message MutateMediaFileResult {
   // The mutated media file with only mutable fields after mutate. The field
   // will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/media_file_service.proto
-  google.ads.googleads.v12.resources.MediaFile media_file = 2;
-========
   google.ads.googleads.v14.resources.MediaFile media_file = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/media_file_service.proto
 }

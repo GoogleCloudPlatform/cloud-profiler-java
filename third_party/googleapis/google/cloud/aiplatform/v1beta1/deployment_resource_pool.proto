@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,10 +37,10 @@ message DeploymentResourcePool {
     pattern: "projects/{project}/locations/{location}/deploymentResourcePools/{deployment_resource_pool}"
   };
 
-  // Output only. The resource name of the DeploymentResourcePool.
+  // Immutable. The resource name of the DeploymentResourcePool.
   // Format:
   // `projects/{project}/locations/{location}/deploymentResourcePools/{deployment_resource_pool}`
-  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // Required. The underlying DedicatedResources that the DeploymentResourcePool
   // uses.

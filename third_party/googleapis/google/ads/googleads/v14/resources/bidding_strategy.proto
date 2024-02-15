@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/bidding_strategy.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/bidding_strategy.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/bidding_strategy.proto
-package google.ads.searchads360.v0.resources;
-
-import "google/ads/searchads360/v0/common/bidding.proto";
-import "google/ads/searchads360/v0/enums/bidding_strategy_status.proto";
-import "google/ads/searchads360/v0/enums/bidding_strategy_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.SearchAds360.V0.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/searchads360/v0/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "BiddingStrategyProto";
-option java_package = "com.google.ads.searchads360.v0.resources";
-option objc_class_prefix = "GASA360";
-option php_namespace = "Google\\Ads\\SearchAds360\\V0\\Resources";
-option ruby_package = "Google::Ads::SearchAds360::V0::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/common/bidding.proto";
@@ -52,14 +30,13 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/bidding_strategy.proto
 
 // Proto file describing the BiddingStrategy resource
 
 // A bidding strategy.
 message BiddingStrategy {
   option (google.api.resource) = {
-    type: "searchads360.googleapis.com/BiddingStrategy"
+    type: "googleads.googleapis.com/BiddingStrategy"
     pattern: "customers/{customer_id}/biddingStrategies/{bidding_strategy_id}"
   };
 
@@ -70,7 +47,7 @@ message BiddingStrategy {
   string resource_name = 1 [
     (google.api.field_behavior) = IMMUTABLE,
     (google.api.resource_reference) = {
-      type: "searchads360.googleapis.com/BiddingStrategy"
+      type: "googleads.googleapis.com/BiddingStrategy"
     }
   ];
 
@@ -87,23 +64,15 @@ message BiddingStrategy {
   // Output only. The status of the bidding strategy.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/bidding_strategy.proto
-  google.ads.searchads360.v0.enums.BiddingStrategyStatusEnum.BiddingStrategyStatus status = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v14.enums.BiddingStrategyStatusEnum.BiddingStrategyStatus
       status = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/bidding_strategy.proto
 
   // Output only. The type of the bidding strategy.
   // Create a bidding strategy by setting the bidding scheme.
   //
   // This field is read-only.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/bidding_strategy.proto
-  google.ads.searchads360.v0.enums.BiddingStrategyTypeEnum.BiddingStrategyType type = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v14.enums.BiddingStrategyTypeEnum.BiddingStrategyType
       type = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/bidding_strategy.proto
 
   // Immutable. The currency used by the bidding strategy (ISO 4217 three-letter
   // code).
@@ -155,41 +124,6 @@ message BiddingStrategy {
     // A bidding strategy that raises bids for clicks that seem more likely to
     // lead to a conversion and lowers them for clicks where they seem less
     // likely.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/searchads360/v0/resources/bidding_strategy.proto
-    google.ads.searchads360.v0.common.EnhancedCpc enhanced_cpc = 7;
-
-    // An automated bidding strategy to help get the most conversion value for
-    // your campaigns while spending your budget.
-    google.ads.searchads360.v0.common.MaximizeConversionValue maximize_conversion_value = 21;
-
-    // An automated bidding strategy to help get the most conversions for your
-    // campaigns while spending your budget.
-    google.ads.searchads360.v0.common.MaximizeConversions maximize_conversions = 22;
-
-    // A bidding strategy that sets bids to help get as many conversions as
-    // possible at the target cost-per-acquisition (CPA) you set.
-    google.ads.searchads360.v0.common.TargetCpa target_cpa = 9;
-
-    // A bidding strategy that automatically optimizes towards a chosen
-    // percentage of impressions.
-    google.ads.searchads360.v0.common.TargetImpressionShare target_impression_share = 48;
-
-    // A bidding strategy that sets bids based on the target fraction of
-    // auctions where the advertiser should outrank a specific competitor.
-    // This field is deprecated. Creating a new bidding strategy with this
-    // field or attaching bidding strategies with this field to a campaign will
-    // fail. Mutates to strategies that already have this scheme populated are
-    // allowed.
-    google.ads.searchads360.v0.common.TargetOutrankShare target_outrank_share = 10;
-
-    // A bidding strategy that helps you maximize revenue while averaging a
-    // specific target Return On Ad Spend (ROAS).
-    google.ads.searchads360.v0.common.TargetRoas target_roas = 11;
-
-    // A bid strategy that sets your bids to help get as many clicks as
-    // possible within your budget.
-    google.ads.searchads360.v0.common.TargetSpend target_spend = 12;
-========
     google.ads.googleads.v14.common.EnhancedCpc enhanced_cpc = 7;
 
     // An automated bidding strategy to help get the most conversion value for
@@ -218,6 +152,5 @@ message BiddingStrategy {
     // A bid strategy that sets your bids to help get as many clicks as
     // possible within your budget.
     google.ads.googleads.v14.common.TargetSpend target_spend = 12;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/bidding_strategy.proto
   }
 }

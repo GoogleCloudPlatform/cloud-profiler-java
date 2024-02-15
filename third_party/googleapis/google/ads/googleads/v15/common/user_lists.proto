@@ -14,29 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/customer_match_upload_key_type.proto";
-import "google/ads/googleads/v12/enums/user_list_combined_rule_operator.proto";
-import "google/ads/googleads/v12/enums/user_list_crm_data_source_type.proto";
-import "google/ads/googleads/v12/enums/user_list_date_rule_item_operator.proto";
-import "google/ads/googleads/v12/enums/user_list_flexible_rule_operator.proto";
-import "google/ads/googleads/v12/enums/user_list_logical_rule_operator.proto";
-import "google/ads/googleads/v12/enums/user_list_number_rule_item_operator.proto";
-import "google/ads/googleads/v12/enums/user_list_prepopulation_status.proto";
-import "google/ads/googleads/v12/enums/user_list_rule_type.proto";
-import "google/ads/googleads/v12/enums/user_list_string_rule_item_operator.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "UserListsProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v15.common;
 
 import "google/ads/googleads/v15/enums/customer_match_upload_key_type.proto";
@@ -58,7 +35,6 @@ option java_package = "com.google.ads.googleads.v15.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V15::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
 // Proto file describing user list types.
 
@@ -101,13 +77,6 @@ message CrmBasedUserListInfo {
   // Matching key type of the list.
   // Mixed data types are not allowed on the same list.
   // This field is required for an ADD operation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.CustomerMatchUploadKeyTypeEnum.CustomerMatchUploadKeyType upload_key_type = 2;
-
-  // Data source of the list. Default value is FIRST_PARTY.
-  // Only customers on the allow-list can create third-party sourced CRM lists.
-  google.ads.googleads.v12.enums.UserListCrmDataSourceTypeEnum.UserListCrmDataSourceType data_source_type = 3;
-========
   google.ads.googleads.v15.enums.CustomerMatchUploadKeyTypeEnum
       .CustomerMatchUploadKeyType upload_key_type = 2;
 
@@ -115,7 +84,6 @@ message CrmBasedUserListInfo {
   // Only customers on the allow-list can create third-party sourced CRM lists.
   google.ads.googleads.v15.enums.UserListCrmDataSourceTypeEnum
       .UserListCrmDataSourceType data_source_type = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 }
 
 // A client defined rule based on custom parameters sent by web sites or
@@ -127,15 +95,9 @@ message UserListRuleInfo {
   // That is, rule items will be ANDed together within rule item groups and the
   // groups themselves will be ORed together.
   //
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  // Currently AND of ORs (conjunctive normal form) is only supported for
-  // ExpressionRuleUserList.
-  google.ads.googleads.v12.enums.UserListRuleTypeEnum.UserListRuleType rule_type = 1;
-========
   // OR of ANDs is the only supported type for FlexibleRuleUserList.
   google.ads.googleads.v15.enums.UserListRuleTypeEnum.UserListRuleType
       rule_type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
   // List of rule item groups that defines this rule.
   // Rule item groups are grouped together based on rule_type.
@@ -178,13 +140,9 @@ message UserListDateRuleItemInfo {
   // Date comparison operator.
   // This field is required and must be populated when creating new date
   // rule item.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.UserListDateRuleItemOperatorEnum.UserListDateRuleItemOperator operator = 1;
-========
   google.ads.googleads.v15.enums.UserListDateRuleItemOperatorEnum
       .UserListDateRuleItemOperator
       operator = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
   // String representing date value to be compared with the rule variable.
   // Supported date format is YYYY-MM-DD.
@@ -202,13 +160,9 @@ message UserListNumberRuleItemInfo {
   // Number comparison operator.
   // This field is required and must be populated when creating a new number
   // rule item.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.UserListNumberRuleItemOperatorEnum.UserListNumberRuleItemOperator operator = 1;
-========
   google.ads.googleads.v15.enums.UserListNumberRuleItemOperatorEnum
       .UserListNumberRuleItemOperator
       operator = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
   // Number value to be compared with the variable.
   // This field is required and must be populated when creating a new number
@@ -221,13 +175,9 @@ message UserListStringRuleItemInfo {
   // String comparison operator.
   // This field is required and must be populated when creating a new string
   // rule item.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.UserListStringRuleItemOperatorEnum.UserListStringRuleItemOperator operator = 1;
-========
   google.ads.googleads.v15.enums.UserListStringRuleItemOperatorEnum
       .UserListStringRuleItemOperator
       operator = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
   // The right hand side of the string rule item. For URLs or referrer URLs,
   // the value can not contain illegal URL chars such as newlines, quotes,
@@ -236,26 +186,6 @@ message UserListStringRuleItemInfo {
   optional string value = 3;
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-// User lists defined by combining two rules, left operand and right operand.
-// There are two operators: AND where left operand and right operand have to be
-// true; AND_NOT where left operand is true but right operand is false.
-message CombinedRuleUserListInfo {
-  // Left operand of the combined rule.
-  // This field is required and must be populated when creating new combined
-  // rule based user list.
-  UserListRuleInfo left_operand = 1;
-
-  // Right operand of the combined rule.
-  // This field is required and must be populated when creating new combined
-  // rule based user list.
-  UserListRuleInfo right_operand = 2;
-
-  // Operator to connect the two operands.
-  //
-  // Required for creating a combined rule user list.
-  google.ads.googleads.v12.enums.UserListCombinedRuleOperatorEnum.UserListCombinedRuleOperator rule_operator = 3;
-========
 // Flexible rule that wraps the common rule and a lookback window.
 message FlexibleRuleOperandInfo {
   // List of rule item groups that defines this rule.
@@ -264,7 +194,6 @@ message FlexibleRuleOperandInfo {
 
   // Lookback window for this rule in days. From now until X days ago.
   optional int64 lookback_window_days = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 }
 
 // Flexible rule representation of visitors with one or multiple actions. The
@@ -290,31 +219,6 @@ message FlexibleRuleUserListInfo {
   repeated FlexibleRuleOperandInfo exclusive_operands = 3;
 }
 
-// Flexible rule that wraps the common rule and a lookback window.
-message FlexibleRuleOperandInfo {
-  // List of rule item groups that defines this rule.
-  // Rule item groups are grouped together.
-  UserListRuleInfo rule = 1;
-
-  // Lookback window for this rule in days. From now until X days ago.
-  optional int64 lookback_window_days = 2;
-}
-
-// Flexible rule representation of visitors with one or multiple actions.
-message FlexibleRuleUserListInfo {
-  // Operator that defines how the inclusive operands are combined.
-  google.ads.googleads.v12.enums.UserListFlexibleRuleOperatorEnum.UserListFlexibleRuleOperator inclusive_rule_operator = 1;
-
-  // Actions that are located on the inclusive side.
-  // These are joined together by either AND/OR as specified by the
-  // inclusive_rule_operator.
-  repeated FlexibleRuleOperandInfo inclusive_operands = 2;
-
-  // Actions that are located on the exclusive side.
-  // These are joined together with OR.
-  repeated FlexibleRuleOperandInfo exclusive_operands = 3;
-}
-
 // Representation of a userlist that is generated by a rule.
 message RuleBasedUserListInfo {
   // The status of pre-population. The field is default to NONE if not set which
@@ -325,24 +229,6 @@ message RuleBasedUserListInfo {
   // list's membership duration and the date when the remarketing tag is added.
   // The status will be updated to FINISHED once request is processed, or FAILED
   // if the request fails.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.UserListPrepopulationStatusEnum.UserListPrepopulationStatus prepopulation_status = 1;
-
-  // Flexible rule representation of visitors with one or multiple actions.
-  FlexibleRuleUserListInfo flexible_rule_user_list = 5;
-
-  // Subtypes of rule based user lists.
-  oneof rule_based_user_list {
-    // User lists defined by combining two rules.
-    // There are two operators: AND, where the left and right operands have to
-    // be true; AND_NOT where left operand is true but right operand is false.
-    CombinedRuleUserListInfo combined_rule_user_list = 2;
-
-    // Visitors of a page. The page visit is defined by one boolean rule
-    // expression.
-    ExpressionRuleUserListInfo expression_rule_user_list = 4;
-  }
-========
   google.ads.googleads.v15.enums.UserListPrepopulationStatusEnum
       .UserListPrepopulationStatus prepopulation_status = 1;
 
@@ -354,7 +240,6 @@ message RuleBasedUserListInfo {
   // inclusive operands are included in the user list, minus the users
   // represented by the exclusive operands.
   FlexibleRuleUserListInfo flexible_rule_user_list = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 }
 
 // Represents a user list that is a custom combination of user lists.
@@ -371,13 +256,9 @@ message LogicalUserListInfo {
 // list of user lists as operands.
 message UserListLogicalRuleInfo {
   // The logical operator of the rule.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/user_lists.proto
-  google.ads.googleads.v12.enums.UserListLogicalRuleOperatorEnum.UserListLogicalRuleOperator operator = 1;
-========
   google.ads.googleads.v15.enums.UserListLogicalRuleOperatorEnum
       .UserListLogicalRuleOperator
       operator = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/user_lists.proto
 
   // The list of operands of the rule.
   repeated LogicalUserListOperandInfo rule_operands = 2;

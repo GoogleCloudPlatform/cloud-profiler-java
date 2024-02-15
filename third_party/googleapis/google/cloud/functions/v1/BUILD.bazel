@@ -45,6 +45,8 @@ proto_library_with_info(
     deps = [
         ":functions_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
+        "//google/iam/v1:iam_policy_proto",
     ],
 )
 
@@ -80,12 +82,14 @@ java_gapic_library(
     service_yaml = "cloudfunctions_v1.yaml",
     test_deps = [
         ":functions_java_grpc",
+        "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":functions_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
         "//google/iam/v1:iam_java_proto",
     ],
 )
@@ -120,7 +124,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -147,6 +150,7 @@ go_gapic_library(
     transport = "grpc+rest",
     deps = [
         ":functions_go_proto",
+        "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go_longrunning//:go_default_library",
@@ -156,19 +160,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "functions_go_gapic_test",
-    srcs = [":functions_go_gapic_srcjar_test"],
-    embed = [":functions_go_gapic"],
-    importpath = "cloud.google.com/go/functions/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-functions-v1-go",
     deps = [
         ":functions_go_gapic",
         ":functions_go_gapic_srcjar-metadata.srcjar",
+        ":functions_go_gapic_srcjar-snippets.srcjar",
         ":functions_go_gapic_srcjar-test.srcjar",
         ":functions_go_proto",
     ],
@@ -221,19 +219,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "functions_php_proto",
     deps = [":functions_proto"],
-)
-
-php_grpc_library(
-    name = "functions_php_grpc",
-    srcs = [":functions_proto"],
-    deps = [":functions_php_proto"],
 )
 
 php_gapic_library(
@@ -243,10 +234,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "cloudfunctions_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":functions_php_grpc",
-        ":functions_php_proto",
-    ],
+    deps = [":functions_php_proto"],
 )
 
 # Open Source Packages
@@ -254,7 +242,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-functions-v1-php",
     deps = [
         ":functions_php_gapic",
-        ":functions_php_grpc",
         ":functions_php_proto",
     ],
 )
@@ -278,6 +265,7 @@ nodejs_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "cloudfunctions_v1.yaml",
     transport = "grpc+rest",
+    mixins = "google.longrunning.Operations;google.cloud.location.Locations",
     deps = [],
 )
 
@@ -326,6 +314,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "The Cloud Functions API manages lightweight user-provided functions executed in response to events.",
     ruby_cloud_title = "Cloud Functions V1",
     service_yaml = "cloudfunctions_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":functions_ruby_grpc",
         ":functions_ruby_proto",

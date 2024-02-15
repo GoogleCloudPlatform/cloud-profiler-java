@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ message Endpoint {
   option (google.api.resource) = {
     type: "aiplatform.googleapis.com/Endpoint"
     pattern: "projects/{project}/locations/{location}/endpoints/{endpoint}"
+    pattern: "projects/{project}/locations/{location}/publishers/{publisher}/models/{model}"
   };
 
   // Output only. The resource name of the Endpoint.
@@ -127,7 +128,8 @@ message Endpoint {
 
   // Output only. Resource name of the Model Monitoring job associated with this
   // Endpoint if monitoring is enabled by
-  // [CreateModelDeploymentMonitoringJob][]. Format:
+  // [JobService.CreateModelDeploymentMonitoringJob][google.cloud.aiplatform.v1.JobService.CreateModelDeploymentMonitoringJob].
+  // Format:
   // `projects/{project}/locations/{location}/modelDeploymentMonitoringJobs/{model_deployment_monitoring_job}`
   string model_deployment_monitoring_job = 14 [
     (google.api.field_behavior) = OUTPUT_ONLY,
@@ -148,6 +150,7 @@ message DeployedModel {
   // even if the DeployedModel receives no traffic.
   // Not all Models support all resources types. See
   // [Model.supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types].
+  // Required except for Large Model Deploy use cases.
   oneof prediction_resources {
     // A description of resources that are dedicated to the DeployedModel, and
     // that need a higher degree of manual configuration.
@@ -156,12 +159,19 @@ message DeployedModel {
     // A description of resources that to large degree are decided by Vertex
     // AI, and require only a modest additional configuration.
     AutomaticResources automatic_resources = 8;
+
+    // The resource name of the shared DeploymentResourcePool to deploy on.
+    // Format:
+    // `projects/{project}/locations/{location}/deploymentResourcePools/{deployment_resource_pool}`
+    string shared_resources = 17 [(google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/DeploymentResourcePool"
+    }];
   }
 
   // Immutable. The ID of the DeployedModel. If not provided upon deployment,
   // Vertex AI will generate a value for this ID.
   //
-  // This value should be 1-10 characters, and valid characters are /[0-9]/.
+  // This value should be 1-10 characters, and valid characters are `/[0-9]/`.
   string id = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // Required. The resource name of the Model that this is the deployment of.
@@ -222,19 +232,19 @@ message DeployedModel {
 
   // For custom-trained Models and AutoML Tabular Models, the container of the
   // DeployedModel instances will send `stderr` and `stdout` streams to
-  // Stackdriver Logging by default. Please note that the logs incur cost,
+  // Cloud Logging by default. Please note that the logs incur cost,
   // which are subject to [Cloud Logging
-  // pricing](https://cloud.google.com/stackdriver/pricing).
+  // pricing](https://cloud.google.com/logging/pricing).
   //
   // User can disable container logging by setting this flag to true.
   bool disable_container_logging = 15;
 
-  // If true, online prediction access logs are sent to StackDriver
+  // If true, online prediction access logs are sent to Cloud
   // Logging.
   // These logs are like standard server access logs, containing
   // information like timestamp and latency for each prediction request.
   //
-  // Note that Stackdriver logs may incur a cost, especially if your project
+  // Note that logs may incur a cost, especially if your project
   // receives prediction requests at a high queries per second rate (QPS).
   // Estimate your costs before enabling this option.
   bool enable_access_logging = 13;

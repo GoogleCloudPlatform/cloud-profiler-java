@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_extension_setting.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/extension_setting_device.proto";
-import "google/ads/googleads/v12/enums/extension_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "AdGroupExtensionSettingProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/enums/extension_setting_device.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_extension_setting.proto
 
 // Proto file describing the AdGroupExtensionSetting resource.
 
@@ -69,12 +51,8 @@ message AdGroupExtensionSetting {
   ];
 
   // Immutable. The extension type of the ad group extension setting.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_extension_setting.proto
-  google.ads.googleads.v12.enums.ExtensionTypeEnum.ExtensionType extension_type = 2 [(google.api.field_behavior) = IMMUTABLE];
-========
   google.ads.googleads.v15.enums.ExtensionTypeEnum.ExtensionType
       extension_type = 2 [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_extension_setting.proto
 
   // Immutable. The resource name of the ad group. The linked extension feed
   // items will serve under this ad group. AdGroup resource names have the form:
@@ -96,10 +74,6 @@ message AdGroupExtensionSetting {
   }];
 
   // The device for which the extensions will serve. Optional.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/ad_group_extension_setting.proto
-  google.ads.googleads.v12.enums.ExtensionSettingDeviceEnum.ExtensionSettingDevice device = 5;
-========
   google.ads.googleads.v15.enums.ExtensionSettingDeviceEnum
       .ExtensionSettingDevice device = 5;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/ad_group_extension_setting.proto
 }

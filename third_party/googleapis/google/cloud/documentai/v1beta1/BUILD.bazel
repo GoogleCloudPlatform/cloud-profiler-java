@@ -72,6 +72,7 @@ java_gapic_library(
     srcs = [":documentai_proto_with_info"],
     grpc_service_config = "documentai_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "//google/cloud/documentai:documentai_v1beta1.yaml",
     test_deps = [
         ":documentai_java_grpc",
     ],
@@ -110,7 +111,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -143,18 +143,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "documentai_go_gapic_test",
-    srcs = [":documentai_go_gapic_srcjar_test"],
-    embed = [":documentai_go_gapic"],
-    importpath = "cloud.google.com/go/documentai/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-documentai-v1beta1-go",
     deps = [
         ":documentai_go_gapic",
+        ":documentai_go_gapic_srcjar-snippets.srcjar",
         ":documentai_go_gapic_srcjar-test.srcjar",
         ":documentai_go_proto",
     ],
@@ -204,19 +198,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "documentai_php_proto",
     deps = [":documentai_proto"],
-)
-
-php_grpc_library(
-    name = "documentai_php_grpc",
-    srcs = [":documentai_proto"],
-    deps = [":documentai_php_proto"],
 )
 
 php_gapic_library(
@@ -226,10 +213,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "//google/cloud/documentai:documentai_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":documentai_php_grpc",
-        ":documentai_php_proto",
-    ],
+    deps = [":documentai_php_proto"],
 )
 
 # Open Source Packages
@@ -237,7 +221,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-documentai-v1beta1-php",
     deps = [
         ":documentai_php_gapic",
-        ":documentai_php_grpc",
         ":documentai_php_proto",
     ],
 )
@@ -300,6 +283,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-documentai-v1beta1"],
     rest_numeric_enums = True,
     service_yaml = "//google/cloud/documentai:documentai_v1beta1.yaml",
+    transport = "grpc",
     deps = [
         ":documentai_ruby_grpc",
         ":documentai_ruby_proto",

@@ -21,6 +21,7 @@ load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 proto_library(
     name = "retail_proto",
     srcs = [
+        "analytics_service.proto",
         "catalog.proto",
         "catalog_service.proto",
         "common.proto",
@@ -111,6 +112,8 @@ java_gapic_library(
 java_gapic_test(
     name = "retail_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.retail.v2beta.AnalyticsServiceClientHttpJsonTest",
+        "com.google.cloud.retail.v2beta.AnalyticsServiceClientTest",
         "com.google.cloud.retail.v2beta.CatalogServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2beta.CatalogServiceClientTest",
         "com.google.cloud.retail.v2beta.CompletionServiceClientHttpJsonTest",
@@ -154,7 +157,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -192,19 +194,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "retail_go_gapic_test",
-    srcs = [":retail_go_gapic_srcjar_test"],
-    embed = [":retail_go_gapic"],
-    importpath = "cloud.google.com/go/retail/apiv2beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-retail-v2beta-go",
     deps = [
         ":retail_go_gapic",
         ":retail_go_gapic_srcjar-metadata.srcjar",
+        ":retail_go_gapic_srcjar-snippets.srcjar",
         ":retail_go_gapic_srcjar-test.srcjar",
         ":retail_go_proto",
     ],
@@ -254,19 +250,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "retail_php_proto",
     deps = [":retail_proto"],
-)
-
-php_grpc_library(
-    name = "retail_php_grpc",
-    srcs = [":retail_proto"],
-    deps = [":retail_php_proto"],
 )
 
 php_gapic_library(
@@ -276,10 +265,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "retail_v2beta.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":retail_php_grpc",
-        ":retail_php_proto",
-    ],
+    deps = [":retail_php_proto"],
 )
 
 # Open Source Packages
@@ -287,7 +273,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-retail-v2beta-php",
     deps = [
         ":retail_php_gapic",
-        ":retail_php_grpc",
         ":retail_php_proto",
     ],
 )
@@ -360,6 +345,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Retail enables you to build an end-to-end personalized recommendation system based on state-of-the-art deep learning ML models, without a need for expertise in ML or recommendation systems.",
     ruby_cloud_title = "Retail V2beta",
     service_yaml = "retail_v2beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":retail_ruby_grpc",
         ":retail_ruby_proto",

@@ -10,6 +10,8 @@ apis:
 types:
 - name: google.cloud.contactcenterinsights.v1.BulkAnalyzeConversationsMetadata
 - name: google.cloud.contactcenterinsights.v1.BulkAnalyzeConversationsResponse
+- name: google.cloud.contactcenterinsights.v1.BulkDeleteConversationsMetadata
+- name: google.cloud.contactcenterinsights.v1.BulkDeleteConversationsResponse
 - name: google.cloud.contactcenterinsights.v1.CreateAnalysisOperationMetadata
 - name: google.cloud.contactcenterinsights.v1.CreateIssueModelMetadata
 - name: google.cloud.contactcenterinsights.v1.DeleteIssueModelMetadata
@@ -21,6 +23,7 @@ types:
 - name: google.cloud.contactcenterinsights.v1.IngestConversationsResponse
 - name: google.cloud.contactcenterinsights.v1.UndeployIssueModelMetadata
 - name: google.cloud.contactcenterinsights.v1.UndeployIssueModelResponse
+- name: google.cloud.contactcenterinsights.v1.UploadConversationMetadata
 
 http:
   rules:
@@ -41,13 +44,3 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
-
-publishing:
-  organization: CLIENT_LIBRARY_ORGANIZATION_UNSPECIFIED
-  new_issue_uri: ''
-  documentation_uri: ''
-  api_short_name: ''
-  github_label: ''
-  doc_tag_prefix: ''
-  codeowner_github_teams:
-  library_settings:

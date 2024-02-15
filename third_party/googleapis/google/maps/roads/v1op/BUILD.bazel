@@ -16,7 +16,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -24,7 +23,6 @@ load(
     "java_proto_library",
     "nodejs_gapic_assembly_pkg",
     "nodejs_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -78,6 +76,7 @@ java_gapic_library(
     srcs = [":roads_proto_with_info"],
     grpc_service_config = "roads_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "roads_v1op.yaml",
     test_deps = [
         ":roads_java_grpc",
     ],
@@ -117,7 +116,7 @@ maps_assembly_pkg(
 go_proto_library(
     name = "roads_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/maps/roads/v1op",
+    importpath = "cloud.google.com/go/maps/roads/apiv1op/roadspb",
     protos = [":roads_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -129,7 +128,7 @@ go_gapic_library(
     name = "roads_go_gapic",
     srcs = [":roads_proto_with_info"],
     grpc_service_config = "roads_grpc_service_config.json",
-    importpath = "developers.google.com/maps/go/roads/v1op;roads",
+    importpath = "cloud.google.com/go/maps/roads/apiv1op;roads",
     rest_numeric_enums = True,
     service_yaml = "roads_v1op.yaml",
     transport = "grpc+rest",
@@ -138,18 +137,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "roads_go_gapic_test",
-    srcs = [":roads_go_gapic_srcjar_test"],
-    embed = [":roads_go_gapic"],
-    importpath = "developers.google.com/maps/go/roads/v1op",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapic-maps-roads-v1op-go",
     deps = [
         ":roads_go_gapic",
+        ":roads_go_gapic_srcjar-snippets.srcjar",
         ":roads_go_gapic_srcjar-test.srcjar",
         ":roads_go_proto",
     ],
@@ -193,28 +186,11 @@ php_proto_library(
     deps = [":roads_proto"],
 )
 
-php_grpc_library(
-    name = "roads_php_grpc",
-    srcs = [":roads_proto"],
-    deps = [":roads_php_proto"],
-)
-# A HttpRule option must be defined
-# php_gapic_library(
-#     name = "roads_php_gapic",
-#     srcs = [":roads_proto_with_info"],
-#     service_yaml = "roads_v1op.yaml",
-#     deps = [
-#         ":roads_php_grpc",
-#         ":roads_php_proto",
-#     ],
-# )
-
 # # Open Source Packages
 # php_gapic_assembly_pkg(
 #     name = "google-maps-roads-v1op-php",
 #     deps = [
 #         ":roads_php_gapic",
-#         ":roads_php_grpc",
 #         ":roads_php_proto",
 #     ],
 # )
@@ -256,6 +232,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-roads-v1op"],
     rest_numeric_enums = True,
     service_yaml = "roads_v1op.yaml",
+    transport = "grpc",
     deps = [
         ":roads_ruby_grpc",
         ":roads_ruby_proto",

@@ -77,12 +77,14 @@ java_gapic_library(
     srcs = [":speech_proto_with_info"],
     grpc_service_config = "speech_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "speech_v1p1beta1.yaml",
     test_deps = [
         ":speech_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":speech_java_proto",
+        "//google/api:api_java_proto",
     ],
 )
 
@@ -118,7 +120,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -153,19 +154,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "speech_go_gapic_test",
-    srcs = [":speech_go_gapic_srcjar_test"],
-    embed = [":speech_go_gapic"],
-    importpath = "cloud.google.com/go/speech/apiv1p1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-speech-v1p1beta1-go",
     deps = [
         ":speech_go_gapic",
         ":speech_go_gapic_srcjar-metadata.srcjar",
+        ":speech_go_gapic_srcjar-snippets.srcjar",
         ":speech_go_gapic_srcjar-test.srcjar",
         ":speech_go_proto",
     ],
@@ -215,19 +210,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "speech_php_proto",
     deps = [":speech_proto"],
-)
-
-php_grpc_library(
-    name = "speech_php_grpc",
-    srcs = [":speech_proto"],
-    deps = [":speech_php_proto"],
 )
 
 php_gapic_library(
@@ -237,10 +225,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "speech_v1p1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":speech_php_grpc",
-        ":speech_php_proto",
-    ],
+    deps = [":speech_php_proto"],
 )
 
 # Open Source Packages
@@ -248,7 +233,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-speech-v1p1beta1-php",
     deps = [
         ":speech_php_gapic",
-        ":speech_php_grpc",
         ":speech_php_proto",
     ],
 )

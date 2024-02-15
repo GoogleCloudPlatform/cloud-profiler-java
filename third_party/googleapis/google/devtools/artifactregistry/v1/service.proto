@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import "google/longrunning/operations.proto";
 import "google/protobuf/empty.proto";
 
 option csharp_namespace = "Google.Cloud.ArtifactRegistry.V1";
-option go_package = "google.golang.org/genproto/googleapis/devtools/artifactregistry/v1;artifactregistry";
+option go_package = "cloud.google.com/go/artifactregistry/apiv1/artifactregistrypb;artifactregistrypb";
 option java_multiple_files = true;
 option java_outer_classname = "ServiceProto";
 option java_package = "com.google.devtools.artifactregistry.v1";
@@ -273,6 +273,21 @@ service ArtifactRegistry {
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
       metadata_type: "google.devtools.artifactregistry.v1.OperationMetadata"
+    };
+  }
+
+  // Deletes multiple versions across a repository. The returned operation will
+  // complete once the versions have been deleted.
+  rpc BatchDeleteVersions(BatchDeleteVersionsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/locations/*/repositories/*/packages/*}/versions:batchDelete"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,names";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "google.devtools.artifactregistry.v1.BatchDeleteVersionsMetadata"
     };
   }
 

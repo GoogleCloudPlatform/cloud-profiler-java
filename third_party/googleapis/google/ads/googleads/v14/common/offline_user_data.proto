@@ -14,21 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/user_identifier_source.proto";
-import "google/api/field_behavior.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "OfflineUserDataProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v14.common;
 
 import "google/ads/googleads/v14/enums/user_identifier_source.proto";
@@ -42,7 +27,6 @@ option java_package = "com.google.ads.googleads.v14.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V14::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
 
 // Proto file describing offline user data.
 
@@ -81,12 +65,8 @@ message OfflineUserAddressInfo {
 message UserIdentifier {
   // Source of the user identifier when the upload is from Store Sales,
   // ConversionUploadService, or ConversionAdjustmentUploadService.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  google.ads.googleads.v12.enums.UserIdentifierSourceEnum.UserIdentifierSource user_identifier_source = 6;
-========
   google.ads.googleads.v14.enums.UserIdentifierSourceEnum.UserIdentifierSource
       user_identifier_source = 6;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
 
   // Exactly one must be specified. For OfflineUserDataJobService, Customer
   // Match accepts hashed_email, hashed_phone_number, mobile_id,
@@ -238,13 +218,8 @@ message UserAttribute {
   // allow-list with the user's consent.
   optional ShoppingLoyalty shopping_loyalty = 7;
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  // Optional. Advertiser defined lifecycle stage for the user. The accepted values are
-  // "Lead", "Active" and "Churned".
-========
   // Optional. Advertiser defined lifecycle stage for the user. The accepted
   // values are "Lead", "Active" and "Churned".
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
   string lifecycle_stage = 8 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. Timestamp of the first purchase made by the user.
@@ -253,28 +228,17 @@ message UserAttribute {
   // use the account's timezone as default.
   string first_purchase_date_time = 9 [(google.api.field_behavior) = OPTIONAL];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  // Optional. Advertiser defined events and their attributes. All the values in the
-  // nested fields are required. Currently this field is in beta.
-  repeated EventAttribute event_attribute = 10 [(google.api.field_behavior) = OPTIONAL];
-========
   // Optional. Advertiser defined events and their attributes. All the values in
   // the nested fields are required. Currently this field is in beta.
   repeated EventAttribute event_attribute = 10
       [(google.api.field_behavior) = OPTIONAL];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
 }
 
 // Advertiser defined events and their attributes. All the values in the
 // nested fields are required.
 message EventAttribute {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  // Required. Advertiser defined event to be used for remarketing. The accepted values
-  // are "Viewed", "Cart", "Purchased" and "Recommended".
-========
   // Required. Advertiser defined event to be used for remarketing. The accepted
   // values are "Viewed", "Cart", "Purchased" and "Recommended".
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
   string event = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Timestamp at which the event happened.
@@ -284,23 +248,14 @@ message EventAttribute {
   string event_date_time = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Item attributes of the event.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  repeated EventItemAttribute item_attribute = 3 [(google.api.field_behavior) = REQUIRED];
-========
   repeated EventItemAttribute item_attribute = 3
       [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
 }
 
 // Event Item attributes of the Customer Match.
 message EventItemAttribute {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/offline_user_data.proto
-  // Optional. A unique identifier of a product. It can be either the Merchant Center Item
-  // ID or GTIN (Global Trade Item Number).
-========
   // Optional. A unique identifier of a product. It can be either the Merchant
   // Center Item ID or GTIN (Global Trade Item Number).
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/common/offline_user_data.proto
   string item_id = 1 [(google.api.field_behavior) = OPTIONAL];
 }
 

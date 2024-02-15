@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-package google.ads.googleads.v13.resources;
-
-import "google/ads/googleads/v13/common/simulation.proto";
-import "google/ads/googleads/v13/enums/simulation_modification_method.proto";
-import "google/ads/googleads/v13/enums/simulation_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CampaignSimulationProto";
-option java_package = "com.google.ads.googleads.v13.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V13::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/common/simulation.proto";
@@ -52,7 +30,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
 
 // Proto file describing the campaign simulation resource.
 
@@ -72,12 +49,9 @@ option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
 // * MULTI_CHANNEL - TARGET_CPA - UNIFORM
 // * DISCOVERY - TARGET_CPA - DEFAULT
 // * DISPLAY - TARGET_CPA - UNIFORM
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-========
 // * PERFORMANCE_MAX - TARGET_CPA - UNIFORM
 // * PERFORMANCE_MAX - TARGET_ROAS - UNIFORM
 // * PERFORMANCE_MAX - BUDGET - UNIFORM
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
 message CampaignSimulation {
   option (google.api.resource) = {
     type: "googleads.googleapis.com/CampaignSimulation"
@@ -99,19 +73,11 @@ message CampaignSimulation {
   int64 campaign_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The field that the simulation modifies.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-  google.ads.googleads.v13.enums.SimulationTypeEnum.SimulationType type = 3
-      [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. How the simulation modifies the field.
-  google.ads.googleads.v13.enums.SimulationModificationMethodEnum
-========
   google.ads.googleads.v14.enums.SimulationTypeEnum.SimulationType type = 3
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. How the simulation modifies the field.
   google.ads.googleads.v14.enums.SimulationModificationMethodEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
       .SimulationModificationMethod modification_method = 4
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -126,17 +92,6 @@ message CampaignSimulation {
   // List of simulation points.
   oneof point_list {
     // Output only. Simulation points if the simulation type is CPC_BID.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-    google.ads.googleads.v13.common.CpcBidSimulationPointList
-        cpc_bid_point_list = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is TARGET_CPA.
-    google.ads.googleads.v13.common.TargetCpaSimulationPointList
-        target_cpa_point_list = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-    // Output only. Simulation points if the simulation type is TARGET_ROAS.
-    google.ads.googleads.v13.common.TargetRoasSimulationPointList
-========
     google.ads.googleads.v14.common.CpcBidSimulationPointList
         cpc_bid_point_list = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -146,25 +101,16 @@ message CampaignSimulation {
 
     // Output only. Simulation points if the simulation type is TARGET_ROAS.
     google.ads.googleads.v14.common.TargetRoasSimulationPointList
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
         target_roas_point_list = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // Output only. Simulation points if the simulation type is
     // TARGET_IMPRESSION_SHARE.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-    google.ads.googleads.v13.common.TargetImpressionShareSimulationPointList
-========
     google.ads.googleads.v14.common.TargetImpressionShareSimulationPointList
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
         target_impression_share_point_list = 10
         [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // Output only. Simulation points if the simulation type is BUDGET.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/resources/campaign_simulation.proto
-    google.ads.googleads.v13.common.BudgetSimulationPointList
-========
     google.ads.googleads.v14.common.BudgetSimulationPointList
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/campaign_simulation.proto
         budget_point_list = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 }

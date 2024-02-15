@@ -14,28 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/listing_group_filter_bidding_category_level.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_custom_attribute_index.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_product_channel.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_product_condition.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_product_type_level.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_type_enum.proto";
-import "google/ads/googleads/v12/enums/listing_group_filter_vertical.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "AssetGroupListingGroupFilterProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/enums/listing_group_filter_bidding_category_level.proto";
@@ -56,7 +34,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
 
 // AssetGroupListingGroupFilter represents a listing group filter tree node in
 // an asset group.
@@ -90,13 +67,6 @@ message AssetGroupListingGroupFilter {
   int64 id = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Immutable. Type of a listing group filter node.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-  google.ads.googleads.v12.enums.ListingGroupFilterTypeEnum.ListingGroupFilterType type = 4 [(google.api.field_behavior) = IMMUTABLE];
-
-  // Immutable. The vertical the current node tree represents. All nodes in the same tree
-  // must belong to the same vertical.
-  google.ads.googleads.v12.enums.ListingGroupFilterVerticalEnum.ListingGroupFilterVertical vertical = 5 [(google.api.field_behavior) = IMMUTABLE];
-========
   google.ads.googleads.v14.enums.ListingGroupFilterTypeEnum
       .ListingGroupFilterType type = 4
       [(google.api.field_behavior) = IMMUTABLE];
@@ -106,7 +76,6 @@ message AssetGroupListingGroupFilter {
   google.ads.googleads.v14.enums.ListingGroupFilterVerticalEnum
       .ListingGroupFilterVertical vertical = 5
       [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
 
   // Dimension value with which this listing group is refining its parent.
   // Undefined for the root group.
@@ -149,12 +118,8 @@ message ListingGroupFilterDimension {
     optional int64 id = 1;
 
     // Indicates the level of the category in the taxonomy.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-    google.ads.googleads.v12.enums.ListingGroupFilterBiddingCategoryLevelEnum.ListingGroupFilterBiddingCategoryLevel level = 2;
-========
     google.ads.googleads.v14.enums.ListingGroupFilterBiddingCategoryLevelEnum
         .ListingGroupFilterBiddingCategoryLevel level = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
   }
 
   // Brand of the product.
@@ -166,23 +131,15 @@ message ListingGroupFilterDimension {
   // Locality of a product offer.
   message ProductChannel {
     // Value of the locality.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-    google.ads.googleads.v12.enums.ListingGroupFilterProductChannelEnum.ListingGroupFilterProductChannel channel = 1;
-========
     google.ads.googleads.v14.enums.ListingGroupFilterProductChannelEnum
         .ListingGroupFilterProductChannel channel = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
   }
 
   // Condition of a product offer.
   message ProductCondition {
     // Value of the condition.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-    google.ads.googleads.v12.enums.ListingGroupFilterProductConditionEnum.ListingGroupFilterProductCondition condition = 1;
-========
     google.ads.googleads.v14.enums.ListingGroupFilterProductConditionEnum
         .ListingGroupFilterProductCondition condition = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
   }
 
   // Custom attribute of a product offer.
@@ -191,12 +148,8 @@ message ListingGroupFilterDimension {
     optional string value = 1;
 
     // Indicates the index of the custom attribute.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-    google.ads.googleads.v12.enums.ListingGroupFilterCustomAttributeIndexEnum.ListingGroupFilterCustomAttributeIndex index = 2;
-========
     google.ads.googleads.v14.enums.ListingGroupFilterCustomAttributeIndexEnum
         .ListingGroupFilterCustomAttributeIndex index = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
   }
 
   // Item id of a product offer.
@@ -211,12 +164,8 @@ message ListingGroupFilterDimension {
     optional string value = 1;
 
     // Level of the type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/asset_group_listing_group_filter.proto
-    google.ads.googleads.v12.enums.ListingGroupFilterProductTypeLevelEnum.ListingGroupFilterProductTypeLevel level = 2;
-========
     google.ads.googleads.v14.enums.ListingGroupFilterProductTypeLevelEnum
         .ListingGroupFilterProductTypeLevel level = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/asset_group_listing_group_filter.proto
   }
 
   // Dimension of one of the types below is always present.

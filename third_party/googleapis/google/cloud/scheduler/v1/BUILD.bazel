@@ -78,8 +78,8 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "cloudscheduler_v1.yaml",
     test_deps = [
-        "//google/cloud/location:location_java_grpc",
         ":scheduler_java_grpc",
+        "//google/cloud/location:location_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -119,7 +119,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -150,19 +149,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "scheduler_go_gapic_test",
-    srcs = [":scheduler_go_gapic_srcjar_test"],
-    embed = [":scheduler_go_gapic"],
-    importpath = "cloud.google.com/go/scheduler/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-scheduler-v1-go",
     deps = [
         ":scheduler_go_gapic",
         ":scheduler_go_gapic_srcjar-metadata.srcjar",
+        ":scheduler_go_gapic_srcjar-snippets.srcjar",
         ":scheduler_go_gapic_srcjar-test.srcjar",
         ":scheduler_go_proto",
     ],
@@ -214,7 +207,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -223,23 +215,15 @@ php_proto_library(
     deps = [":scheduler_proto"],
 )
 
-php_grpc_library(
-    name = "scheduler_php_grpc",
-    srcs = [":scheduler_proto"],
-    deps = [":scheduler_php_proto"],
-)
-
 php_gapic_library(
     name = "scheduler_php_gapic",
     srcs = [":scheduler_proto_with_info"],
     grpc_service_config = "cloudscheduler_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "cloudscheduler_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":scheduler_php_grpc",
-        ":scheduler_php_proto",
-    ],
+    deps = [":scheduler_php_proto"],
 )
 
 # Open Source Packages
@@ -247,7 +231,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-scheduler-v1-php",
     deps = [
         ":scheduler_php_gapic",
-        ":scheduler_php_grpc",
         ":scheduler_php_proto",
     ],
 )
@@ -320,6 +303,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Cloud Scheduler is a fully managed enterprise-grade cron job scheduler. It allows you to schedule virtually any job, including batch, big data jobs, cloud infrastructure operations, and more. You can automate everything, including retries in case of failure to reduce manual toil and intervention. Cloud Scheduler even acts as a single pane of glass, allowing you to manage all your automation tasks from one place.",
     ruby_cloud_title = "Cloud Scheduler V1",
     service_yaml = "cloudscheduler_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":scheduler_ruby_grpc",
         ":scheduler_ruby_proto",

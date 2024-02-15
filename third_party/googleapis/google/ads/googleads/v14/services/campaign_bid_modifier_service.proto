@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,17 +14,10 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/enums/response_content_type.proto";
-import "google/ads/googleads/v13/resources/campaign_bid_modifier.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/enums/response_content_type.proto";
 import "google/ads/googleads/v14/resources/campaign_bid_modifier.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -36,16 +25,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "CampaignBidModifierServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -54,7 +33,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
 
 // Proto file describing the Campaign Bid Modifier service.
 
@@ -92,11 +70,7 @@ service CampaignBidModifierService {
   rpc MutateCampaignBidModifiers(MutateCampaignBidModifiersRequest)
       returns (MutateCampaignBidModifiersResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-      post: "/v13/customers/{customer_id=*}/campaignBidModifiers:mutate"
-========
       post: "/v14/customers/{customer_id=*}/campaignBidModifiers:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -104,11 +78,7 @@ service CampaignBidModifierService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-// [CampaignBidModifierService.MutateCampaignBidModifiers][google.ads.googleads.v13.services.CampaignBidModifierService.MutateCampaignBidModifiers].
-========
 // [CampaignBidModifierService.MutateCampaignBidModifiers][google.ads.googleads.v14.services.CampaignBidModifierService.MutateCampaignBidModifiers].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
 message MutateCampaignBidModifiersRequest {
   // Required. ID of the customer whose campaign bid modifiers are being
   // modified.
@@ -131,11 +101,7 @@ message MutateCampaignBidModifiersRequest {
 
   // The response content type setting. Determines whether the mutable resource
   // or just the resource name should be returned post mutation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-  google.ads.googleads.v13.enums.ResponseContentTypeEnum.ResponseContentType
-========
   google.ads.googleads.v14.enums.ResponseContentTypeEnum.ResponseContentType
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
       response_content_type = 5;
 }
 
@@ -148,19 +114,11 @@ message CampaignBidModifierOperation {
   oneof operation {
     // Create operation: No resource name is expected for the new campaign bid
     // modifier.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-    google.ads.googleads.v13.resources.CampaignBidModifier create = 1;
-
-    // Update operation: The campaign bid modifier is expected to have a valid
-    // resource name.
-    google.ads.googleads.v13.resources.CampaignBidModifier update = 2;
-========
     google.ads.googleads.v14.resources.CampaignBidModifier create = 1;
 
     // Update operation: The campaign bid modifier is expected to have a valid
     // resource name.
     google.ads.googleads.v14.resources.CampaignBidModifier update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
 
     // Remove operation: A resource name for the removed campaign bid modifier
     // is expected, in this format:
@@ -194,10 +152,6 @@ message MutateCampaignBidModifierResult {
   // The mutated campaign bid modifier with only mutable fields after mutate.
   // The field will only be returned when response_content_type is set to
   // "MUTABLE_RESOURCE".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/campaign_bid_modifier_service.proto
-  google.ads.googleads.v13.resources.CampaignBidModifier campaign_bid_modifier =
-========
   google.ads.googleads.v14.resources.CampaignBidModifier campaign_bid_modifier =
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/campaign_bid_modifier_service.proto
       2;
 }

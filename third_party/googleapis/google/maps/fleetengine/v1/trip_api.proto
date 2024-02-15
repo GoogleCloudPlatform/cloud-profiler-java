@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/v1;fleetengine";
+option csharp_namespace = "Google.Maps.FleetEngine.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/apiv1/fleetenginepb;fleetenginepb";
 option java_multiple_files = true;
 option java_outer_classname = "TripApi";
 option java_package = "google.maps.fleetengine.v1";
@@ -38,6 +39,8 @@ option objc_class_prefix = "CFE";
 // Trip management service.
 service TripService {
   option (google.api.default_host) = "fleetengine.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
 
   // Creates a trip in the Fleet Engine and returns the new trip.
   rpc CreateTrip(CreateTripRequest) returns (Trip) {
@@ -150,8 +153,13 @@ message CreateTripRequest {
   // * `vehicle_id`
   // * `dropoff_point`
   // * `intermediate_destinations`
+  // * `vehicle_waypoints`
   //
-  // Only `EXCLUSIVE` trips support multiple destinations.
+  // All other Trip fields are ignored. For example, all trips start with a
+  // `trip_status` of `NEW` even if you pass in a `trip_status` of `CANCELED` in
+  // the creation request.
+  //
+  // Only `EXCLUSIVE` trips support `intermediate_destinations`.
   //
   // When `vehicle_id` is set for a shared trip, you must supply
   // the list of `Trip.vehicle_waypoints` to specify the order of the remaining
@@ -167,8 +175,6 @@ message CreateTripRequest {
   //
   // The `trip_id`, `waypoint_type` and `location` fields are used, and all
   // other TripWaypoint fields in `vehicle_waypoints` are ignored.
-  //
-  // All other Trip fields are ignored.
   Trip trip = 4 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -364,8 +370,8 @@ message SearchTripsResponse {
   // The list of trips for the requested vehicle.
   repeated Trip trips = 1;
 
-  // Pass this token in the SearchTripsRequest to continue to
-  // list results. If all results have been returned, this field is an empty
-  // string or not present in the response.
+  // Pass this token in the SearchTripsRequest to page through list results. The
+  // API returns a trip list on each call, and when no more results remain the
+  // trip list is empty.
   string next_page_token = 2;
 }

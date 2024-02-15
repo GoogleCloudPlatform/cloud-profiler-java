@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_conversion_goal.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/conversion_action_category.proto";
-import "google/ads/googleads/v12/enums/conversion_origin.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "CustomerConversionGoalProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/enums/conversion_action_category.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_conversion_goal.proto
 
 // Biddability control for conversion actions with a matching category and
 // origin.
@@ -69,22 +51,14 @@ message CustomerConversionGoal {
 
   // The conversion category of this customer conversion goal. Only
   // conversion actions that have this category will be included in this goal.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_conversion_goal.proto
-  google.ads.googleads.v12.enums.ConversionActionCategoryEnum.ConversionActionCategory category = 2;
-========
   google.ads.googleads.v15.enums.ConversionActionCategoryEnum
       .ConversionActionCategory category = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_conversion_goal.proto
 
   // The conversion origin of this customer conversion goal. Only
   // conversion actions that have this conversion origin will be included in
   // this goal.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/customer_conversion_goal.proto
-  google.ads.googleads.v12.enums.ConversionOriginEnum.ConversionOrigin origin = 3;
-========
   google.ads.googleads.v15.enums.ConversionOriginEnum.ConversionOrigin origin =
       3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/customer_conversion_goal.proto
 
   // The biddability of the customer conversion goal.
   bool biddable = 4;

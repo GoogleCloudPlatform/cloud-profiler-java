@@ -14,36 +14,18 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/common/extensions.proto";
-import "google/ads/googleads/v12/enums/keyword_match_type.proto";
-import "google/ads/googleads/v12/resources/ad.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/common/extensions.proto";
 import "google/ads/googleads/v14/enums/keyword_match_type.proto";
 import "google/ads/googleads/v14/resources/ad.proto";
 import "google/ads/googleads/v14/resources/asset.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "RecommendationServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -52,7 +34,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 
 // Proto file describing the Recommendation service.
 
@@ -78,11 +59,7 @@ service RecommendationService {
   rpc ApplyRecommendation(ApplyRecommendationRequest)
       returns (ApplyRecommendationResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-      post: "/v12/customers/{customer_id=*}/recommendations:apply"
-========
       post: "/v14/customers/{customer_id=*}/recommendations:apply"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -101,23 +78,15 @@ service RecommendationService {
   rpc DismissRecommendation(DismissRecommendationRequest)
       returns (DismissRecommendationResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-      post: "/v12/customers/{customer_id=*}/recommendations:dismiss"
-========
       post: "/v14/customers/{customer_id=*}/recommendations:dismiss"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-// Request message for [RecommendationService.ApplyRecommendation][google.ads.googleads.v12.services.RecommendationService.ApplyRecommendation].
-========
 // Request message for
 // [RecommendationService.ApplyRecommendation][google.ads.googleads.v14.services.RecommendationService.ApplyRecommendation].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 message ApplyRecommendationRequest {
   // Required. The ID of the customer with the recommendation.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -161,11 +130,7 @@ message ApplyRecommendationOperation {
   message TextAdParameters {
     // New ad to add to recommended ad group. All necessary fields need to be
     // set in this message. This is a required field.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    google.ads.googleads.v12.resources.Ad ad = 1;
-========
     google.ads.googleads.v14.resources.Ad ad = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying keyword recommendation.
@@ -174,12 +139,8 @@ message ApplyRecommendationOperation {
     optional string ad_group = 4;
 
     // The match type of the keyword. This is a required field.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    google.ads.googleads.v12.enums.KeywordMatchTypeEnum.KeywordMatchType match_type = 2;
-========
     google.ads.googleads.v14.enums.KeywordMatchTypeEnum.KeywordMatchType
         match_type = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 
     // Optional, CPC bid to set for the keyword. If not set, keyword will use
     // bid based on bidding strategy used by target ad group.
@@ -210,30 +171,18 @@ message ApplyRecommendationOperation {
   // Parameters to use when applying callout extension recommendation.
   message CalloutExtensionParameters {
     // Callout extensions to be added. This is a required field.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    repeated google.ads.googleads.v12.common.CalloutFeedItem callout_extensions = 1;
-========
     repeated google.ads.googleads.v14.common.CalloutFeedItem
         callout_extensions = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying call extension recommendation.
   message CallExtensionParameters {
     // Call extensions to be added. This is a required field.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    repeated google.ads.googleads.v12.common.CallFeedItem call_extensions = 1;
-========
     repeated google.ads.googleads.v14.common.CallFeedItem call_extensions = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying sitelink recommendation.
   message SitelinkExtensionParameters {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    // Sitelink extensions to be added. This is a required field.
-    repeated google.ads.googleads.v12.common.SitelinkFeedItem sitelink_extensions = 1;
-========
     // Sitelinks to be added. This is a required field.
     repeated google.ads.googleads.v14.common.SitelinkFeedItem
         sitelink_extensions = 1;
@@ -303,7 +252,6 @@ message ApplyRecommendationOperation {
     // account. Assets at the campaign scope will override any attached at the
     // customer scope.
     ApplyScope scope = 3 [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying move unused budget recommendation.
@@ -317,46 +265,29 @@ message ApplyRecommendationOperation {
   // recommendation.
   message ResponsiveSearchAdAssetParameters {
     // Updated ad. The current ad's content will be replaced.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    google.ads.googleads.v12.resources.Ad updated_ad = 1;
-========
     google.ads.googleads.v14.resources.Ad updated_ad = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying a responsive search ad improve ad strength
   // recommendation.
   message ResponsiveSearchAdImproveAdStrengthParameters {
     // Updated ad. The current ad's content will be replaced.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    google.ads.googleads.v12.resources.Ad updated_ad = 1;
-========
     google.ads.googleads.v14.resources.Ad updated_ad = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying a responsive search ad recommendation.
   message ResponsiveSearchAdParameters {
     // Required. New ad to add to recommended ad group.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    google.ads.googleads.v12.resources.Ad ad = 1 [(google.api.field_behavior) = REQUIRED];
-========
     google.ads.googleads.v14.resources.Ad ad = 1
         [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
   }
 
   // Parameters to use when applying a raise target CPA bid too low
   // recommendation. The apply is asynchronous and can take minutes depending on
   // the number of ad groups there is in the related campaign..
   message RaiseTargetCpaBidTooLowParameters {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    // Required. A number greater than 1.0 indicating the factor by which to increase the
-    // target CPA. This is a required field.
-========
     // Required. A number greater than 1.0 indicating the factor by which to
     // increase the target CPA. This is a required field.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
     double target_multiplier = 1 [(google.api.field_behavior) = REQUIRED];
   }
 
@@ -415,12 +346,8 @@ message ApplyRecommendationOperation {
 
     // Parameters to use when applying a responsive search ad improve ad
     // strength recommendation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-    ResponsiveSearchAdImproveAdStrengthParameters responsive_search_ad_improve_ad_strength = 14;
-========
     ResponsiveSearchAdImproveAdStrengthParameters
         responsive_search_ad_improve_ad_strength = 14;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 
     // Parameters to use when applying a raise target CPA bid too low
     // recommendation. The apply is asynchronous and can take minutes depending
@@ -430,12 +357,6 @@ message ApplyRecommendationOperation {
     // Parameters to use when applying a forecasting set target ROAS
     // recommendation.
     ForecastingSetTargetRoasParameters forecasting_set_target_roas = 16;
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-  }
-}
-
-// Response message for [RecommendationService.ApplyRecommendation][google.ads.googleads.v12.services.RecommendationService.ApplyRecommendation].
-========
 
     // Parameters to use when applying callout asset recommendation.
     CalloutAssetParameters callout_asset = 17;
@@ -456,7 +377,6 @@ message ApplyRecommendationOperation {
 
 // Response message for
 // [RecommendationService.ApplyRecommendation][google.ads.googleads.v14.services.RecommendationService.ApplyRecommendation].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 message ApplyRecommendationResponse {
   // Results of operations to apply recommendations.
   repeated ApplyRecommendationResult results = 1;
@@ -476,12 +396,8 @@ message ApplyRecommendationResult {
   }];
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-// Request message for [RecommendationService.DismissRecommendation][google.ads.googleads.v12.services.RecommendationService.DismissRecommendation].
-========
 // Request message for
 // [RecommendationService.DismissRecommendation][google.ads.googleads.v14.services.RecommendationService.DismissRecommendation].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 message DismissRecommendationRequest {
   // Operation to dismiss a single recommendation identified by resource_name.
   message DismissRecommendationOperation {
@@ -505,12 +421,8 @@ message DismissRecommendationRequest {
   bool partial_failure = 2;
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/recommendation_service.proto
-// Response message for [RecommendationService.DismissRecommendation][google.ads.googleads.v12.services.RecommendationService.DismissRecommendation].
-========
 // Response message for
 // [RecommendationService.DismissRecommendation][google.ads.googleads.v14.services.RecommendationService.DismissRecommendation].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/recommendation_service.proto
 message DismissRecommendationResponse {
   // The result of dismissing a recommendation.
   message DismissRecommendationResult {

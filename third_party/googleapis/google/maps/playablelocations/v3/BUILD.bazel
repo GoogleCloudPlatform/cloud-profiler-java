@@ -13,7 +13,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -23,7 +22,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "ruby_cloud_gapic_library",
@@ -81,6 +79,7 @@ java_gapic_library(
     srcs = [":playablelocations_proto_with_info"],
     grpc_service_config = "playablelocations_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "playablelocations_v3.yaml",
     test_deps = [
         ":playablelocations_java_grpc",
     ],
@@ -115,7 +114,7 @@ java_gapic_assembly_gradle_pkg(
 go_proto_library(
     name = "playablelocations_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/maps/playablelocations/v3",
+    importpath = "cloud.google.com/go/maps/playablelocations/apiv3/playablelocationspb",
     protos = [":playablelocations_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -129,7 +128,7 @@ go_gapic_library(
     name = "playablelocations_go_gapic",
     srcs = [":playablelocations_proto_with_info"],
     grpc_service_config = "playablelocations_grpc_service_config.json",
-    importpath = "google.golang.org/google/maps/playablelocations/v3;playablelocations",
+    importpath = "cloud.google.com/go/maps/playablelocations/apiv3;playablelocations",
     rest_numeric_enums = True,
     service_yaml = "playablelocations_v3.yaml",
     transport = "grpc+rest",
@@ -139,18 +138,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "playablelocations_go_gapic_test",
-    srcs = [":playablelocations_go_gapic_srcjar_test"],
-    embed = [":playablelocations_go_gapic"],
-    importpath = "google.golang.org/google/maps/playablelocations/v3",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-maps-playablelocations-v3-go",
     deps = [
         ":playablelocations_go_gapic",
+        ":playablelocations_go_gapic_srcjar-snippets.srcjar",
         ":playablelocations_go_gapic_srcjar-test.srcjar",
         ":playablelocations_go_proto",
     ],
@@ -161,22 +154,13 @@ php_proto_library(
     deps = [":playablelocations_proto"],
 )
 
-php_grpc_library(
-    name = "playablelocations_php_grpc",
-    srcs = [":playablelocations_proto"],
-    deps = [":playablelocations_php_proto"],
-)
-
 php_gapic_library(
     name = "playablelocations_php_gapic",
     srcs = [":playablelocations_proto_with_info"],
     rest_numeric_enums = True,
     service_yaml = "playablelocations_v3.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":playablelocations_php_grpc",
-        ":playablelocations_php_proto",
-    ],
+    deps = [":playablelocations_php_proto"],
 )
 
 # Open Source Packages
@@ -184,7 +168,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-maps-playablelocations-v3-php",
     deps = [
         ":playablelocations_php_gapic",
-        ":playablelocations_php_grpc",
         ":playablelocations_php_proto",
     ],
 )
@@ -205,8 +188,10 @@ nodejs_gapic_assembly_pkg(
     name = "maps-playablelocations-v3-nodejs",
     deps = [
         ":playablelocations_nodejs_gapic",
+        "//google/maps/playablelocations/v3/sample:resources_proto",
         ":playablelocations_proto",
-    ],
+        "//google/maps/unity:clientinfo_proto",
+  ],
 )
 
 ruby_proto_library(

@@ -113,7 +113,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -145,19 +144,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "gkehub_go_gapic_test",
-    srcs = [":gkehub_go_gapic_srcjar_test"],
-    embed = [":gkehub_go_gapic"],
-    importpath = "cloud.google.com/go/gkehub/apiv1alpha2",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-gkehub-v1alpha2-go",
     deps = [
         ":gkehub_go_gapic",
         ":gkehub_go_gapic_srcjar-metadata.srcjar",
+        ":gkehub_go_gapic_srcjar-snippets.srcjar",
         ":gkehub_go_gapic_srcjar-test.srcjar",
         ":gkehub_go_proto",
     ],
@@ -208,19 +201,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "gkehub_php_proto",
     deps = [":gkehub_proto"],
-)
-
-php_grpc_library(
-    name = "gkehub_php_grpc",
-    srcs = [":gkehub_proto"],
-    deps = [":gkehub_php_proto"],
 )
 
 php_gapic_library(
@@ -230,10 +216,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1alpha2.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":gkehub_php_grpc",
-        ":gkehub_php_proto",
-    ],
+    deps = [":gkehub_php_proto"],
 )
 
 # Open Source Packages
@@ -241,7 +224,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-gkehub-v1alpha2-php",
     deps = [
         ":gkehub_php_gapic",
-        ":gkehub_php_grpc",
         ":gkehub_php_proto",
     ],
 )
@@ -305,6 +287,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "membership_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1alpha2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":gkehub_ruby_grpc",
         ":gkehub_ruby_proto",

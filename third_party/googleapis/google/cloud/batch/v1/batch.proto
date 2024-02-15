@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package google.cloud.batch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 import "google/api/resource.proto";
 import "google/cloud/batch/v1/job.proto";
 import "google/cloud/batch/v1/task.proto";
@@ -176,6 +177,10 @@ message ListJobsRequest {
 
   // List filter.
   string filter = 4;
+
+  // Optional. Sort results. Supported are "name", "name desc", "create_time",
+  // and "create_time desc".
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
 
   // Page size.
   int32 page_size = 2;

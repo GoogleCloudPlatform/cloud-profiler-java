@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ option java_package = "com.google.cloud.paymentgateway.issuerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\IssuerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::IssuerSwitch::V1";
 
+// Fetch the issuer switch participant.
 // Lists and exports transactions processed by the issuer switch.
 service IssuerSwitchTransactions {
   option (google.api.default_host) = "issuerswitch.googleapis.com";
@@ -281,6 +282,19 @@ service IssuerSwitchTransactions {
   //     * **Max Length** - 9 characters
   //     * **Description** - Type of the payee's device. This will be one of
   //     'MOB', 'INET', 'USDC/USDB', 'POS'.
+  // 1. `ReferenceID`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - Consumer reference number to identify loan number,
+  //     order id etc.
+  // 1. `ReferenceURI`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - URL for the  transaction.
+  // 1. `ReferenceCategory`
+  //     * **Min Length** - 2 characters
+  //     * **Max Length** - 2 characters
+  //     * **Description** - Reference category.
   rpc ExportFinancialTransactions(ExportFinancialTransactionsRequest)
       returns (google.longrunning.Operation) {
     option (google.api.http) = {
@@ -410,6 +424,20 @@ service IssuerSwitchTransactions {
   //     * **Min Length** - 12 characters
   //     * **Max Length** - 12 characters
   //     * **Description** - Mobile number of the payer.
+  // 1. `PayerIFSC`
+  //     * **Min Length** - 11 characters
+  //     * **Max Length** - 11 characters
+  //     * **Description** - IFSC of the payer's bank account.
+  // 1. `PayerAccountNumber`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 30 characters
+  //     * **Description** - Payer's bank account number.
+  // 1. `PayerAccountType`
+  //     * **Min Length** - 3 characters
+  //     * **Max Length** - 7 characters
+  //     * **Description** - Payer's bank account type. This will be one of
+  //     `SAVINGS`, `DEFAULT`, `CURRENT`, `NRE`, `NRO`, `PPIWALLET`,
+  //     `BANKWALLET`, `CREDIT`, `SOD`, or `UOD`.
   // 1. `PayeeVPA`
   //     * **Min Length** - 3 characters
   //     * **Max Length** - 255 characters
@@ -418,11 +446,35 @@ service IssuerSwitchTransactions {
   //     * **Min Length** - 12 characters
   //     * **Max Length** - 12 characters
   //     * **Description** - Mobile number of the payee.
+  // 1. `PayeeIFSC`
+  //     * **Min Length** - 11 characters
+  //     * **Max Length** - 11 characters
+  //     * **Description** - IFSC of the payee's bank account.
+  // 1. `PayeeAccountNumber`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 30 characters
+  //     * **Description** - Payee's bank account number.
+  // 1. `PayeeAccountType`
+  //     * **Min Length** - 3 characters
+  //     * **Max Length** - 10 characters
+  //     * **Description** - Payee's bank account type. This will be one of
+  //     `SAVINGS`, `DEFAULT`, `CURRENT`, `NRE`, `NRO`, `PPIWALLET`,
+  //     `BANKWALLET`, `CREDIT`, `SOD`, or `UOD`.
   // 1. `PayeeMerchantID`
   //     * **Min Length** - 1 characters
   //     * **Max Length** - 30 characters
   //     * **Description** - Payee's merchant ID, only if the payee is a
   //     merchant
+  // 1. `PayeeMerchantName`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 99 characters
+  //     * **Description** - Payee's merchant name, only if the payee is a
+  //     merchant.
+  // 1. `PayeeMCC`
+  //     * **Min Length** - 4 characters
+  //     * **Max Length** - 4 characters
+  //     * **Description** - Payee's Merchant Category Code (MCC), only if the
+  //     payee is a merchant.
   // 1. `Amount`
   //     * **Description** - Amount specified in the mandate.
   // 1. `RecurrencePattern`
@@ -448,12 +500,12 @@ service IssuerSwitchTransactions {
   // 1. `StartDate`
   //     * **Min Length** - 10 characters
   //     * **Max Length** - 10 characters
-  //     * **Description** - The start date of the mandate in `YYYY-MM-DD`
+  //     * **Description** - The start date of the mandate in `DD-MM-YYYY`
   //     format.
   // 1. `EndDate`
   //     * **Min Length** - 10 characters
   //     * **Max Length** - 10 characters
-  //     * **Description** - The end date of the mandate in `YYYY-MM-DD` format.
+  //     * **Description** - The end date of the mandate in `DD-MM-YYYY` format.
   // 1. `AmountRuleType`
   //     * **Description** - The amount rule of the mandate. The value will be
   //     of the
@@ -495,6 +547,99 @@ service IssuerSwitchTransactions {
   //     * **Description** - Error code as per the UPI specification. The issuer
   //     switch maps the ErrorCode to an appropriate error code that complies
   //     with the UPI specification.
+  // 1. `PayerDeviceInfoTypeAppName`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 20 characters
+  //     * **Description** - Payment application name on the payer's device.
+  // 1. `PayerDeviceInfoTypeCapability`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 99 characters
+  //     * **Description** - Capability of the payer's device.
+  // 1. `PayerDeviceInfoTypeGeoCode`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 15 characters
+  //     * **Description** - Geo code of the payer's device. This will include
+  //     floating point values for latitude and longitude (separated by colon).
+  // 1. `PayerDeviceInfoTypeID`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - Device ID of the payer's device.
+  // 1. `PayerDeviceInfoTypeIP`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 39 characters
+  //     * **Description** - IP address of the payer's device.
+  // 1. `PayerDeviceInfoTypeLocation`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 40 characters
+  //     * **Description** - Coarse location of the payer's device.
+  // 1. `PayerDeviceInfoTypeOS`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 20 characters
+  //     * **Description** - Operating system on the payer's device.
+  // 1. `PayerDeviceInfoTypeTelecomProvider`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 99 characters
+  //     * **Description** - Telecom provider for the payer's device.
+  // 1. `PayerDeviceInfoTypeDeviceType`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 9 characters
+  //     * **Description** - Type of the payer's device. This will be one of
+  //     'MOB', 'INET', 'USDC/USDB', 'POS'.
+  // 1. `PayeeDeviceInfoTypeAppName`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 20 characters
+  //     * **Description** - Payment application name on the payee's device.
+  // 1. `PayeeDeviceInfoTypeCapability`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 99 characters
+  //     * **Description** - Capability of the payee's device.
+  // 1. `PayeeDeviceInfoTypeGeoCode`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 15 characters
+  //     * **Description** - Geo code of the payee's device. This will include
+  //     floating point values for latitude and longitude (separated by colon).
+  // 1. `PayeeDeviceInfoTypeID`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - Device ID of the payee's device.
+  // 1. `PayeeDeviceInfoTypeIP`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 39 characters
+  //     * **Description** - IP address of the payee's device.
+  // 1. `PayeeDeviceInfoTypeLocation`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 40 characters
+  //     * **Description** - Coarse location of the payee's device.
+  // 1. `PayeeDeviceInfoTypeOS`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 20 characters
+  //     * **Description** - Operating system on the payee's device.
+  // 1. `PayeeDeviceInfoTypeTelecomProvider`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 99 characters
+  //     * **Description** - Telecom provider for the payee's device.
+  // 1. `PayeeDeviceInfoTypeDeviceType`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 9 characters
+  //     * **Description** - Type of the payee's device. This will be one of
+  //     `MOB`, `INET`, `USDC/USDB`, `POS`.
+  // 1. `ReferenceID`
+  //     * **Min Length** - 0 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - Consumer reference number to identify loan number,
+  //     order id etc.
+  // 1. `ReferenceURI`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 35 characters
+  //     * **Description** - URL for the  transaction.
+  // 1. `ReferenceCategory`
+  //     * **Min Length** - 2 characters
+  //     * **Max Length** - 2 characters
+  //     * **Description** - Reference category.
+  // 1. `MandateName`
+  //     * **Min Length** - 1 characters
+  //     * **Max Length** - 255 characters
+  //     * **Description** - The mandate's name.
   rpc ExportMandateTransactions(ExportMandateTransactionsRequest)
       returns (google.longrunning.Operation) {
     option (google.api.http) = {
@@ -710,6 +855,11 @@ message TransactionInfo {
     // with the transaction type as `TRANSACTION_TYPE_CREDIT` when the payment
     // was initiated in response to a refund.
     REFUND = 6;
+
+    // Credit subtype. This is used in a `SETTLE_PAYMENT` API type transaction,
+    // with the transaction type as `TRANSACTION_TYPE_REVERSAL` when the
+    // original payment was a credit request.
+    CREDIT = 7;
   }
 
   // Common metadata about an API transaction.
@@ -740,6 +890,9 @@ message TransactionInfo {
     // Output only. The purpose code of this API transaction. In UPI, the values
     // are as defined by the UPI API specification.
     string purpose_code = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // Output only. The reference category of this API transaction.
+    string reference_category = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
   // All details about any error in the processing of an API transaction.
@@ -987,59 +1140,49 @@ message MandateTransaction {
   // Output only. This maps to Unique Mandate Number (UMN) in UPI specification.
   string unique_mandate_number = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Output only. The virtual payment address (VPA) of the payer.
-  string payer_vpa = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // Output only. The payer in the transaction.
+  SettlementParticipant payer = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Output only. The virtual payment address (VPA) of the payee.
-  string payee_vpa = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. A unique identifier for merchant.
-  string payee_merchant_id = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. The mobile number of the payer consisting of total twelve
-  // digits where first two digits of country code (for eg. 91 for India) and
-  // then ten digits mobile number. For eg. 911234567890
-  string payer_mobile_number = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. The mobile number of the payer consisting of total twelve
-  // digits where first two digits of country code (for eg. 91 for India) and
-  // then ten digits mobile number. For eg. 911234567890
-  string payee_mobile_number = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // Output only. The payee in the transaction.
+  SettlementParticipant payee = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The type of recurrence pattern of the mandate.
-  RecurrencePatternType recurrence_pattern = 9
+  RecurrencePatternType recurrence_pattern = 6
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The type of recurrence rule of the mandate.
-  RecurrenceRuleType recurrence_rule_type = 10
+  RecurrenceRuleType recurrence_rule_type = 7
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The recurrence rule value of the mandate. This is a value from
   // 1 to 31.
-  int32 recurrence_rule_value = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int32 recurrence_rule_value = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The start date of the mandate.
-  google.type.Date start_date = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.type.Date start_date = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The end date of the mandate.
-  google.type.Date end_date = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.type.Date end_date = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. If true, this specifies mandate can be revoked.
-  bool revokable = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool revokable = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The amount of the mandate.
-  double amount = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+  double amount = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The amount rule type of the mandate.
-  AmountRuleType amount_rule = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+  AmountRuleType amount_rule = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The Block funds reference generated by the bank, this will be
   // available only when Recurrence is ONETIME.
-  string approval_reference = 17 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string approval_reference = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. If true, this specifies the mandate transaction requested
   // funds to be blocked.
-  bool block_funds = 18 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool block_funds = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The mandate's name.
+  string mandate_name = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // A complaint API transaction processed by the issuer switch. In
@@ -1118,21 +1261,10 @@ message ListMetadataTransactionsRequest {
   //   values. Allowed comparison operators: `=`.
   //   * `transactionID` - The UPI transaction ID of the metadata transaction.
   //   Allowed comparison operators: `=`.
-  //   * `originVPA` - The VPA of the originator of a metadata transaction.
-  //   Allowed comparison operators: `=`.
   //   * `createTime` - The time at which the transaction was created
   //   (received) by the issuer switch. The value should be in
   //   the format `YYYY-MM-DDTHH:MM:SSZ`. Allowed comparison operators: `>`,
   //   `<`.
-  //   * `state` - The state of the transaction. Must be one of
-  //   [TransactionInfo.State][google.cloud.paymentgateway.issuerswitch.v1.TransactionInfo.State]
-  //   values. Allowed comparison operators: `=`.
-  //   * `errorCode` - Use this filter to list financial transactions which
-  //   have failed a particular error code. Allowed comparison operators:
-  //   `=`.
-  //   * `adapterRequestID` - Adapter request ID used when invoking the Bank or
-  //   Card Adapter API for fulfilling a transaction request. Allowed comparison
-  //   operators: `=`.
   //
   // You can combine multiple expressions by enclosing each expression in
   // parentheses. Expressions are combined with AND logic. No other logical
@@ -1186,12 +1318,6 @@ message ListFinancialTransactionsRequest {
   // The following fields in the `FinancialTransaction` are eligible for
   // filtering:
   //
-  //   * `transactionType` - The transaction type of the financial
-  //   transaction. Must be one of
-  //   [TransactionType][google.cloud.paymentgateway.issuerswitch.v1.TransactionType]
-  //   values. For financial transactions, only valid transaction types are
-  //   `TRANSACTION_TYPE_CREDIT`, `TRANSACTION_TYPE_DEBIT` and
-  //   `TRANSACTION_TYPE_REVERSAL`. Allowed comparison operators: `=`.
   //   * `transactionID` - The UPI transaction ID of the financial
   //   transaction. Allowed comparison operators: `=`.
   //   * `RRN` - The retrieval reference number of the transaction. Allowed
@@ -1204,20 +1330,10 @@ message ListFinancialTransactionsRequest {
   //      transaction. Allowed comparison operators: `=`.
   //   * `payeeMobileNumber` - The mobile number of the payee in a financial
   //      transaction. Allowed comparison operators: `=`.
-  //   * `payeeMerchantId` - The merchant id of the payee in a financial
-  //      transaction. Allowed comparison operators: `=`.
   //   * `createTime` - The time at which the transaction was created
   //   (received) by the issuer switch. The value should be in
   //   the format `YYYY-MM-DDTHH:MM:SSZ`. Allowed comparison operators: `>`,
   //   `<`.
-  //   * `state` - The state of the transaction. Must be one of
-  //   [TransactionInfo.State][google.cloud.paymentgateway.issuerswitch.v1.TransactionInfo.State]
-  //   values. Allowed comparison operators: `=`.
-  //   * `errorCode` - Use this filter to list financial transactions which
-  //   have failed a particular error code. Allowed comparison operators: `=`.
-  //   * `adapterRequestID` - Adapter request ID used when invoking the Bank or
-  //   Card Adapter API for fulfilling a transaction request. Allowed comparison
-  //   operators: `=`.
   //
   // You can combine multiple expressions by enclosing each expression in
   // parentheses. Expressions are combined with AND logic. No other logical
@@ -1225,12 +1341,11 @@ message ListFinancialTransactionsRequest {
   //
   // Here are a few examples:
   //
-  //   * `transactionType = CREDIT` - The transaction type is _CREDIT_.
-  //   * `state = SUCCEEDED` - The transaction's state is _SUCCEEDED_.
-  //   * `payerVpa = example@okbank` - The VPA of the payer is the string
-  //   _example@okbank_.
-  //   * `(transactionType = DEBIT) AND (createTime < "2021-08-15T14:50:00Z")`
-  //   - The transaction type is _DEBIT_ and the transaction was received
+  //   * `rrn = 123456789123` - The RRN is _123456789123_.
+  //   * `payerVpa = example@goog` - The VPA of the payer is the string
+  //   _example@goog_.
+  //   * `(payeeVpa = example@goog) AND (createTime < "2021-08-15T14:50:00Z")`
+  //   - The VPA of the payee is _example@goog_ and the transaction was received
   //   before _2021-08-15 14:50:00 UTC_.
   //   * `createTime > "2021-08-15T14:50:00Z" AND createTime <
   //   "2021-08-16T14:50:00Z"` - The transaction was received between
@@ -1286,37 +1401,10 @@ message ListMandateTransactionsRequest {
   //   values. For mandate transactions, only valid transaction types are
   //   `TRANSACTION_TYPE_CREATE`, `TRANSACTION_TYPE_REVOKE` and
   //   `TRANSACTION_TYPE_UPDATE`. Allowed comparison operators: `=`.
-  //   * `payerVPA` - The VPA of the payer in a mandate transaction. Allowed
-  //   comparison operators: `=`.
-  //   * `payeeVPA` - The VPA of the payee in a mandate transaction. Allowed
-  //   comparison operators: `=`.
-  //   * `payeeMerchantID` - The merchant ID of the payee in a mandate
-  //   transaction. Allowed comparison operators: `=`.
-  //   * `payerMobileNumber` - The mobile number of the payer in a mandate
-  //   transaction. Allowed comparison operators: `=`.
-  //   * `payeeMobileNumber` - The mobile number of the payee in a mandate
-  //   transaction. Allowed comparison operators: `=`.
   //   * `createTime` - The time at which the transaction was created
   //   (received) by the issuer switch. The value should be in
   //   the format `YYYY-MM-DDTHH:MM:SSZ`. Allowed comparison
   //   operators: `>`, `<`.
-  //   * `state` - The state of the transaction. Must be one of
-  //   [TransactionInfo.State][google.cloud.paymentgateway.issuerswitch.v1.TransactionInfo.State]
-  //   values. Allowed comparison operators: `=`.
-  //   * `recurrencePattern` - The recurrence pattern of the mandate. Must be
-  //   one of
-  //   [MandateTransaction.RecurrencePatternType][google.cloud.paymentgateway.issuerswitch.v1.MandateTransaction.RecurrencePatternType]
-  //   values. Allowed comparison operators: `=`.
-  //   * `startDate` - The start date of the mandate. The value should be in
-  //   the format `YYYY-MM-DD`. Allowed comparison operators: `<` and `>`.
-  //   * `endDate` - The end date of the mandate. The value should be in
-  //   the format `YYYY-MM-DD`. Allowed comparison operators: `<` and `>`.
-  //   * `errorCode` - Use this filter to list mandate transactions which
-  //   have failed a particular error code. Allowed comparison
-  //   operators: `=`.
-  //   * `adapterRequestID` - Adapter request ID used when invoking the Bank or
-  //   Card Adapter API for fulfilling a transaction request. Allowed comparison
-  //   operators: `=`.
   // You can combine multiple expressions by enclosing each expression in
   // parentheses. Expressions are combined with AND logic. No other logical
   // operators are supported.

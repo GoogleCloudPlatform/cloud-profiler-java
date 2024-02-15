@@ -25,6 +25,7 @@ proto_library(
         "agent.proto",
         "audio_config.proto",
         "changelog.proto",
+        "data_store_connection.proto",
         "deployment.proto",
         "entity_type.proto",
         "environment.proto",
@@ -32,9 +33,14 @@ proto_library(
         "flow.proto",
         "fulfillment.proto",
         "gcs.proto",
+        "generative_settings.proto",
+        "generator.proto",
+        "import_strategy.proto",
+        "inline.proto",
         "intent.proto",
         "page.proto",
         "response_message.proto",
+        "safety_settings.proto",
         "security_settings.proto",
         "session.proto",
         "session_entity_type.proto",
@@ -128,6 +134,8 @@ java_gapic_test(
         "com.google.cloud.dialogflow.cx.v3.ExperimentsClientTest",
         "com.google.cloud.dialogflow.cx.v3.FlowsClientHttpJsonTest",
         "com.google.cloud.dialogflow.cx.v3.FlowsClientTest",
+        "com.google.cloud.dialogflow.cx.v3.GeneratorsClientHttpJsonTest",
+        "com.google.cloud.dialogflow.cx.v3.GeneratorsClientTest",
         "com.google.cloud.dialogflow.cx.v3.IntentsClientHttpJsonTest",
         "com.google.cloud.dialogflow.cx.v3.IntentsClientTest",
         "com.google.cloud.dialogflow.cx.v3.PagesClientHttpJsonTest",
@@ -171,7 +179,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -208,19 +215,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "cx_go_gapic_test",
-    srcs = [":cx_go_gapic_srcjar_test"],
-    embed = [":cx_go_gapic"],
-    importpath = "cloud.google.com/go/dialogflow/cx/apiv3",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-dialogflow-cx-v3-go",
     deps = [
         ":cx_go_gapic",
         ":cx_go_gapic_srcjar-metadata.srcjar",
+        ":cx_go_gapic_srcjar-snippets.srcjar",
         ":cx_go_gapic_srcjar-test.srcjar",
         ":cx_go_proto",
     ],
@@ -252,16 +253,15 @@ py_gapic_library(
     ],
 )
 
-# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
-# py_test(
-#     name = "cx_py_gapic_test",
-#     srcs = [
-#         "cx_py_gapic_pytest.py",
-#         "cx_py_gapic_test.py",
-#     ],
-#     legacy_create_init = False,
-#     deps = [":cx_py_gapic"],
-# )
+py_test(
+    name = "cx_py_gapic_test",
+    srcs = [
+        "cx_py_gapic_pytest.py",
+        "cx_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":cx_py_gapic"],
+)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -278,7 +278,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -287,21 +286,15 @@ php_proto_library(
     deps = [":cx_proto"],
 )
 
-php_grpc_library(
-    name = "cx_php_grpc",
-    srcs = [":cx_proto"],
-    deps = [":cx_php_proto"],
-)
-
 php_gapic_library(
     name = "cx_php_gapic",
     srcs = [":cx_proto_with_info"],
     grpc_service_config = "dialogflow_grpc_service_config.json",
+    migration_mode = "NEW_SURFACE_ONLY",
     rest_numeric_enums = True,
     service_yaml = "dialogflow_v3.yaml",
     transport = "grpc+rest",
     deps = [
-        ":cx_php_grpc",
         ":cx_php_proto",
     ],
 )
@@ -311,7 +304,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-dialogflow-cx-v3-php",
     deps = [
         ":cx_php_gapic",
-        ":cx_php_grpc",
         ":cx_php_proto",
     ],
 )
@@ -385,6 +377,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Dialogflow is an end-to-end, build-once deploy-everywhere development suite for creating conversational interfaces for websites, mobile applications, popular messaging platforms, and IoT devices. You can use it to build interfaces (such as chatbots and conversational IVR) that enable natural and rich interactions between your users and your business. This client is for Dialogflow CX, providing an advanced agent type suitable for large or very complex agents.",
     ruby_cloud_title = "Dialogflow CX V3",
     service_yaml = "dialogflow_v3.yaml",
+    transport = "grpc+rest",
     deps = [
         ":cx_ruby_grpc",
         ":cx_ruby_proto",
@@ -414,6 +407,7 @@ load(
 
 csharp_proto_library(
     name = "cx_csharp_proto",
+    extra_opts = [],
     deps = [":cx_proto"],
 )
 

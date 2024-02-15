@@ -112,7 +112,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -140,19 +139,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "biglake_go_gapic_test",
-    srcs = [":biglake_go_gapic_srcjar_test"],
-    embed = [":biglake_go_gapic"],
-    importpath = "cloud.google.com/go/bigquery/biglake/apiv1alpha1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-bigquery-biglake-v1alpha1-go",
     deps = [
         ":biglake_go_gapic",
         ":biglake_go_gapic_srcjar-metadata.srcjar",
+        ":biglake_go_gapic_srcjar-snippets.srcjar",
         ":biglake_go_gapic_srcjar-test.srcjar",
         ":biglake_go_proto",
     ],
@@ -172,6 +165,10 @@ py_gapic_library(
     name = "biglake_py_gapic",
     srcs = [":biglake_proto"],
     grpc_service_config = "biglake_v1alpha1_grpc_service_config.json",
+    opt_args = [
+        "python-gapic-namespace=google.cloud",
+        "python-gapic-name=bigquery_biglake",
+    ],
     rest_numeric_enums = True,
     service_yaml = "biglake_v1alpha1.yaml",
     transport = "grpc+rest",
@@ -204,19 +201,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "biglake_php_proto",
     deps = [":biglake_proto"],
-)
-
-php_grpc_library(
-    name = "biglake_php_grpc",
-    srcs = [":biglake_proto"],
-    deps = [":biglake_php_proto"],
 )
 
 php_gapic_library(
@@ -226,10 +216,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "biglake_v1alpha1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":biglake_php_grpc",
-        ":biglake_php_proto",
-    ],
+    deps = [":biglake_php_proto"],
 )
 
 # Open Source Packages
@@ -237,7 +224,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-bigquery-biglake-v1alpha1-php",
     deps = [
         ":biglake_php_gapic",
-        ":biglake_php_grpc",
         ":biglake_php_proto",
     ],
 )

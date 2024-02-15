@@ -111,7 +111,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -141,19 +140,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "iap_go_gapic_test",
-    srcs = [":iap_go_gapic_srcjar_test"],
-    embed = [":iap_go_gapic"],
-    importpath = "cloud.google.com/go/iap/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-iap-v1beta1-go",
     deps = [
         ":iap_go_gapic",
         ":iap_go_gapic_srcjar-metadata.srcjar",
+        ":iap_go_gapic_srcjar-snippets.srcjar",
         ":iap_go_gapic_srcjar-test.srcjar",
         ":iap_go_proto",
     ],
@@ -206,19 +199,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "iap_php_proto",
     deps = [":iap_proto"],
-)
-
-php_grpc_library(
-    name = "iap_php_grpc",
-    srcs = [":iap_proto"],
-    deps = [":iap_php_proto"],
 )
 
 php_gapic_library(
@@ -228,10 +214,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "iap_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":iap_php_grpc",
-        ":iap_php_proto",
-    ],
+    deps = [":iap_php_proto"],
 )
 
 # Open Source Packages
@@ -239,7 +222,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-iap-v1beta1-php",
     deps = [
         ":iap_php_gapic",
-        ":iap_php_grpc",
         ":iap_php_proto",
     ],
 )
@@ -311,6 +293,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "IAP lets you establish a central authorization layer for applications accessed by HTTPS, so you can use an application-level access control model instead of relying on network-level firewalls.",
     ruby_cloud_title = "Identity-Aware Proxy V1beta1",
     service_yaml = "iap_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iap_ruby_grpc",
         ":iap_ruby_proto",

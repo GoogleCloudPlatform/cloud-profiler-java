@@ -115,13 +115,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "mapsplatformdatasets_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/maps/mapsplatformdatasets/v1alpha",
+    importpath = "cloud.google.com/go/maps/mapsplatformdatasets/apiv1alpha/mapsplatformdatasetspb",
     protos = [":mapsplatformdatasets_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -134,6 +133,7 @@ go_gapic_library(
     grpc_service_config = "mapsplatformdatasets_grpc_service_config.json",
     importpath = "cloud.google.com/go/maps/mapsplatformdatasets/apiv1alpha;mapsplatformdatasets",
     metadata = True,
+    release_level = "alpha",
     rest_numeric_enums = True,
     service_yaml = "mapsplatformdatasets_v1alpha.yaml",
     transport = "grpc+rest",
@@ -142,19 +142,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "mapsplatformdatasets_go_gapic_test",
-    srcs = [":mapsplatformdatasets_go_gapic_srcjar_test"],
-    embed = [":mapsplatformdatasets_go_gapic"],
-    importpath = "cloud.google.com/go/maps/mapsplatformdatasets/apiv1alpha",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-maps-mapsplatformdatasets-v1alpha-go",
     deps = [
         ":mapsplatformdatasets_go_gapic",
         ":mapsplatformdatasets_go_gapic_srcjar-metadata.srcjar",
+        ":mapsplatformdatasets_go_gapic_srcjar-snippets.srcjar",
         ":mapsplatformdatasets_go_gapic_srcjar-test.srcjar",
         ":mapsplatformdatasets_go_proto",
     ],
@@ -206,19 +200,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "mapsplatformdatasets_php_proto",
     deps = [":mapsplatformdatasets_proto"],
-)
-
-php_grpc_library(
-    name = "mapsplatformdatasets_php_grpc",
-    srcs = [":mapsplatformdatasets_proto"],
-    deps = [":mapsplatformdatasets_php_proto"],
 )
 
 php_gapic_library(
@@ -229,7 +216,6 @@ php_gapic_library(
     service_yaml = "mapsplatformdatasets_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
-        ":mapsplatformdatasets_php_grpc",
         ":mapsplatformdatasets_php_proto",
     ],
 )
@@ -239,7 +225,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-maps-mapsplatformdatasets-v1alpha-php",
     deps = [
         ":mapsplatformdatasets_php_gapic",
-        ":mapsplatformdatasets_php_grpc",
         ":mapsplatformdatasets_php_proto",
     ],
 )
@@ -303,6 +288,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "mapsplatformdatasets_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "mapsplatformdatasets_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":mapsplatformdatasets_ruby_grpc",
         ":mapsplatformdatasets_ruby_proto",
@@ -332,6 +318,7 @@ load(
 
 csharp_proto_library(
     name = "mapsplatformdatasets_csharp_proto",
+    extra_opts = [],
     deps = [":mapsplatformdatasets_proto"],
 )
 

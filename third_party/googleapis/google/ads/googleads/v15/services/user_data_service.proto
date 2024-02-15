@@ -14,29 +14,13 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/common/offline_user_data.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/common/offline_user_data.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "UserDataServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -45,7 +29,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
 
 // Proto file describing the UserDataService.
 
@@ -75,22 +58,14 @@ service UserDataService {
   //   [UserDataError]()
   rpc UploadUserData(UploadUserDataRequest) returns (UploadUserDataResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-      post: "/v12/customers/{customer_id=*}:uploadUserData"
-========
       post: "/v15/customers/{customer_id=*}:uploadUserData"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
       body: "*"
     };
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-// Request message for [UserDataService.UploadUserData][google.ads.googleads.v12.services.UserDataService.UploadUserData]
-========
 // Request message for
 // [UserDataService.UploadUserData][google.ads.googleads.v15.services.UserDataService.UploadUserData]
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
 message UploadUserDataRequest {
   // Required. The ID of the customer for which to update the user data.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -102,12 +77,8 @@ message UploadUserDataRequest {
   // Metadata of the request.
   oneof metadata {
     // Metadata for data updates to a Customer Match user list.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-    google.ads.googleads.v12.common.CustomerMatchUserListMetadata customer_match_user_list_metadata = 2;
-========
     google.ads.googleads.v15.common.CustomerMatchUserListMetadata
         customer_match_user_list_metadata = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
   }
 }
 
@@ -116,16 +87,6 @@ message UserDataOperation {
   // Operation to be made for the UploadUserDataRequest.
   oneof operation {
     // The list of user data to be appended to the user list.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/user_data_service.proto
-    google.ads.googleads.v12.common.UserData create = 1;
-
-    // The list of user data to be removed from the user list.
-    google.ads.googleads.v12.common.UserData remove = 2;
-  }
-}
-
-// Response message for [UserDataService.UploadUserData][google.ads.googleads.v12.services.UserDataService.UploadUserData]
-========
     google.ads.googleads.v15.common.UserData create = 1;
 
     // The list of user data to be removed from the user list.
@@ -135,7 +96,6 @@ message UserDataOperation {
 
 // Response message for
 // [UserDataService.UploadUserData][google.ads.googleads.v15.services.UserDataService.UploadUserData]
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/user_data_service.proto
 // Uploads made through this service will not be visible under the 'Segment
 // members' section for the Customer Match List in the Google Ads UI.
 message UploadUserDataResponse {

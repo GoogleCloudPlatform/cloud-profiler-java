@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ option java_package = "com.google.cloud.securitycenter.v1";
 option php_namespace = "Google\\Cloud\\SecurityCenter\\V1";
 option ruby_package = "Google::Cloud::SecurityCenter::V1";
 
-// The details pertaining to specific contacts
+// Details about specific contacts
 message ContactDetails {
   // A list of contacts
   repeated Contact contacts = 1;
 }
 
-// Representa a single contact's email address
+// The email address of a contact.
 message Contact {
-  // An email address e.g. "person123@company.com"
+  // An email address. For example, "`person123@company.com`".
   string email = 1;
 }

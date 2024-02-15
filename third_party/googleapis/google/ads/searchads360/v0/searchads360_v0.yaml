@@ -5,6 +5,7 @@ title: Search Ads 360 Reporting API
 
 apis:
 - name: google.ads.searchads360.v0.services.CustomColumnService
+- name: google.ads.searchads360.v0.services.CustomerService
 - name: google.ads.searchads360.v0.services.SearchAds360FieldService
 - name: google.ads.searchads360.v0.services.SearchAds360Service
 
@@ -13,21 +14,6 @@ documentation:
     The Search Ads 360 API allows developers to automate downloading reports
     from Search Ads 360.
 
-backend:
-  rules:
-  - selector: google.ads.searchads360.v0.services.CustomColumnService.GetCustomColumn
-    deadline: 600.0
-  - selector: google.ads.searchads360.v0.services.CustomColumnService.ListCustomColumns
-    deadline: 600.0
-  - selector: google.ads.searchads360.v0.services.SearchAds360FieldService.GetSearchAds360Field
-    deadline: 600.0
-  - selector: google.ads.searchads360.v0.services.SearchAds360FieldService.SearchSearchAds360Fields
-    deadline: 600.0
-  - selector: google.ads.searchads360.v0.services.SearchAds360Service.Search
-    deadline: 3600.0
-  - selector: google.ads.searchads360.v0.services.SearchAds360Service.SearchStream
-    deadline: 3600.0
-
 authentication:
   rules:
   - selector: google.ads.searchads360.v0.services.CustomColumnService.GetCustomColumn
@@ -35,6 +21,10 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/doubleclicksearch
   - selector: google.ads.searchads360.v0.services.CustomColumnService.ListCustomColumns
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/doubleclicksearch
+  - selector: google.ads.searchads360.v0.services.CustomerService.ListAccessibleCustomers
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/doubleclicksearch

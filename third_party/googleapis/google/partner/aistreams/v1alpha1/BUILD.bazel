@@ -24,7 +24,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -34,7 +33,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -90,12 +88,14 @@ java_gapic_library(
     srcs = [":aistreams_proto_with_info"],
     grpc_service_config = "aistreams_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "aistreams_v1alpha1.yaml",
     test_deps = [
         ":aistreams_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":aistreams_java_proto",
+        "//google/api:api_java_proto",
     ],
 )
 
@@ -148,18 +148,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "aistreams_go_gapic_test",
-    srcs = [":aistreams_go_gapic_srcjar_test"],
-    embed = [":aistreams_go_gapic"],
-    importpath = "cloud.google.com/go/partner/aistreams/apiv1alpha1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-partner-aistreams-v1alpha1-go",
     deps = [
         ":aistreams_go_gapic",
+        ":aistreams_go_gapic_srcjar-snippets.srcjar",
         ":aistreams_go_gapic_srcjar-test.srcjar",
         ":aistreams_go_proto",
     ],
@@ -197,12 +191,6 @@ php_proto_library(
     deps = [":aistreams_proto"],
 )
 
-php_grpc_library(
-    name = "aistreams_php_grpc",
-    srcs = [":aistreams_proto"],
-    deps = [":aistreams_php_proto"],
-)
-
 php_gapic_library(
     name = "aistreams_php_gapic",
     srcs = [":aistreams_proto_with_info"],
@@ -210,10 +198,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "aistreams_v1alpha1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":aistreams_php_grpc",
-        ":aistreams_php_proto",
-    ],
+    deps = [":aistreams_php_proto"],
 )
 
 # Open Source Packages
@@ -221,7 +206,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-partner-aistreams-v1alpha1-php",
     deps = [
         ":aistreams_php_gapic",
-        ":aistreams_php_grpc",
         ":aistreams_php_proto",
     ],
 )
@@ -264,6 +248,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "aistreams_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "aistreams_v1alpha1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":aistreams_ruby_grpc",
         ":aistreams_ruby_proto",

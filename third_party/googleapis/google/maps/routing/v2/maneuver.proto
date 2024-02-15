@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package google.maps.routing.v2;
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Maps.Routing.V2";
-option go_package = "google.golang.org/genproto/googleapis/maps/routing/v2;routing";
+option go_package = "cloud.google.com/go/maps/routing/apiv2/routingpb;routingpb";
 option java_multiple_files = true;
 option java_outer_classname = "ManeuverProto";
 option java_package = "com.google.maps.routing.v2";
@@ -85,4 +85,10 @@ enum Maneuver {
 
   // Turn right at the roundabout.
   ROUNDABOUT_RIGHT = 18;
+
+  // Initial maneuver.
+  DEPART = 19;
+
+  // Used to indicate a street name change.
+  NAME_CHANGE = 20;
 }

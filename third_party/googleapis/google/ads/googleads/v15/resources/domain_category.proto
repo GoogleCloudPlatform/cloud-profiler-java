@@ -14,25 +14,11 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/domain_category.proto
-package google.ads.googleads.v12.resources;
-========
 package google.ads.googleads.v15.resources;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/domain_category.proto
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/domain_category.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "DomainCategoryProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Resources";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/resources;resources";
 option java_multiple_files = true;
@@ -41,7 +27,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/domain_category.proto
 
 // Proto file describing the Domain Category resource.
 
@@ -74,19 +59,6 @@ message DomainCategory {
     }
   ];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/domain_category.proto
-  // Output only. Recommended category for the website domain, for example, if you have a
-  // website about electronics, the categories could be "cameras",
-  // "televisions", etc.
-  optional string category = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  // Output only. The language code specifying the language of the website, for example, "en"
-  // for English. The language can be specified in the DynamicSearchAdsSetting
-  // required for dynamic search ads. This is the language of the pages from
-  // your website that you want Google Ads to find, create ads for,
-  // and match searches with.
-  optional string language_code = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   // Output only. Recommended category for the website domain, for example, if
   // you have a website about electronics, the categories could be "cameras",
   // "televisions", etc.
@@ -99,7 +71,6 @@ message DomainCategory {
   // create ads for, and match searches with.
   optional string language_code = 12
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/domain_category.proto
 
   // Output only. The domain for the website. The domain can be specified in the
   // DynamicSearchAdsSetting required for dynamic search ads.

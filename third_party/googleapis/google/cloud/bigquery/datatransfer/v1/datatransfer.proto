@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -236,6 +236,18 @@ service DataTransferService {
       }
     };
   }
+
+  // Unenroll data sources in a user project. This allows users to remove
+  // transfer configurations for these data sources. They will no longer appear
+  // in the ListDataSources RPC and will also no longer appear in the [BigQuery
+  // UI](https://console.cloud.google.com/bigquery).
+  rpc UnenrollDataSources(UnenrollDataSourcesRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/locations/*}:unenrollDataSources"
+      body: "*"
+    };
+  }
 }
 
 // A parameter used to define custom fields in a data source definition.
@@ -263,6 +275,9 @@ message DataSourceParameter {
 
     // Page ID for a Google+ Page.
     PLUS_PAGE = 6;
+
+    // List of strings parameter.
+    LIST = 7;
   }
 
   // Parameter identifier.
@@ -861,11 +876,16 @@ message StartManualTransferRunsRequest {
   // The requested time specification - this can be a time range or a specific
   // run_time.
   oneof time {
-    // Time range for the transfer runs that should be started.
+    // A time_range start and end timestamp for historical data files or reports
+    // that are scheduled to be transferred by the scheduled transfer run.
+    // requested_time_range must be a past time and cannot include future time
+    // values.
     TimeRange requested_time_range = 3;
 
-    // Specific run_time for a transfer run to be started. The
-    // requested_run_time must not be in the future.
+    // A run_time timestamp for historical data files or reports
+    // that are scheduled to be transferred by the scheduled transfer run.
+    // requested_run_time must be a past time and cannot include future time
+    // values.
     google.protobuf.Timestamp requested_run_time = 4;
   }
 }
@@ -883,6 +903,17 @@ message EnrollDataSourcesRequest {
   string name = 1;
 
   // Data sources that are enrolled. It is required to provide at least one
+  // data source id.
+  repeated string data_source_ids = 2;
+}
+
+// A request to unenroll a set of data sources so they are no longer visible in
+// the BigQuery UI's `Transfer` tab.
+message UnenrollDataSourcesRequest {
+  // The name of the project resource in the form: `projects/{project_id}`
+  string name = 1;
+
+  // Data sources that are unenrolled. It is required to provide at least one
   // data source id.
   repeated string data_source_ids = 2;
 }

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,8 +45,21 @@ message UiDetectionRequest {
   // Required. Required field that indicates the detection type.
   DetectionRequest request = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // Indicates whether to resize the image when detecting.
+  // Indicates whether to fall back to resizing the image if no elements are
+  // detected.
   optional bool resize_image = 3;
+
+  // Deprecated as of 2023-03-29. Use test_metadata instead.
+  string test_id = 4 [deprecated = true];
+
+  // Optional. Metadata about the client for analytics.
+  TestMetadata test_metadata = 5 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Indicates whether to always start by resizing the image.
+  bool force_image_resizing = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Indicates whether to respond with the transformed image png.
+  bool return_transformed_image = 7 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Detection type specifies what to detect in the image.
@@ -61,6 +74,22 @@ message DetectionRequest {
     // Detection type for custom icon detection.
     CustomIconDetectionRequest custom_icon_detection_request = 3;
   }
+}
+
+// Metadata about the client test and test device.
+message TestMetadata {
+  // Name of the calling test. For example, 'tast.uidetection.BasicDetections'.
+  string test_id = 1;
+
+  // Board name of the ChromeOS device under test. For example, 'volteer'.
+  string board = 2;
+
+  // Model name of the ChromeOS device under test. For example, 'volet'.
+  string model = 3;
+
+  // ChromeOS build of the device under test.
+  // For example, 'volteer-release/R110-15275.0.0-75031-8794956681263330561'.
+  string cros_build = 4;
 }
 
 // Detection type for word detection.
@@ -116,6 +145,14 @@ message CustomIconDetectionRequest {
 message UiDetectionResponse {
   // Locations of matching UI elements.
   repeated BoundingBox bounding_boxes = 1;
+
+  // The transformed detection image PNG, if requested and transformations were
+  // applied.
+  bytes transformed_image_png = 2;
+
+  // The amount the original image was scaled by to make the transformed image.
+  // 1.0 if the detection result is not based on a resized image.
+  float resizing_scale_factor = 3;
 }
 
 // The location of a UI element.

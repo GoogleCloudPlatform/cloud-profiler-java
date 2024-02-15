@@ -14,10 +14,10 @@ load(
     "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_library",
+    "py_import",
     "py_test",
     "ruby_grpc_library",
     "ruby_proto_library",
@@ -92,7 +92,7 @@ java_gapic_assembly_gradle_pkg(
 go_proto_library(
     name = "routes_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/maps/routes/v1",
+    importpath = "cloud.google.com/go/maps/routes/apiv1/routespb",
     protos = [":routes_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -103,14 +103,24 @@ go_proto_library(
     ],
 )
 
+py_import(
+    name = "viewport",
+    srcs = [
+        "//google/geo/type:viewport_py_gapic",
+    ],
+)
+
 py_gapic_library(
     name = "routes_py_gapic",
     srcs = [":routes_proto"],
     grpc_service_config = "routes_grpc_service_config.json",
+    opt_args = [
+        "proto-plus-deps=google.geo.type",
+    ],
     rest_numeric_enums = True,
     transport = "grpc+rest",
     deps = [
-        "//google/geo/type:viewport_py_proto",
+        ":viewport",
     ],
 )
 
@@ -127,12 +137,6 @@ py_test(
 php_proto_library(
     name = "routes_php_proto",
     deps = [":routes_proto"],
-)
-
-php_grpc_library(
-    name = "routes_php_grpc",
-    srcs = [":routes_proto"],
-    deps = [":routes_php_proto"],
 )
 
 ruby_proto_library(

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package google.maps.routing.v2;
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Maps.Routing.V2";
-option go_package = "google.golang.org/genproto/googleapis/maps/routing/v2;routing";
+option go_package = "cloud.google.com/go/maps/routing/apiv2/routingpb;routingpb";
 option java_multiple_files = true;
 option java_outer_classname = "RoutingPreferenceProto";
 option java_package = "com.google.maps.routing.v2";
@@ -35,12 +35,13 @@ enum RoutingPreference {
   // Computes routes without taking live traffic conditions into consideration.
   // Suitable when traffic conditions don't matter or are not applicable.
   // Using this value produces the lowest latency.
-  // Note: For `RouteTravelMode` DRIVE and TWO_WHEELER choice of route and
-  // duration are based on road network and average time-independent traffic
-  // conditions. Results for a given request may vary over time due to changes
-  // in the road network, updated average traffic conditions, and the
-  // distributed nature of the service. Results may also vary between
-  // nearly-equivalent routes at any time or frequency.
+  // Note: For [RouteTravelMode][google.maps.routing.v2.RouteTravelMode] `DRIVE`
+  // and `TWO_WHEELER` choice of route and duration are based on road network
+  // and average time-independent traffic conditions. Results for a given
+  // request may vary over time due to changes in the road network, updated
+  // average traffic conditions, and the distributed nature of the service.
+  // Results may also vary between nearly-equivalent routes at any time or
+  // frequency.
   TRAFFIC_UNAWARE = 1;
 
   // Calculates routes taking live traffic conditions into consideration.

@@ -14,15 +14,9 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-package google.ads.googleads.v12.services;
-
-import "google/ads/googleads/v12/resources/experiment.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/resources/experiment.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -32,16 +26,6 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "ExperimentServiceProto";
-option java_package = "com.google.ads.googleads.v12.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V12::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -50,7 +34,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 
 // Proto file describing the Experiment service.
 
@@ -72,11 +55,7 @@ service ExperimentService {
   rpc MutateExperiments(MutateExperimentsRequest)
       returns (MutateExperimentsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      post: "/v12/customers/{customer_id=*}/experiments:mutate"
-========
       post: "/v15/customers/{customer_id=*}/experiments:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -96,11 +75,7 @@ service ExperimentService {
   //   [RequestError]()
   rpc EndExperiment(EndExperimentRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      post: "/v12/{experiment=customers/*/experiments/*}:endExperiment"
-========
       post: "/v15/{experiment=customers/*/experiments/*}:endExperiment"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "experiment";
@@ -120,11 +95,7 @@ service ExperimentService {
   rpc ListExperimentAsyncErrors(ListExperimentAsyncErrorsRequest)
       returns (ListExperimentAsyncErrorsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      get: "/v12/{resource_name=customers/*/experiments/*}:listExperimentAsyncErrors"
-========
       get: "/v15/{resource_name=customers/*/experiments/*}:listExperimentAsyncErrors"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
     };
     option (google.api.method_signature) = "resource_name";
   }
@@ -143,11 +114,7 @@ service ExperimentService {
   rpc GraduateExperiment(GraduateExperimentRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      post: "/v12/{experiment=customers/*/experiments/*}:graduateExperiment"
-========
       post: "/v15/{experiment=customers/*/experiments/*}:graduateExperiment"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
       body: "*"
     };
     option (google.api.method_signature) =
@@ -181,21 +148,13 @@ service ExperimentService {
   rpc ScheduleExperiment(ScheduleExperimentRequest)
       returns (google.longrunning.Operation) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      post: "/v12/{resource_name=customers/*/experiments/*}:scheduleExperiment"
-========
       post: "/v15/{resource_name=customers/*/experiments/*}:scheduleExperiment"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "resource_name";
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      metadata_type: "google.ads.googleads.v12.services.ScheduleExperimentMetadata"
-========
       metadata_type: "google.ads.googleads.v15.services.ScheduleExperimentMetadata"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
     };
   }
 
@@ -218,31 +177,19 @@ service ExperimentService {
   rpc PromoteExperiment(PromoteExperimentRequest)
       returns (google.longrunning.Operation) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      post: "/v12/{resource_name=customers/*/experiments/*}:promoteExperiment"
-========
       post: "/v15/{resource_name=customers/*/experiments/*}:promoteExperiment"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "resource_name";
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-      metadata_type: "google.ads.googleads.v12.services.PromoteExperimentMetadata"
-========
       metadata_type: "google.ads.googleads.v15.services.PromoteExperimentMetadata"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
     };
   }
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// Request message for [ExperimentService.MutateExperiments][google.ads.googleads.v12.services.ExperimentService.MutateExperiments].
-========
 // Request message for
 // [ExperimentService.MutateExperiments][google.ads.googleads.v15.services.ExperimentService.MutateExperiments].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message MutateExperimentsRequest {
   // Required. The ID of the customer whose experiments are being modified.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -270,19 +217,11 @@ message ExperimentOperation {
   // The mutate operation.
   oneof operation {
     // Create operation
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-    google.ads.googleads.v12.resources.Experiment create = 1;
-
-    // Update operation: The experiment is expected to have a valid
-    // resource name.
-    google.ads.googleads.v12.resources.Experiment update = 2;
-========
     google.ads.googleads.v15.resources.Experiment create = 1;
 
     // Update operation: The experiment is expected to have a valid
     // resource name.
     google.ads.googleads.v15.resources.Experiment update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 
     // Remove operation: The experiment is expected to have a valid
     // resource name, in this format:
@@ -314,12 +253,8 @@ message MutateExperimentResult {
   }];
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// Request message for [ExperimentService.EndExperiment][google.ads.googleads.v12.services.ExperimentService.EndExperiment].
-========
 // Request message for
 // [ExperimentService.EndExperiment][google.ads.googleads.v15.services.ExperimentService.EndExperiment].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message EndExperimentRequest {
   // Required. The resource name of the campaign experiment to end.
   string experiment = 1 [
@@ -335,11 +270,7 @@ message EndExperimentRequest {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// [ExperimentService.ListExperimentAsyncErrors][google.ads.googleads.v12.services.ExperimentService.ListExperimentAsyncErrors].
-========
 // [ExperimentService.ListExperimentAsyncErrors][google.ads.googleads.v15.services.ExperimentService.ListExperimentAsyncErrors].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message ListExperimentAsyncErrorsRequest {
   // Required. The name of the experiment from which to retrieve the async
   // errors.
@@ -364,11 +295,7 @@ message ListExperimentAsyncErrorsRequest {
 }
 
 // Response message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// [ExperimentService.ListExperimentAsyncErrors][google.ads.googleads.v12.services.ExperimentService.ListExperimentAsyncErrors].
-========
 // [ExperimentService.ListExperimentAsyncErrors][google.ads.googleads.v15.services.ExperimentService.ListExperimentAsyncErrors].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message ListExperimentAsyncErrorsResponse {
   // details of the errors when performing the asynchronous operation.
   repeated google.rpc.Status errors = 1;
@@ -380,12 +307,8 @@ message ListExperimentAsyncErrorsResponse {
   string next_page_token = 2;
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// Request message for [ExperimentService.GraduateExperiment][google.ads.googleads.v12.services.ExperimentService.GraduateExperiment].
-========
 // Request message for
 // [ExperimentService.GraduateExperiment][google.ads.googleads.v15.services.ExperimentService.GraduateExperiment].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message GraduateExperimentRequest {
   // Required. The experiment to be graduated.
   string experiment = 1 [
@@ -426,12 +349,8 @@ message CampaignBudgetMapping {
   ];
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// Request message for [ExperimentService.ScheduleExperiment][google.ads.googleads.v12.services.ExperimentService.ScheduleExperiment].
-========
 // Request message for
 // [ExperimentService.ScheduleExperiment][google.ads.googleads.v15.services.ExperimentService.ScheduleExperiment].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message ScheduleExperimentRequest {
   // Required. The scheduled experiment.
   string resource_name = 1 [
@@ -457,12 +376,8 @@ message ScheduleExperimentMetadata {
   ];
 }
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/services/experiment_service.proto
-// Request message for [ExperimentService.PromoteExperiment][google.ads.googleads.v12.services.ExperimentService.PromoteExperiment].
-========
 // Request message for
 // [ExperimentService.PromoteExperiment][google.ads.googleads.v15.services.ExperimentService.PromoteExperiment].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/experiment_service.proto
 message PromoteExperimentRequest {
   // Required. The resource name of the experiment to promote.
   string resource_name = 1 [

@@ -24,7 +24,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -34,7 +33,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -132,7 +130,7 @@ java_gapic_assembly_gradle_pkg(
 go_proto_library(
     name = "storagetransfer_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/storagetransfer/v1",
+    importpath = "cloud.google.com/go/storagetransfer/apiv1/storagetransferpb",
     protos = [":storagetransfer_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -149,6 +147,7 @@ go_gapic_library(
     grpc_service_config = "storagetransfer_grpc_service_config.json",
     importpath = "cloud.google.com/go/storagetransfer/apiv1;storagetransfer",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "storagetransfer_v1.yaml",
     transport = "grpc+rest",
@@ -161,19 +160,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "storagetransfer_go_gapic_test",
-    srcs = [":storagetransfer_go_gapic_srcjar_test"],
-    embed = [":storagetransfer_go_gapic"],
-    importpath = "cloud.google.com/go/storagetransfer/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-storagetransfer-v1-go",
     deps = [
         ":storagetransfer_go_gapic",
         ":storagetransfer_go_gapic_srcjar-metadata.srcjar",
+        ":storagetransfer_go_gapic_srcjar-snippets.srcjar",
         ":storagetransfer_go_gapic_srcjar-test.srcjar",
         ":storagetransfer_go_proto",
     ],
@@ -216,23 +209,15 @@ php_proto_library(
     deps = [":storagetransfer_proto"],
 )
 
-php_grpc_library(
-    name = "storagetransfer_php_grpc",
-    srcs = [":storagetransfer_proto"],
-    deps = [":storagetransfer_php_proto"],
-)
-
 php_gapic_library(
     name = "storagetransfer_php_gapic",
     srcs = [":storagetransfer_proto_with_info"],
     grpc_service_config = "storagetransfer_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "storagetransfer_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":storagetransfer_php_grpc",
-        ":storagetransfer_php_proto",
-    ],
+    deps = [":storagetransfer_php_proto"],
 )
 
 # Open Source Packages
@@ -240,7 +225,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-storagetransfer-v1-php",
     deps = [
         ":storagetransfer_php_gapic",
-        ":storagetransfer_php_grpc",
         ":storagetransfer_php_proto",
     ],
 )
@@ -291,6 +275,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Storage Transfer Service allows you to quickly import online data into Cloud Storage. You can also set up a repeating schedule for transferring data, as well as transfer data within Cloud Storage, from one bucket to another.",
     ruby_cloud_title = "Storage Transfer Service V1",
     service_yaml = "storagetransfer_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":storagetransfer_ruby_grpc",
         ":storagetransfer_ruby_proto",

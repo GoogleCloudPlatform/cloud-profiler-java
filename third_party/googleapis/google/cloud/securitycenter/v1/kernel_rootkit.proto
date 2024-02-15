@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ option ruby_package = "Google::Cloud::SecurityCenter::V1";
 
 // Kernel mode rootkit signatures.
 message KernelRootkit {
-  // Rootkit name when available.
+  // Rootkit name, when available.
   string name = 1;
 
   // True if unexpected modifications of kernel code memory are present.

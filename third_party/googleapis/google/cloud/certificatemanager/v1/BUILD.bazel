@@ -118,7 +118,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -152,19 +151,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "certificatemanager_go_gapic_test",
-    srcs = [":certificatemanager_go_gapic_srcjar_test"],
-    embed = [":certificatemanager_go_gapic"],
-    importpath = "cloud.google.com/go/certificatemanager/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-certificatemanager-v1-go",
     deps = [
         ":certificatemanager_go_gapic",
         ":certificatemanager_go_gapic_srcjar-metadata.srcjar",
+        ":certificatemanager_go_gapic_srcjar-snippets.srcjar",
         ":certificatemanager_go_gapic_srcjar-test.srcjar",
         ":certificatemanager_go_proto",
     ],
@@ -221,7 +214,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -230,23 +222,15 @@ php_proto_library(
     deps = [":certificatemanager_proto"],
 )
 
-php_grpc_library(
-    name = "certificatemanager_php_grpc",
-    srcs = [":certificatemanager_proto"],
-    deps = [":certificatemanager_php_proto"],
-)
-
 php_gapic_library(
     name = "certificatemanager_php_gapic",
     srcs = [":certificatemanager_proto_with_info"],
     grpc_service_config = "certificatemanager_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "certificatemanager_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":certificatemanager_php_grpc",
-        ":certificatemanager_php_proto",
-    ],
+    deps = [":certificatemanager_php_proto"],
 )
 
 # Open Source Packages
@@ -254,7 +238,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-certificatemanager-v1-php",
     deps = [
         ":certificatemanager_php_gapic",
-        ":certificatemanager_php_grpc",
         ":certificatemanager_php_proto",
     ],
 )
@@ -325,6 +308,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Certificate Manager lets you acquire and manage Transport Layer Security (TLS) (SSL) certificates for use with classic external HTTP(S) load balancers in Google Cloud.",
     ruby_cloud_title = "Certificate Manager V1",
     service_yaml = "certificatemanager_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":certificatemanager_ruby_grpc",
         ":certificatemanager_ruby_proto",

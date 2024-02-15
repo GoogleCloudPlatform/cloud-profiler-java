@@ -115,7 +115,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -136,7 +135,7 @@ go_gapic_library(
     grpc_service_config = "edgecontainer_grpc_service_config.json",
     importpath = "cloud.google.com/go/edgecontainer/apiv1;edgecontainer",
     metadata = True,
-    release_level = "beta",
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "edgecontainer_v1.yaml",
     transport = "grpc+rest",
@@ -149,19 +148,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "edgecontainer_go_gapic_test",
-    srcs = [":edgecontainer_go_gapic_srcjar_test"],
-    embed = [":edgecontainer_go_gapic"],
-    importpath = "cloud.google.com/go/edgecontainer/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-edgecontainer-v1-go",
     deps = [
         ":edgecontainer_go_gapic",
         ":edgecontainer_go_gapic_srcjar-metadata.srcjar",
+        ":edgecontainer_go_gapic_srcjar-snippets.srcjar",
         ":edgecontainer_go_gapic_srcjar-test.srcjar",
         ":edgecontainer_go_proto",
     ],
@@ -184,7 +177,7 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "edgecontainer_v1.yaml",
     transport = "grpc+rest",
-    deps = ["//google/iam/v1:iam_policy_py_proto",],
+    deps = ["//google/iam/v1:iam_policy_py_proto"],
 )
 
 py_test(
@@ -212,19 +205,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "edgecontainer_php_proto",
     deps = [":edgecontainer_proto"],
-)
-
-php_grpc_library(
-    name = "edgecontainer_php_grpc",
-    srcs = [":edgecontainer_proto"],
-    deps = [":edgecontainer_php_proto"],
 )
 
 php_gapic_library(
@@ -234,10 +220,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "edgecontainer_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":edgecontainer_php_grpc",
-        ":edgecontainer_php_proto",
-    ],
+    deps = [":edgecontainer_php_proto"],
 )
 
 # Open Source Packages
@@ -245,7 +228,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-edgecontainer-v1-php",
     deps = [
         ":edgecontainer_php_gapic",
-        ":edgecontainer_php_grpc",
         ":edgecontainer_php_proto",
     ],
 )
@@ -309,6 +291,7 @@ ruby_cloud_gapic_library(
     grpc_service_config = "edgecontainer_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "edgecontainer_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":edgecontainer_ruby_grpc",
         ":edgecontainer_ruby_proto",

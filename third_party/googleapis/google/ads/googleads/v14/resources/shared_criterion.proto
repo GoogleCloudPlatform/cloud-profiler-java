@@ -14,23 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/shared_criterion.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/enums/criterion_type.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "SharedCriterionProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v14.resources;
 
 import "google/ads/googleads/v14/common/criteria.proto";
@@ -46,7 +29,6 @@ option java_package = "com.google.ads.googleads.v14.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V14::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/shared_criterion.proto
 
 // Proto file describing the SharedCriterion resource.
 
@@ -82,36 +64,14 @@ message SharedCriterion {
   optional int64 criterion_id = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. The type of the criterion.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/shared_criterion.proto
-  google.ads.googleads.v12.enums.CriterionTypeEnum.CriterionType type = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
-========
   google.ads.googleads.v14.enums.CriterionTypeEnum.CriterionType type = 4
       [(google.api.field_behavior) = OUTPUT_ONLY];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/shared_criterion.proto
 
   // The criterion.
   //
   // Exactly one must be set.
   oneof criterion {
     // Immutable. Keyword.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/shared_criterion.proto
-    google.ads.googleads.v12.common.KeywordInfo keyword = 3 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. YouTube Video.
-    google.ads.googleads.v12.common.YouTubeVideoInfo youtube_video = 5 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. YouTube Channel.
-    google.ads.googleads.v12.common.YouTubeChannelInfo youtube_channel = 6 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Placement.
-    google.ads.googleads.v12.common.PlacementInfo placement = 7 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Mobile App Category.
-    google.ads.googleads.v12.common.MobileAppCategoryInfo mobile_app_category = 8 [(google.api.field_behavior) = IMMUTABLE];
-
-    // Immutable. Mobile application.
-    google.ads.googleads.v12.common.MobileApplicationInfo mobile_application = 9 [(google.api.field_behavior) = IMMUTABLE];
-========
     google.ads.googleads.v14.common.KeywordInfo keyword = 3
         [(google.api.field_behavior) = IMMUTABLE];
 
@@ -134,6 +94,5 @@ message SharedCriterion {
     // Immutable. Mobile application.
     google.ads.googleads.v14.common.MobileApplicationInfo mobile_application = 9
         [(google.api.field_behavior) = IMMUTABLE];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/resources/shared_criterion.proto
   }
 }

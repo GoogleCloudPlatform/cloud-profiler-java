@@ -1077,7 +1077,14 @@ message BigQueryAuditMetadata {
     int64 total_slot_ms = 10;
 
     // Reservation usage attributed from each tier of a reservation hierarchy.
-    repeated ReservationResourceUsage reservation_usage = 11;
+    // This field reported misleading information and will no longer be
+    // populated. Aggregate usage of all jobs submitted to a reservation
+    // should provide a more reliable indicator of reservation imbalance.
+    repeated ReservationResourceUsage reservation_usage = 11
+        [deprecated = true];
+
+    // Reservation name or "unreserved" for on-demand resource usage.
+    string reservation = 14;
 
     // Parent job name. Only present for child jobs.
     string parent_job_name = 12;

@@ -14,22 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/frequency_cap.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/enums/frequency_cap_event_type.proto";
-import "google/ads/googleads/v12/enums/frequency_cap_level.proto";
-import "google/ads/googleads/v12/enums/frequency_cap_time_unit.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "FrequencyCapProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v15.common;
 
 import "google/ads/googleads/v15/enums/frequency_cap_event_type.proto";
@@ -44,7 +28,6 @@ option java_package = "com.google.ads.googleads.v15.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V15::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/frequency_cap.proto
 
 // Proto file describing frequency caps.
 
@@ -64,15 +47,6 @@ message FrequencyCapEntry {
 message FrequencyCapKey {
   // The level on which the cap is to be applied (for example, ad group ad, ad
   // group). The cap is applied to all the entities of this level.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/frequency_cap.proto
-  google.ads.googleads.v12.enums.FrequencyCapLevelEnum.FrequencyCapLevel level = 1;
-
-  // The type of event that the cap applies to (for example, impression).
-  google.ads.googleads.v12.enums.FrequencyCapEventTypeEnum.FrequencyCapEventType event_type = 3;
-
-  // Unit of time the cap is defined at (for example, day, week).
-  google.ads.googleads.v12.enums.FrequencyCapTimeUnitEnum.FrequencyCapTimeUnit time_unit = 2;
-========
   google.ads.googleads.v15.enums.FrequencyCapLevelEnum.FrequencyCapLevel level =
       1;
 
@@ -83,7 +57,6 @@ message FrequencyCapKey {
   // Unit of time the cap is defined at (for example, day, week).
   google.ads.googleads.v15.enums.FrequencyCapTimeUnitEnum.FrequencyCapTimeUnit
       time_unit = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/frequency_cap.proto
 
   // Number of time units the cap lasts.
   optional int32 time_length = 5;

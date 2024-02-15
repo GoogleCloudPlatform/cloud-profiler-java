@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/date.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/storage/v2;storage";
+option go_package = "cloud.google.com/go/storage/internal/apiv2/storagepb;storagepb";
 option java_multiple_files = true;
 option java_outer_classname = "StorageProto";
 option java_package = "com.google.storage.v2";
@@ -112,34 +112,24 @@ service Storage {
     option (google.api.method_signature) = "bucket";
   }
 
-  // Gets the IAM policy for a specified bucket or object.
+  // Gets the IAM policy for a specified bucket.
   // The `resource` field in the request should be
-  // projects/_/buckets/<bucket_name> for a bucket or
-  // projects/_/buckets/<bucket_name>/objects/<object_name> for an object.
+  // `projects/_/buckets/{bucket}`.
   rpc GetIamPolicy(google.iam.v1.GetIamPolicyRequest)
       returns (google.iam.v1.Policy) {
     option (google.api.routing) = {
       routing_parameters { field: "resource" path_template: "{bucket=**}" }
-      routing_parameters {
-        field: "resource"
-        path_template: "{bucket=projects/*/buckets/*}/objects/**"
-      }
     };
     option (google.api.method_signature) = "resource";
   }
 
-  // Updates an IAM policy for the specified bucket or object.
+  // Updates an IAM policy for the specified bucket.
   // The `resource` field in the request should be
-  // projects/_/buckets/<bucket_name> for a bucket or
-  // projects/_/buckets/<bucket_name>/objects/<object_name> for an object.
+  // `projects/_/buckets/{bucket}`.
   rpc SetIamPolicy(google.iam.v1.SetIamPolicyRequest)
       returns (google.iam.v1.Policy) {
     option (google.api.routing) = {
       routing_parameters { field: "resource" path_template: "{bucket=**}" }
-      routing_parameters {
-        field: "resource"
-        path_template: "{bucket=projects/*/buckets/*}/objects/**"
-      }
     };
     option (google.api.method_signature) = "resource,policy";
   }
@@ -147,8 +137,8 @@ service Storage {
   // Tests a set of permissions on the given bucket or object to see which, if
   // any, are held by the caller.
   // The `resource` field in the request should be
-  // projects/_/buckets/<bucket_name> for a bucket or
-  // projects/_/buckets/<bucket_name>/objects/<object_name> for an object.
+  // `projects/_/buckets/{bucket}` for a bucket or
+  // `projects/_/buckets/{bucket}/objects/{object}` for an object.
   rpc TestIamPermissions(google.iam.v1.TestIamPermissionsRequest)
       returns (google.iam.v1.TestIamPermissionsResponse) {
     option (google.api.routing) = {
@@ -225,8 +215,12 @@ service Storage {
     };
   }
 
-  // Deletes an object and its metadata. Deletions are permanent if versioning
-  // is not enabled for the bucket, or if the `generation` parameter is used.
+  // Deletes an object and its metadata.
+  //
+  // Deletions are normally permanent when versioning is disabled or whenever
+  // the generation parameter is used. However, if soft delete is enabled for
+  // the bucket, deleted objects can be restored using RestoreObject until the
+  // soft delete retention period has passed.
   rpc DeleteObject(DeleteObjectRequest) returns (google.protobuf.Empty) {
     option (google.api.routing) = {
       routing_parameters { field: "bucket" path_template: "{bucket=**}" }
@@ -235,7 +229,22 @@ service Storage {
     option (google.api.method_signature) = "bucket,object,generation";
   }
 
+  // Restores a soft-deleted object.
+  rpc RestoreObject(RestoreObjectRequest) returns (Object) {
+    option (google.api.routing) = {
+      routing_parameters { field: "bucket" path_template: "{bucket=**}" }
+    };
+    option (google.api.method_signature) = "bucket,object,generation";
+  }
+
   // Cancels an in-progress resumable upload.
+  //
+  // Any attempts to write to the resumable upload after cancelling the upload
+  // will fail.
+  //
+  // The behavior for currently in progress write operations is not guaranteed -
+  // they could either complete before the cancellation or fail if the
+  // cancellation completes first.
   rpc CancelResumableWrite(CancelResumableWriteRequest)
       returns (CancelResumableWriteResponse) {
     option (google.api.routing) = {
@@ -316,6 +325,8 @@ service Storage {
   //     persisted offset. Even though the data isn't written, it may still
   //     incur a performance cost over resuming at the correct write offset.
   //     This behavior can make client-side handling simpler in some cases.
+  //   - Clients must only send data that is a multiple of 256 KiB per message,
+  //     unless the object is being finished with `finish_write` set to `true`.
   //
   // The service will not view the object as complete until the client has
   // sent a `WriteObjectRequest` with `finish_write` set to `true`. Sending any
@@ -327,7 +338,29 @@ service Storage {
   // Attempting to resume an already finalized object will result in an OK
   // status, with a WriteObjectResponse containing the finalized object's
   // metadata.
+  //
+  // Alternatively, the BidiWriteObject operation may be used to write an
+  // object with controls over flushing and the ability to fetch the ability to
+  // determine the current persisted size.
   rpc WriteObject(stream WriteObjectRequest) returns (WriteObjectResponse) {}
+
+  // Stores a new object and metadata.
+  //
+  // This is similar to the WriteObject call with the added support for
+  // manual flushing of persisted state, and the ability to determine current
+  // persisted size without closing the stream.
+  //
+  // The client may specify one or both of the `state_lookup` and `flush` fields
+  // in each BidiWriteObjectRequest. If `flush` is specified, the data written
+  // so far will be persisted to storage. If `state_lookup` is specified, the
+  // service will respond with a BidiWriteObjectResponse that contains the
+  // persisted size. If both `flush` and `state_lookup` are specified, the flush
+  // will always occur before a `state_lookup`, so that both may be set in the
+  // same request and the returned state will be the state of the object
+  // post-flush. When the stream is closed, a BidiWriteObjectResponse will
+  // always be sent to the client, regardless of the value of `state_lookup`.
+  rpc BidiWriteObject(stream BidiWriteObjectRequest)
+      returns (stream BidiWriteObjectResponse) {}
 
   // Retrieves a list of objects matching the criteria.
   rpc ListObjects(ListObjectsRequest) returns (ListObjectsResponse) {
@@ -482,14 +515,17 @@ message CreateBucketRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "storage.googleapis.com/Bucket"
     }
   ];
 
   // Properties of the new bucket being inserted.
-  // The project and name of the bucket are specified in the parent and
-  // bucket_id fields, respectively. Populating those fields in `bucket` will
-  // result in an error.
+  // The name of the bucket is specified in the `bucket_id` field. Populating
+  // `bucket.name` field will result in an error.
+  // The project of the bucket must be specified in the `bucket.project` field.
+  // This field must be in `projects/{projectIdentifier}` format,
+  // {projectIdentifier} can be the project ID or project number. The `parent`
+  // field must be either empty or `projects/_`.
   Bucket bucket = 2;
 
   // Required. The ID to use for this bucket, which will become the final
@@ -514,7 +550,7 @@ message ListBucketsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "cloudresourcemanager.googleapis.com/Project"
+      child_type: "storage.googleapis.com/Bucket"
     }
   ];
 
@@ -593,8 +629,6 @@ message UpdateBucketRequest {
   // may accidentally reset the new field's value.
   //
   // Not specifying any fields is an error.
-  // Not specifying a field while setting that field to a non-default value is
-  // an error.
   google.protobuf.FieldMask update_mask = 6
       [(google.api.field_behavior) = REQUIRED];
 }
@@ -617,7 +651,9 @@ message GetNotificationConfigRequest {
   // `projects/{project}/buckets/{bucket}/notificationConfigs/{notificationConfig}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+    (google.api.resource_reference) = {
+      type: "storage.googleapis.com/NotificationConfig"
+    }
   ];
 }
 
@@ -627,7 +663,7 @@ message CreateNotificationConfigRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      child_type: "storage.googleapis.com/Bucket"
+      child_type: "storage.googleapis.com/NotificationConfig"
     }
   ];
 
@@ -642,7 +678,7 @@ message ListNotificationConfigsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      child_type: "storage.googleapis.com/Bucket"
+      child_type: "storage.googleapis.com/NotificationConfig"
     }
   ];
 
@@ -732,7 +768,10 @@ message ComposeObjectRequest {
 // `bucket` and `object` **must** be set.
 message DeleteObjectRequest {
   // Required. Name of the bucket in which the object resides.
-  string bucket = 1 [(google.api.field_behavior) = REQUIRED];
+  string bucket = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+  ];
 
   // Required. The name of the finalized object to delete.
   // Note: If you want to delete an unfinalized resumable upload please use
@@ -766,6 +805,49 @@ message DeleteObjectRequest {
   CommonObjectRequestParams common_object_request_params = 10;
 }
 
+// Message for restoring an object.
+// `bucket`, `object`, and `generation` **must** be set.
+message RestoreObjectRequest {
+  // Required. Name of the bucket in which the object resides.
+  string bucket = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+  ];
+
+  // Required. The name of the object to restore.
+  string object = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The specific revision of the object to restore.
+  int64 generation = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Makes the operation conditional on whether the object's current generation
+  // matches the given value. Setting to 0 makes the operation succeed only if
+  // there are no live versions of the object.
+  optional int64 if_generation_match = 4;
+
+  // Makes the operation conditional on whether the object's live generation
+  // does not match the given value. If no live object exists, the precondition
+  // fails. Setting to 0 makes the operation succeed only if there is a live
+  // version of the object.
+  optional int64 if_generation_not_match = 5;
+
+  // Makes the operation conditional on whether the object's current
+  // metageneration matches the given value.
+  optional int64 if_metageneration_match = 6;
+
+  // Makes the operation conditional on whether the object's current
+  // metageneration does not match the given value.
+  optional int64 if_metageneration_not_match = 7;
+
+  // If false or unset, the bucket's default object ACL will be used.
+  // If true, copy the source object's access controls.
+  // Return an error if bucket has UBLA enabled.
+  optional bool copy_source_acl = 9;
+
+  // A set of parameters common to Storage API requests concerning an object.
+  CommonObjectRequestParams common_object_request_params = 8;
+}
+
 // Message for canceling an in-progress resumable upload.
 // `upload_id` **must** be set.
 message CancelResumableWriteRequest {
@@ -781,7 +863,10 @@ message CancelResumableWriteResponse {}
 // Request message for ReadObject.
 message ReadObjectRequest {
   // Required. The name of the bucket containing the object to read.
-  string bucket = 1 [(google.api.field_behavior) = REQUIRED];
+  string bucket = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+  ];
 
   // Required. The name of the object to read.
   string object = 2 [(google.api.field_behavior) = REQUIRED];
@@ -843,7 +928,10 @@ message ReadObjectRequest {
 // Request message for GetObject.
 message GetObjectRequest {
   // Required. Name of the bucket in which the object resides.
-  string bucket = 1 [(google.api.field_behavior) = REQUIRED];
+  string bucket = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+  ];
 
   // Required. Name of the object.
   string object = 2 [(google.api.field_behavior) = REQUIRED];
@@ -851,6 +939,9 @@ message GetObjectRequest {
   // If present, selects a specific revision of this object (as opposed to the
   // latest version, the default).
   int64 generation = 3;
+
+  // If true, return the soft-deleted version of this object.
+  optional bool soft_deleted = 11;
 
   // Makes the operation conditional on whether the object's current generation
   // matches the given value. Setting to 0 makes the operation succeed only if
@@ -889,9 +980,9 @@ message ReadObjectResponse {
   // generate more data.
   ChecksummedData checksummed_data = 1;
 
-  // The checksums of the complete object. The client should compute one of
-  // these checksums over the downloaded object and compare it against the value
-  // provided here.
+  // The checksums of the complete object. If the object is downloaded in full,
+  // the client should compute one of these checksums over the downloaded object
+  // and compare it against the value provided here.
   ObjectChecksums object_checksums = 2;
 
   // If read_offset and or read_limit was specified on the
@@ -940,8 +1031,6 @@ message WriteObjectSpec {
   // This situation is considered a client error, and if such an error occurs
   // you must start the upload over from scratch, this time sending the correct
   // number of bytes.
-  //
-  // The `object_size` value is ignored for one-shot (non-resumable) writes.
   optional int64 object_size = 8;
 }
 
@@ -981,7 +1070,7 @@ message WriteObjectRequest {
   }
 
   // Checksums for the complete object. If the checksums computed by the service
-  // don't match the specifified checksums the call will fail. May only be
+  // don't match the specified checksums the call will fail. May only be
   // provided in the first or last request (either with first_message, or
   // finish_write set).
   ObjectChecksums object_checksums = 6;
@@ -1012,14 +1101,97 @@ message WriteObjectResponse {
   }
 }
 
+// Request message for BidiWriteObject.
+message BidiWriteObjectRequest {
+  // The first message of each stream should set one of the following.
+  oneof first_message {
+    // For resumable uploads. This should be the `upload_id` returned from a
+    // call to `StartResumableWriteResponse`.
+    string upload_id = 1;
+
+    // For non-resumable uploads. Describes the overall upload, including the
+    // destination bucket and object name, preconditions, etc.
+    WriteObjectSpec write_object_spec = 2;
+  }
+
+  // Required. The offset from the beginning of the object at which the data
+  // should be written.
+  //
+  // In the first `WriteObjectRequest` of a `WriteObject()` action, it
+  // indicates the initial offset for the `Write()` call. The value **must** be
+  // equal to the `persisted_size` that a call to `QueryWriteStatus()` would
+  // return (0 if this is the first write to the object).
+  //
+  // On subsequent calls, this value **must** be no larger than the sum of the
+  // first `write_offset` and the sizes of all `data` chunks sent previously on
+  // this stream.
+  //
+  // An invalid value will cause an error.
+  int64 write_offset = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // A portion of the data for the object.
+  oneof data {
+    // The data to insert. If a crc32c checksum is provided that doesn't match
+    // the checksum computed by the service, the request will fail.
+    ChecksummedData checksummed_data = 4;
+  }
+
+  // Checksums for the complete object. If the checksums computed by the service
+  // don't match the specified checksums the call will fail. May only be
+  // provided in the first or last request (either with first_message, or
+  // finish_write set).
+  ObjectChecksums object_checksums = 6;
+
+  // For each BidiWriteObjectRequest where state_lookup is `true` or the client
+  // closes the stream, the service will send a BidiWriteObjectResponse
+  // containing the current persisted size. The persisted size sent in responses
+  // covers all the bytes the server has persisted thus far and can be used to
+  // decide what data is safe for the client to drop. Note that the object's
+  // current size reported by the BidiWriteObjectResponse may lag behind the
+  // number of bytes written by the client. This field is ignored if
+  // `finish_write` is set to true.
+  bool state_lookup = 7;
+
+  // Persists data written on the stream, up to and including the current
+  // message, to permanent storage. This option should be used sparingly as it
+  // may reduce performance. Ongoing writes will periodically be persisted on
+  // the server even when `flush` is not set. This field is ignored if
+  // `finish_write` is set to true since there's no need to checkpoint or flush
+  // if this message completes the write.
+  bool flush = 8;
+
+  // If `true`, this indicates that the write is complete. Sending any
+  // `WriteObjectRequest`s subsequent to one in which `finish_write` is `true`
+  // will cause an error.
+  // For a non-resumable write (where the upload_id was not set in the first
+  // message), it is an error not to set this field in the final message of the
+  // stream.
+  bool finish_write = 9;
+
+  // A set of parameters common to Storage API requests concerning an object.
+  CommonObjectRequestParams common_object_request_params = 10;
+}
+
+// Response message for BidiWriteObject.
+message BidiWriteObjectResponse {
+  // The response will set one of the following.
+  oneof write_status {
+    // The total number of bytes that have been processed for the given object
+    // from all `WriteObject` calls. Only set if the upload has not finalized.
+    int64 persisted_size = 1;
+
+    // A resource containing the metadata for the uploaded object. Only set if
+    // the upload has finalized.
+    Object resource = 2;
+  }
+}
+
 // Request message for ListObjects.
 message ListObjectsRequest {
   // Required. Name of the bucket in which to look for objects.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      child_type: "storage.googleapis.com/Bucket"
-    }
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
   ];
 
   // Maximum number of `items` plus `prefixes` to return
@@ -1071,6 +1243,16 @@ message ListObjectsRequest {
   // listed have names between lexicographic_start (inclusive) and
   // lexicographic_end (exclusive).
   string lexicographic_end = 11 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. If true, only list all soft-deleted versions of the object.
+  // Soft delete policy is required to set this option.
+  bool soft_deleted = 12 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Filter results to objects and prefixes that match this glob
+  // pattern. See [List Objects Using
+  // Glob](https://cloud.google.com/storage/docs/json_api/v1/objects/list#list-objects-and-prefixes-using-glob)
+  // for the full syntax.
+  string match_glob = 14 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Request object for `QueryWriteStatus`.
@@ -1147,7 +1329,10 @@ message RewriteObjectRequest {
   Object destination = 1;
 
   // Required. Name of the bucket in which to find the source object.
-  string source_bucket = 2 [(google.api.field_behavior) = REQUIRED];
+  string source_bucket = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = { type: "storage.googleapis.com/Bucket" }
+  ];
 
   // Required. Name of the source object.
   string source_object = 3 [(google.api.field_behavior) = REQUIRED];
@@ -1323,8 +1508,6 @@ message UpdateObjectRequest {
   // may accidentally reset the new field's value.
   //
   // Not specifying any fields is an error.
-  // Not specifying a field while setting that field to a non-default value is
-  // an error.
   google.protobuf.FieldMask update_mask = 7
       [(google.api.field_behavior) = REQUIRED];
 
@@ -1334,8 +1517,8 @@ message UpdateObjectRequest {
 
 // Request message for GetServiceAccount.
 message GetServiceAccountRequest {
-  // Required. Project ID, in the format of "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // Required. Project ID, in the format of "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1347,7 +1530,7 @@ message GetServiceAccountRequest {
 // Request message for CreateHmacKey.
 message CreateHmacKeyRequest {
   // Required. The project that the HMAC-owning service account lives in, in the
-  // format of "projects/<projectIdentifier>". <projectIdentifier> can be the
+  // format of "projects/{projectIdentifier}". {projectIdentifier} can be the
   // project ID or project number.
   string project = 1 [
     (google.api.field_behavior) = REQUIRED,
@@ -1376,8 +1559,8 @@ message DeleteHmacKeyRequest {
   string access_id = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The project that owns the HMAC key, in the format of
-  // "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 2 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1392,8 +1575,8 @@ message GetHmacKeyRequest {
   string access_id = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The project the HMAC key lies in, in the format of
-  // "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 2 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1405,8 +1588,8 @@ message GetHmacKeyRequest {
 // Request to fetch a list of HMAC keys under a given project.
 message ListHmacKeysRequest {
   // Required. The project to list HMAC keys for, in the format of
-  // "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1729,18 +1912,23 @@ message Bucket {
     // Once locked, an object retention policy cannot be modified.
     bool is_locked = 2;
 
-    // The duration in seconds that objects need to be retained. Retention
-    // duration must be greater than zero and less than 100 years. Note that
-    // enforcement of retention periods less than a day is not guaranteed. Such
-    // periods should only be used for testing purposes.
-    optional int64 retention_period = 3;
-
     // The duration that objects need to be retained. Retention duration must be
     // greater than zero and less than 100 years. Note that enforcement of
     // retention periods less than a day is not guaranteed. Such periods should
     // only be used for testing purposes. Any `nanos` value specified will be
     // rounded down to the nearest second.
     google.protobuf.Duration retention_duration = 4;
+  }
+
+  // Soft delete policy properties of a bucket.
+  message SoftDeletePolicy {
+    // The period of time that soft-deleted objects in the bucket must be
+    // retained and cannot be permanently deleted. The duration must be greater
+    // than or equal to 7 days and less than 1 year.
+    optional google.protobuf.Duration retention_duration = 1;
+
+    // Time from which the policy was effective. This is service-provided.
+    optional google.protobuf.Timestamp effective_time = 2;
   }
 
   // Properties of a bucket related to versioning.
@@ -1788,9 +1976,20 @@ message Bucket {
     // to the bucket creation time.
     google.protobuf.Timestamp toggle_time = 2
         [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // An object in an Autoclass bucket will eventually cool down to the
+    // terminal storage class if there is no access to the object.
+    // The only valid values are NEARLINE and ARCHIVE.
+    optional string terminal_storage_class = 3;
+
+    // Output only. Latest instant at which the autoclass terminal storage class
+    // was updated.
+    optional google.protobuf.Timestamp terminal_storage_class_update_time = 4
+        [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
   // Immutable. The name of the bucket.
+  // Format: `projects/{project}/buckets/{bucket}`
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // Output only. The user-chosen part of the bucket name. The `{bucket}`
@@ -1804,8 +2003,8 @@ message Bucket {
   string etag = 29;
 
   // Immutable. The project which owns this bucket, in the format of
-  // "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 3 [
     (google.api.field_behavior) = IMMUTABLE,
     (google.api.resource_reference) = {
@@ -1814,8 +2013,6 @@ message Bucket {
   ];
 
   // Output only. The metadata generation of this bucket.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   int64 metageneration = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Immutable. The location of the bucket. Object data for objects in the
@@ -1843,7 +2040,7 @@ message Bucket {
   // replication. "ASYNC_TURBO" enables turbo replication, valid for dual-region
   // buckets only. If rpo is not specified when the bucket is created, it
   // defaults to "DEFAULT". For more information, see
-  // https://cloud.google.com/storage/docs/turbo-replication.
+  // https://cloud.google.com/storage/docs/availability-durability#turbo-replication.
   string rpo = 27;
 
   // Access controls on the bucket.
@@ -1862,8 +2059,6 @@ message Bucket {
   Lifecycle lifecycle = 10;
 
   // Output only. The creation time of the bucket.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   google.protobuf.Timestamp create_time = 11
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -1872,8 +2067,6 @@ message Bucket {
   repeated Cors cors = 12;
 
   // Output only. The modification time of the bucket.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   google.protobuf.Timestamp update_time = 13
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -1942,6 +2135,11 @@ message Bucket {
   // The bucket's Autoclass configuration. If there is no configuration, the
   // Autoclass feature will be disabled and have no effect on the bucket.
   Autoclass autoclass = 28;
+
+  // Optional. The bucket's soft delete policy. The soft delete policy prevents
+  // soft-deleted objects from being permanently deleted.
+  SoftDeletePolicy soft_delete_policy = 31
+      [(google.api.field_behavior) = OPTIONAL];
 }
 
 // An access-control entry.
@@ -1998,8 +2196,8 @@ message BucketAccessControl {
 // Message used to convey content being read or written, along with an optional
 // checksum.
 message ChecksummedData {
-  // The data.
-  bytes content = 1;
+  // Optional. The data.
+  bytes content = 1 [ctype = CORD, (google.api.field_behavior) = OPTIONAL];
 
   // If set, the CRC32C digest of the content field.
   optional fixed32 crc32c = 2;
@@ -2009,7 +2207,7 @@ message ChecksummedData {
 message ObjectChecksums {
   // CRC32C digest of the object data. Computed by the Cloud Storage service for
   // all written objects.
-  // If set in an WriteObjectRequest, service will validate that the stored
+  // If set in a WriteObjectRequest, service will validate that the stored
   // object matches this checksum.
   optional fixed32 crc32c = 1;
 
@@ -2026,16 +2224,16 @@ message ObjectChecksums {
 // Hmac Key Metadata, which includes all information other than the secret.
 message HmacKeyMetadata {
   // Immutable. Resource name ID of the key in the format
-  // <projectIdentifier>/<accessId>.
-  // <projectIdentifier> can be the project ID or project number.
+  // {projectIdentifier}/{accessId}.
+  // {projectIdentifier} can be the project ID or project number.
   string id = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // Immutable. Globally unique id for keys.
   string access_id = 2 [(google.api.field_behavior) = IMMUTABLE];
 
   // Immutable. Identifies the project that owns the service account of the
-  // specified HMAC key, in the format "projects/<projectIdentifier>".
-  // <projectIdentifier> can be the project ID or project number.
+  // specified HMAC key, in the format "projects/{projectIdentifier}".
+  // {projectIdentifier} can be the project ID or project number.
   string project = 3 [
     (google.api.field_behavior) = IMMUTABLE,
     (google.api.resource_reference) = {
@@ -2136,15 +2334,13 @@ message Object {
   string etag = 27;
 
   // Immutable. The content generation of this object. Used for object
-  // versioning. Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
+  // versioning.
   int64 generation = 3 [(google.api.field_behavior) = IMMUTABLE];
 
   // Output only. The version of the metadata for this generation of this
   // object. Used for preconditions and for detecting changes in metadata. A
   // metageneration number is only meaningful in the context of a particular
-  // generation of a particular object. Attempting to set or update this field
-  // will result in a [FieldViolation][google.rpc.BadRequest.FieldViolation].
+  // generation of a particular object.
   int64 metageneration = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Storage class of the object.
@@ -2152,8 +2348,6 @@ message Object {
 
   // Output only. Content-Length of the object data in bytes, matching
   // [https://tools.ietf.org/html/rfc7230#section-3.3.2][RFC 7230 §3.3.2].
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   int64 size = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Content-Encoding of the object data, matching
@@ -2179,10 +2373,8 @@ message Object {
   // [https://tools.ietf.org/html/rfc7231#section-3.1.3.2][RFC 7231 §3.1.3.2].
   string content_language = 11;
 
-  // Output only. The deletion time of the object. Will be returned if and only
-  // if this version of the object has been deleted. Attempting to set or update
-  // this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
+  // Output only. If this object is noncurrent, this is the time when the object
+  // became noncurrent.
   google.protobuf.Timestamp delete_time = 12
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -2193,15 +2385,11 @@ message Object {
   string content_type = 13;
 
   // Output only. The creation time of the object.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   google.protobuf.Timestamp create_time = 14
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Number of underlying components that make up this object.
-  // Components are accumulated by compose operations. Attempting to set or
-  // update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
+  // Components are accumulated by compose operations.
   int32 component_count = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Hashes for the data part of this object. This field is used
@@ -2214,8 +2402,6 @@ message Object {
   // such as modifying custom metadata, as well as changes made by Cloud Storage
   // on behalf of a requester, such as changing the storage class based on an
   // Object Lifecycle Configuration.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   google.protobuf.Timestamp update_time = 17
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -2227,8 +2413,6 @@ message Object {
 
   // Output only. The time at which the object's storage class was last changed.
   // When the object is initially created, it will be set to time_created.
-  // Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
   google.protobuf.Timestamp update_storage_class_time = 19
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -2265,8 +2449,7 @@ message Object {
   optional bool event_based_hold = 23;
 
   // Output only. The owner of the object. This will always be the uploader of
-  // the object. Attempting to set or update this field will result in a
-  // [FieldViolation][google.rpc.BadRequest.FieldViolation].
+  // the object.
   Owner owner = 24 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Metadata of Customer-Supplied Encryption Key, if the object is encrypted by
@@ -2370,10 +2553,10 @@ message Owner {
 
 // Specifies a requested range of bytes to download.
 message ContentRange {
-  // The starting offset of the object data.
+  // The starting offset of the object data. This value is inclusive.
   int64 start = 1;
 
-  // The ending offset of the object data.
+  // The ending offset of the object data. This value is exclusive.
   int64 end = 2;
 
   // The complete length of the object data.

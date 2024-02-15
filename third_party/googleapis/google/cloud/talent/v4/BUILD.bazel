@@ -90,12 +90,14 @@ java_gapic_library(
     srcs = [":talent_proto_with_info"],
     grpc_service_config = "talent_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "jobs_v4.yaml",
     test_deps = [
         ":talent_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":talent_java_proto",
+        "//google/api:api_java_proto",
     ],
 )
 
@@ -137,7 +139,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -176,18 +177,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "talent_go_gapic_test",
-    srcs = [":talent_go_gapic_srcjar_test"],
-    embed = [":talent_go_gapic"],
-    importpath = "cloud.google.com/go/talent/apiv4",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-talent-v4-go",
     deps = [
         ":talent_go_gapic",
+        ":talent_go_gapic_srcjar-snippets.srcjar",
         ":talent_go_gapic_srcjar-test.srcjar",
         ":talent_go_proto",
     ],
@@ -236,7 +231,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -245,23 +239,15 @@ php_proto_library(
     deps = [":talent_proto"],
 )
 
-php_grpc_library(
-    name = "talent_php_grpc",
-    srcs = [":talent_proto"],
-    deps = [":talent_php_proto"],
-)
-
 php_gapic_library(
     name = "talent_php_gapic",
     srcs = [":talent_proto_with_info"],
     grpc_service_config = "talent_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "jobs_v4.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":talent_php_grpc",
-        ":talent_php_proto",
-    ],
+    deps = [":talent_php_proto"],
 )
 
 # Open Source Packages
@@ -269,7 +255,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-talent-v4-php",
     deps = [
         ":talent_php_gapic",
-        ":talent_php_grpc",
         ":talent_php_proto",
     ],
 )
@@ -342,6 +327,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Transform your job search and candidate matching capabilities with Cloud Talent Solution, designed to support enterprise talent acquisition technology and evolve with your growing needs. This AI solution includes features such as Job Search and Profile Search to provide candidates and employers with an enhanced talent acquisition experience.",
     ruby_cloud_title = "Cloud Talent Solution V4",
     service_yaml = "jobs_v4.yaml",
+    transport = "grpc+rest",
     deps = [
         ":talent_ruby_grpc",
         ":talent_ruby_proto",
@@ -383,6 +369,8 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "talent_csharp_gapic",
     srcs = [":talent_proto_with_info"],
+    common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "talent_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "jobs_v4.yaml",
     transport = "grpc+rest",

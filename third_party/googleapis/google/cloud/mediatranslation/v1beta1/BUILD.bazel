@@ -66,6 +66,7 @@ java_gapic_library(
     srcs = [":mediatranslation_proto_with_info"],
     grpc_service_config = "mediatranslation_grpc_service_config.json",
     rest_numeric_enums = True,
+    service_yaml = "mediatranslation_v1beta1.yaml",
     test_deps = [
         ":mediatranslation_java_grpc",
     ],
@@ -104,7 +105,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -133,19 +133,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "mediatranslation_go_gapic_test",
-    srcs = [":mediatranslation_go_gapic_srcjar_test"],
-    embed = [":mediatranslation_go_gapic"],
-    importpath = "cloud.google.com/go/mediatranslation/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-mediatranslation-v1beta1-go",
     deps = [
         ":mediatranslation_go_gapic",
         ":mediatranslation_go_gapic_srcjar-metadata.srcjar",
+        ":mediatranslation_go_gapic_srcjar-snippets.srcjar",
         ":mediatranslation_go_gapic_srcjar-test.srcjar",
         ":mediatranslation_go_proto",
     ],
@@ -198,7 +192,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -207,23 +200,15 @@ php_proto_library(
     deps = [":mediatranslation_proto"],
 )
 
-php_grpc_library(
-    name = "mediatranslation_php_grpc",
-    srcs = [":mediatranslation_proto"],
-    deps = [":mediatranslation_php_proto"],
-)
-
 php_gapic_library(
     name = "mediatranslation_php_gapic",
     srcs = [":mediatranslation_proto_with_info"],
     grpc_service_config = "mediatranslation_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "mediatranslation_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":mediatranslation_php_grpc",
-        ":mediatranslation_php_proto",
-    ],
+    deps = [":mediatranslation_php_proto"],
 )
 
 # Open Source Packages
@@ -231,7 +216,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-mediatranslation-v1beta1-php",
     deps = [
         ":mediatranslation_php_gapic",
-        ":mediatranslation_php_grpc",
         ":mediatranslation_php_proto",
     ],
 )
@@ -303,6 +287,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Media Translation API delivers real-time speech translation to your content and applications directly from your audio data. Leveraging Google’s machine learning technologies, the API offers enhanced accuracy and simplified integration while equipping you with a comprehensive set of features to further refine your translation results. Improve user experience with low-latency streaming translation and scale quickly with straightforward internationalization.",
     ruby_cloud_title = "Media Translation V1beta1",
     service_yaml = "mediatranslation_v1beta1.yaml",
+    transport = "grpc",
     deps = [
         ":mediatranslation_ruby_grpc",
         ":mediatranslation_ruby_proto",

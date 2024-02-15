@@ -124,7 +124,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -159,19 +158,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "eventarc_go_gapic_test",
-    srcs = [":eventarc_go_gapic_srcjar_test"],
-    embed = [":eventarc_go_gapic"],
-    importpath = "cloud.google.com/go/eventarc/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-eventarc-v1-go",
     deps = [
         ":eventarc_go_gapic",
         ":eventarc_go_gapic_srcjar-metadata.srcjar",
+        ":eventarc_go_gapic_srcjar-snippets.srcjar",
         ":eventarc_go_gapic_srcjar-test.srcjar",
         ":eventarc_go_proto",
     ],
@@ -224,7 +217,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -233,23 +225,15 @@ php_proto_library(
     deps = [":eventarc_proto"],
 )
 
-php_grpc_library(
-    name = "eventarc_php_grpc",
-    srcs = [":eventarc_proto"],
-    deps = [":eventarc_php_proto"],
-)
-
 php_gapic_library(
     name = "eventarc_php_gapic",
     srcs = [":eventarc_proto_with_info"],
     grpc_service_config = "eventarc_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "eventarc_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":eventarc_php_grpc",
-        ":eventarc_php_proto",
-    ],
+    deps = [":eventarc_php_proto"],
 )
 
 # Open Source Packages
@@ -257,7 +241,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-eventarc-v1-php",
     deps = [
         ":eventarc_php_gapic",
-        ":eventarc_php_grpc",
         ":eventarc_php_proto",
     ],
 )
@@ -329,6 +312,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Eventarc lets you asynchronously deliver events from Google services, SaaS, and your own apps using loosely coupled services that react to state changes. Eventarc requires no infrastructure management — you can optimize productivity and costs while building a modern, event-driven solution.",
     ruby_cloud_title = "Eventarc V1",
     service_yaml = "eventarc_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":eventarc_ruby_grpc",
         ":eventarc_ruby_proto",

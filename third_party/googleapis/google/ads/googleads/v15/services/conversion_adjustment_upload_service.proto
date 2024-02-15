@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,32 +14,15 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/common/offline_user_data.proto";
-import "google/ads/googleads/v13/enums/conversion_adjustment_type.proto";
-========
 package google.ads.googleads.v15.services;
 
 import "google/ads/googleads/v15/common/offline_user_data.proto";
 import "google/ads/googleads/v15/enums/conversion_adjustment_type.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "ConversionAdjustmentUploadServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V15.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v15/services;services";
 option java_multiple_files = true;
@@ -52,7 +31,6 @@ option java_package = "com.google.ads.googleads.v15.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V15::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 
 // Service to upload conversion adjustments.
 service ConversionAdjustmentUploadService {
@@ -72,11 +50,7 @@ service ConversionAdjustmentUploadService {
   rpc UploadConversionAdjustments(UploadConversionAdjustmentsRequest)
       returns (UploadConversionAdjustmentsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-      post: "/v13/customers/{customer_id=*}:uploadConversionAdjustments"
-========
       post: "/v15/customers/{customer_id=*}:uploadConversionAdjustments"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
       body: "*"
     };
     option (google.api.method_signature) =
@@ -85,11 +59,7 @@ service ConversionAdjustmentUploadService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-// [ConversionAdjustmentUploadService.UploadConversionAdjustments][google.ads.googleads.v13.services.ConversionAdjustmentUploadService.UploadConversionAdjustments].
-========
 // [ConversionAdjustmentUploadService.UploadConversionAdjustments][google.ads.googleads.v15.services.ConversionAdjustmentUploadService.UploadConversionAdjustments].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 message UploadConversionAdjustmentsRequest {
   // Required. The ID of the customer performing the upload.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -120,11 +90,7 @@ message UploadConversionAdjustmentsRequest {
 }
 
 // Response message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-// [ConversionAdjustmentUploadService.UploadConversionAdjustments][google.ads.googleads.v13.services.ConversionAdjustmentUploadService.UploadConversionAdjustments].
-========
 // [ConversionAdjustmentUploadService.UploadConversionAdjustments][google.ads.googleads.v15.services.ConversionAdjustmentUploadService.UploadConversionAdjustments].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 message UploadConversionAdjustmentsResponse {
   // Errors that pertain to conversion adjustment failures in the partial
   // failure mode. Returned when all errors occur inside the adjustments. If any
@@ -167,11 +133,7 @@ message ConversionAdjustment {
   optional string adjustment_date_time = 9;
 
   // The adjustment type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-  google.ads.googleads.v13.enums.ConversionAdjustmentTypeEnum
-========
   google.ads.googleads.v15.enums.ConversionAdjustmentTypeEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
       .ConversionAdjustmentType adjustment_type = 5;
 
   // Information needed to restate the conversion's value.
@@ -187,11 +149,7 @@ message ConversionAdjustment {
   // ConversionAdjustmentUploadService only accepts user identifiers in
   // enhancements. The maximum number of user identifiers for each
   // enhancement is 5.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-  repeated google.ads.googleads.v13.common.UserIdentifier user_identifiers = 10;
-========
   repeated google.ads.googleads.v15.common.UserIdentifier user_identifiers = 10;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
 
   // The user agent to enhance the original conversion. This can be found in
   // your user's HTTP request header when they convert on your web page.
@@ -251,10 +209,6 @@ message ConversionAdjustmentResult {
   optional string adjustment_date_time = 8;
 
   // The adjustment type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/conversion_adjustment_upload_service.proto
-  google.ads.googleads.v13.enums.ConversionAdjustmentTypeEnum
-========
   google.ads.googleads.v15.enums.ConversionAdjustmentTypeEnum
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/services/conversion_adjustment_upload_service.proto
       .ConversionAdjustmentType adjustment_type = 5;
 }

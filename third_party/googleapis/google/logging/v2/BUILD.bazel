@@ -9,44 +9,14 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
+
 ##############################################################################
 # Common
 ##############################################################################
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "cc_grpc_library",
-    "cc_proto_library",
-    "csharp_gapic_assembly_pkg",
-    "csharp_gapic_library",
-    "csharp_grpc_library",
-    "csharp_proto_library",
-    "go_gapic_assembly_pkg",
-    "go_gapic_library",
-    "go_proto_library",
-    "go_test",
-    "java_gapic_assembly_gradle_pkg",
-    "java_gapic_library",
-    "java_gapic_test",
-    "java_grpc_library",
-    "java_proto_library",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-    "php_gapic_assembly_pkg",
-    "php_gapic_library",
-    "php_grpc_library",
-    "php_proto_library",
-    "proto_library_with_info",
-    "py_gapic_assembly_pkg",
-    "py_gapic_library",
-    "ruby_cloud_gapic_library",
-    "ruby_gapic_assembly_pkg",
-    "ruby_grpc_library",
-    "ruby_proto_library",
-)
-
-# This is an API workspace, having public visibility by default makes perfect sense.
-package(default_visibility = ["//visibility:public"])
+load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 
 proto_library(
     name = "logging_proto",
@@ -82,6 +52,18 @@ proto_library_with_info(
         ":logging_proto",
         "//google/cloud:common_resources_proto",
     ],
+)
+
+##############################################################################
+# Java
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "java_gapic_assembly_gradle_pkg",
+    "java_gapic_library",
+    "java_gapic_test",
+    "java_grpc_library",
+    "java_proto_library",
 )
 
 java_proto_library(
@@ -135,10 +117,20 @@ java_gapic_assembly_gradle_pkg(
     ],
 )
 
+##############################################################################
+# Go
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "go_gapic_assembly_pkg",
+    "go_gapic_library",
+    "go_proto_library",
+)
+
 go_proto_library(
     name = "logging_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/logging/v2",
+    importpath = "cloud.google.com/go/logging/apiv2/loggingpb",
     protos = [":logging_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -157,6 +149,7 @@ go_gapic_library(
     grpc_service_config = "logging_grpc_service_config.json",
     importpath = "cloud.google.com/go/logging/apiv2;logging",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "logging_v2.yaml",
     transport = "grpc",
@@ -173,22 +166,26 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "logging_go_gapic_test",
-    srcs = [":logging_go_gapic_srcjar_test"],
-    embed = [":logging_go_gapic"],
-    importpath = "cloud.google.com/go/logging/apiv2",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-logging-v2-go",
     deps = [
         ":logging_go_gapic",
         ":logging_go_gapic_srcjar-metadata.srcjar",
+        ":logging_go_gapic_srcjar-snippets.srcjar",
         ":logging_go_gapic_srcjar-test.srcjar",
         ":logging_go_proto",
     ],
+)
+
+##############################################################################
+# Python
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "py_gapic_assembly_pkg",
+    "py_gapic_library",
+    "py_test",
 )
 
 py_gapic_library(
@@ -202,18 +199,19 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "logging_v2.yaml",
     transport = "grpc",
+    deps = [
+    ],
 )
 
-# Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1359 is fixed
-#py_test(
-#    name = "logging_py_gapic_test",
-#    srcs = [
-#        "logging_py_gapic_pytest.py",
-#        "logging_py_gapic_test.py",
-#    ],
-#    legacy_create_init = False,
-#    deps = [":logging_py_gapic"],
-#)
+py_test(
+    name = "logging_py_gapic_test",
+    srcs = [
+        "logging_py_gapic_pytest.py",
+        "logging_py_gapic_test.py",
+    ],
+    legacy_create_init = False,
+    deps = [":logging_py_gapic"],
+)
 
 # Open Source Packages
 py_gapic_assembly_pkg(
@@ -223,15 +221,19 @@ py_gapic_assembly_pkg(
     ],
 )
 
+##############################################################################
+# PHP
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_proto_library",
+)
+
 php_proto_library(
     name = "logging_php_proto",
     deps = [":logging_proto"],
-)
-
-php_grpc_library(
-    name = "logging_php_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_php_proto"],
 )
 
 php_gapic_library(
@@ -239,13 +241,11 @@ php_gapic_library(
     srcs = [":logging_proto_with_info"],
     gapic_yaml = "logging_gapic.yaml",
     grpc_service_config = "logging_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "logging_v2.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":logging_php_grpc",
-        ":logging_php_proto",
-    ],
+    deps = [":logging_php_proto"],
 )
 
 # Open Source Packages
@@ -253,9 +253,17 @@ php_gapic_assembly_pkg(
     name = "google-cloud-logging-v2-php",
     deps = [
         ":logging_php_gapic",
-        ":logging_php_grpc",
         ":logging_php_proto",
     ],
+)
+
+##############################################################################
+# Node.js
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "nodejs_gapic_assembly_pkg",
+    "nodejs_gapic_library",
 )
 
 nodejs_gapic_library(
@@ -278,7 +286,19 @@ nodejs_gapic_assembly_pkg(
     deps = [
         ":logging_nodejs_gapic",
         ":logging_proto",
+        "//google/logging/type:type_proto",
     ],
+)
+
+##############################################################################
+# Ruby
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
+    "ruby_grpc_library",
+    "ruby_proto_library",
 )
 
 ruby_proto_library(
@@ -309,6 +329,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "The Cloud Logging API lets you programmatically read and write log entries, set up exclusions, create logs-based metrics, and manage export sinks.",
     ruby_cloud_title = "Cloud Logging V2",
     service_yaml = "logging_v2.yaml",
+    transport = "grpc",
     deps = [
         ":logging_ruby_grpc",
         ":logging_ruby_proto",
@@ -323,6 +344,17 @@ ruby_gapic_assembly_pkg(
         ":logging_ruby_grpc",
         ":logging_ruby_proto",
     ],
+)
+
+##############################################################################
+# C#
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "csharp_gapic_assembly_pkg",
+    "csharp_gapic_library",
+    "csharp_grpc_library",
+    "csharp_proto_library",
 )
 
 csharp_proto_library(
@@ -358,6 +390,15 @@ csharp_gapic_assembly_pkg(
         ":logging_csharp_grpc",
         ":logging_csharp_proto",
     ],
+)
+
+##############################################################################
+# C++
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
 )
 
 cc_proto_library(

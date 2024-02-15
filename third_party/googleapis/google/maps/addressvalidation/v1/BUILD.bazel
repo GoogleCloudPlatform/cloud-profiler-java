@@ -115,13 +115,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "addressvalidation_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/maps/addressvalidation/v1",
+    importpath = "cloud.google.com/go/maps/addressvalidation/apiv1/addressvalidationpb",
     protos = [":addressvalidation_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -135,8 +134,9 @@ go_gapic_library(
     name = "addressvalidation_go_gapic",
     srcs = [":addressvalidation_proto_with_info"],
     grpc_service_config = "addressvalidation_grpc_service_config.json",
-    importpath = "google.golang.org/google/maps/addressvalidation/v1;addressvalidation",
+    importpath = "cloud.google.com/go/maps/addressvalidation/apiv1;addressvalidation",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "addressvalidation_v1.yaml",
     transport = "grpc+rest",
@@ -145,19 +145,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "addressvalidation_go_gapic_test",
-    srcs = [":addressvalidation_go_gapic_srcjar_test"],
-    embed = [":addressvalidation_go_gapic"],
-    importpath = "google.golang.org/google/maps/addressvalidation/v1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-maps-addressvalidation-v1-go",
     deps = [
         ":addressvalidation_go_gapic",
         ":addressvalidation_go_gapic_srcjar-metadata.srcjar",
+        ":addressvalidation_go_gapic_srcjar-snippets.srcjar",
         ":addressvalidation_go_gapic_srcjar-test.srcjar",
         ":addressvalidation_go_proto",
     ],
@@ -170,18 +164,27 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
     "py_gapic_library",
+    "py_import",
     "py_test",
+)
+
+py_import(
+    name = "viewport",
+    srcs = [
+        "//google/geo/type:viewport_py_gapic",
+    ],
 )
 
 py_gapic_library(
     name = "addressvalidation_py_gapic",
     srcs = [":addressvalidation_proto"],
     grpc_service_config = "addressvalidation_grpc_service_config.json",
+    opt_args = ["proto-plus-deps=google.geo.type"],
     rest_numeric_enums = True,
     service_yaml = "addressvalidation_v1.yaml",
     transport = "grpc+rest",
     deps = [
-        "//google/geo/type:viewport_py_proto",
+        ":viewport",
     ],
 )
 
@@ -212,19 +215,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "addressvalidation_php_proto",
     deps = [":addressvalidation_proto"],
-)
-
-php_grpc_library(
-    name = "addressvalidation_php_grpc",
-    srcs = [":addressvalidation_proto"],
-    deps = [":addressvalidation_php_proto"],
 )
 
 php_gapic_library(
@@ -234,10 +230,7 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "addressvalidation_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":addressvalidation_php_grpc",
-        ":addressvalidation_php_proto",
-    ],
+    deps = [":addressvalidation_php_proto"],
 )
 
 # Open Source Packages
@@ -245,7 +238,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-maps-addressvalidation-v1-php",
     deps = [
         ":addressvalidation_php_gapic",
-        ":addressvalidation_php_grpc",
         ":addressvalidation_php_proto",
     ],
 )
@@ -317,6 +309,7 @@ ruby_cloud_gapic_library(
     ruby_cloud_description = "Address Validation is an API that accepts an address, identifies its components, validates them, normalizes the address for mailing and finds the best known location for it. It can help understand if an address refers to a real place. If the address does not refer to a real place, it can identify possibly wrong components, enabling users to correct them.",
     ruby_cloud_title = "Address Validation V1",
     service_yaml = "addressvalidation_v1.yaml",
+    transport = "grpc",
     deps = [
         ":addressvalidation_ruby_grpc",
         ":addressvalidation_ruby_proto",

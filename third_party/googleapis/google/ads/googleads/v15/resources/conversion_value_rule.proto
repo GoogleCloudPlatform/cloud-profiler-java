@@ -14,25 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-package google.ads.googleads.v12.resources;
-
-import "google/ads/googleads/v12/enums/conversion_value_rule_status.proto";
-import "google/ads/googleads/v12/enums/value_rule_device_type.proto";
-import "google/ads/googleads/v12/enums/value_rule_geo_location_match_type.proto";
-import "google/ads/googleads/v12/enums/value_rule_operation.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Resources";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/resources;resources";
-option java_multiple_files = true;
-option java_outer_classname = "ConversionValueRuleProto";
-option java_package = "com.google.ads.googleads.v12.resources";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Resources";
-option ruby_package = "Google::Ads::GoogleAds::V12::Resources";
-========
 package google.ads.googleads.v15.resources;
 
 import "google/ads/googleads/v15/enums/conversion_value_rule_status.proto";
@@ -50,7 +31,6 @@ option java_package = "com.google.ads.googleads.v15.resources";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Resources";
 option ruby_package = "Google::Ads::GoogleAds::V15::Resources";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
 
 // Proto file describing the Conversion Value Rule resource.
 
@@ -64,12 +44,8 @@ message ConversionValueRule {
   // Action applied when rule is applied.
   message ValueRuleAction {
     // Specifies applied operation.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-    google.ads.googleads.v12.enums.ValueRuleOperationEnum.ValueRuleOperation operation = 1;
-========
     google.ads.googleads.v15.enums.ValueRuleOperationEnum.ValueRuleOperation
         operation = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
 
     // Specifies applied value.
     double value = 2;
@@ -84,12 +60,8 @@ message ConversionValueRule {
         }];
 
     // Excluded Geo location match type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-    google.ads.googleads.v12.enums.ValueRuleGeoLocationMatchTypeEnum.ValueRuleGeoLocationMatchType excluded_geo_match_type = 2;
-========
     google.ads.googleads.v15.enums.ValueRuleGeoLocationMatchTypeEnum
         .ValueRuleGeoLocationMatchType excluded_geo_match_type = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
 
     // Geo locations that advertisers want to include.
     repeated string geo_target_constants = 3
@@ -98,23 +70,15 @@ message ConversionValueRule {
         }];
 
     // Included Geo location match type.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-    google.ads.googleads.v12.enums.ValueRuleGeoLocationMatchTypeEnum.ValueRuleGeoLocationMatchType geo_match_type = 4;
-========
     google.ads.googleads.v15.enums.ValueRuleGeoLocationMatchTypeEnum
         .ValueRuleGeoLocationMatchType geo_match_type = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
   }
 
   // Condition on Device dimension.
   message ValueRuleDeviceCondition {
     // Value for device type condition.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-    repeated google.ads.googleads.v12.enums.ValueRuleDeviceTypeEnum.ValueRuleDeviceType device_types = 1;
-========
     repeated google.ads.googleads.v15.enums.ValueRuleDeviceTypeEnum
         .ValueRuleDeviceType device_types = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
   }
 
   // Condition on Audience dimension.
@@ -174,10 +138,6 @@ message ConversionValueRule {
   ];
 
   // The status of the conversion value rule.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/resources/conversion_value_rule.proto
-  google.ads.googleads.v12.enums.ConversionValueRuleStatusEnum.ConversionValueRuleStatus status = 8;
-========
   google.ads.googleads.v15.enums.ConversionValueRuleStatusEnum
       .ConversionValueRuleStatus status = 8;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/resources/conversion_value_rule.proto
 }

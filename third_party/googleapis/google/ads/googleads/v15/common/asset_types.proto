@@ -14,37 +14,6 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-package google.ads.googleads.v12.common;
-
-import "google/ads/googleads/v12/common/criteria.proto";
-import "google/ads/googleads/v12/common/feed_common.proto";
-import "google/ads/googleads/v12/enums/call_conversion_reporting_state.proto";
-import "google/ads/googleads/v12/enums/call_to_action_type.proto";
-import "google/ads/googleads/v12/enums/lead_form_call_to_action_type.proto";
-import "google/ads/googleads/v12/enums/lead_form_desired_intent.proto";
-import "google/ads/googleads/v12/enums/lead_form_field_user_input_type.proto";
-import "google/ads/googleads/v12/enums/lead_form_post_submit_call_to_action_type.proto";
-import "google/ads/googleads/v12/enums/location_ownership_type.proto";
-import "google/ads/googleads/v12/enums/mime_type.proto";
-import "google/ads/googleads/v12/enums/mobile_app_vendor.proto";
-import "google/ads/googleads/v12/enums/price_extension_price_qualifier.proto";
-import "google/ads/googleads/v12/enums/price_extension_price_unit.proto";
-import "google/ads/googleads/v12/enums/price_extension_type.proto";
-import "google/ads/googleads/v12/enums/promotion_extension_discount_modifier.proto";
-import "google/ads/googleads/v12/enums/promotion_extension_occasion.proto";
-import "google/api/field_behavior.proto";
-import "google/api/resource.proto";
-
-option csharp_namespace = "Google.Ads.GoogleAds.V12.Common";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v12/common;common";
-option java_multiple_files = true;
-option java_outer_classname = "AssetTypesProto";
-option java_package = "com.google.ads.googleads.v12.common";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V12\\Common";
-option ruby_package = "Google::Ads::GoogleAds::V12::Common";
-========
 package google.ads.googleads.v15.common;
 
 import "google/ads/googleads/v15/common/criteria.proto";
@@ -74,7 +43,6 @@ option java_package = "com.google.ads.googleads.v15.common";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V15\\Common";
 option ruby_package = "Google::Ads::GoogleAds::V15::Common";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
 // Proto file containing info messages for specific asset types.
 
@@ -106,11 +74,7 @@ message ImageAsset {
   optional int64 file_size = 6;
 
   // MIME type of the image asset.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.MimeTypeEnum.MimeType mime_type = 3;
-========
   google.ads.googleads.v15.enums.MimeTypeEnum.MimeType mime_type = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Metadata for this image at its original size.
   ImageDimension full_size = 4;
@@ -140,13 +104,9 @@ message LeadFormAsset {
   string business_name = 10 [(google.api.field_behavior) = REQUIRED];
 
   // Required. Pre-defined display text that encourages user to expand the form.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.LeadFormCallToActionTypeEnum.LeadFormCallToActionType call_to_action_type = 17 [(google.api.field_behavior) = REQUIRED];
-========
   google.ads.googleads.v15.enums.LeadFormCallToActionTypeEnum
       .LeadFormCallToActionType call_to_action_type = 17
       [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Required. Text giving a clear value proposition of what users expect once
   // they expand the form.
@@ -187,12 +147,8 @@ message LeadFormAsset {
 
   // Pre-defined display text that encourages user action after the form is
   // submitted.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.LeadFormPostSubmitCallToActionTypeEnum.LeadFormPostSubmitCallToActionType post_submit_call_to_action_type = 19;
-========
   google.ads.googleads.v15.enums.LeadFormPostSubmitCallToActionTypeEnum
       .LeadFormPostSubmitCallToActionType post_submit_call_to_action_type = 19;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Asset resource name of the background image. The minimum size is 600x314
   // and the aspect ratio must be 1.91:1 (+-1%).
@@ -200,12 +156,8 @@ message LeadFormAsset {
 
   // Chosen intent for the lead form, for example, more volume or more
   // qualified.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.LeadFormDesiredIntentEnum.LeadFormDesiredIntent desired_intent = 21;
-========
   google.ads.googleads.v15.enums.LeadFormDesiredIntentEnum.LeadFormDesiredIntent
       desired_intent = 21;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Custom disclosure shown along with Google disclaimer on the lead form.
   // Accessible to allowed customers only.
@@ -216,12 +168,8 @@ message LeadFormAsset {
 message LeadFormField {
   // Describes the input type, which may be a predefined type such as "full
   // name" or a pre-vetted question like "What kind of vehicle do you have?".
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.LeadFormFieldUserInputTypeEnum.LeadFormFieldUserInputType input_type = 1;
-========
   google.ads.googleads.v15.enums.LeadFormFieldUserInputTypeEnum
       .LeadFormFieldUserInputType input_type = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Defines answer configuration that this form field accepts. If oneof is not
   // set, this is a free-text answer.
@@ -306,12 +254,8 @@ message PromotionAsset {
   string promotion_target = 1 [(google.api.field_behavior) = REQUIRED];
 
   // A modifier for qualification of the discount.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.PromotionExtensionDiscountModifierEnum.PromotionExtensionDiscountModifier discount_modifier = 2;
-========
   google.ads.googleads.v15.enums.PromotionExtensionDiscountModifierEnum
       .PromotionExtensionDiscountModifier discount_modifier = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Start date of when the promotion is eligible to be redeemed, in yyyy-MM-dd
   // format.
@@ -324,12 +268,8 @@ message PromotionAsset {
   // The occasion the promotion was intended for.
   // If an occasion is set, the redemption window will need to fall within the
   // date range associated with the occasion.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.PromotionExtensionOccasionEnum.PromotionExtensionOccasion occasion = 9;
-========
   google.ads.googleads.v15.enums.PromotionExtensionOccasionEnum
       .PromotionExtensionOccasion occasion = 9;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // The language of the promotion.
   // Represented as BCP 47 language tag.
@@ -507,12 +447,8 @@ message MobileAppAsset {
   string app_id = 1 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The application store that distributes this specific app.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.MobileAppVendorEnum.MobileAppVendor app_store = 2 [(google.api.field_behavior) = REQUIRED];
-========
   google.ads.googleads.v15.enums.MobileAppVendorEnum.MobileAppVendor app_store =
       2 [(google.api.field_behavior) = REQUIRED];
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Required. The visible text displayed when the link is rendered in an ad.
   // The length of this string should be between 1 and 25, inclusive.
@@ -550,12 +486,8 @@ message CallAsset {
 
   // Indicates whether this CallAsset should use its own call conversion
   // setting, follow the account level setting, or disable call conversion.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.CallConversionReportingStateEnum.CallConversionReportingState call_conversion_reporting_state = 3;
-========
   google.ads.googleads.v15.enums.CallConversionReportingStateEnum
       .CallConversionReportingState call_conversion_reporting_state = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // The conversion action to attribute a call conversion to. If not set, the
   // default conversion action is used. This field only has effect if
@@ -574,19 +506,12 @@ message CallAsset {
 // An asset representing a list of price offers.
 message PriceAsset {
   // Required. The type of the price asset.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.PriceExtensionTypeEnum.PriceExtensionType type = 1 [(google.api.field_behavior) = REQUIRED];
-
-  // The price qualifier of the price asset.
-  google.ads.googleads.v12.enums.PriceExtensionPriceQualifierEnum.PriceExtensionPriceQualifier price_qualifier = 2;
-========
   google.ads.googleads.v15.enums.PriceExtensionTypeEnum.PriceExtensionType
       type = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The price qualifier of the price asset.
   google.ads.googleads.v15.enums.PriceExtensionPriceQualifierEnum
       .PriceExtensionPriceQualifier price_qualifier = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Required. The language of the price asset.
   // Represented as BCP 47 language tag.
@@ -611,12 +536,8 @@ message PriceOffering {
   Money price = 3 [(google.api.field_behavior) = REQUIRED];
 
   // The price unit of the price offering.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.PriceExtensionPriceUnitEnum.PriceExtensionPriceUnit unit = 4;
-========
   google.ads.googleads.v15.enums.PriceExtensionPriceUnitEnum
       .PriceExtensionPriceUnit unit = 4;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 
   // Required. The final URL after all cross domain redirects.
   string final_url = 5 [(google.api.field_behavior) = REQUIRED];
@@ -628,12 +549,8 @@ message PriceOffering {
 // A call to action asset.
 message CallToActionAsset {
   // Call to action.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.CallToActionTypeEnum.CallToActionType call_to_action = 1;
-========
   google.ads.googleads.v15.enums.CallToActionTypeEnum.CallToActionType
       call_to_action = 1;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 }
 
 // A dynamic real estate asset.
@@ -987,12 +904,8 @@ message DynamicLocalAsset {
   // be unique and match the values of remarketing tag. Required.
   string deal_id = 1 [(google.api.field_behavior) = REQUIRED];
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  // Required. Deal name, for example, 50% off at Mountain View Grocers. Required.
-========
   // Required. Deal name, for example, 50% off at Mountain View Grocers.
   // Required.
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
   string deal_name = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Subtitle, for example, Groceries.
@@ -1122,12 +1035,8 @@ message LocationAsset {
   // The type of location ownership.
   // If the type is BUSINESS_OWNER, it will be served as a location extension.
   // If the type is AFFILIATE, it will be served as an affiliate location.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-  google.ads.googleads.v12.enums.LocationOwnershipTypeEnum.LocationOwnershipType location_ownership_type = 3;
-========
   google.ads.googleads.v15.enums.LocationOwnershipTypeEnum.LocationOwnershipType
       location_ownership_type = 3;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto
 }
 
 // Business Profile location data synced from the linked Business Profile
@@ -1145,8 +1054,6 @@ message BusinessProfileLocation {
   // linked Business Profile account.
   int64 listing_id = 3;
 }
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v12/common/asset_types.proto
-========
 
 // A hotel property asset.
 message HotelPropertyAsset {
@@ -1161,4 +1068,3 @@ message HotelPropertyAsset {
   // Name of the hotel. Read-only.
   string hotel_name = 3;
 }
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v15/common/asset_types.proto

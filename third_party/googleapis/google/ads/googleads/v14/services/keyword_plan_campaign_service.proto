@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-// Copyright 2022 Google LLC
-========
 // Copyright 2023 Google LLC
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +14,9 @@
 
 syntax = "proto3";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-package google.ads.googleads.v13.services;
-
-import "google/ads/googleads/v13/resources/keyword_plan_campaign.proto";
-========
 package google.ads.googleads.v14.services;
 
 import "google/ads/googleads/v14/resources/keyword_plan_campaign.proto";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -34,16 +24,6 @@ import "google/api/resource.proto";
 import "google/protobuf/field_mask.proto";
 import "google/rpc/status.proto";
 
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-option csharp_namespace = "Google.Ads.GoogleAds.V13.Services";
-option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v13/services;services";
-option java_multiple_files = true;
-option java_outer_classname = "KeywordPlanCampaignServiceProto";
-option java_package = "com.google.ads.googleads.v13.services";
-option objc_class_prefix = "GAA";
-option php_namespace = "Google\\Ads\\GoogleAds\\V13\\Services";
-option ruby_package = "Google::Ads::GoogleAds::V13::Services";
-========
 option csharp_namespace = "Google.Ads.GoogleAds.V14.Services";
 option go_package = "google.golang.org/genproto/googleapis/ads/googleads/v14/services;services";
 option java_multiple_files = true;
@@ -52,7 +32,6 @@ option java_package = "com.google.ads.googleads.v14.services";
 option objc_class_prefix = "GAA";
 option php_namespace = "Google\\Ads\\GoogleAds\\V14\\Services";
 option ruby_package = "Google::Ads::GoogleAds::V14::Services";
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
 
 // Proto file describing the keyword plan campaign service.
 
@@ -83,11 +62,7 @@ service KeywordPlanCampaignService {
   rpc MutateKeywordPlanCampaigns(MutateKeywordPlanCampaignsRequest)
       returns (MutateKeywordPlanCampaignsResponse) {
     option (google.api.http) = {
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-      post: "/v13/customers/{customer_id=*}/keywordPlanCampaigns:mutate"
-========
       post: "/v14/customers/{customer_id=*}/keywordPlanCampaigns:mutate"
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
       body: "*"
     };
     option (google.api.method_signature) = "customer_id,operations";
@@ -95,11 +70,7 @@ service KeywordPlanCampaignService {
 }
 
 // Request message for
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-// [KeywordPlanCampaignService.MutateKeywordPlanCampaigns][google.ads.googleads.v13.services.KeywordPlanCampaignService.MutateKeywordPlanCampaigns].
-========
 // [KeywordPlanCampaignService.MutateKeywordPlanCampaigns][google.ads.googleads.v14.services.KeywordPlanCampaignService.MutateKeywordPlanCampaigns].
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
 message MutateKeywordPlanCampaignsRequest {
   // Required. The ID of the customer whose Keyword Plan campaigns are being
   // modified.
@@ -131,19 +102,11 @@ message KeywordPlanCampaignOperation {
   oneof operation {
     // Create operation: No resource name is expected for the new Keyword Plan
     // campaign.
-<<<<<<<< HEAD:third_party/googleapis/google/ads/googleads/v13/services/keyword_plan_campaign_service.proto
-    google.ads.googleads.v13.resources.KeywordPlanCampaign create = 1;
-
-    // Update operation: The Keyword Plan campaign is expected to have a valid
-    // resource name.
-    google.ads.googleads.v13.resources.KeywordPlanCampaign update = 2;
-========
     google.ads.googleads.v14.resources.KeywordPlanCampaign create = 1;
 
     // Update operation: The Keyword Plan campaign is expected to have a valid
     // resource name.
     google.ads.googleads.v14.resources.KeywordPlanCampaign update = 2;
->>>>>>>> 046687af63d391fd9e6a7e25dc7f4fcda6d9aa90:third_party/googleapis/google/ads/googleads/v14/services/keyword_plan_campaign_service.proto
 
     // Remove operation: A resource name for the removed Keyword Plan campaign
     // is expected, in this format:

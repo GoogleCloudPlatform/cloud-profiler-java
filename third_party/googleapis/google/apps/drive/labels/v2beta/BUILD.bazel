@@ -124,7 +124,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -145,6 +144,7 @@ go_gapic_library(
     grpc_service_config = "drivelabels_v2beta_grpc_service_config.json",
     importpath = "google.golang.org/google/apps/drive/labels/v2beta;labels",
     metadata = True,
+    release_level = "beta",
     rest_numeric_enums = True,
     service_yaml = "drivelabels_v2beta.yaml",
     transport = "grpc+rest",
@@ -153,19 +153,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "labels_go_gapic_test",
-    srcs = [":labels_go_gapic_srcjar_test"],
-    embed = [":labels_go_gapic"],
-    importpath = "google.golang.org/google/apps/drive/labels/v2beta",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-drive-labels-v2beta-go",
     deps = [
         ":labels_go_gapic",
         ":labels_go_gapic_srcjar-metadata.srcjar",
+        ":labels_go_gapic_srcjar-snippets.srcjar",
         ":labels_go_gapic_srcjar-test.srcjar",
         ":labels_go_proto",
     ],
@@ -188,7 +182,8 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "drivelabels_v2beta.yaml",
     transport = "grpc+rest",
-    deps = [],
+    deps = [
+    ],
 )
 
 py_test(
@@ -216,7 +211,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -225,21 +219,15 @@ php_proto_library(
     deps = [":labels_proto"],
 )
 
-php_grpc_library(
-    name = "labels_php_grpc",
-    srcs = [":labels_proto"],
-    deps = [":labels_php_proto"],
-)
-
 php_gapic_library(
     name = "labels_php_gapic",
     srcs = [":labels_proto_with_info"],
     grpc_service_config = "drivelabels_v2beta_grpc_service_config.json",
+    migration_mode = "PRE_MIGRATION_SURFACE_ONLY",
     rest_numeric_enums = True,
     service_yaml = "drivelabels_v2beta.yaml",
     transport = "grpc+rest",
     deps = [
-        ":labels_php_grpc",
         ":labels_php_proto",
     ],
 )
@@ -249,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-drive-labels-v2beta-php",
     deps = [
         ":labels_php_gapic",
-        ":labels_php_grpc",
         ":labels_php_proto",
     ],
 )
@@ -309,12 +296,11 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "labels_ruby_gapic",
     srcs = [":labels_proto_with_info"],
-    extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-drive-labels-v2beta",
-    ],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-drive-labels-v2beta"],
     grpc_service_config = "drivelabels_v2beta_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "drivelabels_v2beta.yaml",
+    transport = "grpc+rest",
     deps = [
         ":labels_ruby_grpc",
         ":labels_ruby_proto",
@@ -344,6 +330,7 @@ load(
 
 csharp_proto_library(
     name = "labels_csharp_proto",
+    extra_opts = [],
     deps = [":labels_proto"],
 )
 

@@ -17,7 +17,6 @@ load(
     "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
-    "php_grpc_library",
     "php_proto_library",
     "ruby_grpc_library",
     "ruby_proto_library",
@@ -97,12 +96,6 @@ py_gapic_assembly_pkg(
     name = "type-py",
     deps = [
         ":type_py_gapic",
-        "//google/apps/script/type/calendar:calendar_py_gapic",
-        "//google/apps/script/type/docs:docs_py_gapic",
-        "//google/apps/script/type/drive:drive_py_gapic",
-        "//google/apps/script/type/gmail:gmail_py_gapic",
-        "//google/apps/script/type/sheets:sheets_py_gapic",
-        "//google/apps/script/type/slides:slides_py_gapic",
     ],
 )
 
@@ -112,12 +105,6 @@ py_gapic_assembly_pkg(
 php_proto_library(
     name = "type_php_proto",
     deps = [":type_proto"],
-)
-
-php_grpc_library(
-    name = "type_php_grpc",
-    srcs = [":type_proto"],
-    deps = [":type_php_proto"],
 )
 
 ruby_proto_library(

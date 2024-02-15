@@ -21,6 +21,8 @@ load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
 proto_library(
     name = "translation_proto",
     srcs = [
+        "adaptive_mt.proto",
+        "common.proto",
         "translation_service.proto",
     ],
     deps = [
@@ -29,8 +31,8 @@ proto_library(
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
-        "//google/rpc:status_proto",
         "@com_google_protobuf//:empty_proto",
+        "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -81,8 +83,6 @@ java_gapic_library(
     deps = [
         ":translation_java_proto",
         "//google/api:api_java_proto",
-        "//google/cloud/location:location_java_grpc",
-        "//google/cloud/location:location_java_proto",
     ],
 )
 
@@ -105,9 +105,6 @@ java_gapic_assembly_gradle_pkg(
         ":translation_java_grpc",
         ":translation_java_proto",
         ":translation_proto",
-        "//google/cloud/location:location_java_grpc",
-        "//google/cloud/location:location_java_proto",
-        "//google/cloud/location:location_proto",
     ],
 )
 
@@ -119,13 +116,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "translation_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "cloud.google.com/go/translation/apiv3/translationpb",
+    importpath = "cloud.google.com/go/translate/apiv3/translatepb",
     protos = [":translation_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -153,19 +149,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "translation_go_gapic_test",
-    srcs = [":translation_go_gapic_srcjar_test"],
-    embed = [":translation_go_gapic"],
-    importpath = "cloud.google.com/go/translate/apiv3",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-translation-v3-go",
     deps = [
         ":translation_go_gapic",
         ":translation_go_gapic_srcjar-metadata.srcjar",
+        ":translation_go_gapic_srcjar-snippets.srcjar",
         ":translation_go_gapic_srcjar-test.srcjar",
         ":translation_go_proto",
     ],
@@ -189,6 +179,8 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "translate_v3.yaml",
     transport = "grpc+rest",
+    deps = [
+    ],
 )
 
 py_test(
@@ -216,7 +208,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -225,21 +216,15 @@ php_proto_library(
     deps = [":translation_proto"],
 )
 
-php_grpc_library(
-    name = "translation_php_grpc",
-    srcs = [":translation_proto"],
-    deps = [":translation_php_proto"],
-)
-
 php_gapic_library(
     name = "translation_php_gapic",
     srcs = [":translation_proto_with_info"],
     grpc_service_config = "translate_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "translate_v3.yaml",
     transport = "grpc+rest",
     deps = [
-        ":translation_php_grpc",
         ":translation_php_proto",
     ],
 )
@@ -249,7 +234,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-translation-v3-php",
     deps = [
         ":translation_php_gapic",
-        ":translation_php_grpc",
         ":translation_php_proto",
     ],
 )
@@ -351,6 +335,7 @@ load(
 
 csharp_proto_library(
     name = "translation_csharp_proto",
+    extra_opts = [],
     deps = [":translation_proto"],
 )
 

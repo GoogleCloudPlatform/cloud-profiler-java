@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,18 +21,55 @@ import "google/ads/searchads360/v0/common/segments.proto";
 import "google/ads/searchads360/v0/common/value.proto";
 import "google/ads/searchads360/v0/enums/summary_row_setting.proto";
 import "google/ads/searchads360/v0/resources/ad_group.proto";
+import "google/ads/searchads360/v0/resources/ad_group_ad.proto";
+import "google/ads/searchads360/v0/resources/ad_group_ad_label.proto";
+import "google/ads/searchads360/v0/resources/ad_group_asset.proto";
+import "google/ads/searchads360/v0/resources/ad_group_asset_set.proto";
+import "google/ads/searchads360/v0/resources/ad_group_audience_view.proto";
 import "google/ads/searchads360/v0/resources/ad_group_bid_modifier.proto";
 import "google/ads/searchads360/v0/resources/ad_group_criterion.proto";
+import "google/ads/searchads360/v0/resources/ad_group_criterion_label.proto";
+import "google/ads/searchads360/v0/resources/ad_group_label.proto";
+import "google/ads/searchads360/v0/resources/age_range_view.proto";
+import "google/ads/searchads360/v0/resources/asset.proto";
+import "google/ads/searchads360/v0/resources/asset_group.proto";
+import "google/ads/searchads360/v0/resources/asset_group_asset.proto";
+import "google/ads/searchads360/v0/resources/asset_group_listing_group_filter.proto";
+import "google/ads/searchads360/v0/resources/asset_group_signal.proto";
+import "google/ads/searchads360/v0/resources/asset_group_top_combination_view.proto";
+import "google/ads/searchads360/v0/resources/asset_set.proto";
+import "google/ads/searchads360/v0/resources/asset_set_asset.proto";
+import "google/ads/searchads360/v0/resources/audience.proto";
 import "google/ads/searchads360/v0/resources/bidding_strategy.proto";
 import "google/ads/searchads360/v0/resources/campaign.proto";
+import "google/ads/searchads360/v0/resources/campaign_asset.proto";
+import "google/ads/searchads360/v0/resources/campaign_asset_set.proto";
+import "google/ads/searchads360/v0/resources/campaign_audience_view.proto";
 import "google/ads/searchads360/v0/resources/campaign_budget.proto";
 import "google/ads/searchads360/v0/resources/campaign_criterion.proto";
+import "google/ads/searchads360/v0/resources/campaign_label.proto";
+import "google/ads/searchads360/v0/resources/cart_data_sales_view.proto";
+import "google/ads/searchads360/v0/resources/conversion.proto";
 import "google/ads/searchads360/v0/resources/conversion_action.proto";
+import "google/ads/searchads360/v0/resources/conversion_custom_variable.proto";
 import "google/ads/searchads360/v0/resources/customer.proto";
+import "google/ads/searchads360/v0/resources/customer_asset.proto";
+import "google/ads/searchads360/v0/resources/customer_asset_set.proto";
 import "google/ads/searchads360/v0/resources/customer_client.proto";
 import "google/ads/searchads360/v0/resources/customer_manager_link.proto";
+import "google/ads/searchads360/v0/resources/dynamic_search_ads_search_term_view.proto";
+import "google/ads/searchads360/v0/resources/gender_view.proto";
+import "google/ads/searchads360/v0/resources/geo_target_constant.proto";
 import "google/ads/searchads360/v0/resources/keyword_view.proto";
+import "google/ads/searchads360/v0/resources/label.proto";
+import "google/ads/searchads360/v0/resources/language_constant.proto";
+import "google/ads/searchads360/v0/resources/location_view.proto";
+import "google/ads/searchads360/v0/resources/product_bidding_category_constant.proto";
 import "google/ads/searchads360/v0/resources/product_group_view.proto";
+import "google/ads/searchads360/v0/resources/shopping_performance_view.proto";
+import "google/ads/searchads360/v0/resources/user_list.proto";
+import "google/ads/searchads360/v0/resources/visit.proto";
+import "google/ads/searchads360/v0/resources/webpage_view.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -52,7 +89,8 @@ option ruby_package = "Google::Ads::SearchAds360::V0::Services";
 // Service to fetch data and metrics across resources.
 service SearchAds360Service {
   option (google.api.default_host) = "searchads360.googleapis.com";
-  option (google.api.oauth_scopes) = "https://www.googleapis.com/auth/doubleclicksearch";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/doubleclicksearch";
 
   // Returns all rows that match the search query.
   //
@@ -82,7 +120,8 @@ service SearchAds360Service {
   //   [QueryError]()
   //   [QuotaError]()
   //   [RequestError]()
-  rpc SearchStream(SearchSearchAds360StreamRequest) returns (stream SearchSearchAds360StreamResponse) {
+  rpc SearchStream(SearchSearchAds360StreamRequest)
+      returns (stream SearchSearchAds360StreamResponse) {
     option (google.api.http) = {
       post: "/v0/customers/{customer_id=*}/searchAds360:searchStream"
       body: "*"
@@ -91,7 +130,8 @@ service SearchAds360Service {
   }
 }
 
-// Request message for [SearchAds360Service.Search][google.ads.searchads360.v0.services.SearchAds360Service.Search].
+// Request message for
+// [SearchAds360Service.Search][google.ads.searchads360.v0.services.SearchAds360Service.Search].
 message SearchSearchAds360Request {
   // Required. The ID of the customer being queried.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -121,10 +161,12 @@ message SearchSearchAds360Request {
   // Determines whether a summary row will be returned. By default, summary row
   // is not returned. If requested, the summary row will be sent in a response
   // by itself after all other query results are returned.
-  google.ads.searchads360.v0.enums.SummaryRowSettingEnum.SummaryRowSetting summary_row_setting = 8;
+  google.ads.searchads360.v0.enums.SummaryRowSettingEnum.SummaryRowSetting
+      summary_row_setting = 8;
 }
 
-// Response message for [SearchAds360Service.Search][google.ads.searchads360.v0.services.SearchAds360Service.Search].
+// Response message for
+// [SearchAds360Service.Search][google.ads.searchads360.v0.services.SearchAds360Service.Search].
 message SearchSearchAds360Response {
   // The list of rows that matched the query.
   repeated SearchAds360Row results = 1;
@@ -149,9 +191,25 @@ message SearchSearchAds360Response {
 
   // The headers of the custom columns in the results.
   repeated CustomColumnHeader custom_column_headers = 7;
+
+  // The headers of the conversion custom metrics in the results.
+  repeated ConversionCustomMetricHeader conversion_custom_metric_headers = 9;
+
+  // The headers of the conversion custom dimensions in the results.
+  repeated ConversionCustomDimensionHeader conversion_custom_dimension_headers =
+      10;
+
+  // The headers of the raw event conversion metrics in the results.
+  repeated RawEventConversionMetricHeader raw_event_conversion_metric_headers =
+      11;
+
+  // The headers of the raw event conversion dimensions in the results.
+  repeated RawEventConversionDimensionHeader
+      raw_event_conversion_dimension_headers = 12;
 }
 
-// Request message for [SearchAds360Service.SearchStream][google.ads.searchads360.v0.services.SearchAds360Service.SearchStream].
+// Request message for
+// [SearchAds360Service.SearchStream][google.ads.searchads360.v0.services.SearchAds360Service.SearchStream].
 message SearchSearchAds360StreamRequest {
   // Required. The ID of the customer being queried.
   string customer_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -167,10 +225,12 @@ message SearchSearchAds360StreamRequest {
   // Determines whether a summary row will be returned. By default, summary row
   // is not returned. If requested, the summary row will be sent in a response
   // by itself after all other query results are returned.
-  google.ads.searchads360.v0.enums.SummaryRowSettingEnum.SummaryRowSetting summary_row_setting = 3;
+  google.ads.searchads360.v0.enums.SummaryRowSettingEnum.SummaryRowSetting
+      summary_row_setting = 3;
 }
 
-// Response message for [SearchAds360Service.SearchStream][google.ads.searchads360.v0.services.SearchAds360Service.SearchStream].
+// Response message for
+// [SearchAds360Service.SearchStream][google.ads.searchads360.v0.services.SearchAds360Service.SearchStream].
 message SearchSearchAds360StreamResponse {
   // The list of rows that matched the query.
   repeated SearchAds360Row results = 1;
@@ -186,6 +246,21 @@ message SearchSearchAds360StreamResponse {
   // The headers of the custom columns in the results.
   repeated CustomColumnHeader custom_column_headers = 5;
 
+  // The headers of the conversion custom metrics in the results.
+  repeated ConversionCustomMetricHeader conversion_custom_metric_headers = 7;
+
+  // The headers of the conversion custom dimension in the results.
+  repeated ConversionCustomDimensionHeader conversion_custom_dimension_headers =
+      8;
+
+  // The headers of the raw event conversion metrics in the results.
+  repeated RawEventConversionMetricHeader raw_event_conversion_metric_headers =
+      9;
+
+  // The headers of the raw event conversion dimensions in the results.
+  repeated RawEventConversionDimensionHeader
+      raw_event_conversion_dimension_headers = 10;
+
   // The unique id of the request that is used for debugging purposes.
   string request_id = 4;
 }
@@ -195,11 +270,65 @@ message SearchAds360Row {
   // The ad group referenced in the query.
   google.ads.searchads360.v0.resources.AdGroup ad_group = 3;
 
+  // The ad referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupAd ad_group_ad = 16;
+
+  // The ad group ad label referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupAdLabel ad_group_ad_label = 120;
+
+  // The ad group asset referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupAsset ad_group_asset = 154;
+
+  // The ad group asset set referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupAssetSet ad_group_asset_set = 196;
+
+  // The ad group audience view referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupAudienceView
+      ad_group_audience_view = 57;
+
   // The bid modifier referenced in the query.
-  google.ads.searchads360.v0.resources.AdGroupBidModifier ad_group_bid_modifier = 24;
+  google.ads.searchads360.v0.resources.AdGroupBidModifier
+      ad_group_bid_modifier = 24;
 
   // The criterion referenced in the query.
   google.ads.searchads360.v0.resources.AdGroupCriterion ad_group_criterion = 17;
+
+  // The ad group criterion label referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupCriterionLabel
+      ad_group_criterion_label = 121;
+
+  // The ad group label referenced in the query.
+  google.ads.searchads360.v0.resources.AdGroupLabel ad_group_label = 115;
+
+  // The age range view referenced in the query.
+  google.ads.searchads360.v0.resources.AgeRangeView age_range_view = 48;
+
+  // The asset referenced in the query.
+  google.ads.searchads360.v0.resources.Asset asset = 105;
+
+  // The asset group asset referenced in the query.
+  google.ads.searchads360.v0.resources.AssetGroupAsset asset_group_asset = 173;
+
+  // The asset group signal referenced in the query.
+  google.ads.searchads360.v0.resources.AssetGroupSignal asset_group_signal =
+      191;
+
+  // The asset group listing group filter referenced in the query.
+  google.ads.searchads360.v0.resources.AssetGroupListingGroupFilter
+      asset_group_listing_group_filter = 182;
+
+  // The asset group top combination view referenced in the query.
+  google.ads.searchads360.v0.resources.AssetGroupTopCombinationView
+      asset_group_top_combination_view = 199;
+
+  // The asset group referenced in the query.
+  google.ads.searchads360.v0.resources.AssetGroup asset_group = 172;
+
+  // The asset set asset referenced in the query.
+  google.ads.searchads360.v0.resources.AssetSetAsset asset_set_asset = 180;
+
+  // The asset set referenced in the query.
+  google.ads.searchads360.v0.resources.AssetSet asset_set = 179;
 
   // The bidding strategy referenced in the query.
   google.ads.searchads360.v0.resources.BiddingStrategy bidding_strategy = 18;
@@ -210,26 +339,100 @@ message SearchAds360Row {
   // The campaign referenced in the query.
   google.ads.searchads360.v0.resources.Campaign campaign = 2;
 
+  // The campaign asset referenced in the query.
+  google.ads.searchads360.v0.resources.CampaignAsset campaign_asset = 142;
+
+  // The campaign asset set referenced in the query.
+  google.ads.searchads360.v0.resources.CampaignAssetSet campaign_asset_set =
+      181;
+
+  // The campaign audience view referenced in the query.
+  google.ads.searchads360.v0.resources.CampaignAudienceView
+      campaign_audience_view = 69;
+
   // The campaign criterion referenced in the query.
-  google.ads.searchads360.v0.resources.CampaignCriterion campaign_criterion = 20;
+  google.ads.searchads360.v0.resources.CampaignCriterion campaign_criterion =
+      20;
+
+  // The campaign label referenced in the query.
+  google.ads.searchads360.v0.resources.CampaignLabel campaign_label = 108;
+
+  // The cart data sales view referenced in the query.
+  google.ads.searchads360.v0.resources.CartDataSalesView cart_data_sales_view =
+      221;
+
+  // The Audience referenced in the query.
+  google.ads.searchads360.v0.resources.Audience audience = 190;
 
   // The conversion action referenced in the query.
   google.ads.searchads360.v0.resources.ConversionAction conversion_action = 103;
 
+  // The conversion custom variable referenced in the query.
+  google.ads.searchads360.v0.resources.ConversionCustomVariable
+      conversion_custom_variable = 153;
+
   // The customer referenced in the query.
   google.ads.searchads360.v0.resources.Customer customer = 1;
 
+  // The customer asset referenced in the query.
+  google.ads.searchads360.v0.resources.CustomerAsset customer_asset = 155;
+
+  // The customer asset set referenced in the query.
+  google.ads.searchads360.v0.resources.CustomerAssetSet customer_asset_set =
+      195;
+
   // The CustomerManagerLink referenced in the query.
-  google.ads.searchads360.v0.resources.CustomerManagerLink customer_manager_link = 61;
+  google.ads.searchads360.v0.resources.CustomerManagerLink
+      customer_manager_link = 61;
 
   // The CustomerClient referenced in the query.
   google.ads.searchads360.v0.resources.CustomerClient customer_client = 70;
 
+  // The dynamic search ads search term view referenced in the query.
+  google.ads.searchads360.v0.resources.DynamicSearchAdsSearchTermView
+      dynamic_search_ads_search_term_view = 106;
+
+  // The gender view referenced in the query.
+  google.ads.searchads360.v0.resources.GenderView gender_view = 40;
+
+  // The geo target constant referenced in the query.
+  google.ads.searchads360.v0.resources.GeoTargetConstant geo_target_constant =
+      23;
+
   // The keyword view referenced in the query.
   google.ads.searchads360.v0.resources.KeywordView keyword_view = 21;
 
+  // The label referenced in the query.
+  google.ads.searchads360.v0.resources.Label label = 52;
+
+  // The language constant referenced in the query.
+  google.ads.searchads360.v0.resources.LanguageConstant language_constant = 55;
+
+  // The location view referenced in the query.
+  google.ads.searchads360.v0.resources.LocationView location_view = 123;
+
+  // The Product Bidding Category referenced in the query.
+  google.ads.searchads360.v0.resources.ProductBiddingCategoryConstant
+      product_bidding_category_constant = 109;
+
   // The product group view referenced in the query.
   google.ads.searchads360.v0.resources.ProductGroupView product_group_view = 54;
+
+  // The shopping performance view referenced in the query.
+  google.ads.searchads360.v0.resources.ShoppingPerformanceView
+      shopping_performance_view = 117;
+
+  // The user list referenced in the query.
+  google.ads.searchads360.v0.resources.UserList user_list = 38;
+
+  // The webpage view referenced in the query.
+  google.ads.searchads360.v0.resources.WebpageView webpage_view = 162;
+
+  // The event level visit referenced in the query.
+  google.ads.searchads360.v0.resources.Visit visit = 203;
+
+  // The event level conversion referenced in the query.
+  google.ads.searchads360.v0.resources.Conversion conversion = 206;
 
   // The metrics.
   google.ads.searchads360.v0.common.Metrics metrics = 4;
@@ -251,4 +454,40 @@ message CustomColumnHeader {
 
   // True when the custom column references metrics.
   bool references_metrics = 3;
+}
+
+// Message for conversion custom metric header.
+message ConversionCustomMetricHeader {
+  // The conversion custom metric ID.
+  int64 id = 1;
+
+  // The user defined name of the conversion custom metric.
+  string name = 2;
+}
+
+// Message for conversion custom dimension header.
+message ConversionCustomDimensionHeader {
+  // The conversion custom dimension ID.
+  int64 id = 1;
+
+  // The user defined name of the conversion custom dimension.
+  string name = 2;
+}
+
+// Message for raw event conversion metric header.
+message RawEventConversionMetricHeader {
+  // The conversion custom variable ID.
+  int64 id = 1;
+
+  // The user defined name of the raw event metric.
+  string name = 2;
+}
+
+// Message for raw event conversion dimension header.
+message RawEventConversionDimensionHeader {
+  // The conversion custom variable ID.
+  int64 id = 1;
+
+  // The user defined name of the raw event dimension.
+  string name = 2;
 }

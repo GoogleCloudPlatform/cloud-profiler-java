@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ message Customer {
   string org_display_name = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Required. The organization address for the customer. To enforce US laws and
-  // embargoes, we require a region and zip code. You must provide valid
-  // addresses for every customer. To set the customer's language, use the
-  // Customer-level language code.
+  // embargoes, we require a region, postal code, and address lines. You must
+  // provide valid addresses for every customer. To set the customer's
+  // language, use the Customer-level language code.
   google.type.PostalAddress org_postal_address = 3
       [(google.api.field_behavior) = REQUIRED];
 
@@ -87,6 +87,10 @@ message Customer {
   // Cloud Identity ID of the customer's channel partner.
   // Populated only if a channel partner exists for this customer.
   string channel_partner_id = 13;
+
+  // Optional. External CRM ID for the customer.
+  // Populated only if a CRM ID exists for this customer.
+  string correlation_id = 14 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Contact information for a customer account.
