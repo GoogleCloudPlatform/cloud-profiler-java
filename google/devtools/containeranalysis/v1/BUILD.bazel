@@ -9,14 +9,41 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
-# This is an API workspace, having public visibility by default makes perfect sense.
-package(default_visibility = ["//visibility:public"])
-
 ##############################################################################
 # Common
 ##############################################################################
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
+    "csharp_gapic_assembly_pkg",
+    "csharp_gapic_library",
+    "csharp_grpc_library",
+    "csharp_proto_library",
+    "go_proto_library",
+    "java_gapic_assembly_gradle_pkg",
+    "java_gapic_library",
+    "java_gapic_test",
+    "java_grpc_library",
+    "java_proto_library",
+    "nodejs_gapic_assembly_pkg",
+    "nodejs_gapic_library",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_proto_library",
+    "proto_library_with_info",
+    "py_gapic_assembly_pkg",
+    "py_gapic_library",
+    "py_test",
+    "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
+    "ruby_grpc_library",
+    "ruby_proto_library",
+)
+
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "containeranalysis_proto",
@@ -55,18 +82,6 @@ proto_library_with_info(
     ],
 )
 
-##############################################################################
-# Java
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "java_gapic_assembly_gradle_pkg",
-    "java_gapic_library",
-    "java_gapic_test",
-    "java_grpc_library",
-    "java_proto_library",
-)
-
 java_proto_library(
     name = "containeranalysis_java_proto",
     deps = [":containeranalysis_proto"],
@@ -83,6 +98,7 @@ java_gapic_library(
     srcs = [":containeranalysis_proto_with_info"],
     gapic_yaml = "containeranalysis_gapic.yaml",
     grpc_service_config = "containeranalysis_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "containeranalysis_v1.yaml",
     test_deps = [
         ":containeranalysis_java_grpc",
@@ -109,6 +125,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-devtools-containeranalysis-v1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":containeranalysis_java_gapic",
@@ -116,17 +133,6 @@ java_gapic_assembly_gradle_pkg(
         ":containeranalysis_java_proto",
         ":containeranalysis_proto",
     ],
-)
-
-##############################################################################
-# Go
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "go_gapic_assembly_pkg",
-    "go_gapic_library",
-    "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -155,40 +161,29 @@ go_proto_library(
 #     ],
 # )
 
-# go_test(
-#     name = "containeranalysis_go_gapic_test",
-#     srcs = [":containeranalysis_go_gapic_srcjar_test"],
-#     embed = [":containeranalysis_go_gapic"],
-#     importpath = "cloud.google.com/go/devtools/containeranalysis/apiv1",
-# )
-
 # # Open Source Packages
 # go_gapic_assembly_pkg(
 #     name = "gapi-cloud-devtools-containeranalysis-v1-go",
 #     deps = [
 #         ":containeranalysis_go_gapic",
 #         ":containeranalysis_go_gapic_srcjar-metadata.srcjar",
+#         ":containeranalysis_go_gapic_srcjar-snippets.srcjar",
 #         ":containeranalysis_go_gapic_srcjar-test.srcjar",
 #         ":containeranalysis_go_proto",
 #     ],
 # )
 
-##############################################################################
-# Python
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "py_gapic_assembly_pkg",
-    "py_gapic_library",
-    "py_test",
-)
-
 py_gapic_library(
     name = "containeranalysis_py_gapic",
     srcs = [":containeranalysis_proto"],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
-    opt_args = ["python-gapic-namespace=google.cloud.devtools"],
-    transport = "grpc",
+    opt_args = [
+        "python-gapic-namespace=google.cloud.devtools",
+        "warehouse-package-name=google-cloud-containeranalysis",
+    ],
+    rest_numeric_enums = True,
+    service_yaml = "containeranalysis_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
         "//google/iam/v1:policy_py_proto",
@@ -214,37 +209,20 @@ py_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# PHP
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "php_gapic_assembly_pkg",
-    "php_gapic_library",
-    "php_grpc_library",
-    "php_proto_library",
-)
-
 php_proto_library(
     name = "containeranalysis_php_proto",
     deps = [":containeranalysis_proto"],
-)
-
-php_grpc_library(
-    name = "containeranalysis_php_grpc",
-    srcs = [":containeranalysis_proto"],
-    deps = [":containeranalysis_php_proto"],
 )
 
 php_gapic_library(
     name = "containeranalysis_php_gapic",
     srcs = [":containeranalysis_proto_with_info"],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "containeranalysis_v1.yaml",
-    deps = [
-        ":containeranalysis_php_grpc",
-        ":containeranalysis_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":containeranalysis_php_proto"],
 )
 
 # Open Source Packages
@@ -252,18 +230,8 @@ php_gapic_assembly_pkg(
     name = "google-cloud-devtools-containeranalysis-v1-php",
     deps = [
         ":containeranalysis_php_gapic",
-        ":containeranalysis_php_grpc",
         ":containeranalysis_php_proto",
     ],
-)
-
-##############################################################################
-# Node.js
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
 )
 
 nodejs_gapic_library(
@@ -275,7 +243,9 @@ nodejs_gapic_library(
     grpc_service_config = "containeranalysis_grpc_service_config.json",
     main_service = "containeranalysis",
     package = "google.devtools.containeranalysis.v1",
+    rest_numeric_enums = True,
     service_yaml = "containeranalysis_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -287,17 +257,6 @@ nodejs_gapic_assembly_pkg(
         ## DO NOT CHANGE: must include Grafeas protos
         "//grafeas/v1:grafeas_proto",
     ],
-)
-
-##############################################################################
-# Ruby
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_cloud_gapic_library",
-    "ruby_gapic_assembly_pkg",
-    "ruby_grpc_library",
-    "ruby_proto_library",
 )
 
 ruby_proto_library(
@@ -320,11 +279,13 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/container-registry/docs/container-analysis",
         "ruby-cloud-api-id=containeranalysis.googleapis.com",
         "ruby-cloud-api-shortname=containeranalysis",
-        "ruby-cloud-extra-dependencies=grafeas-v1=>= 0.4|< 2.a",
+        "ruby-cloud-extra-dependencies=grafeas-v1=>=0.4+<2.a",
     ],
     grpc_service_config = "containeranalysis_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Container Analysis API is an implementation of Grafeas. It stores, and enables querying and retrieval of, critical metadata about all of your software artifacts.",
     ruby_cloud_title = "Container Analysis V1",
+    service_yaml = "containeranalysis_v1.yaml",
     deps = [
         ":containeranalysis_ruby_grpc",
         ":containeranalysis_ruby_proto",
@@ -339,17 +300,6 @@ ruby_gapic_assembly_pkg(
         ":containeranalysis_ruby_grpc",
         ":containeranalysis_ruby_proto",
     ],
-)
-
-##############################################################################
-# C#
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "csharp_gapic_assembly_pkg",
-    "csharp_gapic_library",
-    "csharp_grpc_library",
-    "csharp_proto_library",
 )
 
 csharp_proto_library(
@@ -368,7 +318,9 @@ csharp_gapic_library(
     srcs = [":containeranalysis_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "containeranalysis_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "containeranalysis_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":containeranalysis_csharp_grpc",
         ":containeranalysis_csharp_proto",
@@ -383,15 +335,6 @@ csharp_gapic_assembly_pkg(
         ":containeranalysis_csharp_grpc",
         ":containeranalysis_csharp_proto",
     ],
-)
-
-##############################################################################
-# C++
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "cc_grpc_library",
-    "cc_proto_library",
 )
 
 cc_proto_library(

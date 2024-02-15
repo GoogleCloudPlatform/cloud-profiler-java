@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package google.cloud.documentai.v1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/cloud/documentai/v1/document_schema.proto";
+import "google/cloud/documentai/v1/evaluation.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.DocumentAI.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/documentai/v1;documentai";
+option go_package = "cloud.google.com/go/documentai/apiv1/documentaipb;documentaipb";
 option java_multiple_files = true;
 option java_outer_classname = "DocumentAiProcessor";
 option java_package = "com.google.cloud.documentai.v1";
@@ -29,10 +31,9 @@ option php_namespace = "Google\\Cloud\\DocumentAI\\V1";
 option ruby_package = "Google::Cloud::DocumentAI::V1";
 
 // A processor version is an implementation of a processor. Each processor
-// can have multiple versions, pre-trained by Google internally or up-trained
-// by the customer. At a time, a processor can only have one default version
-// version. So the processor's behavior (when processing documents) is defined
-// by a default version
+// can have multiple versions, pretrained by Google internally or uptrained
+// by the customer. A processor can only have one default version at a time.
+// Its document-processing behavior is defined by that version.
 message ProcessorVersion {
   option (google.api.resource) = {
     type: "documentai.googleapis.com/ProcessorVersion"
@@ -45,9 +46,10 @@ message ProcessorVersion {
     google.protobuf.Timestamp deprecation_time = 1;
 
     // If set, the processor version that will be used as a replacement.
-    string replacement_processor_version = 2 [(google.api.resource_reference) = {
-                                                type: "documentai.googleapis.com/ProcessorVersion"
-                                              }];
+    string replacement_processor_version = 2
+        [(google.api.resource_reference) = {
+          type: "documentai.googleapis.com/ProcessorVersion"
+        }];
   }
 
   // The possible states of the processor version.
@@ -75,6 +77,21 @@ message ProcessorVersion {
 
     // The processor version failed and is in an indeterminate state.
     FAILED = 7;
+
+    // The processor version is being imported.
+    IMPORTING = 8;
+  }
+
+  // The possible model types of the processor version.
+  enum ModelType {
+    // The processor version has unspecified model type.
+    MODEL_TYPE_UNSPECIFIED = 0;
+
+    // The processor version has generative model type.
+    MODEL_TYPE_GENERATIVE = 1;
+
+    // The processor version has custom model type.
+    MODEL_TYPE_CUSTOM = 2;
   }
 
   // The resource name of the processor version.
@@ -85,11 +102,17 @@ message ProcessorVersion {
   // The display name of the processor version.
   string display_name = 2;
 
+  // The schema of the processor version. Describes the output.
+  DocumentSchema document_schema = 12;
+
   // The state of the processor version.
   State state = 6;
 
   // The time the processor version was created.
   google.protobuf.Timestamp create_time = 7;
+
+  // The most recently invoked evaluation for the processor version.
+  EvaluationReference latest_evaluation = 8;
 
   // The KMS key name used for encryption.
   string kms_key_name = 9;
@@ -97,11 +120,25 @@ message ProcessorVersion {
   // The KMS key version with which data is encrypted.
   string kms_key_version_name = 10;
 
-  // Denotes that this ProcessorVersion is managed by google.
-  bool google_managed = 11;
+  // Output only. Denotes that this `ProcessorVersion` is managed by Google.
+  bool google_managed = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // If set, information about the eventual deprecation of this version.
   DeprecationInfo deprecation_info = 13;
+
+  // Output only. The model type of this processor version.
+  ModelType model_type = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Contains the alias and the aliased resource name of processor version.
+message ProcessorVersionAlias {
+  // The alias in the form of `processor_version` resource name.
+  string alias = 1;
+
+  // The resource name of aliased processor version.
+  string processor_version = 2 [(google.api.resource_reference) = {
+    type: "documentai.googleapis.com/ProcessorVersion"
+  }];
 }
 
 // The first-class citizen for Document AI. Each processor defines how to
@@ -125,14 +162,14 @@ message Processor {
     // The processor is disabled.
     DISABLED = 2;
 
-    // The processor is being enabled, will become ENABLED if successful.
+    // The processor is being enabled, will become `ENABLED` if successful.
     ENABLING = 3;
 
-    // The processor is being disabled, will become DISABLED if successful.
+    // The processor is being disabled, will become `DISABLED` if successful.
     DISABLING = 4;
 
-    // The processor is being created, will become either ENABLED (for
-    // successful creation) or FAILED (for failed ones).
+    // The processor is being created, will become either `ENABLED` (for
+    // successful creation) or `FAILED` (for failed ones).
     // Once a processor is in this state, it can then be used for document
     // processing, but the feature dependencies of the processor might not be
     // fully created yet.
@@ -154,8 +191,8 @@ message Processor {
     (google.api.field_behavior) = OUTPUT_ONLY
   ];
 
-  // The processor type, e.g., OCR_PROCESSOR, INVOICE_PROCESSOR, etc.
-  // To get a list of processors types, see
+  // The processor type, such as: `OCR_PROCESSOR`, `INVOICE_PROCESSOR`.
+  // To get a list of processor types, see
   // [FetchProcessorTypes][google.cloud.documentai.v1.DocumentProcessorService.FetchProcessorTypes].
   string type = 2;
 
@@ -167,10 +204,15 @@ message Processor {
 
   // The default processor version.
   string default_processor_version = 9 [(google.api.resource_reference) = {
-                                          type: "documentai.googleapis.com/ProcessorVersion"
-                                        }];
+    type: "documentai.googleapis.com/ProcessorVersion"
+  }];
 
-  // Output only. Immutable. The http endpoint that can be called to invoke processing.
+  // Output only. The processor version aliases.
+  repeated ProcessorVersionAlias processor_version_aliases = 10
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Immutable. The http endpoint that can be called to invoke
+  // processing.
   string process_endpoint = 6 [
     (google.api.field_behavior) = OUTPUT_ONLY,
     (google.api.field_behavior) = IMMUTABLE
@@ -179,7 +221,7 @@ message Processor {
   // The time the processor was created.
   google.protobuf.Timestamp create_time = 7;
 
-  // The KMS key used for encryption/decryption in CMEK scenarios.
-  // See https://cloud.google.com/security-key-management.
+  // The [KMS key](https://cloud.google.com/security-key-management) used for
+  // encryption and decryption in CMEK scenarios.
   string kms_key_name = 8;
 }

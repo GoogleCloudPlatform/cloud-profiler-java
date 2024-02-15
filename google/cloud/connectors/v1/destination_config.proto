@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package google.cloud.connectors.v1;
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/connectors/v1;connectors";
+option go_package = "cloud.google.com/go/connectors/apiv1/connectorspb;connectorspb";
 option java_multiple_files = true;
 
 // Define the Connectors target endpoint.

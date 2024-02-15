@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/rpc/status.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/speech/v2;speech";
+option go_package = "cloud.google.com/go/speech/apiv2/speechpb;speechpb";
 option java_multiple_files = true;
 option java_outer_classname = "CloudSpeechProto";
 option java_package = "com.google.cloud.speech.v2";
@@ -70,7 +70,7 @@ service Speech {
 
   // Returns the requested
   // [Recognizer][google.cloud.speech.v2.Recognizer]. Fails with
-  // [NOT_FOUND][google.rpc.Code.NOT_FOUND] if the requested recognizer doesn't
+  // [NOT_FOUND][google.rpc.Code.NOT_FOUND] if the requested Recognizer doesn't
   // exist.
   rpc GetRecognizer(GetRecognizerRequest) returns (Recognizer) {
     option (google.api.http) = {
@@ -417,14 +417,14 @@ message OperationMetadata {
     UndeletePhraseSetRequest undelete_phrase_set_request = 20;
 
     // The UpdateConfigRequest that spawned the Operation.
-    UpdateConfigRequest update_config_request = 21;
+    UpdateConfigRequest update_config_request = 21 [deprecated = true];
   }
 
   // The percent progress of the Operation. Values can range from 0-100. If the
   // value is 100, then the operation is finished.
   int32 progress_percent = 22;
 
-  // Specific metadata per RPC
+  // Specific metadata per RPC.
   oneof metadata {
     // Metadata specific to the BatchRecognize method.
     BatchRecognizeMetadata batch_recognize_metadata = 23;
@@ -444,8 +444,8 @@ message ListRecognizersRequest {
   ];
 
   // The maximum number of Recognizers to return. The service may return fewer
-  // than this value. If unspecified, at most 20 Recognizers will be returned.
-  // The maximum value is 20; values above 20 will be coerced to 20.
+  // than this value. If unspecified, at most 5 Recognizers will be returned.
+  // The maximum value is 100; values above 100 will be coerced to 100.
   int32 page_size = 2;
 
   // A page token, received from a previous
@@ -585,37 +585,31 @@ message Recognizer {
   // characters or less.
   string display_name = 3;
 
-  // Required. Which model to use for recognition requests. Select the model
-  // best suited to your domain to get best results.
+  // Optional. This field is now deprecated. Prefer the
+  // [`model`][google.cloud.speech.v2.RecognitionConfig.model] field in the
+  // [`RecognitionConfig`][google.cloud.speech.v2.RecognitionConfig] message.
   //
-  // Supported models:
+  // Which model to use for recognition requests. Select the model best suited
+  // to your domain to get best results.
   //
-  // - `latest_long`
-  //
-  //   Best for long form content like media or conversation.
-  //
-  // - `latest_short`
-  //
-  //   Best for short form content like commands or single shot directed speech.
-  //   When using this model, the service will stop transcribing audio after the
-  //   first utterance is detected and completed.
-  //
-  // When using this model,
-  // [SEPARATE_RECOGNITION_PER_CHANNEL][google.cloud.speech.v2.RecognitionFeatures.MultiChannelMode.SEPARATE_RECOGNITION_PER_CHANNEL]
-  // is not supported; multi-channel audio is accepted, but only the first
-  // channel will be processed and transcribed.
-  string model = 4 [(google.api.field_behavior) = REQUIRED];
+  // Guidance for choosing which model to use can be found in the [Transcription
+  // Models
+  // Documentation](https://cloud.google.com/speech-to-text/v2/docs/transcription-model)
+  // and the models supported in each region can be found in the [Table Of
+  // Supported
+  // Models](https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages).
+  string model = 4 [deprecated = true, (google.api.field_behavior) = OPTIONAL];
 
-  // Required. The language of the supplied audio as a
+  // Optional. This field is now deprecated. Prefer the
+  // [`language_codes`][google.cloud.speech.v2.RecognitionConfig.language_codes]
+  // field in the
+  // [`RecognitionConfig`][google.cloud.speech.v2.RecognitionConfig] message.
+  //
+  // The language of the supplied audio as a
   // [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
   //
-  // Supported languages:
-  //
-  // - `en-US`
-  //
-  // - `en-GB`
-  //
-  // - `fr-FR`
+  // Supported languages for each model are listed in the [Table of Supported
+  // Models](https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages).
   //
   // If additional languages are provided, recognition result will contain
   // recognition in the most likely language detected. The recognition result
@@ -623,7 +617,8 @@ message Recognizer {
   // When you create or update a Recognizer, these values are
   // stored in normalized BCP-47 form. For example, "en-us" is stored as
   // "en-US".
-  repeated string language_codes = 17 [(google.api.field_behavior) = REQUIRED];
+  repeated string language_codes = 17
+      [deprecated = true, (google.api.field_behavior) = OPTIONAL];
 
   // Default configuration to use for requests with this Recognizer.
   // This can be overwritten by inline configuration in the
@@ -689,15 +684,26 @@ message Recognizer {
 
 // Automatically detected decoding parameters.
 // Supported for the following encodings:
+//
 // * WAV_LINEAR16: 16-bit signed little-endian PCM samples in a WAV container.
+//
 // * WAV_MULAW: 8-bit companded mulaw samples in a WAV container.
+//
 // * WAV_ALAW: 8-bit companded alaw samples in a WAV container.
+//
 // * RFC4867_5_AMR: AMR frames with an rfc4867.5 header.
+//
 // * RFC4867_5_AMRWB: AMR-WB frames with an rfc4867.5 header.
+//
 // * FLAC: FLAC frames in the "native FLAC" container format.
+//
 // * MP3: MPEG audio frames with optional (ignored) ID3 metadata.
+//
 // * OGG_OPUS: Opus audio frames in an Ogg container.
+//
 // * WEBM_OPUS: Opus audio frames in a WebM container.
+//
+// * M4A: M4A audio format.
 message AutoDetectDecodingConfig {}
 
 // Explicitly specified decoding parameters.
@@ -725,16 +731,24 @@ message ExplicitDecodingConfig {
   // sampling rate of the audio source to 16000 Hz. If that's not possible, use
   // the native sample rate of the audio source (instead of re-sampling).
   // Supported for the following encodings:
+  //
   // * LINEAR16: Headerless 16-bit signed little-endian PCM samples.
+  //
   // * MULAW: Headerless 8-bit companded mulaw samples.
+  //
   // * ALAW: Headerless 8-bit companded alaw samples.
   int32 sample_rate_hertz = 2;
 
   // Number of channels present in the audio data sent for recognition.
   // Supported for the following encodings:
+  //
   // * LINEAR16: Headerless 16-bit signed little-endian PCM samples.
+  //
   // * MULAW: Headerless 8-bit companded mulaw samples.
+  //
   // * ALAW: Headerless 8-bit companded alaw samples.
+  //
+  // The maximum allowed value is 8.
   int32 audio_channel_count = 3;
 }
 
@@ -742,7 +756,7 @@ message ExplicitDecodingConfig {
 message SpeakerDiarizationConfig {
   // Required. Minimum number of speakers in the conversation. This range gives
   // you more flexibility by allowing the system to automatically determine the
-  // correct number of speakers. If not set, the default value is 2.
+  // correct number of speakers.
   //
   // To fix the number of speakers detected in the audio, set
   // `min_speaker_count` = `max_speaker_count`.
@@ -824,30 +838,54 @@ message RecognitionFeatures {
   int32 max_alternatives = 16;
 }
 
+// Transcription normalization configuration. Use transcription normalization
+// to automatically replace parts of the transcript with phrases of your
+// choosing. For StreamingRecognize, this normalization only applies to stable
+// partial transcripts (stability > 0.8) and final transcripts.
+message TranscriptNormalization {
+  // A single replacement configuration.
+  message Entry {
+    // What to replace. Max length is 100 characters.
+    string search = 1;
+
+    // What to replace with. Max length is 100 characters.
+    string replace = 2;
+
+    // Whether the search is case sensitive.
+    bool case_sensitive = 3;
+  }
+
+  // A list of replacement entries. We will perform replacement with one entry
+  // at a time. For example, the second entry in ["cat" => "dog", "mountain cat"
+  // => "mountain dog"] will never be applied because we will always process the
+  // first entry before it. At most 100 entries.
+  repeated Entry entries = 1;
+}
+
 // Provides "hints" to the speech recognizer to favor specific words and phrases
-// in the results. Phrase sets can be specified as an inline resource, or a
-// reference to an existing phrase set resource.
+// in the results. PhraseSets can be specified as an inline resource, or a
+// reference to an existing PhraseSet resource.
 message SpeechAdaptation {
-  // A biasing phrase set, which can be either a string referencing the name of
-  // an existing phrase set resource, or an inline definition of a phrase set.
+  // A biasing PhraseSet, which can be either a string referencing the name of
+  // an existing PhraseSets resource, or an inline definition of a PhraseSet.
   message AdaptationPhraseSet {
     oneof value {
-      // The name of an existing phrase set resource. The user must have read
+      // The name of an existing PhraseSet resource. The user must have read
       // access to the resource and it must not be deleted.
       string phrase_set = 1 [(google.api.resource_reference) = {
         type: "speech.googleapis.com/PhraseSet"
       }];
 
-      // An inline defined phrase set.
+      // An inline defined PhraseSet.
       PhraseSet inline_phrase_set = 2;
     }
   }
 
-  // A list of inline or referenced phrase sets.
+  // A list of inline or referenced PhraseSets.
   repeated AdaptationPhraseSet phrase_sets = 1;
 
-  // A list of inline custom classes. Existing custom class resources can be
-  // referenced directly in a phrase set.
+  // A list of inline CustomClasses. Existing CustomClass resources can be
+  // referenced directly in a PhraseSet.
   repeated CustomClass custom_classes = 2;
 }
 
@@ -865,12 +903,43 @@ message RecognitionConfig {
     ExplicitDecodingConfig explicit_decoding_config = 8;
   }
 
+  // Optional. Which model to use for recognition requests. Select the model
+  // best suited to your domain to get best results.
+  //
+  // Guidance for choosing which model to use can be found in the [Transcription
+  // Models
+  // Documentation](https://cloud.google.com/speech-to-text/v2/docs/transcription-model)
+  // and the models supported in each region can be found in the [Table Of
+  // Supported
+  // Models](https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages).
+  string model = 9 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The language of the supplied audio as a
+  // [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+  // Language tags are normalized to BCP-47 before they are used eg "en-us"
+  // becomes "en-US".
+  //
+  // Supported languages for each model are listed in the [Table of Supported
+  // Models](https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages).
+  //
+  // If additional languages are provided, recognition result will contain
+  // recognition in the most likely language detected. The recognition result
+  // will include the language tag of the language detected in the audio.
+  repeated string language_codes = 10 [(google.api.field_behavior) = OPTIONAL];
+
   // Speech recognition features to enable.
   RecognitionFeatures features = 2;
 
   // Speech adaptation context that weights recognizer predictions for specific
   // words and phrases.
   SpeechAdaptation adaptation = 6;
+
+  // Optional. Use transcription normalization to automatically replace parts of
+  // the transcript with phrases of your choosing. For StreamingRecognize, this
+  // normalization only applies to stable partial transcripts (stability > 0.8)
+  // and final transcripts.
+  TranscriptNormalization transcript_normalization = 11
+      [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Request message for the
@@ -881,7 +950,8 @@ message RecognitionConfig {
 message RecognizeRequest {
   // Required. The name of the Recognizer to use during recognition. The
   // expected format is
-  // `projects/{project}/locations/{location}/recognizers/{recognizer}`.
+  // `projects/{project}/locations/{location}/recognizers/{recognizer}`. The
+  // {recognizer} segment may be set to `_` to use an empty implicit Recognizer.
   string recognizer = 3 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -955,9 +1025,9 @@ message SpeechRecognitionAlternative {
   float confidence = 2;
 
   // A list of word-specific information for each recognized word.
-  // When
-  // [enable_speaker_diarization][google.cloud.speech.v2.SpeakerDiarizationConfig.enable_speaker_diarization]
-  // is true, you will see all the words from the beginning of the audio.
+  // When the
+  // [SpeakerDiarizationConfig][google.cloud.speech.v2.SpeakerDiarizationConfig]
+  // is set, you will see all the words from the beginning of the audio.
   repeated WordInfo words = 3;
 }
 
@@ -995,8 +1065,8 @@ message WordInfo {
   // A distinct label is assigned for every speaker within the audio. This field
   // specifies which one of those speakers was detected to have spoken this
   // word. `speaker_label` is set if
-  // [enable_speaker_diarization][google.cloud.speech.v2.SpeakerDiarizationConfig.enable_speaker_diarization]
-  // is `true` and only in the top alternative.
+  // [SpeakerDiarizationConfig][google.cloud.speech.v2.SpeakerDiarizationConfig]
+  // is given and only in the top alternative.
   string speaker_label = 6;
 }
 
@@ -1081,9 +1151,9 @@ message StreamingRecognitionConfig {
   // of the recognizer during this recognition request. If no mask is provided,
   // all non-default valued fields in
   // [config][google.cloud.speech.v2.StreamingRecognitionConfig.config] override
-  // the values in the recognizer for this recognition request. If a mask is
+  // the values in the Recognizer for this recognition request. If a mask is
   // provided, only the fields listed in the mask override the config in the
-  // recognizer for this recognition request. If a wildcard (`*`) is provided,
+  // Recognizer for this recognition request. If a wildcard (`*`) is provided,
   // [config][google.cloud.speech.v2.StreamingRecognitionConfig.config]
   // completely overrides and replaces the config in the recognizer for this
   // recognition request.
@@ -1098,24 +1168,27 @@ message StreamingRecognitionConfig {
 // [StreamingRecognize][google.cloud.speech.v2.Speech.StreamingRecognize]
 // method. Multiple
 // [StreamingRecognizeRequest][google.cloud.speech.v2.StreamingRecognizeRequest]
-// messages are sent. The first message must contain a
+// messages are sent in one call.
+//
+// If the [Recognizer][google.cloud.speech.v2.Recognizer] referenced by
+// [recognizer][google.cloud.speech.v2.StreamingRecognizeRequest.recognizer]
+// contains a fully specified request configuration then the stream may only
+// contain messages with only
+// [audio][google.cloud.speech.v2.StreamingRecognizeRequest.audio] set.
+//
+// Otherwise the first message must contain a
 // [recognizer][google.cloud.speech.v2.StreamingRecognizeRequest.recognizer] and
-// optionally a
+// a
 // [streaming_config][google.cloud.speech.v2.StreamingRecognizeRequest.streaming_config]
-// message and must not contain
-// [audio][google.cloud.speech.v2.StreamingRecognizeRequest.audio]. All
-// subsequent messages must contain
-// [audio][google.cloud.speech.v2.StreamingRecognizeRequest.audio] and must not
-// contain a
-// [streaming_config][google.cloud.speech.v2.StreamingRecognizeRequest.streaming_config]
-// message.
+// message that together fully specify the request configuration and must not
+// contain [audio][google.cloud.speech.v2.StreamingRecognizeRequest.audio]. All
+// subsequent messages must only have
+// [audio][google.cloud.speech.v2.StreamingRecognizeRequest.audio] set.
 message StreamingRecognizeRequest {
-  // Required. Streaming recognition should start with an initial request having
-  // a `recognizer`. Subsequent requests carry the audio data to be recognized.
-  //
-  // The initial request with configuration can be omitted if the Recognizer
-  // being used has a
-  // [default_recognition_config][google.cloud.speech.v2.Recognizer.default_recognition_config].
+  // Required. The name of the Recognizer to use during recognition. The
+  // expected format is
+  // `projects/{project}/locations/{location}/recognizers/{recognizer}`. The
+  // {recognizer} segment may be set to `_` to use an empty implicit Recognizer.
   string recognizer = 3 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1130,6 +1203,7 @@ message StreamingRecognizeRequest {
     StreamingRecognitionConfig streaming_config = 6;
 
     // Inline audio bytes to be Recognized.
+    // Maximum size for this field is 15 KB per request.
     bytes audio = 5;
   }
 }
@@ -1138,7 +1212,21 @@ message StreamingRecognizeRequest {
 // [BatchRecognize][google.cloud.speech.v2.Speech.BatchRecognize]
 // method.
 message BatchRecognizeRequest {
-  // Required. Resource name of the recognizer to be used for ASR.
+  // Possible processing strategies for batch requests.
+  enum ProcessingStrategy {
+    // Default value for the processing strategy. The request is processed as
+    // soon as its received.
+    PROCESSING_STRATEGY_UNSPECIFIED = 0;
+
+    // If selected, processes the request during lower utilization periods for a
+    // price discount. The request is fulfilled within 24 hours.
+    DYNAMIC_BATCHING = 1;
+  }
+
+  // Required. The name of the Recognizer to use during recognition. The
+  // expected format is
+  // `projects/{project}/locations/{location}/recognizers/{recognizer}`. The
+  // {recognizer} segment may be set to `_` to use an empty implicit Recognizer.
   string recognizer = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -1170,7 +1258,40 @@ message BatchRecognizeRequest {
   google.protobuf.FieldMask config_mask = 5;
 
   // Audio files with file metadata for ASR.
+  // The maximum number of files allowed to be specified is 5.
   repeated BatchRecognizeFileMetadata files = 3;
+
+  // Configuration options for where to output the transcripts of each file.
+  RecognitionOutputConfig recognition_output_config = 6;
+
+  // Processing strategy to use for this request.
+  ProcessingStrategy processing_strategy = 7;
+}
+
+// Output configurations for Cloud Storage.
+message GcsOutputConfig {
+  // The Cloud Storage URI prefix with which recognition results will be
+  // written.
+  string uri = 1;
+}
+
+// Output configurations for inline response.
+message InlineOutputConfig {}
+
+// Configuration options for the output(s) of recognition.
+message RecognitionOutputConfig {
+  oneof output {
+    // If this message is populated, recognition results are written to the
+    // provided Google Cloud Storage URI.
+    GcsOutputConfig gcs_output_config = 1;
+
+    // If this message is populated, recognition results are provided in the
+    // [BatchRecognizeResponse][google.cloud.speech.v2.BatchRecognizeResponse]
+    // message of the Operation when completed. This is only supported when
+    // calling [BatchRecognize][google.cloud.speech.v2.Speech.BatchRecognize]
+    // with just one audio file.
+    InlineOutputConfig inline_response_config = 2;
+  }
 }
 
 // Response message for
@@ -1179,15 +1300,62 @@ message BatchRecognizeRequest {
 message BatchRecognizeResponse {
   // Map from filename to the final result for that file.
   map<string, BatchRecognizeFileResult> results = 1;
+
+  // When available, billed audio seconds for the corresponding request.
+  google.protobuf.Duration total_billed_duration = 2;
+}
+
+// Output type for Cloud Storage of BatchRecognize transcripts. Though this
+// proto isn't returned in this API anywhere, the Cloud Storage transcripts will
+// be this proto serialized and should be parsed as such.
+message BatchRecognizeResults {
+  // Sequential list of transcription results corresponding to sequential
+  // portions of audio.
+  repeated SpeechRecognitionResult results = 1;
+
+  // Metadata about the recognition.
+  RecognitionResponseMetadata metadata = 2;
+}
+
+// Final results written to Cloud Storage.
+message CloudStorageResult {
+  // The Cloud Storage URI to which recognition results were written.
+  string uri = 1;
+}
+
+// Final results returned inline in the recognition response.
+message InlineResult {
+  // The transcript for the audio file.
+  BatchRecognizeResults transcript = 1;
 }
 
 // Final results for a single file.
 message BatchRecognizeFileResult {
-  // The GCS URI to which recognition results were written.
-  string uri = 1;
-
   // Error if one was encountered.
   google.rpc.Status error = 2;
+
+  RecognitionResponseMetadata metadata = 3;
+
+  oneof result {
+    // Recognition results written to Cloud Storage. This is
+    // populated only when
+    // [GcsOutputConfig][google.cloud.speech.v2.GcsOutputConfig] is set in
+    // the
+    // [RecognitionOutputConfig][[google.cloud.speech.v2.RecognitionOutputConfig].
+    CloudStorageResult cloud_storage_result = 5;
+
+    // Recognition results. This is populated only when
+    // [InlineOutputConfig][google.cloud.speech.v2.InlineOutputConfig] is set in
+    // the
+    // [RecognitionOutputConfig][[google.cloud.speech.v2.RecognitionOutputConfig].
+    InlineResult inline_result = 6;
+  }
+
+  // Deprecated. Use `cloud_storage_result.native_format_uri` instead.
+  string uri = 1 [deprecated = true];
+
+  // Deprecated. Use `inline_result.transcript` instead.
+  BatchRecognizeResults transcript = 4 [deprecated = true];
 }
 
 // Metadata about transcription for a single file (for example, progress
@@ -1199,7 +1367,7 @@ message BatchRecognizeTranscriptionMetadata {
   // Error if one was encountered.
   google.rpc.Status error = 2;
 
-  // The GCS URI to which recognition results will be written.
+  // The Cloud Storage URI to which recognition results will be written.
   string uri = 3;
 }
 
@@ -1562,11 +1730,11 @@ message PhraseSet {
     // be recognized over other similar sounding phrases. The higher the boost,
     // the higher the chance of false positive recognition as well. Negative
     // boost values would correspond to anti-biasing. Anti-biasing is not
-    // enabled, so negative boost will simply be ignored. Though `boost` can
-    // accept a wide range of positive values, most use cases are best served
-    // with values between 0 and 20. We recommend using a binary search approach
-    // to finding the optimal value for your use case. Speech recognition
-    // will skip PhraseSets with a boost value of 0.
+    // enabled, so negative boost values will return an error. Boost values must
+    // be between 0 and 20. Any values outside that range will return an error.
+    // We recommend using a binary search approach to finding the optimal value
+    // for your use case as well as adding phrases both with and without boost
+    // to your requests.
     float boost = 2;
   }
 
@@ -1597,7 +1765,8 @@ message PhraseSet {
   // phrase will be recognized over other similar sounding phrases. The higher
   // the boost, the higher the chance of false positive recognition as well.
   // Valid `boost` values are between 0 (exclusive) and 20. We recommend using a
-  // binary search approach to finding the optimal value for your use case.
+  // binary search approach to finding the optimal value for your use case as
+  // well as adding phrases both with and without boost to your requests.
   float boost = 4;
 
   // User-settable, human-readable name for the PhraseSet. Must be 63
@@ -1699,10 +1868,10 @@ message ListCustomClassesRequest {
     }
   ];
 
-  // Number of results per requests. A valid page_size ranges from 0 to 20
+  // Number of results per requests. A valid page_size ranges from 0 to 100
   // inclusive. If the page_size is zero or unspecified, a page size of 5 will
-  // be chosen. If the page size exceeds 20, it will be coerced down to 20. Note
-  // that a call might return fewer results than the requested page size.
+  // be chosen. If the page size exceeds 100, it will be coerced down to 100.
+  // Note that a call might return fewer results than the requested page size.
   int32 page_size = 2;
 
   // A page token, received from a previous
@@ -1854,8 +2023,8 @@ message ListPhraseSetsRequest {
   ];
 
   // The maximum number of PhraseSets to return. The service may return fewer
-  // than this value. If unspecified, at most 20 PhraseSets will be returned.
-  // The maximum value is 20; values above 20 will be coerced to 20.
+  // than this value. If unspecified, at most 5 PhraseSets will be returned.
+  // The maximum value is 100; values above 100 will be coerced to 100.
   int32 page_size = 2;
 
   // A page token, received from a previous

@@ -23,7 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Google.Cloud.Retail.V2";
-option go_package = "google.golang.org/genproto/googleapis/cloud/retail/v2;retail";
+option go_package = "cloud.google.com/go/retail/apiv2/retailpb;retailpb";
 option java_multiple_files = true;
 option java_outer_classname = "UserEventProto";
 option java_package = "com.google.cloud.retail.v2";
@@ -226,7 +226,7 @@ message UserEvent {
   // The categories associated with a category page.
   //
   // To represent full path of category, use '>' sign to separate different
-  // hierarchies. If '>' is part of the category name, please replace it with
+  // hierarchies. If '>' is part of the category name, replace it with
   // other character(s).
   //
   // Category pages include special pages such as sales or promotions. For
@@ -267,6 +267,13 @@ message UserEvent {
   // When using the client side event reporting with JavaScript pixel and Google
   // Tag Manager, this value is filled in automatically.
   string page_view_id = 15;
+
+  // The entity for customers that may run multiple different entities, domains,
+  // sites or regions, for example, `Google US`, `Google Ads`, `Waymo`,
+  // `google.com`, `youtube.com`, etc.
+  // It is recommended to set this field to get better per-entity search,
+  // completion and prediction results.
+  string entity = 23;
 }
 
 // Detailed product information associated with a user event.

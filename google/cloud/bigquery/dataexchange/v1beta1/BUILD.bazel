@@ -73,6 +73,7 @@ java_gapic_library(
     srcs = [":dataexchange_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
     test_deps = [
         ":dataexchange_java_grpc",
@@ -118,13 +119,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "dataexchange_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/dataexchange/v1beta1",
+    importpath = "cloud.google.com/go/bigquery/dataexchange/apiv1beta1/dataexchangepb",
     protos = [":dataexchange_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -138,6 +138,8 @@ go_gapic_library(
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/dataexchange/apiv1beta1;dataexchange",
     metadata = True,
+    release_level = "beta",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -147,19 +149,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "dataexchange_go_gapic_test",
-    srcs = [":dataexchange_go_gapic_srcjar_test"],
-    embed = [":dataexchange_go_gapic"],
-    importpath = "cloud.google.com/go/bigquery/dataexchange/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-bigquery-dataexchange-v1beta1-go",
     deps = [
         ":dataexchange_go_gapic",
         ":dataexchange_go_gapic_srcjar-metadata.srcjar",
+        ":dataexchange_go_gapic_srcjar-snippets.srcjar",
         ":dataexchange_go_gapic_srcjar-test.srcjar",
         ":dataexchange_go_proto",
     ],
@@ -184,6 +180,7 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "warehouse-package-name=google-cloud-bigquery-data-exchange",
     ],
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
     transport = "grpc",
     deps = [
@@ -216,7 +213,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -225,21 +221,15 @@ php_proto_library(
     deps = [":dataexchange_proto"],
 )
 
-php_grpc_library(
-    name = "dataexchange_php_grpc",
-    srcs = [":dataexchange_proto"],
-    deps = [":dataexchange_php_proto"],
-)
-
 php_gapic_library(
     name = "dataexchange_php_gapic",
     srcs = [":dataexchange_proto_with_info"],
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
-    deps = [
-        ":dataexchange_php_grpc",
-        ":dataexchange_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":dataexchange_php_proto"],
 )
 
 # Open Source Packages
@@ -247,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-bigquery-dataexchange-v1beta1-php",
     deps = [
         ":dataexchange_php_gapic",
-        ":dataexchange_php_grpc",
         ":dataexchange_php_proto",
     ],
 )
@@ -268,7 +257,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
     package = "google.cloud.bigquery.dataexchange.v1beta1",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -312,6 +303,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/analytics-hub/",
     ],
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
+    rest_numeric_enums = False,
     ruby_cloud_description = "Analytics Hub is a data exchange that allows you to efficiently and securely exchange data assets across organizations to address challenges of data reliability and cost. Curate a library of internal and external assets, including unique datasets like Google Trends, backed by the power of BigQuery.",
     ruby_cloud_title = "Analytics Hub V1beta1",
     service_yaml = "analyticshub_v1beta1.yaml",
@@ -358,6 +350,7 @@ csharp_gapic_library(
     srcs = [":dataexchange_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "analyticshub_v1beta1_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "analyticshub_v1beta1.yaml",
     deps = [
         ":dataexchange_csharp_grpc",

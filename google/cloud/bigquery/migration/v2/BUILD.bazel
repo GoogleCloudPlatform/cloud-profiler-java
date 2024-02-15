@@ -77,6 +77,7 @@ java_gapic_library(
     srcs = [":migration_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "bigquerymigration_v2.yaml",
     test_deps = [
         ":migration_java_grpc",
@@ -118,13 +119,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "migration_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/migration/v2",
+    importpath = "cloud.google.com/go/bigquery/migration/apiv2/migrationpb",
     protos = [":migration_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -140,19 +140,14 @@ go_gapic_library(
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
     importpath = "cloud.google.com/go/bigquery/migration/apiv2;migration",
     metadata = True,
+    release_level = "beta",
+    rest_numeric_enums = False,
     service_yaml = "bigquerymigration_v2.yaml",
-    transport = "grpc+rest",
+    transport = "grpc",
     deps = [
         ":migration_go_proto",
         "//google/api:metric_go_proto",
     ],
-)
-
-go_test(
-    name = "migration_go_gapic_test",
-    srcs = [":migration_go_gapic_srcjar_test"],
-    embed = [":migration_go_gapic"],
-    importpath = "cloud.google.com/go/bigquery/migration/apiv2",
 )
 
 # Open Source Packages
@@ -161,6 +156,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":migration_go_gapic",
         ":migration_go_gapic_srcjar-metadata.srcjar",
+        ":migration_go_gapic_srcjar-snippets.srcjar",
         ":migration_go_gapic_srcjar-test.srcjar",
         ":migration_go_proto",
     ],
@@ -184,6 +180,8 @@ py_gapic_library(
         "python-gapic-name=bigquery_migration",
         "python-gapic-namespace=google.cloud",
     ],
+    rest_numeric_enums = False,
+    service_yaml = "bigquerymigration_v2.yaml",
     transport = "grpc",
 )
 
@@ -212,7 +210,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -221,21 +218,15 @@ php_proto_library(
     deps = [":migration_proto"],
 )
 
-php_grpc_library(
-    name = "migration_php_grpc",
-    srcs = [":migration_proto"],
-    deps = [":migration_php_proto"],
-)
-
 php_gapic_library(
     name = "migration_php_gapic",
     srcs = [":migration_proto_with_info"],
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = False,
     service_yaml = "bigquerymigration_v2.yaml",
-    deps = [
-        ":migration_php_grpc",
-        ":migration_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":migration_php_proto"],
 )
 
 # Open Source Packages
@@ -243,7 +234,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-bigquery-migration-v2-php",
     deps = [
         ":migration_php_gapic",
-        ":migration_php_grpc",
         ":migration_php_proto",
     ],
 )
@@ -264,7 +254,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
     package = "google.cloud.bigquery.migration.v2",
+    rest_numeric_enums = False,
     service_yaml = "bigquerymigration_v2.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -308,8 +300,10 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-shortname=bigquerymigration",
     ],
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
+    rest_numeric_enums = False,
     ruby_cloud_description = "The BigQuery Migration Service is a comprehensive solution for migrating your data warehouse to BigQuery.",
     ruby_cloud_title = "BigQuery Migration V2",
+    service_yaml = "bigquerymigration_v2.yaml",
     deps = [
         ":migration_ruby_grpc",
         ":migration_ruby_proto",
@@ -353,6 +347,7 @@ csharp_gapic_library(
     srcs = [":migration_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "bigquerymigration_grpc_service_config.json",
+    rest_numeric_enums = False,
     service_yaml = "bigquerymigration_v2.yaml",
     deps = [
         ":migration_csharp_grpc",

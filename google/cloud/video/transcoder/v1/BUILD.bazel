@@ -71,6 +71,8 @@ java_gapic_library(
     name = "transcoder_java_gapic",
     srcs = [":transcoder_proto_with_info"],
     grpc_service_config = "transcoder_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "transcoder_v1.yaml",
     test_deps = [
         ":transcoder_java_grpc",
     ],
@@ -110,13 +112,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "transcoder_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/video/transcoder/v1",
+    importpath = "cloud.google.com/go/video/transcoder/apiv1/transcoderpb",
     protos = [":transcoder_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -130,6 +131,8 @@ go_gapic_library(
     grpc_service_config = "transcoder_grpc_service_config.json",
     importpath = "cloud.google.com/go/video/transcoder/apiv1;transcoder",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -138,19 +141,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "transcoder_go_gapic_test",
-    srcs = [":transcoder_go_gapic_srcjar_test"],
-    embed = [":transcoder_go_gapic"],
-    importpath = "cloud.google.com/go/video/transcoder/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-video-transcoder-v1-go",
     deps = [
         ":transcoder_go_gapic",
         ":transcoder_go_gapic_srcjar-metadata.srcjar",
+        ":transcoder_go_gapic_srcjar-snippets.srcjar",
         ":transcoder_go_gapic_srcjar-test.srcjar",
         ":transcoder_go_proto",
     ],
@@ -170,7 +167,9 @@ py_gapic_library(
     name = "transcoder_py_gapic",
     srcs = [":transcoder_proto"],
     grpc_service_config = "transcoder_grpc_service_config.json",
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
 )
 
 py_test(
@@ -198,7 +197,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -207,21 +205,15 @@ php_proto_library(
     deps = [":transcoder_proto"],
 )
 
-php_grpc_library(
-    name = "transcoder_php_grpc",
-    srcs = [":transcoder_proto"],
-    deps = [":transcoder_php_proto"],
-)
-
 php_gapic_library(
     name = "transcoder_php_gapic",
     srcs = [":transcoder_proto_with_info"],
     grpc_service_config = "transcoder_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
-    deps = [
-        ":transcoder_php_grpc",
-        ":transcoder_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":transcoder_php_proto"],
 )
 
 # Open Source Packages
@@ -229,7 +221,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-video-transcoder-v1-php",
     deps = [
         ":transcoder_php_gapic",
-        ":transcoder_php_grpc",
         ":transcoder_php_proto",
     ],
 )
@@ -250,7 +241,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "transcoder_grpc_service_config.json",
     package = "google.cloud.video.transcoder.v1",
+    rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -295,8 +288,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/transcoder/",
     ],
     grpc_service_config = "transcoder_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Transcoder API allows you to convert video files and package them for optimized delivery to web, mobile and connected TVs.",
     ruby_cloud_title = "Transcoder V1",
+    service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":transcoder_ruby_grpc",
         ":transcoder_ruby_proto",
@@ -340,7 +336,9 @@ csharp_gapic_library(
     srcs = [":transcoder_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "transcoder_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "transcoder_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":transcoder_csharp_grpc",
         ":transcoder_csharp_proto",

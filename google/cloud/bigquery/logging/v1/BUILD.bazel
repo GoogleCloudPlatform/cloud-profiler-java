@@ -53,7 +53,7 @@ load(
 go_proto_library(
     name = "logging_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/bigquery/logging/v1",
+    importpath = "cloud.google.com/go/bigquery/logging/apiv1/loggingpb",
     protos = [":logging_proto"],
     deps = [
         "//google/iam/v1:iam_go_proto",
@@ -78,6 +78,7 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "python-gapic-name=bigquery_logging",
     ],
+    rest_numeric_enums = False,
     transport = "grpc",
 )
 
@@ -94,7 +95,6 @@ py_gapic_assembly_pkg(
 ##############################################################################
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -103,20 +103,9 @@ php_proto_library(
     deps = [":logging_proto"],
 )
 
-php_grpc_library(
-    name = "logging_php_grpc",
-    srcs = [":logging_proto"],
-    deps = [":logging_php_proto"],
-)
-
 ##############################################################################
 # Node.js
 ##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
-)
 
 ##############################################################################
 # Ruby

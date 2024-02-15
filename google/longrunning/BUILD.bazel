@@ -74,7 +74,7 @@ load(
 go_proto_library(
     name = "longrunning_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/longrunning",
+    importpath = "cloud.google.com/go/longrunning/autogen/longrunningpb",
     protos = [":operations_proto"],
     visibility = ["//visibility:public"],
     deps = [
@@ -88,7 +88,10 @@ go_gapic_library(
     srcs = [":longrunning_proto_with_info"],
     grpc_service_config = "longrunning_grpc_service_config.json",
     importpath = "cloud.google.com/go/longrunning/autogen;longrunning",
-    service_yaml = "//google/longrunning:longrunning.yaml",
+    metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = False,
+    service_yaml = "longrunning.yaml",
     transport = "grpc+rest",
     deps = [":longrunning_go_proto"],
 )
@@ -98,6 +101,9 @@ go_gapic_assembly_pkg(
     name = "gapi-cloud-longrunning-go",
     deps = [
         ":longrunning_go_gapic",
+        ":longrunning_go_gapic_srcjar-metadata.srcjar",
+        ":longrunning_go_gapic_srcjar-snippets.srcjar",
+        ":longrunning_go_gapic_srcjar-test.srcjar",
         ":longrunning_go_proto",
     ],
 )
@@ -150,7 +156,8 @@ csharp_gapic_library(
     srcs = [":longrunning_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "longrunning_grpc_service_config.json",
-    service_yaml = "//google/longrunning:longrunning.yaml",
+    rest_numeric_enums = False,
+    service_yaml = "longrunning.yaml",
     deps = [
         ":longrunning_csharp_grpc",
         ":longrunning_csharp_proto",
@@ -174,7 +181,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -183,21 +189,14 @@ php_proto_library(
     deps = [":operations_proto"],
 )
 
-php_grpc_library(
-    name = "longrunning_php_grpc",
-    srcs = [":operations_proto"],
-    deps = [":longrunning_php_proto"],
-)
-
 php_gapic_library(
     name = "longrunning_php_gapic",
     srcs = [":longrunning_proto_with_info"],
     grpc_service_config = "longrunning_grpc_service_config.json",
-    service_yaml = "//google/longrunning:longrunning.yaml",
-    deps = [
-        ":longrunning_php_grpc",
-        ":longrunning_php_proto",
-    ],
+    rest_numeric_enums = False,
+    service_yaml = "longrunning.yaml",
+    transport = "grpc+rest",
+    deps = [":longrunning_php_proto"],
 )
 
 # Open Source Packages
@@ -205,7 +204,19 @@ php_gapic_assembly_pkg(
     name = "google-longrunning-php",
     deps = [
         ":longrunning_php_gapic",
-        ":longrunning_php_grpc",
         ":longrunning_php_proto",
     ],
+)
+
+##############################################################################
+# Python
+##############################################################################
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "py_proto_library",
+)
+
+py_proto_library(
+    name = "operations_py_proto",
+    deps = ["operations_proto"],
 )

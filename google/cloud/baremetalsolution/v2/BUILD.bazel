@@ -22,11 +22,16 @@ proto_library(
     name = "baremetalsolution_proto",
     srcs = [
         "baremetalsolution.proto",
+        "common.proto",
         "instance.proto",
         "lun.proto",
         "network.proto",
         "nfs_share.proto",
+        "osimage.proto",
+        "provisioning.proto",
+        "ssh_key.proto",
         "volume.proto",
+        "volume_snapshot.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -45,6 +50,8 @@ proto_library_with_info(
     deps = [
         ":baremetalsolution_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
+        "//google/iam/v1:iam_policy_proto",
     ],
 )
 
@@ -76,14 +83,19 @@ java_gapic_library(
     srcs = [":baremetalsolution_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "baremetalsolution_v2.yaml",
     test_deps = [
+        "//google/cloud/location:location_java_grpc",
+        "//google/iam/v1:iam_java_grpc",
         ":baremetalsolution_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":baremetalsolution_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
+        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -117,13 +129,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "baremetalsolution_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/baremetalsolution/v2",
+    importpath = "cloud.google.com/go/baremetalsolution/apiv2/baremetalsolutionpb",
     protos = [":baremetalsolution_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -137,22 +148,18 @@ go_gapic_library(
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
     importpath = "cloud.google.com/go/baremetalsolution/apiv2;baremetalsolution",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "baremetalsolution_v2.yaml",
     transport = "grpc+rest",
     deps = [
         ":baremetalsolution_go_proto",
         "//google/cloud/location:location_go_proto",
+        "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "baremetalsolution_go_gapic_test",
-    srcs = [":baremetalsolution_go_gapic_srcjar_test"],
-    embed = [":baremetalsolution_go_gapic"],
-    importpath = "cloud.google.com/go/baremetalsolution/apiv2",
 )
 
 # Open Source Packages
@@ -161,6 +168,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":baremetalsolution_go_gapic",
         ":baremetalsolution_go_gapic_srcjar-metadata.srcjar",
+        ":baremetalsolution_go_gapic_srcjar-snippets.srcjar",
         ":baremetalsolution_go_gapic_srcjar-test.srcjar",
         ":baremetalsolution_go_proto",
     ],
@@ -181,11 +189,16 @@ py_gapic_library(
     srcs = [":baremetalsolution_proto"],
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
     opt_args = [
-        "warehouse-package-name=google-cloud-bare-metal-solution",
-        "python-gapic-namespace=google.cloud",
         "python-gapic-name=bare_metal_solution",
+        "python-gapic-namespace=google.cloud",
+        "warehouse-package-name=google-cloud-bare-metal-solution",
     ],
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "baremetalsolution_v2.yaml",
+    transport = "grpc+rest",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
 )
 
 py_test(
@@ -213,7 +226,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -222,19 +234,15 @@ php_proto_library(
     deps = [":baremetalsolution_proto"],
 )
 
-php_grpc_library(
-    name = "baremetalsolution_php_grpc",
-    srcs = [":baremetalsolution_proto"],
-    deps = [":baremetalsolution_php_proto"],
-)
-
 php_gapic_library(
     name = "baremetalsolution_php_gapic",
     srcs = [":baremetalsolution_proto_with_info"],
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "baremetalsolution_v2.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":baremetalsolution_php_grpc",
         ":baremetalsolution_php_proto",
     ],
 )
@@ -244,7 +252,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-baremetalsolution-v2-php",
     deps = [
         ":baremetalsolution_php_gapic",
-        ":baremetalsolution_php_grpc",
         ":baremetalsolution_php_proto",
     ],
 )
@@ -265,7 +272,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
     package = "google.cloud.baremetalsolution.v2",
+    rest_numeric_enums = True,
     service_yaml = "baremetalsolution_v2.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -309,9 +318,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/bare-metal/",
     ],
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Bare Metal Solution is a managed solution that provides purpose-built HPE or Atos bare-metal servers in regional extensions that are connected to Google Cloud by a managed, high-performance connection with a low-latency network fabric.",
     ruby_cloud_title = "Bare Metal Solution V2",
     service_yaml = "baremetalsolution_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":baremetalsolution_ruby_grpc",
         ":baremetalsolution_ruby_proto",
@@ -355,7 +366,9 @@ csharp_gapic_library(
     srcs = [":baremetalsolution_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "baremetalsolution_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "baremetalsolution_v2.yaml",
+    transport = "grpc+rest",
     deps = [
         ":baremetalsolution_csharp_grpc",
         ":baremetalsolution_csharp_proto",

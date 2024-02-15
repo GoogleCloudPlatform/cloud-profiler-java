@@ -71,6 +71,7 @@ java_gapic_library(
     srcs = [":optimization_proto_with_info"],
     gapic_yaml = "cloudoptimization_gapic.yaml",
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudoptimization_v1.yaml",
     test_deps = [
         ":optimization_java_grpc",
@@ -112,13 +113,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "optimization_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/optimization/v1",
+    importpath = "cloud.google.com/go/optimization/apiv1/optimizationpb",
     protos = [":optimization_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -133,22 +133,17 @@ go_gapic_library(
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
     importpath = "cloud.google.com/go/optimization/apiv1;optimization",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "cloudoptimization_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":optimization_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
-)
-
-go_test(
-    name = "optimization_go_gapic_test",
-    srcs = [":optimization_go_gapic_srcjar_test"],
-    embed = [":optimization_go_gapic"],
-    importpath = "cloud.google.com/go/optimization/apiv1",
 )
 
 # Open Source Packages
@@ -157,6 +152,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":optimization_go_gapic",
         ":optimization_go_gapic_srcjar-metadata.srcjar",
+        ":optimization_go_gapic_srcjar-snippets.srcjar",
         ":optimization_go_gapic_srcjar-test.srcjar",
         ":optimization_go_proto",
     ],
@@ -176,7 +172,11 @@ py_gapic_library(
     name = "optimization_py_gapic",
     srcs = [":optimization_proto"],
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "cloudoptimization_v1.yaml",
+    transport = "grpc+rest",
+    deps = [
+    ],
 )
 
 py_test(
@@ -204,7 +204,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -213,20 +212,15 @@ php_proto_library(
     deps = [":optimization_proto"],
 )
 
-php_grpc_library(
-    name = "optimization_php_grpc",
-    srcs = [":optimization_proto"],
-    deps = [":optimization_php_proto"],
-)
-
 php_gapic_library(
     name = "optimization_php_gapic",
     srcs = [":optimization_proto_with_info"],
-    gapic_yaml = "cloudoptimization_gapic.yaml",
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "cloudoptimization_v1.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":optimization_php_grpc",
         ":optimization_php_proto",
     ],
 )
@@ -236,7 +230,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-optimization-v1-php",
     deps = [
         ":optimization_php_gapic",
-        ":optimization_php_grpc",
         ":optimization_php_proto",
     ],
 )
@@ -257,7 +250,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
     package = "google.cloud.optimization.v1",
+    rest_numeric_enums = True,
     service_yaml = "cloudoptimization_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -295,14 +290,17 @@ ruby_cloud_gapic_library(
     name = "optimization_ruby_gapic",
     srcs = [":optimization_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-optimization-v1",
-        "ruby-cloud-product-url=https://cloud.google.com/optimization",
         "ruby-cloud-api-id=cloudoptimization.googleapis.com",
         "ruby-cloud-api-shortname=cloudoptimization",
+        "ruby-cloud-gem-name=google-cloud-optimization-v1",
+        "ruby-cloud-product-url=https://cloud.google.com/optimization",
     ],
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Cloud Optimization API provides a portfolio of solvers to address common optimization use cases starting with optimal route planning for vehicle fleets.",
     ruby_cloud_title = "Cloud Optimization V1",
+    service_yaml = "cloudoptimization_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":optimization_ruby_grpc",
         ":optimization_ruby_proto",
@@ -332,6 +330,7 @@ load(
 
 csharp_proto_library(
     name = "optimization_csharp_proto",
+    extra_opts = [],
     deps = [":optimization_proto"],
 )
 
@@ -346,7 +345,9 @@ csharp_gapic_library(
     srcs = [":optimization_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "cloudoptimization_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "cloudoptimization_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":optimization_csharp_grpc",
         ":optimization_csharp_proto",

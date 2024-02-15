@@ -30,9 +30,11 @@ proto_library(
         "//google/api:annotations_proto",
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
+        "//google/api:field_info_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
         "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -43,7 +45,6 @@ proto_library_with_info(
         ":batch_proto",
         "//google/cloud:common_resources_proto",
         "//google/cloud/location:location_proto",
-        "//google/iam/v1:iam_policy_proto",
     ],
 )
 
@@ -75,18 +76,17 @@ java_gapic_library(
     srcs = [":batch_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
     test_deps = [
         ":batch_java_grpc",
         "//google/cloud/location:location_java_grpc",
-        "//google/iam/v1:iam_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":batch_java_proto",
         "//google/api:api_java_proto",
         "//google/cloud/location:location_java_proto",
-        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -120,13 +120,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "batch_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/batch/v1alpha",
+    importpath = "cloud.google.com/go/batch/apiv1alpha/batchpb",
     protos = [":batch_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -140,24 +139,18 @@ go_gapic_library(
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
     importpath = "cloud.google.com/go/batch/apiv1alpha;batch",
     metadata = True,
+    release_level = "alpha",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
         ":batch_go_proto",
         "//google/cloud/location:location_go_proto",
-        "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
-)
-
-go_test(
-    name = "batch_go_gapic_test",
-    srcs = [":batch_go_gapic_srcjar_test"],
-    embed = [":batch_go_gapic"],
-    importpath = "cloud.google.com/go/batch/apiv1alpha",
 )
 
 # Open Source Packages
@@ -166,6 +159,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":batch_go_gapic",
         ":batch_go_gapic_srcjar-metadata.srcjar",
+        ":batch_go_gapic_srcjar-snippets.srcjar",
         ":batch_go_gapic_srcjar-test.srcjar",
         ":batch_go_proto",
     ],
@@ -185,10 +179,10 @@ py_gapic_library(
     name = "batch_py_gapic",
     srcs = [":batch_proto"],
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
     transport = "grpc+rest",
     deps = [
-        "//google/iam/v1:iam_policy_py_proto",
     ],
 )
 
@@ -217,7 +211,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -226,19 +219,15 @@ php_proto_library(
     deps = [":batch_proto"],
 )
 
-php_grpc_library(
-    name = "batch_php_grpc",
-    srcs = [":batch_proto"],
-    deps = [":batch_php_proto"],
-)
-
 php_gapic_library(
     name = "batch_php_gapic",
     srcs = [":batch_proto_with_info"],
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":batch_php_grpc",
         ":batch_php_proto",
     ],
 )
@@ -248,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-batch-v1alpha-php",
     deps = [
         ":batch_php_gapic",
-        ":batch_php_grpc",
         ":batch_php_proto",
     ],
 )
@@ -269,7 +257,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
     package = "google.cloud.batch.v1alpha",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -312,9 +302,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-gem-name=google-cloud-batch-v1alpha",
     ],
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Google Cloud Batch is a fully managed service used by scientists, VFX artists, developers to easily and efficiently run batch workloads on Google Cloud. This service manages provisioning of resources to satisfy the requirements of the batch jobs for a variety of workloads including ML, HPC, VFX rendering, transcoding, genomics and others.",
     ruby_cloud_title = "Batch V1alpha",
     service_yaml = "batch_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":batch_ruby_grpc",
         ":batch_ruby_proto",
@@ -344,6 +336,7 @@ load(
 
 csharp_proto_library(
     name = "batch_csharp_proto",
+    extra_opts = [],
     deps = [":batch_proto"],
 )
 
@@ -358,7 +351,9 @@ csharp_gapic_library(
     srcs = [":batch_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "batch_v1alpha_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "batch_v1alpha.yaml",
+    transport = "grpc+rest",
     deps = [
         ":batch_csharp_grpc",
         ":batch_csharp_proto",

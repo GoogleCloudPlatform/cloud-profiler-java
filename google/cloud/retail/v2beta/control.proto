@@ -22,7 +22,7 @@ import "google/cloud/retail/v2beta/common.proto";
 import "google/cloud/retail/v2beta/search_service.proto";
 
 option csharp_namespace = "Google.Cloud.Retail.V2Beta";
-option go_package = "google.golang.org/genproto/googleapis/cloud/retail/v2beta;retail";
+option go_package = "cloud.google.com/go/retail/apiv2beta/retailpb;retailpb";
 option java_multiple_files = true;
 option java_outer_classname = "ControlProto";
 option java_package = "com.google.cloud.retail.v2beta";
@@ -68,8 +68,8 @@ message Control {
   string display_name = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Output only. List of [serving
-  // configuration][google.cloud.retail.v2beta.ServingConfig] ids that are
-  // associated with this control in the same
+  // config][google.cloud.retail.v2beta.ServingConfig] ids that are associated
+  // with this control in the same
   // [Catalog][google.cloud.retail.v2beta.Catalog].
   //
   // Note the association is managed via the

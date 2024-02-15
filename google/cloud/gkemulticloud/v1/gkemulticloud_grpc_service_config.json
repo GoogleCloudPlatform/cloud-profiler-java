@@ -23,7 +23,19 @@
       },
       {
         "service": "google.cloud.gkemulticloud.v1.AwsClusters",
+        "method": "GenerateAwsClusterAgentToken"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AwsClusters",
         "method": "GetAwsServerConfig"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AwsClusters",
+        "method": "GetAwsOpenIdConfig"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AwsClusters",
+        "method": "GetAwsJsonWebKeys"
       },
       {
         "service": "google.cloud.gkemulticloud.v1.AzureClusters",
@@ -55,7 +67,39 @@
       },
       {
         "service": "google.cloud.gkemulticloud.v1.AzureClusters",
+        "method": "GenerateAzureClusterAgentToken"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AzureClusters",
         "method": "GetAzureServerConfig"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AzureClusters",
+        "method": "GetAzureOpenIdConfig"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AzureClusters",
+        "method": "GetAzureJsonWebKeys"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "GetAttachedCluster"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "ListAttachedClusters"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "GetAttachedServerConfig"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "GenerateAttachedClusterAgentToken"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "GenerateAttachedClusterInstallManifest"
       }
     ],
     "timeout": "60s",
@@ -94,6 +138,10 @@
         "method": "UpdateAwsNodePool"
       },
       {
+        "service": "google.cloud.gkemulticloud.v1.AwsClusters",
+        "method": "RollbackAwsNodePoolUpdate"
+      },
+      {
         "service": "google.cloud.gkemulticloud.v1.AzureClusters",
         "method": "CreateAzureClient"
       },
@@ -124,6 +172,22 @@
       {
         "service": "google.cloud.gkemulticloud.v1.AzureClusters",
         "method": "UpdateAzureNodePool"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "CreateAttachedCluster"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "ImportAttachedCluster"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "UpdateAttachedCluster"
+      },
+      {
+        "service": "google.cloud.gkemulticloud.v1.AttachedClusters",
+        "method": "DeleteAttachedCluster"
       }
     ],
     "timeout": "60s"

@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import "google/api/resource.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/video/stitcher/v1;stitcher";
+option go_package = "cloud.google.com/go/video/stitcher/apiv1/stitcherpb;stitcherpb";
 option java_multiple_files = true;
 option java_outer_classname = "AdTagDetailsProto";
 option java_package = "com.google.cloud.video.stitcher.v1";
@@ -40,7 +40,9 @@ message LiveAdTagDetail {
   repeated AdRequest ad_requests = 2;
 }
 
-// Information related to the details for one ad tag.
+// Information related to the details for one ad tag. This resource is only
+// available for VOD sessions that do not implement Google Ad Manager ad
+// insertion.
 message VodAdTagDetail {
   option (google.api.resource) = {
     type: "videostitcher.googleapis.com/VodAdTagDetail"

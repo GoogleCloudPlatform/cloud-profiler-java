@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import "google/protobuf/wrappers.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Kms.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/kms/v1;kms";
+option go_package = "cloud.google.com/go/kms/apiv1/kmspb;kmspb";
 option java_multiple_files = true;
 option java_outer_classname = "KmsResourcesProto";
 option java_package = "com.google.cloud.kms.v1";
@@ -88,6 +88,13 @@ message CryptoKey {
     // and
     // [GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey].
     ASYMMETRIC_DECRYPT = 6;
+
+    // [CryptoKeys][google.cloud.kms.v1.CryptoKey] with this purpose may be used
+    // with [RawEncrypt][google.cloud.kms.v1.KeyManagementService.RawEncrypt]
+    // and [RawDecrypt][google.cloud.kms.v1.KeyManagementService.RawDecrypt].
+    // This purpose is meant to be used for interoperable symmetric
+    // encryption and does not support automatic CryptoKey rotation.
+    RAW_ENCRYPT_DECRYPT = 7;
 
     // [CryptoKeys][google.cloud.kms.v1.CryptoKey] with this purpose may be used
     // with [MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
@@ -235,6 +242,9 @@ message KeyOperationAttestation {
 
     // Cavium HSM attestation compressed with gzip. Note that this format is
     // defined by Cavium and subject to change at any time.
+    //
+    // See
+    // https://www.marvell.com/products/security-solutions/nitrox-hs-adapters/software-key-attestation.html.
     CAVIUM_V1_COMPRESSED = 3;
 
     // Cavium HSM attestation V2 compressed with gzip. This is a new format
@@ -294,11 +304,11 @@ message CryptoKeyVersion {
   // [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
   // [ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT].
   //
-  // Algorithms beginning with "RSA_SIGN_" are usable with
+  // Algorithms beginning with `RSA_SIGN_` are usable with
   // [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
   // [ASYMMETRIC_SIGN][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN].
   //
-  // The fields in the name after "RSA_SIGN_" correspond to the following
+  // The fields in the name after `RSA_SIGN_` correspond to the following
   // parameters: padding algorithm, modulus bit length, and digest algorithm.
   //
   // For PSS, the salt length used is equal to the length of digest
@@ -306,25 +316,25 @@ message CryptoKeyVersion {
   // [RSA_SIGN_PSS_2048_SHA256][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm.RSA_SIGN_PSS_2048_SHA256]
   // will use PSS with a salt length of 256 bits or 32 bytes.
   //
-  // Algorithms beginning with "RSA_DECRYPT_" are usable with
+  // Algorithms beginning with `RSA_DECRYPT_` are usable with
   // [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
   // [ASYMMETRIC_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_DECRYPT].
   //
-  // The fields in the name after "RSA_DECRYPT_" correspond to the following
+  // The fields in the name after `RSA_DECRYPT_` correspond to the following
   // parameters: padding algorithm, modulus bit length, and digest algorithm.
   //
-  // Algorithms beginning with "EC_SIGN_" are usable with
+  // Algorithms beginning with `EC_SIGN_` are usable with
   // [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
   // [ASYMMETRIC_SIGN][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN].
   //
-  // The fields in the name after "EC_SIGN_" correspond to the following
+  // The fields in the name after `EC_SIGN_` correspond to the following
   // parameters: elliptic curve, digest algorithm.
   //
-  // Algorithms beginning with "HMAC_" are usable with
+  // Algorithms beginning with `HMAC_` are usable with
   // [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
   // [MAC][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.MAC].
   //
-  // The suffix following "HMAC_" corresponds to the hash algorithm being used
+  // The suffix following `HMAC_` corresponds to the hash algorithm being used
   // (eg. SHA256).
   //
   // For more information, see [Key purposes and algorithms]
@@ -335,6 +345,24 @@ message CryptoKeyVersion {
 
     // Creates symmetric encryption keys.
     GOOGLE_SYMMETRIC_ENCRYPTION = 1;
+
+    // AES-GCM (Galois Counter Mode) using 128-bit keys.
+    AES_128_GCM = 41;
+
+    // AES-GCM (Galois Counter Mode) using 256-bit keys.
+    AES_256_GCM = 19;
+
+    // AES-CBC (Cipher Block Chaining Mode) using 128-bit keys.
+    AES_128_CBC = 42;
+
+    // AES-CBC (Cipher Block Chaining Mode) using 256-bit keys.
+    AES_256_CBC = 43;
+
+    // AES-CTR (Counter Mode) using 128-bit keys.
+    AES_128_CTR = 44;
+
+    // AES-CTR (Counter Mode) using 256-bit keys.
+    AES_256_CTR = 45;
 
     // RSASSA-PSS 2048 bit key with a SHA256 digest.
     RSA_SIGN_PSS_2048_SHA256 = 2;
@@ -391,17 +419,35 @@ message CryptoKeyVersion {
     RSA_DECRYPT_OAEP_4096_SHA1 = 39;
 
     // ECDSA on the NIST P-256 curve with a SHA256 digest.
+    // Other hash functions can also be used:
+    // https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
     EC_SIGN_P256_SHA256 = 12;
 
     // ECDSA on the NIST P-384 curve with a SHA384 digest.
+    // Other hash functions can also be used:
+    // https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
     EC_SIGN_P384_SHA384 = 13;
 
     // ECDSA on the non-NIST secp256k1 curve. This curve is only supported for
     // HSM protection level.
+    // Other hash functions can also be used:
+    // https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
     EC_SIGN_SECP256K1_SHA256 = 31;
 
     // HMAC-SHA256 signing with a 256 bit key.
     HMAC_SHA256 = 32;
+
+    // HMAC-SHA1 signing with a 160 bit key.
+    HMAC_SHA1 = 33;
+
+    // HMAC-SHA384 signing with a 384 bit key.
+    HMAC_SHA384 = 34;
+
+    // HMAC-SHA512 signing with a 512 bit key.
+    HMAC_SHA512 = 35;
+
+    // HMAC-SHA224 signing with a 224 bit key.
+    HMAC_SHA224 = 36;
 
     // Algorithm representing symmetric encryption by an external key manager.
     EXTERNAL_SYMMETRIC_ENCRYPTION = 18;
@@ -458,6 +504,23 @@ message CryptoKeyVersion {
     // Additional details can be found in
     // [CryptoKeyVersion.import_failure_reason][google.cloud.kms.v1.CryptoKeyVersion.import_failure_reason].
     IMPORT_FAILED = 7;
+
+    // This version was not generated successfully. It may not be used, enabled,
+    // disabled, or destroyed. Additional details can be found in
+    // [CryptoKeyVersion.generation_failure_reason][google.cloud.kms.v1.CryptoKeyVersion.generation_failure_reason].
+    GENERATION_FAILED = 8;
+
+    // This version was destroyed, and it may not be used or enabled again.
+    // Cloud KMS is waiting for the corresponding key material residing in an
+    // external key manager to be destroyed.
+    PENDING_EXTERNAL_DESTRUCTION = 9;
+
+    // This version was destroyed, and it may not be used or enabled again.
+    // However, Cloud KMS could not confirm that the corresponding key material
+    // residing in an external key manager was destroyed. Additional details can
+    // be found in
+    // [CryptoKeyVersion.external_destruction_failure_reason][google.cloud.kms.v1.CryptoKeyVersion.external_destruction_failure_reason].
+    EXTERNAL_DESTRUCTION_FAILED = 10;
   }
 
   // A view for [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]s.
@@ -552,6 +615,19 @@ message CryptoKeyVersion {
   // [IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED].
   string import_failure_reason = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Output only. The root cause of the most recent generation failure. Only
+  // present if [state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+  // [GENERATION_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.GENERATION_FAILED].
+  string generation_failure_reason = 19
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The root cause of the most recent external destruction
+  // failure. Only present if
+  // [state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+  // [EXTERNAL_DESTRUCTION_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.EXTERNAL_DESTRUCTION_FAILED].
+  string external_destruction_failure_reason = 20
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // ExternalProtectionLevelOptions stores a group of additional fields for
   // configuring a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] that
   // are specific to the
@@ -566,7 +642,7 @@ message CryptoKeyVersion {
   bool reimport_eligible = 18 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
-// The public key for a given
+// The public keys for a given
 // [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. Obtained via
 // [GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey].
 message PublicKey {
@@ -575,10 +651,12 @@ message PublicKey {
     pattern: "projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}/publicKey"
   };
 
-  // The public key, encoded in PEM format. For more information, see the
-  // [RFC 7468](https://tools.ietf.org/html/rfc7468) sections for
-  // [General Considerations](https://tools.ietf.org/html/rfc7468#section-2) and
-  // [Textual Encoding of Subject Public Key Info]
+  // A public key encoded in PEM format, populated only when
+  // [GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey]
+  // returns one key. For more information, see the [RFC
+  // 7468](https://tools.ietf.org/html/rfc7468) sections for [General
+  // Considerations](https://tools.ietf.org/html/rfc7468#section-2) and [Textual
+  // Encoding of Subject Public Key Info]
   // (https://tools.ietf.org/html/rfc7468#section-13).
   string pem = 1;
 
@@ -587,8 +665,10 @@ message PublicKey {
   // associated with this key.
   CryptoKeyVersion.CryptoKeyVersionAlgorithm algorithm = 2;
 
-  // Integrity verification field. A CRC32C checksum of the returned
-  // [PublicKey.pem][google.cloud.kms.v1.PublicKey.pem]. An integrity check of
+  // Integrity verification field: A CRC32C checksum of the returned
+  // [PublicKey.pem][google.cloud.kms.v1.PublicKey.pem]. It is only populated
+  // when [GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey]
+  // returns one key. An integrity check of
   // [PublicKey.pem][google.cloud.kms.v1.PublicKey.pem] can be performed by
   // computing the CRC32C checksum of
   // [PublicKey.pem][google.cloud.kms.v1.PublicKey.pem] and comparing your
@@ -676,6 +756,34 @@ message ImportJob {
     // [RSA AES key wrap
     // mechanism](http://docs.oasis-open.org/pkcs11/pkcs11-curr/v2.40/cos01/pkcs11-curr-v2.40-cos01.html#_Toc408226908).
     RSA_OAEP_4096_SHA1_AES_256 = 2;
+
+    // This ImportMethod represents the CKM_RSA_AES_KEY_WRAP key wrapping
+    // scheme defined in the PKCS #11 standard. In summary, this involves
+    // wrapping the raw key with an ephemeral AES key, and wrapping the
+    // ephemeral AES key with a 3072 bit RSA key. For more details, see
+    // [RSA AES key wrap
+    // mechanism](http://docs.oasis-open.org/pkcs11/pkcs11-curr/v2.40/cos01/pkcs11-curr-v2.40-cos01.html#_Toc408226908).
+    RSA_OAEP_3072_SHA256_AES_256 = 3;
+
+    // This ImportMethod represents the CKM_RSA_AES_KEY_WRAP key wrapping
+    // scheme defined in the PKCS #11 standard. In summary, this involves
+    // wrapping the raw key with an ephemeral AES key, and wrapping the
+    // ephemeral AES key with a 4096 bit RSA key. For more details, see
+    // [RSA AES key wrap
+    // mechanism](http://docs.oasis-open.org/pkcs11/pkcs11-curr/v2.40/cos01/pkcs11-curr-v2.40-cos01.html#_Toc408226908).
+    RSA_OAEP_4096_SHA256_AES_256 = 4;
+
+    // This ImportMethod represents RSAES-OAEP with a 3072 bit RSA key. The
+    // key material to be imported is wrapped directly with the RSA key. Due
+    // to technical limitations of RSA wrapping, this method cannot be used to
+    // wrap RSA keys for import.
+    RSA_OAEP_3072_SHA256 = 5;
+
+    // This ImportMethod represents RSAES-OAEP with a 4096 bit RSA key. The
+    // key material to be imported is wrapped directly with the RSA key. Due
+    // to technical limitations of RSA wrapping, this method cannot be used to
+    // wrap RSA keys for import.
+    RSA_OAEP_4096_SHA256 = 6;
   }
 
   // The state of the [ImportJob][google.cloud.kms.v1.ImportJob], indicating if

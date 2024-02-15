@@ -23,9 +23,15 @@ proto_library(
     srcs = [
         "analyze.proto",
         "content.proto",
+        "data_profile.proto",
+        "data_quality.proto",
+        "data_taxonomy.proto",
+        "datascans.proto",
         "logs.proto",
         "metadata.proto",
+        "processing.proto",
         "resources.proto",
+        "security.proto",
         "service.proto",
         "tasks.proto",
     ],
@@ -82,11 +88,12 @@ java_gapic_library(
     srcs = [":dataplex_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "dataplex_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
     test_deps = [
-        ":dataplex_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
+        ":dataplex_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -102,6 +109,10 @@ java_gapic_test(
     test_classes = [
         "com.google.cloud.dataplex.v1.ContentServiceClientHttpJsonTest",
         "com.google.cloud.dataplex.v1.ContentServiceClientTest",
+        "com.google.cloud.dataplex.v1.DataScanServiceClientHttpJsonTest",
+        "com.google.cloud.dataplex.v1.DataScanServiceClientTest",
+        "com.google.cloud.dataplex.v1.DataTaxonomyServiceClientHttpJsonTest",
+        "com.google.cloud.dataplex.v1.DataTaxonomyServiceClientTest",
         "com.google.cloud.dataplex.v1.DataplexServiceClientHttpJsonTest",
         "com.google.cloud.dataplex.v1.DataplexServiceClientTest",
         "com.google.cloud.dataplex.v1.MetadataServiceClientHttpJsonTest",
@@ -131,13 +142,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "dataplex_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/dataplex/v1",
+    importpath = "cloud.google.com/go/dataplex/apiv1/dataplexpb",
     protos = [":dataplex_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -152,24 +162,19 @@ go_gapic_library(
     grpc_service_config = "dataplex_grpc_service_config.json",
     importpath = "cloud.google.com/go/dataplex/apiv1;dataplex",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
-    transport = "grpc+rest",
+    transport = "grpc",
     deps = [
         ":dataplex_go_proto",
         "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
-)
-
-go_test(
-    name = "dataplex_go_gapic_test",
-    srcs = [":dataplex_go_gapic_srcjar_test"],
-    embed = [":dataplex_go_gapic"],
-    importpath = "cloud.google.com/go/dataplex/apiv1",
 )
 
 # Open Source Packages
@@ -178,6 +183,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":dataplex_go_gapic",
         ":dataplex_go_gapic_srcjar-metadata.srcjar",
+        ":dataplex_go_gapic_srcjar-snippets.srcjar",
         ":dataplex_go_gapic_srcjar-test.srcjar",
         ":dataplex_go_proto",
     ],
@@ -197,6 +203,7 @@ py_gapic_library(
     name = "dataplex_py_gapic",
     srcs = [":dataplex_proto"],
     grpc_service_config = "dataplex_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
     transport = "grpc",
     deps = [
@@ -229,7 +236,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -238,19 +244,15 @@ php_proto_library(
     deps = [":dataplex_proto"],
 )
 
-php_grpc_library(
-    name = "dataplex_php_grpc",
-    srcs = [":dataplex_proto"],
-    deps = [":dataplex_php_proto"],
-)
-
 php_gapic_library(
     name = "dataplex_php_gapic",
     srcs = [":dataplex_proto_with_info"],
     grpc_service_config = "dataplex_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
+    transport = "grpc+rest",
     deps = [
-        ":dataplex_php_grpc",
         ":dataplex_php_proto",
     ],
 )
@@ -260,7 +262,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-dataplex-v1-php",
     deps = [
         ":dataplex_php_gapic",
-        ":dataplex_php_grpc",
         ":dataplex_php_proto",
     ],
 )
@@ -280,10 +281,11 @@ nodejs_gapic_library(
     src = ":dataplex_proto_with_info",
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "dataplex_grpc_service_config.json",
-    package = "google.cloud.dataplex.v1",
-    service_yaml = "dataplex_v1.yaml",
-    # Content service defines IAM RPCs, force override mixins to remove IAM
     mixins = "google.cloud.location.Locations;google.longrunning.Operations",
+    package = "google.cloud.dataplex.v1",
+    rest_numeric_enums = True,
+    service_yaml = "dataplex_v1.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -327,9 +329,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/dataplex/",
     ],
     grpc_service_config = "dataplex_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Dataplex is an intelligent data fabric that provides a way to centrally manage, monitor, and govern your data across data lakes, data warehouses and data marts, and make this data securely accessible to a variety of analytics and data science tools.",
     ruby_cloud_title = "Dataplex V1",
     service_yaml = "dataplex_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":dataplex_ruby_grpc",
         ":dataplex_ruby_proto",
@@ -359,6 +363,7 @@ load(
 
 csharp_proto_library(
     name = "dataplex_csharp_proto",
+    extra_opts = [],
     deps = [":dataplex_proto"],
 )
 
@@ -373,7 +378,9 @@ csharp_gapic_library(
     srcs = [":dataplex_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "dataplex_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":dataplex_csharp_grpc",
         ":dataplex_csharp_proto",

@@ -5,10 +5,13 @@ title: Service Management API
 
 apis:
 - name: google.api.servicemanagement.v1.ServiceManager
+- name: google.iam.v1.IAMPolicy
+- name: google.longrunning.Operations
 
 types:
 - name: google.api.servicemanagement.v1.ConfigRef
 - name: google.api.servicemanagement.v1.ConfigSource
+- name: google.api.servicemanagement.v1.EnableServiceResponse
 - name: google.api.servicemanagement.v1.OperationMetadata
 - name: google.api.servicemanagement.v1.Rollout
 - name: google.api.servicemanagement.v1.SubmitConfigSourceResponse
@@ -157,17 +160,6 @@ documentation:
 
   - selector: google.longrunning.Operations.ListOperations
     description: Lists service operations that match the specified filter in the request.
-
-backend:
-  rules:
-  - selector: 'google.api.servicemanagement.v1.ServiceManager.*'
-    deadline: 10.0
-  - selector: google.api.servicemanagement.v1.ServiceManager.CreateServiceConfig
-    deadline: 20.0
-  - selector: 'google.iam.v1.IAMPolicy.*'
-    deadline: 10.0
-  - selector: 'google.longrunning.Operations.*'
-    deadline: 10.0
 
 http:
   rules:

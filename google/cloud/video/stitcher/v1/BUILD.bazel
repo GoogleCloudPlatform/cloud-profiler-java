@@ -25,6 +25,7 @@ proto_library(
         "cdn_keys.proto",
         "companions.proto",
         "events.proto",
+        "live_configs.proto",
         "sessions.proto",
         "slates.proto",
         "stitch_details.proto",
@@ -35,10 +36,12 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
+        "//google/longrunning:operations_proto",
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:struct_proto",
+        "@com_google_protobuf//:timestamp_proto",
     ],
 )
 
@@ -78,10 +81,12 @@ java_gapic_library(
     srcs = [":stitcher_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "videostitcher_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
     test_deps = [
         ":stitcher_java_grpc",
     ],
+    transport = "grpc",
     deps = [
         ":stitcher_java_proto",
         "//google/api:api_java_proto",
@@ -100,6 +105,7 @@ java_gapic_test(
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-video-stitcher-v1-java",
     include_samples = True,
+    transport = "grpc",
     deps = [
         ":stitcher_java_gapic",
         ":stitcher_java_grpc",
@@ -116,16 +122,16 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "stitcher_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/video/stitcher/v1",
+    importpath = "cloud.google.com/go/video/stitcher/apiv1/stitcherpb",
     protos = [":stitcher_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+        "//google/longrunning:longrunning_go_proto",
     ],
 )
 
@@ -135,18 +141,18 @@ go_gapic_library(
     grpc_service_config = "videostitcher_grpc_service_config.json",
     importpath = "cloud.google.com/go/video/stitcher/apiv1;stitcher",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
+    transport = "grpc",
     deps = [
         ":stitcher_go_proto",
+        "//google/longrunning:longrunning_go_proto",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
         "@io_bazel_rules_go//proto/wkt:duration_go_proto",
+        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
     ],
-)
-
-go_test(
-    name = "stitcher_go_gapic_test",
-    srcs = [":stitcher_go_gapic_srcjar_test"],
-    embed = [":stitcher_go_gapic"],
-    importpath = "cloud.google.com/go/video/stitcher/apiv1",
 )
 
 # Open Source Packages
@@ -155,6 +161,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":stitcher_go_gapic",
         ":stitcher_go_gapic_srcjar-metadata.srcjar",
+        ":stitcher_go_gapic_srcjar-snippets.srcjar",
         ":stitcher_go_gapic_srcjar-test.srcjar",
         ":stitcher_go_proto",
     ],
@@ -174,8 +181,11 @@ py_gapic_library(
     name = "stitcher_py_gapic",
     srcs = [":stitcher_proto"],
     grpc_service_config = "videostitcher_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
-    transport = "grpc+rest",
+    transport = "grpc",
+    deps = [
+    ],
 )
 
 py_test(
@@ -203,7 +213,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -212,21 +221,15 @@ php_proto_library(
     deps = [":stitcher_proto"],
 )
 
-php_grpc_library(
-    name = "stitcher_php_grpc",
-    srcs = [":stitcher_proto"],
-    deps = [":stitcher_php_proto"],
-)
-
 php_gapic_library(
     name = "stitcher_php_gapic",
     srcs = [":stitcher_proto_with_info"],
     grpc_service_config = "videostitcher_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
-    deps = [
-        ":stitcher_php_grpc",
-        ":stitcher_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":stitcher_php_proto"],
 )
 
 # Open Source Packages
@@ -234,7 +237,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-video-stitcher-v1-php",
     deps = [
         ":stitcher_php_gapic",
-        ":stitcher_php_grpc",
         ":stitcher_php_proto",
     ],
 )
@@ -255,7 +257,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "videostitcher_grpc_service_config.json",
     package = "google.cloud.video.stitcher.v1",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
+    transport = "grpc",
     deps = [],
 )
 
@@ -299,8 +303,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/video-stitcher/",
     ],
     grpc_service_config = "videostitcher_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "The Video Stitcher API allows you to manipulate video content to dynamically insert ads prior to delivery to client devices. Using the Video Stitcher API, you can monetize your video-on-demand (VOD) and livestreaming videos by inserting ads as described by metadata stored on ad servers.",
     ruby_cloud_title = "Video Stitcher V1",
+    service_yaml = "videostitcher_v1.yaml",
+    transport = "grpc",
     deps = [
         ":stitcher_ruby_grpc",
         ":stitcher_ruby_proto",
@@ -344,7 +351,9 @@ csharp_gapic_library(
     srcs = [":stitcher_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "videostitcher_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "videostitcher_v1.yaml",
+    transport = "grpc",
     deps = [
         ":stitcher_csharp_grpc",
         ":stitcher_csharp_proto",

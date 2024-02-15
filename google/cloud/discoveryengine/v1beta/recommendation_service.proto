@@ -25,7 +25,7 @@ import "google/cloud/discoveryengine/v1beta/user_event.proto";
 import "google/protobuf/struct.proto";
 
 option csharp_namespace = "Google.Cloud.DiscoveryEngine.V1Beta";
-option go_package = "google.golang.org/genproto/googleapis/cloud/discoveryengine/v1beta;discoveryengine";
+option go_package = "cloud.google.com/go/discoveryengine/apiv1beta/discoveryenginepb;discoveryenginepb";
 option java_multiple_files = true;
 option java_outer_classname = "RecommendationServiceProto";
 option java_package = "com.google.cloud.discoveryengine.v1beta";
@@ -44,17 +44,33 @@ service RecommendationService {
     option (google.api.http) = {
       post: "/v1beta/{serving_config=projects/*/locations/*/dataStores/*/servingConfigs/*}:recommend"
       body: "*"
+      additional_bindings {
+        post: "/v1beta/{serving_config=projects/*/locations/*/collections/*/dataStores/*/servingConfigs/*}:recommend"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/v1beta/{serving_config=projects/*/locations/*/collections/*/engines/*/servingConfigs/*}:recommend"
+        body: "*"
+      }
     };
   }
 }
 
 // Request message for Recommend method.
 message RecommendRequest {
-  // Required. Full resource name of the format:
-  // projects/*/locations/global/dataStores/*/servingConfigs/*
+  // Required. Full resource name of a
+  // [ServingConfig][google.cloud.discoveryengine.v1beta.ServingConfig]:
+  // `projects/*/locations/global/collections/*/engines/*/servingConfigs/*`, or
+  // `projects/*/locations/global/collections/*/dataStores/*/servingConfigs/*`
   //
-  // Before you can request recommendations from your model, you must create at
-  // least one serving config  for it.
+  // One default serving config is created along with your recommendation engine
+  // creation. The engine ID will be used as the ID of the default serving
+  // config. For example, for Engine
+  // `projects/*/locations/global/collections/*/engines/my-engine`, you can use
+  // `projects/*/locations/global/collections/*/engines/my-engine/servingConfigs/my-engine`
+  // for your
+  // [RecommendationService.Recommend][google.cloud.discoveryengine.v1beta.RecommendationService.Recommend]
+  // requests.
   string serving_config = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -93,8 +109,16 @@ message RecommendRequest {
   //
   // Examples:
   //
-  //  * (filter_tags: ANY("Red", "Blue") OR filter_tags: ANY("Hot", "Cold"))
-  //  * (filter_tags: ANY("Red", "Blue")) AND NOT (filter_tags: ANY("Green"))
+  //  * `(filter_tags: ANY("Red", "Blue") OR filter_tags: ANY("Hot", "Cold"))`
+  //  * `(filter_tags: ANY("Red", "Blue")) AND NOT (filter_tags: ANY("Green"))`
+  //
+  // If `attributeFilteringSyntax` is set to true under the `params` field, then
+  // attribute-based expressions are expected instead of the above described
+  // tag-based syntax. Examples:
+  //
+  //  * (launguage: ANY("en", "es")) AND NOT (categories: ANY("Movie"))
+  //  * (available: true) AND
+  //    (launguage: ANY("en", "es")) OR (categories: ANY("Movie"))
   //
   // If your filter blocks all results, the API will return generic
   // (unfiltered) popular Documents. If you only want results strictly matching
@@ -102,8 +126,9 @@ message RecommendRequest {
   // [RecommendRequest.params][google.cloud.discoveryengine.v1beta.RecommendRequest.params]
   // to receive empty results instead.
   //
-  // Note that the API will never return Documents with storageStatus of
-  // "EXPIRED" or "DELETED" regardless of filter choices.
+  // Note that the API will never return
+  // [Document][google.cloud.discoveryengine.v1beta.Document]s with
+  // `storageStatus` of `EXPIRED` or `DELETED` regardless of filter choices.
   string filter = 4;
 
   // Use validate only mode for this recommendation query. If set to true, a
@@ -118,25 +143,47 @@ message RecommendRequest {
   //
   // * `returnDocument`: Boolean. If set to true, the associated Document
   //    object will be returned in
-  //    [RecommendResponse.results.document][RecommendationResult.document].
+  //    [RecommendResponse.RecommendationResult.document][google.cloud.discoveryengine.v1beta.RecommendResponse.RecommendationResult.document].
   // * `returnScore`: Boolean. If set to true, the recommendation 'score'
   //    corresponding to each returned Document will be set in
-  //    [RecommendResponse.results.metadata][RecommendationResult.metadata]. The
-  //    given 'score' indicates the probability of a Document conversion given
-  //    the user's context and history.
+  //    [RecommendResponse.RecommendationResult.metadata][google.cloud.discoveryengine.v1beta.RecommendResponse.RecommendationResult.metadata].
+  //    The given 'score' indicates the probability of a Document conversion
+  //    given the user's context and history.
   // * `strictFiltering`: Boolean. True by default. If set to false, the service
   //    will return generic (unfiltered) popular Documents instead of empty if
   //    your filter blocks all recommendation results.
   // * `diversityLevel`: String. Default empty. If set to be non-empty, then
   //    it needs to be one of:
-  //    *  'no-diversity'
-  //    *  'low-diversity'
-  //    *  'medium-diversity'
-  //    *  'high-diversity'
-  //    *  'auto-diversity'
+  //     *  `no-diversity`
+  //     *  `low-diversity`
+  //     *  `medium-diversity`
+  //     *  `high-diversity`
+  //     *  `auto-diversity`
   //    This gives request-level control and adjusts recommendation results
   //    based on Document category.
+  // * `attributeFilteringSyntax`: Boolean. False by default. If set to true,
+  //    the `filter` field is interpreted according to the new,
+  //    attribute-based syntax.
   map<string, google.protobuf.Value> params = 6;
+
+  // The user labels applied to a resource must meet the following requirements:
+  //
+  // * Each resource can have multiple labels, up to a maximum of 64.
+  // * Each label must be a key-value pair.
+  // * Keys have a minimum length of 1 character and a maximum length of 63
+  //   characters and cannot be empty. Values can be empty and have a maximum
+  //   length of 63 characters.
+  // * Keys and values can contain only lowercase letters, numeric characters,
+  //   underscores, and dashes. All characters must use UTF-8 encoding, and
+  //   international characters are allowed.
+  // * The key portion of a label must be unique. However, you can use the same
+  //   key with multiple resources.
+  // * Keys must start with a lowercase letter or international character.
+  //
+  // See [Requirements for
+  // labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements)
+  // for more details.
+  map<string, string> user_labels = 8;
 }
 
 // Response message for Recommend method.

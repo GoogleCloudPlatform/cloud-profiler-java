@@ -9,14 +9,43 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
-# This is an API workspace, having public visibility by default makes perfect sense.
-package(default_visibility = ["//visibility:public"])
-
 ##############################################################################
 # Common
 ##############################################################################
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
+    "csharp_gapic_assembly_pkg",
+    "csharp_gapic_library",
+    "csharp_grpc_library",
+    "csharp_proto_library",
+    "go_gapic_assembly_pkg",
+    "go_gapic_library",
+    "go_proto_library",
+    "java_gapic_assembly_gradle_pkg",
+    "java_gapic_library",
+    "java_gapic_test",
+    "java_grpc_library",
+    "java_proto_library",
+    "nodejs_gapic_assembly_pkg",
+    "nodejs_gapic_library",
+    "php_gapic_assembly_pkg",
+    "php_gapic_library",
+    "php_proto_library",
+    "proto_library_with_info",
+    "py_gapic_assembly_pkg",
+    "py_gapic_library",
+    "py_test",
+    "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
+    "ruby_grpc_library",
+    "ruby_proto_library",
+)
+
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "networksecurity_proto",
@@ -34,6 +63,7 @@ proto_library(
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -47,18 +77,6 @@ proto_library_with_info(
         "//google/cloud/location:location_proto",
         "//google/iam/v1:iam_policy_proto",
     ],
-)
-
-##############################################################################
-# Java
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "java_gapic_assembly_gradle_pkg",
-    "java_gapic_library",
-    "java_gapic_test",
-    "java_grpc_library",
-    "java_proto_library",
 )
 
 java_proto_library(
@@ -76,11 +94,14 @@ java_gapic_library(
     name = "networksecurity_java_gapic",
     srcs = [":networksecurity_proto_with_info"],
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "networksecurity_v1.yaml",
     test_deps = [
         ":networksecurity_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
     ],
+    transport = "grpc",
     deps = [
         ":networksecurity_java_proto",
         "//google/cloud/location:location_java_proto",
@@ -99,6 +120,8 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-networksecurity-v1-java",
+    include_samples = True,
+    transport = "grpc",
     deps = [
         ":networksecurity_java_gapic",
         ":networksecurity_java_grpc",
@@ -107,21 +130,10 @@ java_gapic_assembly_gradle_pkg(
     ],
 )
 
-##############################################################################
-# Go
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "go_gapic_assembly_pkg",
-    "go_gapic_library",
-    "go_proto_library",
-    "go_test",
-)
-
 go_proto_library(
     name = "networksecurity_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/networksecurity/v1",
+    importpath = "cloud.google.com/go/networksecurity/apiv1/networksecuritypb",
     protos = [":networksecurity_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -135,22 +147,17 @@ go_gapic_library(
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
     importpath = "cloud.google.com/go/networksecurity/apiv1;networksecurity",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "networksecurity_v1.yaml",
     deps = [
         ":networksecurity_go_proto",
         "//google/cloud/location:location_go_proto",
         "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "networksecurity_go_gapic_test",
-    srcs = [":networksecurity_go_gapic_srcjar_test"],
-    embed = [":networksecurity_go_gapic"],
-    importpath = "cloud.google.com/go/networksecurity/apiv1",
 )
 
 # Open Source Packages
@@ -159,19 +166,10 @@ go_gapic_assembly_pkg(
     deps = [
         ":networksecurity_go_gapic",
         ":networksecurity_go_gapic_srcjar-metadata.srcjar",
+        ":networksecurity_go_gapic_srcjar-snippets.srcjar",
         ":networksecurity_go_gapic_srcjar-test.srcjar",
         ":networksecurity_go_proto",
     ],
-)
-
-##############################################################################
-# Python
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "py_gapic_assembly_pkg",
-    "py_gapic_library",
-    "py_test",
 )
 
 py_gapic_library(
@@ -183,7 +181,10 @@ py_gapic_library(
         "python-gapic-namespace=google.cloud",
         "python-gapic-name=network_security",
     ],
+    rest_numeric_enums = True,
+    service_yaml = "networksecurity_v1.yaml",
     transport = "grpc+rest",
+    deps = ["//google/iam/v1:iam_policy_py_proto"],
 )
 
 py_test(
@@ -204,37 +205,20 @@ py_gapic_assembly_pkg(
     ],
 )
 
-##############################################################################
-# PHP
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "php_gapic_assembly_pkg",
-    "php_gapic_library",
-    "php_grpc_library",
-    "php_proto_library",
-)
-
 php_proto_library(
     name = "networksecurity_php_proto",
     deps = [":networksecurity_proto"],
-)
-
-php_grpc_library(
-    name = "networksecurity_php_grpc",
-    srcs = [":networksecurity_proto"],
-    deps = [":networksecurity_php_proto"],
 )
 
 php_gapic_library(
     name = "networksecurity_php_gapic",
     srcs = [":networksecurity_proto_with_info"],
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
+    migration_mode = "NEW_SURFACE_ONLY",
+    rest_numeric_enums = True,
     service_yaml = "networksecurity_v1.yaml",
-    deps = [
-        ":networksecurity_php_grpc",
-        ":networksecurity_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":networksecurity_php_proto"],
 )
 
 # Open Source Packages
@@ -242,18 +226,8 @@ php_gapic_assembly_pkg(
     name = "google-cloud-networksecurity-v1-php",
     deps = [
         ":networksecurity_php_gapic",
-        ":networksecurity_php_grpc",
         ":networksecurity_php_proto",
     ],
-)
-
-##############################################################################
-# Node.js
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "nodejs_gapic_assembly_pkg",
-    "nodejs_gapic_library",
 )
 
 nodejs_gapic_library(
@@ -263,7 +237,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
     package = "google.cloud.networksecurity.v1",
+    rest_numeric_enums = True,
     service_yaml = "networksecurity_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -273,17 +249,6 @@ nodejs_gapic_assembly_pkg(
         ":networksecurity_nodejs_gapic",
         ":networksecurity_proto",
     ],
-)
-
-##############################################################################
-# Ruby
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_cloud_gapic_library",
-    "ruby_gapic_assembly_pkg",
-    "ruby_grpc_library",
-    "ruby_proto_library",
 )
 
 ruby_proto_library(
@@ -304,6 +269,9 @@ ruby_cloud_gapic_library(
         "ruby-cloud-gem-name=google-cloud-networksecurity-v1",
     ],
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "networksecurity_v1.yaml",
+    transport = "grpc",
     deps = [
         ":networksecurity_ruby_grpc",
         ":networksecurity_ruby_proto",
@@ -318,17 +286,6 @@ ruby_gapic_assembly_pkg(
         ":networksecurity_ruby_grpc",
         ":networksecurity_ruby_proto",
     ],
-)
-
-##############################################################################
-# C#
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "csharp_gapic_assembly_pkg",
-    "csharp_gapic_library",
-    "csharp_grpc_library",
-    "csharp_proto_library",
 )
 
 csharp_proto_library(
@@ -347,6 +304,9 @@ csharp_gapic_library(
     srcs = [":networksecurity_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "networksecurity_v1_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "networksecurity_v1.yaml",
+    transport = "grpc",
     deps = [
         ":networksecurity_csharp_grpc",
         ":networksecurity_csharp_proto",
@@ -366,4 +326,14 @@ csharp_gapic_assembly_pkg(
 ##############################################################################
 # C++
 ##############################################################################
-# Put your C++ rules here
+cc_proto_library(
+    name = "networksecurity_cc_proto",
+    deps = [":networksecurity_proto"],
+)
+
+cc_grpc_library(
+    name = "networksecurity_cc_grpc",
+    srcs = [":networksecurity_proto"],
+    grpc_only = True,
+    deps = [":networksecurity_cc_proto"],
+)

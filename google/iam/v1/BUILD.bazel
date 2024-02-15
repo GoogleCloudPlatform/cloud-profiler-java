@@ -1,12 +1,34 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
-# This is an API workspace, having public visibility by default makes perfect sense.
-package(default_visibility = ["//visibility:public"])
-
 ##############################################################################
 # Common
 ##############################################################################
-load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
+load(
+    "@com_google_googleapis_imports//:imports.bzl",
+    "cc_grpc_library",
+    "cc_proto_library",
+    "csharp_gapic_assembly_pkg",
+    "csharp_gapic_library",
+    "csharp_grpc_library",
+    "csharp_proto_library",
+    "go_gapic_assembly_pkg",
+    "go_gapic_library",
+    "go_proto_library",
+    "java_gapic_assembly_gradle_pkg",
+    "java_grpc_library",
+    "java_proto_library",
+    "php_gapic_assembly_pkg",
+    "php_proto_library",
+    "proto_library_with_info",
+    "py_proto_library",
+    "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
+    "ruby_grpc_library",
+    "ruby_proto_library",
+)
+
+# This is an API workspace, having public visibility by default makes perfect sense.
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "iam_policy_proto",
@@ -48,16 +70,6 @@ proto_library_with_info(
     ],
 )
 
-##############################################################################
-# Java
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "java_gapic_assembly_gradle_pkg",
-    "java_grpc_library",
-    "java_proto_library",
-)
-
 java_proto_library(
     name = "iam_java_proto",
     deps = [
@@ -78,26 +90,19 @@ java_grpc_library(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-iam-v1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
-        "iam_java_grpc",
-        "iam_java_proto",
+        ":iam_java_grpc",
+        ":iam_java_proto",
+        ":iam_policy_proto",
     ],
-)
-
-##############################################################################
-# Go
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "go_gapic_assembly_pkg",
-    "go_proto_library",
 )
 
 go_proto_library(
     name = "iam_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/iam/v1",
+    importpath = "cloud.google.com/go/iam/apiv1/iampb",
     protos = [
         ":iam_policy_proto",
         ":options_proto",
@@ -109,20 +114,29 @@ go_proto_library(
     ],
 )
 
+# Manual addition for owlbot migration.
+go_gapic_library(
+    name = "iam_go_gapic",
+    srcs = [":iam_proto_with_info"],
+    grpc_service_config = None,
+    importpath = "cloud.google.com/go/iam/apiv1;iam",
+    metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
+    service_yaml = "iam_meta_api.yaml",
+    transport = "grpc+rest",
+    deps = [":iam_go_proto"],
+)
+
 go_gapic_assembly_pkg(
     name = "gapi-cloud-iam-v1-go",
     deps = [
+        ":iam_go_gapic",
+        ":iam_go_gapic_srcjar-metadata.srcjar",
+        ":iam_go_gapic_srcjar-snippets.srcjar",
+        ":iam_go_gapic_srcjar-test.srcjar",
         ":iam_go_proto",
     ],
-)
-
-##############################################################################
-# C++
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "cc_grpc_library",
-    "cc_proto_library",
 )
 
 cc_proto_library(
@@ -147,14 +161,6 @@ cc_grpc_library(
     deps = [":iam_policy_cc_proto"],
 )
 
-##############################################################################
-# Python
-# ##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "py_proto_library",
-)
-
 py_proto_library(
     name = "iam_policy_py_proto",
     deps = [":iam_policy_proto"],
@@ -170,15 +176,19 @@ py_proto_library(
     deps = [":options_proto"],
 )
 
-##############################################################################
-# Ruby
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_cloud_gapic_library",
-    "ruby_gapic_assembly_pkg",
-    "ruby_grpc_library",
-    "ruby_proto_library",
+php_proto_library(
+    name = "iam_php_proto",
+    deps = [
+        ":iam_policy_proto",
+        ":options_proto",
+        ":policy_proto",
+    ],
+)
+
+# Open Source Packages
+php_gapic_assembly_pkg(
+    name = "google-iam-v1-php",
+    deps = [":iam_php_proto"],
 )
 
 ruby_proto_library(
@@ -203,8 +213,11 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-iam-v1",
     ],
+    rest_numeric_enums = False,
     ruby_cloud_description = "An add-on interface used by some Google API clients to provide IAM Policy calls.",
     ruby_cloud_title = "IAM",
+    service_yaml = "iam_meta_api.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iam_ruby_grpc",
         ":iam_ruby_proto",
@@ -219,17 +232,6 @@ ruby_gapic_assembly_pkg(
         ":iam_ruby_grpc",
         ":iam_ruby_proto",
     ],
-)
-
-##############################################################################
-# C#
-##############################################################################
-load(
-    "@com_google_googleapis_imports//:imports.bzl",
-    "csharp_gapic_assembly_pkg",
-    "csharp_gapic_library",
-    "csharp_grpc_library",
-    "csharp_proto_library",
 )
 
 csharp_proto_library(
@@ -252,6 +254,8 @@ csharp_gapic_library(
     name = "iam_csharp_gapic",
     srcs = [":iam_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    rest_numeric_enums = False,
+    service_yaml = "iam_meta_api.yaml",
     deps = [
         ":iam_csharp_grpc",
         ":iam_csharp_proto",

@@ -4,8 +4,10 @@ name: gkemulticloud.googleapis.com
 title: Anthos Multi-Cloud API
 
 apis:
+- name: google.cloud.gkemulticloud.v1.AttachedClusters
 - name: google.cloud.gkemulticloud.v1.AwsClusters
 - name: google.cloud.gkemulticloud.v1.AzureClusters
+- name: google.longrunning.Operations
 
 types:
 - name: google.cloud.gkemulticloud.v1.OperationMetadata
@@ -22,15 +24,6 @@ documentation:
     You can deploy workloads with the Anthos Multi-Cloud API or the
     gcloud and kubectl command-line tools.
 
-backend:
-  rules:
-  - selector: 'google.cloud.gkemulticloud.v1.AwsClusters.*'
-    deadline: 10.0
-  - selector: 'google.cloud.gkemulticloud.v1.AzureClusters.*'
-    deadline: 10.0
-  - selector: 'google.longrunning.Operations.*'
-    deadline: 10.0
-
 http:
   rules:
   - selector: google.longrunning.Operations.CancelOperation
@@ -45,6 +38,10 @@ http:
 
 authentication:
   rules:
+  - selector: 'google.cloud.gkemulticloud.v1.AttachedClusters.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
   - selector: 'google.cloud.gkemulticloud.v1.AwsClusters.*'
     oauth:
       canonical_scopes: |-
@@ -57,3 +54,47 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+
+publishing:
+  new_issue_uri: https://issuetracker.google.com/issues/new?component=997904&template=1807166
+  documentation_uri: https://cloud.google.com/anthos/clusters/docs/multi-cloud
+  api_short_name: gkemulticloud
+  github_label: 'api: gkemulticloud'
+  doc_tag_prefix: gkemulticloud
+  organization: CLOUD
+  library_settings:
+  - version: google.cloud.gkemulticloud.v1
+    launch_stage: GA
+    java_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    cpp_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    php_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    python_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    node_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    dotnet_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    ruby_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+    go_settings:
+      common:
+        destinations:
+        - PACKAGE_MANAGER
+  proto_reference_documentation_uri: https://cloud.google.com/anthos/clusters/docs/multi-cloud/reference/rest/v1/projects.locations.awsClusters

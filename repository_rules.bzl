@@ -174,11 +174,19 @@ def switched_rules_by_language(
         python and grpc and gapic,
         "@gapic_generator_python//rules_python_gapic:py_gapic_pkg.bzl",
     )
+    rules["py_import"] = _switch(
+        python and grpc and gapic,
+        "@rules_python//python:defs.bzl",
+    )
 
     #
     # Go
     #
     rules["go_proto_library"] = _switch(
+        go,
+        "@io_bazel_rules_go//proto:def.bzl",
+    )
+    rules["go_grpc_library"] = _switch(
         go,
         "@io_bazel_rules_go//proto:def.bzl",
     )

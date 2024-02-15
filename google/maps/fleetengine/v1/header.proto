@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package maps.fleetengine.v1;
 
 import "google/api/field_behavior.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/v1;fleetengine";
+option csharp_namespace = "Google.Maps.FleetEngine.V1";
+option go_package = "cloud.google.com/go/maps/fleetengine/apiv1/fleetenginepb;fleetenginepb";
 option java_multiple_files = true;
 option java_outer_classname = "Headers";
 option java_package = "google.maps.fleetengine.v1";
@@ -100,4 +101,8 @@ message RequestHeader {
   // Android API level of the calling SDK, only applicable for the Android SDKs.
   // Field value example: `23`.
   int32 android_api_level = 11;
+
+  // Optional ID that can be provided for logging purposes in order to identify
+  // the request.
+  string trace_id = 12;
 }

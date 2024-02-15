@@ -34,6 +34,7 @@ proto_library(
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
+        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
@@ -77,7 +78,7 @@ java_gapic_library(
     srcs = [":admin_proto_with_info"],
     gapic_yaml = "firestore_gapic.yaml",
     grpc_service_config = "firestore_admin_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
     test_deps = [
         ":admin_java_grpc",
@@ -121,13 +122,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "admin_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/firestore/admin/v1",
+    importpath = "cloud.google.com/go/firestore/apiv1/admin/adminpb",
     protos = [":admin_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -139,25 +139,19 @@ go_gapic_library(
     name = "admin_go_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "firestore_admin_grpc_service_config.json",
-    importpath = "cloud.google.com/go/firestore/admin/apiv1;admin",
+    importpath = "cloud.google.com/go/firestore/apiv1/admin;apiv1",
     metadata = True,
-    rest_numeric_enums = False,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":admin_go_proto",
         "//google/cloud/location:location_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "admin_go_gapic_test",
-    srcs = [":admin_go_gapic_srcjar_test"],
-    embed = [":admin_go_gapic"],
-    importpath = "cloud.google.com/go/firestore/admin/apiv1",
 )
 
 # Open Source Packages
@@ -166,6 +160,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":admin_go_gapic",
         ":admin_go_gapic_srcjar-metadata.srcjar",
+        ":admin_go_gapic_srcjar-snippets.srcjar",
         ":admin_go_gapic_srcjar-test.srcjar",
         ":admin_go_proto",
     ],
@@ -189,9 +184,9 @@ py_gapic_library(
         "python-gapic-name=firestore_admin",
         "python-gapic-namespace=google.cloud",
     ],
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
     ],
 )
@@ -221,7 +216,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -230,22 +224,15 @@ php_proto_library(
     deps = [":admin_proto"],
 )
 
-php_grpc_library(
-    name = "admin_php_grpc",
-    srcs = [":admin_proto"],
-    deps = [":admin_php_proto"],
-)
-
 php_gapic_library(
     name = "admin_php_gapic",
     srcs = [":admin_proto_with_info"],
     grpc_service_config = "firestore_admin_grpc_service_config.json",
-    rest_numeric_enums = False,
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
-    deps = [
-        ":admin_php_grpc",
-        ":admin_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":admin_php_proto"],
 )
 
 # Open Source Packages
@@ -253,7 +240,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-firestore-admin-v1-php",
     deps = [
         ":admin_php_gapic",
-        ":admin_php_grpc",
         ":admin_php_proto",
     ],
 )
@@ -274,8 +260,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "firestore_admin_grpc_service_config.json",
     package = "google.firestore.admin.v1",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -318,13 +305,13 @@ ruby_cloud_gapic_library(
         "ruby-cloud-env-prefix=FIRESTORE",
         "ruby-cloud-gem-name=google-cloud-firestore-admin-v1",
         "ruby-cloud-product-url=https://cloud.google.com/firestore",
-        "ruby-cloud-wrapper-gem-override=google-cloud-firestore",
     ],
     grpc_service_config = "firestore_admin_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     ruby_cloud_description = "Cloud Firestore is a NoSQL document database built for automatic scaling, high performance, and ease of application development.",
     ruby_cloud_title = "Cloud Firestore Admin V1",
     service_yaml = "firestore_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_ruby_grpc",
         ":admin_ruby_proto",
@@ -368,8 +355,9 @@ csharp_gapic_library(
     srcs = [":admin_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "firestore_admin_grpc_service_config.json",
-    rest_numeric_enums = False,
+    rest_numeric_enums = True,
     service_yaml = "firestore_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":admin_csharp_grpc",
         ":admin_csharp_proto",

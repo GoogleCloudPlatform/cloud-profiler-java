@@ -73,6 +73,7 @@ java_gapic_library(
     srcs = [":iap_proto_with_info"],
     gapic_yaml = None,
     grpc_service_config = "iap_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "iap_v1.yaml",
     test_deps = [
         ":iap_java_grpc",
@@ -118,13 +119,12 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "iap_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/cloud/iap/v1",
+    importpath = "cloud.google.com/go/iap/apiv1/iappb",
     protos = [":iap_proto"],
     deps = [
         "//google/api:annotations_go_proto",
@@ -138,6 +138,8 @@ go_gapic_library(
     grpc_service_config = "iap_grpc_service_config.json",
     importpath = "cloud.google.com/go/iap/apiv1;iap",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "iap_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -147,19 +149,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "iap_go_gapic_test",
-    srcs = [":iap_go_gapic_srcjar_test"],
-    embed = [":iap_go_gapic"],
-    importpath = "cloud.google.com/go/iap/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-iap-v1-go",
     deps = [
         ":iap_go_gapic",
         ":iap_go_gapic_srcjar-metadata.srcjar",
+        ":iap_go_gapic_srcjar-snippets.srcjar",
         ":iap_go_gapic_srcjar-test.srcjar",
         ":iap_go_proto",
     ],
@@ -179,7 +175,9 @@ py_gapic_library(
     name = "iap_py_gapic",
     srcs = [":iap_proto"],
     grpc_service_config = "iap_grpc_service_config.json",
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "iap_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -210,7 +208,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -219,21 +216,15 @@ php_proto_library(
     deps = [":iap_proto"],
 )
 
-php_grpc_library(
-    name = "iap_php_grpc",
-    srcs = [":iap_proto"],
-    deps = [":iap_php_proto"],
-)
-
 php_gapic_library(
     name = "iap_php_gapic",
     srcs = [":iap_proto_with_info"],
     grpc_service_config = "iap_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "iap_v1.yaml",
-    deps = [
-        ":iap_php_grpc",
-        ":iap_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":iap_php_proto"],
 )
 
 # Open Source Packages
@@ -241,7 +232,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-iap-v1-php",
     deps = [
         ":iap_php_gapic",
-        ":iap_php_grpc",
         ":iap_php_proto",
     ],
 )
@@ -262,7 +252,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "iap_grpc_service_config.json",
     package = "google.cloud.iap.v1",
+    rest_numeric_enums = True,
     service_yaml = "iap_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -307,8 +299,11 @@ ruby_cloud_gapic_library(
         "ruby-cloud-product-url=https://cloud.google.com/iap/",
     ],
     grpc_service_config = "iap_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "IAP lets you establish a central authorization layer for applications accessed by HTTPS, so you can use an application-level access control model instead of relying on network-level firewalls.",
     ruby_cloud_title = "Identity-Aware Proxy V1",
+    service_yaml = "iap_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iap_ruby_grpc",
         ":iap_ruby_proto",
@@ -352,7 +347,9 @@ csharp_gapic_library(
     srcs = [":iap_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "iap_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "iap_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":iap_csharp_grpc",
         ":iap_csharp_proto",

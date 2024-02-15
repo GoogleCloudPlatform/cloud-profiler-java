@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "google/type/money.proto";
 
 option csharp_namespace = "Google.Cloud.Recommender.V1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/recommender/v1;recommender";
+option go_package = "cloud.google.com/go/recommender/apiv1/recommenderpb;recommenderpb";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.recommender.v1";
 option objc_class_prefix = "CREC";
@@ -256,11 +256,50 @@ message CostProjection {
 
   // Duration for which this cost applies.
   google.protobuf.Duration duration = 2;
+
+  // The approximate cost savings in the billing account's local currency.
+  google.type.Money cost_in_local_currency = 3;
 }
 
 // Contains various ways of describing the impact on Security.
 message SecurityProjection {
   // Additional security impact details that is provided by the recommender.
+  google.protobuf.Struct details = 2;
+}
+
+// Contains metadata about how much sustainability a recommendation can save or
+// incur.
+message SustainabilityProjection {
+  // Carbon Footprint generated in kg of CO2 equivalent.
+  // Chose kg_c_o2e so that the name renders correctly in camelCase (kgCO2e).
+  double kg_c_o2e = 1;
+
+  // Duration for which this sustainability applies.
+  google.protobuf.Duration duration = 2;
+}
+
+// Contains information on the impact of a reliability recommendation.
+message ReliabilityProjection {
+  // The risk associated with the reliability issue.
+  enum RiskType {
+    // Default unspecified risk. Don't use directly.
+    RISK_TYPE_UNSPECIFIED = 0;
+
+    // Potential service downtime.
+    SERVICE_DISRUPTION = 1;
+
+    // Potential data loss.
+    DATA_LOSS = 2;
+
+    // Potential access denial. The service is still up but some or all clients
+    // can't access it.
+    ACCESS_DENY = 3;
+  }
+
+  // Reliability risks mitigated by this recommendation.
+  repeated RiskType risks = 1;
+
+  // Per-recommender projection.
   google.protobuf.Struct details = 2;
 }
 
@@ -282,6 +321,12 @@ message Impact {
 
     // Indicates a potential increase or decrease in manageability.
     MANAGEABILITY = 4;
+
+    // Indicates a potential increase or decrease in sustainability.
+    SUSTAINABILITY = 5;
+
+    // Indicates a potential increase or decrease in reliability.
+    RELIABILITY = 6;
   }
 
   // Category that is being targeted.
@@ -294,6 +339,12 @@ message Impact {
 
     // Use with CategoryType.SECURITY
     SecurityProjection security_projection = 101;
+
+    // Use with CategoryType.SUSTAINABILITY
+    SustainabilityProjection sustainability_projection = 102;
+
+    // Use with CategoryType.RELIABILITY
+    ReliabilityProjection reliability_projection = 103;
   }
 }
 

@@ -1,9 +1,10 @@
 type: google.api.Service
 config_version: 3
 name: issuerswitch.googleapis.com
-title: Cloud Issuer Switch Service API
+title: Issuer switch API
 
 apis:
+- name: google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchParticipants
 - name: google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchResolutions
 - name: google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchRules
 - name: google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchTransactions
@@ -24,6 +25,7 @@ types:
 - name: google.cloud.paymentgateway.issuerswitch.v1.ExportMetadataTransactionsResponse
 - name: google.cloud.paymentgateway.issuerswitch.v1.ResolveComplaintMetadata
 - name: google.cloud.paymentgateway.issuerswitch.v1.ResolveDisputeMetadata
+- name: google.cloud.paymentgateway.issuerswitch.v1.UpiTransaction
 
 http:
   rules:
@@ -34,6 +36,10 @@ http:
 
 authentication:
   rules:
+  - selector: 'google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchParticipants.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
   - selector: 'google.cloud.paymentgateway.issuerswitch.v1.IssuerSwitchResolutions.*'
     oauth:
       canonical_scopes: |-

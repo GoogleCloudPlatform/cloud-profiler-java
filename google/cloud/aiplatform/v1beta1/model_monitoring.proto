@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,16 @@ import "google/api/resource.proto";
 import "google/cloud/aiplatform/v1beta1/io.proto";
 
 option csharp_namespace = "Google.Cloud.AIPlatform.V1Beta1";
-option go_package = "google.golang.org/genproto/googleapis/cloud/aiplatform/v1beta1;aiplatform";
+option go_package = "cloud.google.com/go/aiplatform/apiv1beta1/aiplatformpb;aiplatformpb";
 option java_multiple_files = true;
 option java_outer_classname = "ModelMonitoringProto";
 option java_package = "com.google.cloud.aiplatform.v1beta1";
 option php_namespace = "Google\\Cloud\\AIPlatform\\V1beta1";
 option ruby_package = "Google::Cloud::AIPlatform::V1beta1";
+option (google.api.resource_definition) = {
+  type: "monitoring.googleapis.com/NotificationChannel"
+  pattern: "projects/{project}/notificationChannels/{notification_channel}"
+};
 
 // The model monitoring configuration used for Batch Prediction Job.
 message ModelMonitoringConfig {
@@ -59,8 +63,8 @@ message ModelMonitoringObjectiveConfig {
     oneof data_source {
       // The resource name of the Dataset used to train this Model.
       string dataset = 3 [(google.api.resource_reference) = {
-                            type: "aiplatform.googleapis.com/Dataset"
-                          }];
+        type: "aiplatform.googleapis.com/Dataset"
+      }];
 
       // The Google Cloud Storage uri of the unmanaged Dataset used to train
       // this Model.
@@ -135,8 +139,10 @@ message ModelMonitoringObjectiveConfig {
   // The config for integrating with Vertex Explainable AI. Only applicable if
   // the Model has explanation_spec populated.
   message ExplanationConfig {
-    // Output from [BatchPredictionJob][google.cloud.aiplatform.v1beta1.BatchPredictionJob] for Model Monitoring baseline dataset,
-    // which can be used to generate baseline attribution scores.
+    // Output from
+    // [BatchPredictionJob][google.cloud.aiplatform.v1beta1.BatchPredictionJob]
+    // for Model Monitoring baseline dataset, which can be used to generate
+    // baseline attribution scores.
     message ExplanationBaseline {
       // The storage format of the predictions generated BatchPrediction job.
       enum PredictionFormat {
@@ -178,7 +184,8 @@ message ModelMonitoringObjectiveConfig {
   TrainingDataset training_dataset = 1;
 
   // The config for skew between training data and prediction data.
-  TrainingPredictionSkewDetectionConfig training_prediction_skew_detection_config = 2;
+  TrainingPredictionSkewDetectionConfig
+      training_prediction_skew_detection_config = 2;
 
   // The config for drift of prediction data.
   PredictionDriftDetectionConfig prediction_drift_detection_config = 3;
@@ -187,6 +194,7 @@ message ModelMonitoringObjectiveConfig {
   ExplanationConfig explanation_config = 5;
 }
 
+// The alert config for model monitoring.
 message ModelMonitoringAlertConfig {
   // The config for email alert.
   message EmailAlertConfig {
@@ -205,6 +213,13 @@ message ModelMonitoringAlertConfig {
   // This can be further sinked to Pub/Sub or any other services supported
   // by Cloud Logging.
   bool enable_logging = 2;
+
+  // Resource names of the NotificationChannels to send alert.
+  // Must be of the format
+  // `projects/<project_id_or_number>/notificationChannels/<channel_id>`
+  repeated string notification_channels = 3 [(google.api.resource_reference) = {
+    type: "monitoring.googleapis.com/NotificationChannel"
+  }];
 }
 
 // The config for feature monitoring threshold.

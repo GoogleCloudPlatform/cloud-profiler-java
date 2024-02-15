@@ -62,6 +62,18 @@
         {
           "service": "google.cloud.asset.v1.AssetService",
           "method": "DeleteSavedQuery"
+        },
+        {
+          "service": "google.cloud.asset.v1.AssetService",
+          "method": "AnalyzeOrgPolicies"
+        },
+        {
+          "service": "google.cloud.asset.v1.AssetService",
+          "method": "AnalyzeOrgPolicyGovernedContainers"
+        },
+        {
+          "service": "google.cloud.asset.v1.AssetService",
+          "method": "AnalyzeOrgPolicyGovernedAssets"
         }
       ],
       "timeout": "60s",
@@ -155,6 +167,40 @@
         }
       ],
       "timeout": "300s",
+      "retryPolicy": {
+        "initialBackoff": "0.100s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 1.3,
+        "retryableStatusCodes": [
+          "UNAVAILABLE"
+        ]
+      }
+    },
+    {
+      "name": [
+        {
+          "service": "google.cloud.asset.v1.AssetService",
+          "method": "TraverseGraph"
+        }
+      ],
+      "timeout": "60s",
+      "retryPolicy": {
+        "initialBackoff": "0.100s",
+        "maxBackoff": "60s",
+        "backoffMultiplier": 1.3,
+        "retryableStatusCodes": [
+          "UNAVAILABLE"
+        ]
+      }
+    },
+    {
+      "name": [
+        {
+          "service": "google.cloud.asset.v1.AssetService",
+          "method": "IngestAsset"
+        }
+      ],
+      "timeout": "60s",
       "retryPolicy": {
         "initialBackoff": "0.100s",
         "maxBackoff": "60s",

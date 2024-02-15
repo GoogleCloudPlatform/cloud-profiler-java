@@ -32,9 +32,12 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
+        "//google/iam/v1:iam_policy_proto",
+        "//google/iam/v1:policy_proto",
         "//google/identity/accesscontextmanager/type:type_proto",
         "//google/longrunning:operations_proto",
         "//google/type:expr_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
@@ -57,6 +60,7 @@ proto_library(
         "//google/api:resource_proto",
         "//google/identity/accesscontextmanager/type:type_proto",
         "//google/type:expr_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -68,6 +72,7 @@ proto_library(
     ],
     deps = [
         "//google/api:resource_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -79,6 +84,7 @@ proto_library(
     ],
     deps = [
         "//google/api:resource_proto",
+        "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -109,13 +115,19 @@ java_grpc_library(
 java_gapic_library(
     name = "accesscontextmanager_java_gapic",
     srcs = [":accesscontextmanager_proto_with_info"],
+    gapic_yaml = None,
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    rest_numeric_enums = True,
+    service_yaml = "accesscontextmanager_v1.yaml",
     test_deps = [
         ":accesscontextmanager_java_grpc",
+        "//google/iam/v1:iam_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_java_proto",
+        "//google/api:api_java_proto",
+        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -131,6 +143,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-accesscontextmanager-v1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_java_gapic",
@@ -148,16 +161,16 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
     name = "accesscontextmanager_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "google.golang.org/genproto/googleapis/identity/accesscontextmanager/v1",
+    importpath = "cloud.google.com/go/accesscontextmanager/apiv1/accesscontextmanagerpb",
     protos = [":accesscontextmanager_proto"],
     deps = [
         "//google/api:annotations_go_proto",
+        "//google/iam/v1:iam_go_proto",
         "//google/identity/accesscontextmanager/type:type_go_proto",
         "//google/longrunning:longrunning_go_proto",
         "//google/type:expr_go_proto",
@@ -168,23 +181,19 @@ go_gapic_library(
     name = "accesscontextmanager_go_gapic",
     srcs = [":accesscontextmanager_proto_with_info"],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
-    importpath = "cloud.google.com/go/identity/accesscontextmanager/apiv1;accesscontextmanager",
+    importpath = "cloud.google.com/go/accesscontextmanager/apiv1;accesscontextmanager",
     metadata = True,
+    release_level = "ga",
+    rest_numeric_enums = True,
     service_yaml = "accesscontextmanager_v1.yaml",
     transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_go_proto",
+        "//google/iam/v1:iam_go_proto",
         "//google/longrunning:longrunning_go_proto",
-        "@com_google_cloud_go//longrunning:go_default_library",
-        "@com_google_cloud_go//longrunning/autogen:go_default_library",
+        "@com_google_cloud_go_longrunning//:go_default_library",
+        "@com_google_cloud_go_longrunning//autogen:go_default_library",
     ],
-)
-
-go_test(
-    name = "accesscontextmanager_go_gapic_test",
-    srcs = [":accesscontextmanager_go_gapic_srcjar_test"],
-    embed = [":accesscontextmanager_go_gapic"],
-    importpath = "cloud.google.com/go/identity/accesscontextmanager/apiv1",
 )
 
 # Open Source Packages
@@ -193,6 +202,7 @@ go_gapic_assembly_pkg(
     deps = [
         ":accesscontextmanager_go_gapic",
         ":accesscontextmanager_go_gapic_srcjar-metadata.srcjar",
+        ":accesscontextmanager_go_gapic_srcjar-snippets.srcjar",
         ":accesscontextmanager_go_gapic_srcjar-test.srcjar",
         ":accesscontextmanager_go_proto",
     ],
@@ -227,7 +237,12 @@ py_gapic_library(
     name = "accesscontextmanager_py_gapic",
     srcs = [":accesscontextmanager_proto"],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
-    transport = "grpc",
+    rest_numeric_enums = True,
+    service_yaml = "accesscontextmanager_v1.yaml",
+    transport = "grpc+rest",
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
 )
 
 # Uncomment once https://github.com/googleapis/gapic-generator-python/issues/1376 is fixed
@@ -256,7 +271,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -265,21 +279,15 @@ php_proto_library(
     deps = [":accesscontextmanager_proto"],
 )
 
-php_grpc_library(
-    name = "accesscontextmanager_php_grpc",
-    srcs = [":accesscontextmanager_proto"],
-    deps = [":accesscontextmanager_php_proto"],
-)
-
 php_gapic_library(
     name = "accesscontextmanager_php_gapic",
     srcs = [":accesscontextmanager_proto_with_info"],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    migration_mode = "MIGRATING",
+    rest_numeric_enums = True,
     service_yaml = "accesscontextmanager_v1.yaml",
-    deps = [
-        ":accesscontextmanager_php_grpc",
-        ":accesscontextmanager_php_proto",
-    ],
+    transport = "grpc+rest",
+    deps = [":accesscontextmanager_php_proto"],
 )
 
 # Open Source Packages
@@ -287,7 +295,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-identity-accesscontextmanager-v1-php",
     deps = [
         ":accesscontextmanager_php_gapic",
-        ":accesscontextmanager_php_grpc",
         ":accesscontextmanager_php_proto",
     ],
 )
@@ -308,7 +315,9 @@ nodejs_gapic_library(
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
     package = "google.identity.accesscontextmanager.v1",
+    rest_numeric_enums = True,
     service_yaml = "accesscontextmanager_v1.yaml",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -350,14 +359,17 @@ ruby_cloud_gapic_library(
     name = "accesscontextmanager_ruby_gapic",
     srcs = [":accesscontextmanager_proto_with_info"],
     extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-identity-access_context_manager-v1",
-        "ruby-cloud-product-url=https://cloud.google.com/access-context-manager/",
         "ruby-cloud-api-id=accesscontextmanager.googleapis.com",
         "ruby-cloud-api-shortname=accesscontextmanager",
+        "ruby-cloud-gem-name=google-identity-access_context_manager-v1",
+        "ruby-cloud-product-url=https://cloud.google.com/access-context-manager/",
     ],
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    rest_numeric_enums = True,
     ruby_cloud_description = "Access Context Manager allows enterprises to configure access levels which map to a policy defined on request attributes.",
     ruby_cloud_title = "Access Context Manager V1",
+    service_yaml = "accesscontextmanager_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_ruby_grpc",
         ":accesscontextmanager_ruby_proto",
@@ -401,7 +413,9 @@ csharp_gapic_library(
     srcs = [":accesscontextmanager_proto_with_info"],
     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "accesscontextmanager_grpc_service_config.json",
+    rest_numeric_enums = True,
     service_yaml = "accesscontextmanager_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":accesscontextmanager_csharp_grpc",
         ":accesscontextmanager_csharp_proto",
