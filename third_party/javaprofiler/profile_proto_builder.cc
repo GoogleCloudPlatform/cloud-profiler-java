@@ -33,7 +33,7 @@ const int kMetric = 1;
 
 ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                                          ProfileFrameCache *native_cache,
-                                         int64 sampling_rate,
+                                         int64_t sampling_rate,
                                          const SampleType &count_type,
                                          const SampleType &metric_type)
     : sampling_rate_(sampling_rate),
@@ -61,8 +61,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
 }
 
 void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
-                                    const int32 *counts,
-                                    int num_traces) {
+                                    const int32_t *counts, int num_traces) {
   if (native_cache_) {
     native_cache_->ProcessTraces(traces, num_traces);
   }
@@ -81,7 +80,7 @@ void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
   auto sample = profile->add_sample();
   sample->add_location_id(location->id());
   // Move count * sampling rate to 64-bit.
-  InitSampleValues(sample, count, static_cast<int64>(count) * sampling_rate);
+  InitSampleValues(sample, count, static_cast<int64_t>(count) * sampling_rate);
 }
 
 void ProfileProtoBuilder::UnsampleMetrics() {
@@ -131,13 +130,13 @@ void ProfileProtoBuilder::SetPeriodType(const SampleType &metric_type) {
 }
 
 void ProfileProtoBuilder::UpdateSampleValues(
-    perftools::profiles::Sample *sample, int64 count, int64 size) {
+    perftools::profiles::Sample *sample, int64_t count, int64_t size) {
   sample->set_value(kCount, sample->value(kCount) + count);
   sample->set_value(kMetric, sample->value(kMetric) + size);
 }
 
 void ProfileProtoBuilder::InitSampleValues(perftools::profiles::Sample *sample,
-                                           int64 count, int64 metric) {
+                                           int64_t count, int64_t metric) {
   sample->add_value(count);
   sample->add_value(metric);
 }
@@ -160,10 +159,10 @@ void ProfileProtoBuilder::AddLabels(const TraceAndLabels &trace_and_labels,
 }
 
 void ProfileProtoBuilder::AddTrace(const ProfileStackTrace &profile_trace,
-                                   int32 count) {
+                                   int32_t count) {
   const TraceAndLabels &trace_and_labels = profile_trace.trace_and_labels;
   auto sample = trace_samples_.SampleFor(trace_and_labels);
-  jint metric_value = profile_trace.metric_value;
+  auto metric_value = profile_trace.metric_value;
 
   if (sample != nullptr) {
     UpdateSampleValues(sample, count, metric_value);
@@ -207,12 +206,12 @@ void ProfileProtoBuilder::AddJavaInfo(
   sample->add_location_id(Location(method_info, jvm_frame));
 }
 
-int64 ProfileProtoBuilder::Location(MethodInfo *method,
-                                    const JVMPI_CallFrame &frame) {
+int64_t ProfileProtoBuilder::Location(MethodInfo *method,
+                                      const JVMPI_CallFrame &frame) {
   // lineno is actually the BCI of the frame.
   int bci = frame.lineno;
 
-  int64 location_id = method->Location(bci);
+  int64_t location_id = method->Location(bci);
 
   // Non-zero as a location id is a valid location ID.
   if (location_id != MethodInfo::kInvalidLocationId) {
@@ -475,7 +474,8 @@ void TraceSamples::Add(const TraceAndLabels &trace,
   traces_[trace] = sample;
 }
 
-double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
+double CalculateSamplingRatio(int64_t rate, int64_t count,
+                              int64_t metric_value) {
   if (rate <= 1 || count < 1 || metric_value < 1) {
     return 1.0;
   }
@@ -490,7 +490,7 @@ double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value) {
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
     ProfileFrameCache *cache) {
   // Cache can be nullptr because the heap sampler can be using a JVMTI
   // Java-only stackframe gatherer.
@@ -499,8 +499,8 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 duration_ns,
-    int64 sampling_rate, ProfileFrameCache *cache) {
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t duration_ns,
+    int64_t sampling_rate, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "CPU profiles may have native frames, cache must be provided";
   return std::unique_ptr<ProfileProtoBuilder>(
@@ -509,8 +509,8 @@ std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
 }
 
 std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
-    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
-    int64 duration_nanos, ProfileFrameCache *cache) {
+    JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
+    int64_t duration_nanos, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "Contention profiles may have native frames, cache must be provided";
   return std::unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(

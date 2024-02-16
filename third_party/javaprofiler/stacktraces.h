@@ -20,6 +20,7 @@
 #define THIRD_PARTY_JAVAPROFILER_STACKTRACES_H_
 
 #include <atomic>
+#include <cstdint>
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
@@ -33,7 +34,7 @@ namespace javaprofiler {
 // Maximum number of frames to store from the stack traces sampled.
 const int kMaxFramesToCapture = 128;
 
-uint64 CalculateHash(int64 attr, int num_frames,
+uint64_t CalculateHash(int64_t attr, int num_frames,
                        const JVMPI_CallFrame *frame);
 bool Equal(int num_frames, const JVMPI_CallFrame *f1,
            const JVMPI_CallFrame *f2);
@@ -44,6 +45,10 @@ const int kNumCallTraceErrors = 10;
 
 class Asgct {
  public:
+  // This type is neither copyable nor movable.
+  Asgct(const Asgct&) = delete;
+  Asgct& operator=(const Asgct&) = delete;
+
   static void SetAsgct(ASGCTType asgct) { asgct_ = asgct; }
 
   // AsyncGetCallTrace function, to be dlsym'd.
@@ -51,12 +56,14 @@ class Asgct {
 
  private:
   static ASGCTType asgct_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(Asgct);
 };
 
 class AttributeTable {
  public:
+  // This type is neither copyable nor movable.
+  AttributeTable(const AttributeTable&) = delete;
+  AttributeTable& operator=(const AttributeTable&) = delete;
+
   static void Init() {
     mutex_ = new (std::mutex);
     string_map_ = new (std::unordered_map<std::string, int>);
@@ -93,8 +100,6 @@ class AttributeTable {
   static std::mutex *mutex_;
   static std::unordered_map<std::string, int> *string_map_;
   static std::vector<std::string> *strings_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(AttributeTable);
 };
 
 // Multiset of stack traces. There is a maximum number of distinct
@@ -133,10 +138,10 @@ class AsyncSafeTraceMultiset {
   // there is no valid trace at this location.  This operation is
   // thread safe with respect to Add() but only a single call to
   // Extract can be done at a time.
-  int Extract(int location, int64 *attr, int max_frames,
-              JVMPI_CallFrame *frames, int64 *count);
+  int Extract(int location, int64_t *attr, int max_frames,
+              JVMPI_CallFrame *frames, int64_t *count);
 
-  int64 MaxEntries() const { return kMaxStackTraces; }
+  int64_t MaxEntries() const { return kMaxStackTraces; }
 
  private:
   struct TraceData {
@@ -151,7 +156,7 @@ class AsyncSafeTraceMultiset {
     // Number of times a trace has been encountered.
     // 0 indicates that the trace is unused
     // <0 values are reserved, used for concurrency control.
-    std::atomic<int64> count;
+    std::atomic<int64_t> count;
     // Number of active attempts to increase the counter on the trace.
     std::atomic<int> active_updates;
   };
@@ -162,7 +167,7 @@ class AsyncSafeTraceMultiset {
   static const int kMaxStackTraces = 2048;
 
   // Sentinel to use as trace count while the frames are being updated.
-  static const int64 kTraceCountLocked = -1;
+  static const int64_t kTraceCountLocked = -1;
 
   TraceData traces_[kMaxStackTraces];
   DISALLOW_COPY_AND_ASSIGN(AsyncSafeTraceMultiset);
@@ -177,7 +182,7 @@ class TraceMultiset {
  private:
   typedef struct {
     std::vector<JVMPI_CallFrame> frames;
-    int64 attr;
+    int64_t attr;
   } CallTrace;
 
   struct CallTraceHash {
@@ -199,7 +204,7 @@ class TraceMultiset {
     }
   };
 
-  typedef std::unordered_map<CallTrace, uint64, CallTraceHash, CallTraceEqual>
+  typedef std::unordered_map<CallTrace, uint64_t, CallTraceHash, CallTraceEqual>
       CountMap;
 
  public:
@@ -207,8 +212,8 @@ class TraceMultiset {
 
   // Add a trace to the array. If it is already in the array,
   // increment its count.
-  void Add(int64 attr, int num_frames, JVMPI_CallFrame *frames,
-           int64 count);
+  void Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
+           int64_t count);
 
   typedef CountMap::iterator iterator;
   typedef CountMap::const_iterator const_iterator;

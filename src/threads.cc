@@ -19,6 +19,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <mutex>
+#include <vector>
+
 namespace cloud {
 namespace profiler {
 

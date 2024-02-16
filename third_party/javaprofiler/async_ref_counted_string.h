@@ -18,6 +18,7 @@
 #define THIRD_PARTY_JAVAPROFILER_ASYNC_REF_COUNTED_STRING_H_
 
 #include <atomic>
+#include <cstdint>
 
 #include "third_party/javaprofiler/globals.h"
 
@@ -86,7 +87,7 @@ class AsyncRefCountedString {
 
   // Returns the hash value. As a specific string only has one internal copy,
   // the stored string address is directly used as the hash value.
-  uint64 Hash() const { return reinterpret_cast<uintptr_t>(Get()); }
+  uint64_t Hash() const { return reinterpret_cast<uintptr_t>(Get()); }
 
   // Initializes the internal string storage. Must be called before using
   // AsyncRefCountedString to store any string. Should only be called once,

@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_THROTTLER_H_
 
 #include <memory>
+#include <string>
 
 namespace cloud {
 namespace profiler {

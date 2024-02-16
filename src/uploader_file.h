@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_UPLOADER_FILE_H_
 
 #include <cstdio>
+#include <string>
 
 #include "src/uploader.h"
 
@@ -27,6 +28,10 @@ namespace profiler {
 class FileUploader : public cloud::profiler::ProfileUploader {
  public:
   explicit FileUploader(const std::string &prefix) : prefix_(prefix) {}
+
+  // This type is neither copyable nor movable.
+  FileUploader(const FileUploader &) = delete;
+  FileUploader &operator=(const FileUploader &) = delete;
 
   bool Upload(const std::string &profile_type,
               const std::string &profile) override {
@@ -53,7 +58,6 @@ class FileUploader : public cloud::profiler::ProfileUploader {
 
  private:
   std::string prefix_;
-  DISALLOW_COPY_AND_ASSIGN(FileUploader);
 };
 
 }  // namespace profiler

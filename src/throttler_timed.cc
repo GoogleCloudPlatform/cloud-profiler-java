@@ -15,6 +15,10 @@
 #include "src/throttler_timed.h"
 
 #include <algorithm>
+#include <memory>
+#include <random>
+#include <string>
+#include <utility>
 
 #include "src/uploader_file.h"
 #include "src/uploader_gcs.h"

@@ -29,13 +29,11 @@
 using std::hash;
 using std::string;
 
+#ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName &);              \
   void operator=(const TypeName &)
-
-#define DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
-  TypeName();                                    \
-  DISALLOW_COPY_AND_ASSIGN(TypeName)
+#endif
 
 // Short version: reinterpret_cast produces undefined behavior in many
 // cases where memcpy doesn't.
@@ -59,6 +57,10 @@ class JvmtiScopedPtr {
  public:
   explicit JvmtiScopedPtr(jvmtiEnv *jvmti) : jvmti_(jvmti), ref_(NULL) {}
 
+  // This type is neither copyable nor movable.
+  JvmtiScopedPtr(const JvmtiScopedPtr&) = delete;
+  JvmtiScopedPtr& operator=(const JvmtiScopedPtr&) = delete;
+
   JvmtiScopedPtr(jvmtiEnv *jvmti, T *ref) : jvmti_(jvmti), ref_(ref) {}
 
   ~JvmtiScopedPtr() {
@@ -77,14 +79,16 @@ class JvmtiScopedPtr {
  private:
   jvmtiEnv *jvmti_;
   T *ref_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(JvmtiScopedPtr);
 };
 
 template <class T>
 class ScopedLocalRef {
  public:
   ScopedLocalRef(JNIEnv *jni, T ref) : jni_(jni), ref_(ref) {}
+
+  // This type is neither copyable nor movable.
+  ScopedLocalRef(const ScopedLocalRef&) = delete;
+  ScopedLocalRef& operator=(const ScopedLocalRef&) = delete;
 
   ~ScopedLocalRef() {
     if (NULL != ref_) {
@@ -97,8 +101,6 @@ class ScopedLocalRef {
  private:
   JNIEnv *jni_;
   T ref_;
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(ScopedLocalRef);
 };
 
 }  // namespace javaprofiler

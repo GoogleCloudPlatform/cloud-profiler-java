@@ -21,6 +21,7 @@
 
 #include <mutex>  // NOLINT(build/c++11)
 #include <utility>
+#include <vector>
 
 #include "src/globals.h"
 
@@ -36,6 +37,10 @@ class ThreadTable {
  public:
   explicit ThreadTable(bool use_timers)
       : use_timers_(use_timers), period_usec_() {}
+
+  // This type is neither copyable nor movable.
+  ThreadTable(const ThreadTable&) = delete;
+  ThreadTable& operator=(const ThreadTable&) = delete;
 
   // Registers the current thread.
   void RegisterCurrent();
@@ -61,8 +66,6 @@ class ThreadTable {
   bool use_timers_;
   // Non-zero when the thread timers have been started.
   int64_t period_usec_;
-
-  DISALLOW_COPY_AND_ASSIGN(ThreadTable);
 };
 
 // Returns the thread ID of the current thread.

@@ -20,11 +20,22 @@ FROM ubuntu:xenial
 #
 # Dependencies
 #
+# Install JDK 11 as sampling heap profiler depends on the new JVMTI APIs
+# Install Kitware apt repository. This repository contains newer version of
+# CMake. CMake > 3.13 is required to use "module" mode for gRPC dependencies.
+# See https://github.com/grpc/grpc/blob/master/BUILDING.md#install-after-build.
+# Kitware installs CMake v3.20.5
 
-# Install JDK 11 as sampling heap profiler depends on the new JVMTI APIs.
-RUN apt-get update && apt-get install -y software-properties-common
-RUN add-apt-repository -y ppa:openjdk-r/ppa
-RUN apt-get update
+RUN apt-get update && apt-get install -y software-properties-common apt-transport-https ca-certificates gnupg wget && \
+    add-apt-repository -y ppa:openjdk-r/ppa && \
+    test -f /usr/share/doc/kitware-archive-keyring/copyright || \
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
+    | gpg --dearmor - \
+    | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null && \
+    echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ xenial main' \
+    | tee /etc/apt/sources.list.d/kitware.list >/dev/null && \
+    apt-get update && \
+    apt-get install kitware-archive-keyring
 
 # Installing openjdk-11-jdk-headless can be very slow due to repo download
 # speed.
@@ -41,6 +52,7 @@ RUN apt-get update && apt-get -y -q install \
   libtool \
   make \
   openjdk-11-jdk-headless \
+  pkg-config \
   unzip \
   zlib1g-dev
 
@@ -81,7 +93,7 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/glog
 
-# gRPC & protobuf
+# gRPC & protobuf - build using CMake
 # Use the protobuf version from gRPC for everything to avoid conflicting
 # versions to be linked in. Disable OpenSSL embedding: when it's on, the build
 # process of gRPC puts the OpenSSL static object files into the gRPC archive
@@ -89,13 +101,39 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # OpenSSL library itself.
 # Limit the number of threads used by make, as unlimited threads causes
 # memory exhausted error on the Kokoro VM.
-RUN git clone --depth=1 --recursive -b v1.28.1 https://github.com/grpc/grpc.git /tmp/grpc && \
-    cd /tmp/grpc && \
-    cd third_party/protobuf && \
-    ./autogen.sh && \
-    ./configure --with-pic CXXFLAGS="$(pkg-config --cflags protobuf)" LIBS="$(pkg-config --libs protobuf)" LDFLAGS="-Wl,--no-as-needed" && \
-    make -j4 && make install && ldconfig && \
-    cd ../.. && \
-    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make -j4 CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 && \
-    CPPFLAGS="-I /usr/local/ssl/include" LDFLAGS="-L /usr/local/ssl/lib/ -Wl,--no-as-needed" make CONFIG=opt EMBED_OPENSSL=false V=1 HAS_SYSTEM_OPENSSL_NPN=0 install && \
-    rm -rf /tmp/grpc
+# -DCMAKE_CXX_STANDARD=11 is necessary since it is the minimum version supported
+# by gRPC dependencies. Xenial sets default version to c++98.
+#
+# See https://github.com/grpc/grpc/blob/v1.36.4/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
+RUN git clone --depth=1 --recursive -b v1.36.4 https://github.com/grpc/grpc.git /tmp/grpc && \
+    cd /tmp/grpc/ && \
+    # Install protobuf
+    mkdir -p third_party/protobuf/cmake/build && \
+    (cd third_party/protobuf/cmake/build && \
+    cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_CXX_STANDARD=11 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j4 install) && \
+    # Install finish - protobuf
+    # Install gRPC
+    mkdir -p cmake/build && \
+    (cd cmake/build && \
+    cmake \
+        -DOPENSSL_ROOT_DIR=/usr/local/ssl            \
+        -DOPENSSL_INCLUDE_DIR=/usr/local/ssl/include \
+        -DOPENSSL_CRYPTO_LIB=/usr/local/ssl/lib      \
+        -DCMAKE_BUILD_TYPE=Release                   \
+        -DCMAKE_CXX_STANDARD=11                      \
+        -DCMAKE_INSTALL_PREFIX=/usr/local/grpc       \
+        -DgRPC_INSTALL=ON                            \
+        -DgRPC_BUILD_TESTS=OFF                       \
+        -DgRPC_ABSL_PROVIDER=module                  \
+        -DgRPC_CARES_PROVIDER=module                 \
+        -DgRPC_RE2_PROVIDER=module                   \
+        -DgRPC_ZLIB_PROVIDER=module                  \
+        -DgRPC_PROTOBUF_PROVIDER=package             \
+        -DgRPC_SSL_PROVIDER=package                  \
+        ../.. && \
+    make -j4 install) && \
+    cd ~ && rm -rf /tmp/grpc
+
+ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+ENV PATH="${PATH}:/usr/local/grpc/bin"

@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "src/clock.h"
 #include "src/http.h"

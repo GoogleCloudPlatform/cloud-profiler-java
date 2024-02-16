@@ -25,8 +25,8 @@
 namespace google {
 namespace javaprofiler {
 
-constexpr int64 kNanosPerSecond = 1000 * 1000 * 1000;
-constexpr int64 kNanosPerMilli = 1000 * 1000;
+constexpr int64_t kNanosPerSecond = 1000 * 1000 * 1000;
+constexpr int64_t kNanosPerMilli = 1000 * 1000;
 
 inline struct timespec TimeAdd(const struct timespec t1,
                                const struct timespec t2) {
@@ -43,13 +43,13 @@ inline bool TimeLessThan(const struct timespec &t1, const struct timespec &t2) {
          (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec);
 }
 
-inline struct timespec NanosToTimeSpec(int64 nanos) {
+inline struct timespec NanosToTimeSpec(int64_t nanos) {
   time_t seconds = nanos / kNanosPerSecond;
   int32_t nano_seconds = nanos % kNanosPerSecond;
   return timespec{seconds, nano_seconds};
 }
 
-inline int64 TimeSpecToNanos(const struct timespec &ts) {
+inline int64_t TimeSpecToNanos(const struct timespec &ts) {
   return kNanosPerSecond * ts.tv_sec + ts.tv_nsec;
 }
 

@@ -18,6 +18,7 @@
 #define CLOUD_PROFILER_AGENT_JAVA_WORKER_H_
 
 #include <atomic>
+#include <memory>
 #include <mutex>  // NOLINT
 
 #include "src/globals.h"
@@ -31,6 +32,10 @@ class Worker {
  public:
   Worker(jvmtiEnv *jvmti, ThreadTable *threads)
       : jvmti_(jvmti), threads_(threads), stopping_() {}
+
+  // This type is neither copyable nor movable.
+  Worker(const Worker &) = delete;
+  Worker &operator=(const Worker &) = delete;
 
   void Start(JNIEnv *jni);
   void Stop();
@@ -47,7 +52,6 @@ class Worker {
   std::mutex mutex_;  // Held by the worker thread while it's running.
   std::atomic<bool> stopping_;
   static std::atomic<bool> enabled_;
-  DISALLOW_COPY_AND_ASSIGN(Worker);
 };
 
 }  // namespace profiler

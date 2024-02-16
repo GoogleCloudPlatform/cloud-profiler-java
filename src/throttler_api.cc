@@ -22,7 +22,14 @@
 
 #include <algorithm>
 #include <chrono>  // NOLINT
+#include <map>
+#include <memory>
+#include <mutex>
+#include <random>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "src/clock.h"
 #include "src/cloud_env.h"

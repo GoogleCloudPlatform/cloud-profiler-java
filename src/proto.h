@@ -17,6 +17,8 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_PROTO_H_
 #define CLOUD_PROFILER_AGENT_JAVA_PROTO_H_
 
+#include <string>
+
 #include "src/profiler.h"
 #include "perftools/profiles/proto/builder.h"
 

@@ -17,6 +17,8 @@
 #ifndef THIRD_PARTY_JAVAPROFILER_ACCESSORS_H_
 #define THIRD_PARTY_JAVAPROFILER_ACCESSORS_H_
 
+#include <cstdint>
+
 #include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/tags.h"
 
@@ -29,8 +31,8 @@ class Accessors {
   static void SetCurrentJniEnv(JNIEnv *env) { env_ = env; }
   static JNIEnv *CurrentJniEnv() { return env_; }
 
-  static void SetAttribute(int64 value) { attr_ = value; }
-  static int64 GetAttribute() { return attr_; }
+  static void SetAttribute(int64_t value) { attr_ = value; }
+  static int64_t GetAttribute() { return attr_; }
 
   // Allocates the current thread's tags storage which can be later retrieved by
   // GetTags(). If the tags storage is already allocated, asserts an error.
@@ -102,11 +104,11 @@ class Accessors {
   // https://wiki.musl-libc.org/design-concepts.html#Thread-local-storage.
 #if defined(JAVAPROFILER_GLOBAL_DYNAMIC_TLS) || defined(ALPINE)
   static __thread JNIEnv *env_ __attribute__((tls_model("global-dynamic")));
-  static __thread int64 attr_ __attribute__((tls_model("global-dynamic")));
+  static __thread int64_t attr_ __attribute__((tls_model("global-dynamic")));
   static __thread Tags *tags_ __attribute__((tls_model("global-dynamic")));
 #else
   static __thread JNIEnv *env_ __attribute__((tls_model("initial-exec")));
-  static __thread int64 attr_ __attribute__((tls_model("initial-exec")));
+  static __thread int64_t attr_ __attribute__((tls_model("initial-exec")));
   static __thread Tags *tags_ __attribute__((tls_model("initial-exec")));
 #endif
 };

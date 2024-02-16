@@ -15,6 +15,7 @@
 #include <limits.h>
 
 #include <string>
+#include <vector>
 
 #include "src/globals.h"
 #include "src/string.h"
@@ -122,11 +123,10 @@ void JNICALL OnVMInit(jvmtiEnv *jvmti, JNIEnv *jni_env, jthread thread) {
   }
 
   if (FLAGS_cprof_enable_heap_sampling) {
-    // TODO: Allow using the JVM's stack tracer with a flag once
-    // we can get the current context in a cloud build.
-    google::javaprofiler::HeapMonitor::Enable(
-        jvmti, jni_env, FLAGS_cprof_heap_sampling_interval,
-        false /* use_jvm_trace */);
+    if (!google::javaprofiler::HeapMonitor::Enable(
+            jvmti, jni_env, FLAGS_cprof_heap_sampling_interval)) {
+      LOG(WARNING) << "Failed to start HeapMonitor.";
+    }
   }
 
   worker->Start(jni_env);

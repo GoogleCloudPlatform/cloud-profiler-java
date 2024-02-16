@@ -21,6 +21,7 @@
 #include <link.h>
 
 #include <cmath>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -35,13 +36,13 @@ namespace javaprofiler {
 // Value and unit for a numerical label.
 struct NumLabelValue {
   // Actual value of the label.
-  const int64 value;
+  const int64_t value;
 
   // Unit for the numerical label.
   const std::string unit;
 
   // Constructor with a value and unit name.
-  NumLabelValue(int64 v = 0, const std::string &u = "") : value(v), unit(u) {}
+  NumLabelValue(int64_t v = 0, const std::string &u = "") : value(v), unit(u) {}
 
   // Equality operator with another NumLabelValue.
   bool operator==(const NumLabelValue &other) const {
@@ -62,7 +63,7 @@ struct SampleLabel {
       : key(k), str_label(str), is_string_label(true) {}
 
   // Constructor for a numerical label.
-  SampleLabel(const std::string &k, int64 num, const std::string &unit = "")
+  SampleLabel(const std::string &k, int64_t num, const std::string &unit = "")
       : key(k), num_label(num, unit), is_string_label(false) {}
 
   // The label key.
@@ -99,7 +100,7 @@ struct TraceAndLabels {
   }
 
   // Adds a numeric label to the associated trace.
-  void AddLabel(const std::string &key, int64 num_value,
+  void AddLabel(const std::string &key, int64_t num_value,
                 const std::string &unit = "") {
     labels.push_back({key, num_value, unit});
   }
@@ -114,16 +115,16 @@ struct TraceAndLabels {
 // potential labels associated with this trace.
 struct ProfileStackTrace {
   // Constructor for a stack trace without any label.
-  ProfileStackTrace(const JVMPI_CallTrace *trace = nullptr, jint m_value = 0)
+  ProfileStackTrace(const JVMPI_CallTrace *trace = nullptr, int64_t m_value = 0)
       : metric_value(m_value), trace_and_labels(trace) {}
 
   // Constructor for a stack trace with labels.
-  ProfileStackTrace(const JVMPI_CallTrace *trace, jint m_value,
+  ProfileStackTrace(const JVMPI_CallTrace *trace, int64_t m_value,
                     const std::vector<SampleLabel> &labels)
       : metric_value(m_value), trace_and_labels(trace, labels) {}
 
   // Metric associated with the trace and labels.
-  jint metric_value;
+  int64_t metric_value;
 
   // Trace and labels associated with the metric collected.
   TraceAndLabels trace_and_labels;
@@ -222,8 +223,7 @@ class ProfileProtoBuilder {
   // Adds traces to the proto, where each trace has a defined count
   // of occurrences. The traces array must not be deleted
   // before calling CreateProto.
-  void AddTraces(const ProfileStackTrace *traces,
-                 const int32 *counts,
+  void AddTraces(const ProfileStackTrace *traces, const int32_t *counts,
                  int num_traces);
 
   // Adds a "fake" trace with a single frame. Used to represent JVM
@@ -242,18 +242,18 @@ class ProfileProtoBuilder {
   // GetStackTrace and remain in pure Java land frames. Other ForX methods
   // will fail an assertion when attempting a nullptr cache.
   static std::unique_ptr<ProfileProtoBuilder> ForHeap(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 sampling_rate,
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
       ProfileFrameCache *cache = nullptr);
 
   static std::unique_ptr<ProfileProtoBuilder> ForCpu(JNIEnv *jni_env,
                                                      jvmtiEnv *jvmti_env,
-                                                     int64 duration_ns,
-                                                     int64 sampling_rate,
+                                                     int64_t duration_ns,
+                                                     int64_t sampling_rate,
                                                      ProfileFrameCache *cache);
 
   static std::unique_ptr<ProfileProtoBuilder> ForContention(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64 duration_ns,
-      int64 sampling_rate, ProfileFrameCache *cache);
+      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t duration_ns,
+      int64_t sampling_rate, ProfileFrameCache *cache);
 
  protected:
   struct SampleType {
@@ -268,7 +268,7 @@ class ProfileProtoBuilder {
   // information about native frames can be provided. The proto buffer will then
   // contain "Unknown native method" frames.
   ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
-                      ProfileFrameCache *native_cache, int64 sampling_rate,
+                      ProfileFrameCache *native_cache, int64_t sampling_rate,
                       const SampleType &count_type,
                       const SampleType &metric_type);
 
@@ -288,16 +288,16 @@ class ProfileProtoBuilder {
   std::unique_ptr<perftools::profiles::Profile> CreateSampledProto();
 
   perftools::profiles::Builder builder_;
-  int64 sampling_rate_ = 0;
+  int64_t sampling_rate_ = 0;
 
  private:
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
-  void InitSampleValues(perftools::profiles::Sample *sample, int64 count,
-                        int64 metric);
-  void UpdateSampleValues(perftools::profiles::Sample *sample, int64 count,
-                          int64 size);
-  void AddTrace(const ProfileStackTrace &trace, int32 count);
+  void InitSampleValues(perftools::profiles::Sample *sample, int64_t count,
+                        int64_t metric);
+  void UpdateSampleValues(perftools::profiles::Sample *sample, int64_t count,
+                          int64_t size);
+  void AddTrace(const ProfileStackTrace &trace, int32_t count);
   void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
                    perftools::profiles::Profile *profile,
                    perftools::profiles::Sample *sample);
@@ -307,7 +307,7 @@ class ProfileProtoBuilder {
   void UnsampleMetrics();
 
   MethodInfo *Method(jmethodID id);
-  int64 Location(MethodInfo *method, const JVMPI_CallFrame &frame);
+  int64_t Location(MethodInfo *method, const JVMPI_CallFrame &frame);
 
   void AddLabels(const TraceAndLabels &trace_and_labels,
                  perftools::profiles::Sample *sample);
@@ -339,12 +339,13 @@ class ProfileProtoBuilder {
 // on a poisson process to determine which samples to collect, based
 // on the desired average collection rate R. The probability of a
 // sample of size S to appear in that profile is 1-exp(-S/R).
-double CalculateSamplingRatio(int64 rate, int64 count, int64 metric_value);
+double CalculateSamplingRatio(int64_t rate, int64_t count,
+                              int64_t metric_value);
 
 class CpuProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   CpuProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                         int64 duration_ns, int64 sampling_rate,
+                         int64_t duration_ns, int64_t sampling_rate,
                          ProfileFrameCache *cache)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
@@ -365,7 +366,7 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
 class HeapProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   HeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                          int64 sampling_rate, ProfileFrameCache *cache)
+                          int64_t sampling_rate, ProfileFrameCache *cache)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("inuse_objects", "count"),
@@ -397,7 +398,7 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
 class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                                int64 duration_nanos, int64 sampling_rate,
+                                int64_t duration_nanos, int64_t sampling_rate,
                                 ProfileFrameCache *cache)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,

@@ -17,6 +17,8 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_HTTP_H_
 #define CLOUD_PROFILER_AGENT_JAVA_HTTP_H_
 
+#include <string>
+
 #include "src/globals.h"
 
 typedef void CURL;
@@ -31,6 +33,11 @@ const int kHTTPStatusOK = 200;
 class HTTPRequest {
  public:
   HTTPRequest();
+
+  // This type is neither copyable nor movable.
+  HTTPRequest(const HTTPRequest&) = delete;
+  HTTPRequest& operator=(const HTTPRequest&) = delete;
+
   virtual ~HTTPRequest();
 
   virtual void AddAuthBearerHeader(const std::string& token);
@@ -51,7 +58,6 @@ class HTTPRequest {
 
   CURL* curl_;
   struct curl_slist* headers_;
-  DISALLOW_COPY_AND_ASSIGN(HTTPRequest);
 };
 
 }  // namespace profiler

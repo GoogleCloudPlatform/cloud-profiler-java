@@ -30,7 +30,8 @@ CFLAGS = \
 	-Wno-array-bounds \
 	-g0 \
 	-DSTANDALONE_BUILD \
-	-D_GNU_SOURCE
+	-D_GNU_SOURCE \
+	$(shell pkg-config --cflags protobuf grpc)
 
 ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
   # Building on an ARM64 machine.
@@ -50,7 +51,7 @@ endif
 SRC_ROOT_PATH=.
 
 PROTOC ?= /usr/local/bin/protoc
-PROTOC_GEN_GRPC ?= /usr/local/bin/grpc_cpp_plugin
+GRPC_CPP_PLUGIN_PATH ?= /usr/local/grpc/bin/grpc_cpp_plugin
 
 PROFILE_PROTO_PATH ?= third_party/perftools/profiles/proto
 JAVA_AGENT_PATH ?= src
@@ -82,6 +83,8 @@ PROFILER_API_SOURCES = \
 	$(GENFILES_PATH)/google/api/client.pb.cc \
 	$(GENFILES_PATH)/google/api/http.pb.cc \
 	$(GENFILES_PATH)/google/api/launch_stage.pb.cc \
+	$(GENFILES_PATH)/google/api/resource.pb.cc \
+	$(GENFILES_PATH)/google/api/field_behavior.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.grpc.pb.cc \
 	$(GENFILES_PATH)/google/devtools/cloudprofiler/v2/profiler.pb.cc \
 	$(GENFILES_PATH)/google/protobuf/duration.pb.cc \
@@ -160,7 +163,7 @@ HEADERS = \
 
 VERSION_SCRIPT = $(JAVA_AGENT_PATH)/cloud_profiler_java_agent.lds
 OPT_FLAGS = -O3
-LDFLAGS = -static-libstdc++ -shared
+LDFLAGS = -L/usr/local/lib -static-libstdc++ -shared $(shell pkg-config --libs --static protobuf grpc++)
 LDS_FLAGS = -Wl,-z,defs -Wl,--version-script=$(VERSION_SCRIPT)
 
 LIB_ROOT_PATH ?= /usr/local
@@ -175,17 +178,6 @@ LIBS1= \
   $(LIB_ROOT_PATH)/lib/libcurl.a \
   $(LIB_ROOT_PATH)/lib/libglog.a \
 	$(LIB_ROOT_PATH)/lib/libgflags.a \
-
-LIBS2= \
-	$(LIB_ROOT_PATH)/lib/libprotobuf.a \
-	$(LIB_ROOT_PATH)/ssl/lib/libssl.a \
-	$(LIB_ROOT_PATH)/ssl/lib/libcrypto.a \
-	-lz \
-
-GRPC_LIBS= \
-	$(LIB_ROOT_PATH)/lib/libgrpc++.a \
-  $(LIB_ROOT_PATH)/lib/libgrpc.a \
-  $(LIB_ROOT_PATH)/lib/libgpr.a \
 
 # Detect if running on Alpine and modify various flags
 ifeq ("$(wildcard /etc/alpine-release)","/etc/alpine-release")
@@ -212,7 +204,7 @@ clean:
 
 $(TARGET_AGENT): $(SOURCES) $(HEADERS)
 	mkdir -p $(dir $@)
-	$(CC) $(INCLUDES) $(CFLAGS) $(OPT_FLAGS) $(LDFLAGS) $(SOURCES) $(LIBS1) $(GRPC_LIBS) $(LIBS2) -o $@ $(LDS_FLAGS)
+	$(CC) $(INCLUDES) $(CFLAGS) $(OPT_FLAGS) $(SOURCES) $(LIBS1) $(LDFLAGS) -o $@ $(LDS_FLAGS)
 
 $(TARGET_NOTICES): $(JAVA_AGENT_PATH)/NOTICES
 	mkdir -p $(dir $@)
@@ -225,13 +217,21 @@ $(GENFILES_PATH)/%profiler.pb.h $(GENFILES_PATH)/%profiler.pb.cc : third_party/g
 $(GENFILES_PATH)/%profiler.grpc.pb.h $(GENFILES_PATH)/%profiler.grpc.pb.cc : third_party/googleapis/%profiler.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) \
-			--plugin=protoc-gen-grpc=$(PROTOC_GEN_GRPC) --grpc_out=services_namespace=grpc:$(GENFILES_PATH) $<
+			--plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) --grpc_out=services_namespace=grpc:$(GENFILES_PATH) $<
 
 $(GENFILES_PATH)/%annotations.pb.h $(GENFILES_PATH)/%annotations.pb.cc : third_party/googleapis/%annotations.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
 
 $(GENFILES_PATH)/%launch_stage.pb.h $(GENFILES_PATH)/%launch_stage.pb.cc : third_party/googleapis/%launch_stage.proto
+	mkdir -p $(dir $@)
+	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
+
+$(GENFILES_PATH)/%resource.pb.h $(GENFILES_PATH)/%resource.pb.cc : third_party/googleapis/%resource.proto
+	mkdir -p $(dir $@)
+	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
+
+$(GENFILES_PATH)/%field_behavior.pb.h $(GENFILES_PATH)/%field_behavior.pb.cc : third_party/googleapis/%field_behavior.proto
 	mkdir -p $(dir $@)
 	$(PROTOC) -Ithird_party/googleapis -I$(PROTOBUF_INCLUDE_PATH) --cpp_out=$(GENFILES_PATH) $<
 

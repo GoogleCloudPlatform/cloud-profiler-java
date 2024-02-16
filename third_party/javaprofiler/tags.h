@@ -16,6 +16,8 @@
 
 #ifndef THIRD_PARTY_JAVAPROFILER_TAGS_H_
 #define THIRD_PARTY_JAVAPROFILER_TAGS_H_
+
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -47,8 +49,8 @@ class Tags {
 
   // Legacy interfaces. The attribute value is stored internally indexed by a
   // special key (kAttrKey).
-  void SetAttribute(int64 value);
-  int64 GetAttribute() const;
+  void SetAttribute(int64_t value);
+  int64_t GetAttribute() const;
 
   // Async-signal-safe version of operator=(const Tags &other). It requires that
   // the instance should be empty (does not refer to any string). Otherwise, it
@@ -61,7 +63,7 @@ class Tags {
   // Async-signal-safe.
   bool operator==(const Tags &other) const;
   // Async-signal-safe.
-  uint64 Hash() const;
+  uint64_t Hash() const;
 
   // Async-signal-safe.
   static const Tags &Empty();
