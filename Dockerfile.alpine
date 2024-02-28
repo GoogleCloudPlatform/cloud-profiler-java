@@ -39,7 +39,7 @@ RUN apk --no-cache add \
   zlib-dev
 
 # Install JDK 11 as sampling heap profiler depends on the new JVMTI APIs.
- RUN apk --no-cache add openjdk11-jdk
+RUN apk --no-cache add openjdk11-jdk
 
 # openssl
 # This openssl (compiled with -fPIC) is used to statically link into the agent
@@ -88,8 +88,8 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # Limit the number of threads used by make, as unlimited threads causes
 # memory exhausted error on the Kokoro VM.
 #
-# See https://github.com/grpc/grpc/blob/v1.36.4/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
-RUN git clone --depth=1 --recursive -b v1.36.4 https://github.com/grpc/grpc.git /tmp/grpc && \
+# See https://github.com/grpc/grpc/blob/v1.46.7/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
+RUN git clone --depth=1 --recursive -b v1.46.7 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc/ && \
     # Install protobuf
     mkdir -p third_party/protobuf/cmake/build && \
@@ -117,5 +117,5 @@ RUN git clone --depth=1 --recursive -b v1.36.4 https://github.com/grpc/grpc.git 
     make -j4 install && \
     cd ~ && rm -rf /tmp/grpc
 
-ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib64/pkgconfig"
 ENV PATH="${PATH}:/usr/local/grpc/bin"

@@ -104,8 +104,8 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # -DCMAKE_CXX_STANDARD=11 is necessary since it is the minimum version supported
 # by gRPC dependencies. Xenial sets default version to c++98.
 #
-# See https://github.com/grpc/grpc/blob/v1.36.4/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
-RUN git clone --depth=1 --recursive -b v1.36.4 https://github.com/grpc/grpc.git /tmp/grpc && \
+# See https://github.com/grpc/grpc/blob/v1.46.7/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
+RUN git clone --depth=1 --recursive -b v1.46.7 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc/ && \
     # Install protobuf
     mkdir -p third_party/protobuf/cmake/build && \
