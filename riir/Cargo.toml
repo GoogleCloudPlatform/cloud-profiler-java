@@ -1,0 +1,17 @@
+[package]
+name = "cloud-profiler-java"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+bindgen = "0.69.4"
+
+[dev-dependencies]
+test-cdylib = "1.1.0"
+
+[dependencies]
+anyhow = "1.0.80"
+clap = { version = "4.5.2", features = ["derive"] }
