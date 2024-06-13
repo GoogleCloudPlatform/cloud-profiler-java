@@ -211,6 +211,31 @@ class ProfileFrameCache {
   virtual ~ProfileFrameCache() {}
 };
 
+// Caching jmethodID resolution:
+//   - This allows a one-time calculation of a given jmethodID during proto
+//     creation.
+//   - The cache reduces the number of JVMTI calls to symbolize the stacks.
+//   - jmethodIDs are never invalid per se or re-used: if ever the jmethodID's
+//     class is unloaded, the JVMTI calls will return an error code that
+//     caught by the various JVMTI calls done.
+// Though it would theoretically be possible to cache the jmethodID for the
+// lifetime of the program, this just implementation keeps the cache live
+// during this proto creation. The reason is that jmethodIDs might become
+// stale/unloaded and there would need to be extra work to determine
+// cache-size management.
+class MethodInfoCache {
+ public:
+  MethodInfoCache(JNIEnv *jni_env, jvmtiEnv *jvmti_env);
+
+  MethodInfo *Method(jmethodID id);
+
+ private:
+  JNIEnv *jni_env_;
+  jvmtiEnv *jvmti_env_;
+
+  std::unordered_map<jmethodID, std::unique_ptr<MethodInfo>> methods_;
+};
+
 // Create profile protobufs from traces obtained from JVM profiling.
 class ProfileProtoBuilder {
  public:
@@ -306,7 +331,6 @@ class ProfileProtoBuilder {
                      perftools::profiles::Sample *sample);
   void UnsampleMetrics();
 
-  MethodInfo *Method(jmethodID id);
   int64_t Location(MethodInfo *method, const JVMPI_CallFrame &frame);
 
   void AddLabels(const TraceAndLabels &trace_and_labels,
@@ -315,19 +339,7 @@ class ProfileProtoBuilder {
   JNIEnv *jni_env_;
   jvmtiEnv *jvmti_env_;
 
-  // Caching jmethodID resolution:
-  //   - This allows a one-time calculation of a given jmethodID during proto
-  //     creation.
-  //   - The cache reduces the number of JVMTI calls to symbolize the stacks.
-  //   - jmethodIDs are never invalid per se or re-used: if ever the jmethodID's
-  //     class is unloaded, the JVMTI calls will return an error code that
-  //     caught by the various JVMTI calls done.
-  // Though it would theoretically be possible to cache the jmethodID for the
-  // lifetime of the program, this just implementation keeps the cache live
-  // during this proto creation. The reason is that jmethodIDs might become
-  // stale/unloaded and there would need to be extra work to determine
-  // cache-size management.
-  std::unordered_map<jmethodID, std::unique_ptr<MethodInfo>> methods_;
+  MethodInfoCache method_info_cache_;
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;

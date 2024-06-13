@@ -16,17 +16,27 @@
 
 #include "third_party/javaprofiler/method_info.h"
 
+#include <cstdint>
+
 #include "third_party/javaprofiler/display.h"
+#include "third_party/javaprofiler/stacktrace_decls.h"
 
 namespace google {
 namespace javaprofiler {
 
-int64_t MethodInfo::Location(int line_number) {
-  auto it = locations_.find(line_number);
-  if (it == locations_.end()) {
-    return kInvalidLocationId;
+int64_t MethodInfo::LineNumber(const JVMPI_CallFrame &frame) {
+  // lineno is actually the BCI of the frame.
+  int bci = frame.lineno;
+
+  auto it = line_numbers_.find(bci);
+  if (it != line_numbers_.end()) {
+    return it->second;
   }
-  return it->second;
+
+  int line_number = GetLineNumber(jvmti_env_, frame.method_id, bci);
+
+  line_numbers_[bci] = line_number;
+  return line_number;
 }
 
 }  // namespace javaprofiler

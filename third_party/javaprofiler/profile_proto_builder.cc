@@ -16,19 +16,23 @@
 #include "third_party/javaprofiler/stacktrace_fixer.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
 
+using std::string;
 using std::unique_ptr;
 
 namespace google {
 namespace javaprofiler {
+
 namespace {
+
 // Hashes a string using an initial hash value of h.
-size_t HashString(const std::string &str, size_t h) {
-  hash<std::string> hash_string;
+size_t HashString(const string &str, size_t h) {
+  hash<string> hash_string;
   return 31U * h + hash_string(str);
 }
 
 const int kCount = 0;
 const int kMetric = 1;
+
 }  // namespace
 
 ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
@@ -39,6 +43,7 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
     : sampling_rate_(sampling_rate),
       jni_env_(jni_env),
       jvmti_env_(jvmti_env),
+      method_info_cache_(jni_env, jvmti_env),
       native_cache_(native_cache),
       location_builder_(&builder_) {
   AddSampleType(count_type);
@@ -71,7 +76,7 @@ void ProfileProtoBuilder::AddTraces(const ProfileStackTrace *traces,
   }
 }
 
-void ProfileProtoBuilder::AddArtificialTrace(const std::string &name, int count,
+void ProfileProtoBuilder::AddArtificialTrace(const string &name, int count,
                                              int sampling_rate) {
   perftools::profiles::Location *location = location_builder_.LocationFor(
       name, name, "", 0, -1, 0);
@@ -202,46 +207,35 @@ void ProfileProtoBuilder::AddJavaInfo(
     return;
   }
 
-  MethodInfo *method_info = Method(jvm_frame.method_id);
-  sample->add_location_id(Location(method_info, jvm_frame));
-}
+  MethodInfo *method_info = method_info_cache_.Method(jvm_frame.method_id);
 
-int64_t ProfileProtoBuilder::Location(MethodInfo *method,
-                                      const JVMPI_CallFrame &frame) {
-  // lineno is actually the BCI of the frame.
-  int bci = frame.lineno;
-
-  int64_t location_id = method->Location(bci);
-
-  // Non-zero as a location id is a valid location ID.
-  if (location_id != MethodInfo::kInvalidLocationId) {
-    return location_id;
-  }
-
-  int line_number = GetLineNumber(jvmti_env_, frame.method_id, bci);
+  int64_t line_number = method_info->LineNumber(jvm_frame);
 
   perftools::profiles::Location *location =
-      location_builder_.LocationFor(method->ClassName(),
-                                    method->MethodName(),
-                                    method->FileName(),
-                                    method->StartLine(),
+      location_builder_.LocationFor(method_info->ClassName(),
+                                    method_info->MethodName(),
+                                    method_info->FileName(),
+                                    method_info->StartLine(),
                                     line_number,
                                     0);
 
-  method->AddLocation(bci, location->id());
-  return location->id();
+  sample->add_location_id(location->id());
 }
 
-MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
+MethodInfoCache::MethodInfoCache(JNIEnv *jni_env, jvmtiEnv *jvmti_env)
+    : jni_env_(jni_env), jvmti_env_(jvmti_env) {
+}
+
+MethodInfo *MethodInfoCache::Method(jmethodID method_id) {
   auto it = methods_.find(method_id);
   if (it != methods_.end()) {
     return it->second.get();
   }
 
-  std::string file_name;
-  std::string class_name;
-  std::string method_name;
-  std::string signature;
+  string file_name;
+  string class_name;
+  string method_name;
+  string signature;
   int start_line = 0;
 
   // Set lineno to zero to get method first line.
@@ -250,10 +244,11 @@ MethodInfo *ProfileProtoBuilder::Method(jmethodID method_id) {
                         &class_name, &method_name, &signature, &start_line);
 
   FixMethodParameters(&signature);
-  std::string full_method_name = class_name + "." + method_name + signature;
+  string full_method_name = class_name + "." + method_name + signature;
 
-  std::unique_ptr<MethodInfo> unique_method(
-      new MethodInfo(full_method_name, class_name, file_name, start_line));
+  unique_ptr<MethodInfo> unique_method(
+      new MethodInfo(jvmti_env_, full_method_name, class_name, file_name,
+                     start_line));
 
   auto method_ptr = unique_method.get();
   methods_[method_id] = std::move(unique_method);
@@ -271,16 +266,14 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
     return;
   }
 
-  std::string function_name = native_cache_->GetFunctionName(jvm_frame);
+  string function_name = native_cache_->GetFunctionName(jvm_frame);
 
   if (SkipFrame(function_name)) {
     return;
   }
 
   perftools::profiles::Location *location =
-    native_cache_->GetLocation(jvm_frame,
-                               &location_builder_);
-
+      native_cache_->GetLocation(jvm_frame, &location_builder_);
 
   sample->add_location_id(location->id());
 }
@@ -305,7 +298,7 @@ size_t LocationBuilder::LocationInfoHash::operator()(
 
   unsigned int h = 1;
 
-  hash<std::string> hash_string;
+  hash<string> hash_string;
   hash<int> hash_int;
 
   h = 31U * h + hash_string(info.class_name);
@@ -327,8 +320,8 @@ bool LocationBuilder::LocationInfoEquals::operator()(
 }
 
 perftools::profiles::Location *LocationBuilder::LocationFor(
-    const std::string &class_name, const std::string &function_name,
-    const std::string &file_name, int start_line, int line_number,
+    const string &class_name, const string &function_name,
+    const string &file_name, int start_line, int line_number,
     int64_t address) {
   auto profile = builder_->mutable_profile();
 
@@ -361,7 +354,7 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   auto line = location->add_line();
 
-  std::string simplified_name = function_name;
+  string simplified_name = function_name;
   SimplifyFunctionName(&simplified_name);
   auto function_id =
       builder_->FunctionId(simplified_name.c_str(), function_name.c_str(),
@@ -489,31 +482,31 @@ double CalculateSamplingRatio(int64_t rate, int64_t count,
   return 1 / (1 - exp(-size / r));
 }
 
-std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
+unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
     JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
     ProfileFrameCache *cache) {
   // Cache can be nullptr because the heap sampler can be using a JVMTI
   // Java-only stackframe gatherer.
-  return std::unique_ptr<ProfileProtoBuilder>(
+  return unique_ptr<ProfileProtoBuilder>(
       new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
 }
 
-std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
+unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
     JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t duration_ns,
     int64_t sampling_rate, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "CPU profiles may have native frames, cache must be provided";
-  return std::unique_ptr<ProfileProtoBuilder>(
+  return unique_ptr<ProfileProtoBuilder>(
       new CpuProfileProtoBuilder(jni_env, jvmti_env, duration_ns,
                                  sampling_rate, cache));
 }
 
-std::unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
+unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
     JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
     int64_t duration_nanos, ProfileFrameCache *cache) {
   CHECK (cache != nullptr)
       << "Contention profiles may have native frames, cache must be provided";
-  return std::unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(
+  return unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(
       jni_env, jvmti_env, sampling_rate, duration_nanos, cache));
 }
 

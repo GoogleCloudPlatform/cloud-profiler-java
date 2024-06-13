@@ -18,10 +18,10 @@
 #define GOOGLE_JAVAPROFILER_METHOD_INFO_H_
 
 #include <cstdint>
+#include <jvmti.h>
+#include <string>
 #include <unordered_map>
 
-#include "perftools/profiles/proto/builder.h"
-#include "third_party/javaprofiler/globals.h"
 #include "third_party/javaprofiler/stacktrace_decls.h"
 
 namespace google {
@@ -34,24 +34,18 @@ namespace javaprofiler {
 class MethodInfo {
  public:
   // Constructor providing all the information regarding a method.
-  MethodInfo(const std::string &method_name, const std::string &class_name,
-             const std::string &file_name, const int &start_line)
-      : method_name_(method_name),
+  MethodInfo(jvmtiEnv *jvmti_env,
+             const std::string &method_name,
+             const std::string &class_name,
+             const std::string &file_name,
+             const int &start_line)
+      : jvmti_env_(jvmti_env),
+        method_name_(method_name),
         class_name_(class_name),
         file_name_(file_name),
         start_line_(start_line) {}
 
-  // An invalid location Id.
-  static const int64_t kInvalidLocationId = 0;
-
-  // Return the location representing info, returns kInvalidLocationId
-  // if not found.
-  int64_t Location(int line_number);
-
-  // Put a location ID assocated to a ByteCode Index (BCI).
-  void AddLocation(int bci, int64_t location_id) {
-    locations_[bci] = location_id;
-  }
+  int64_t LineNumber(const JVMPI_CallFrame &frame);
 
   const std::string &MethodName() const { return method_name_; }
 
@@ -59,16 +53,18 @@ class MethodInfo {
 
   const std::string &FileName() const { return file_name_; }
 
-  const int& StartLine() const { return start_line_; }
+  int StartLine() const { return start_line_; }
 
  private:
+  jvmtiEnv *jvmti_env_;
+
   std::string method_name_;
   std::string class_name_;
   std::string file_name_;
   int start_line_;
 
   // Cache of jlocation results.
-  std::unordered_map<int, int64_t> locations_;
+  std::unordered_map<int, int64_t> line_numbers_;
 };
 
 }  // namespace javaprofiler
