@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "perftools/profiles/proto/builder.h"
 #include "third_party/javaprofiler/method_info.h"
@@ -295,14 +296,9 @@ class ProfileProtoBuilder {
   ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
                       ProfileFrameCache *native_cache, int64_t sampling_rate,
                       const SampleType &count_type,
-                      const SampleType &metric_type);
-
-  virtual bool SkipFrame(const std::string &function_name) const {
-    return false;
-  }
-
-  // An implementation must decide how many frames to skip in a trace.
-  virtual int SkipTopNativeFrames(const JVMPI_CallTrace &trace) = 0;
+                      const SampleType &metric_type,
+                      bool skip_top_native_frames,
+                      std::vector<std::string> skip_frames);
 
   // Build the proto, unsampling the sample metrics. Calling any other method
   // on the class after calling this has undefined behavior.
@@ -316,6 +312,8 @@ class ProfileProtoBuilder {
   int64_t sampling_rate_ = 0;
 
  private:
+  bool SkipFrame(const std::string &function_name) const;
+  int SkipTopNativeFrames(const JVMPI_CallTrace &trace);
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
   void InitSampleValues(perftools::profiles::Sample *sample, int64_t count,
@@ -343,6 +341,8 @@ class ProfileProtoBuilder {
   ProfileFrameCache *native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;
+
+  bool skip_top_native_frames_;
 };
 
 // Computes the ratio to use to scale heap data to unsample it.
@@ -358,11 +358,15 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   CpuProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                          int64_t duration_ns, int64_t sampling_rate,
-                         ProfileFrameCache *cache)
+                         ProfileFrameCache *cache,
+                         bool skip_top_native_frames,
+                         std::vector<std::string> skip_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("samples", "count"),
-            ProfileProtoBuilder::SampleType("cpu", "nanoseconds")) {
+            ProfileProtoBuilder::SampleType("cpu", "nanoseconds"),
+            skip_top_native_frames,
+            skip_frames) {
     builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
@@ -370,40 +374,25 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateSampledProto();
   }
-
- protected:
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override { return 0; }
 };
 
 class HeapProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   HeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                          int64_t sampling_rate, ProfileFrameCache *cache)
+                          int64_t sampling_rate, ProfileFrameCache *cache,
+                          bool skip_top_native_frames,
+                          std::vector<std::string> skip_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("inuse_objects", "count"),
-            ProfileProtoBuilder::SampleType("inuse_space", "bytes")) {}
+            ProfileProtoBuilder::SampleType("inuse_space", "bytes"),
+            skip_top_native_frames,
+            skip_frames)
+        {
+  }
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateUnsampledProto();
-  }
-
- protected:
-  // Depending on the JDK or how we got the frames (e.g. internal JVM or
-  // JVMTI), we might have native frames on top of the Java frames
-  // (basically where the JVM internally allocated the object).
-  // Returns the first Java frame index or 0 if none were found.
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override {
-    // Skip until we see the first Java frame.
-    for (int i = 0; i < trace.num_frames; i++) {
-      if (trace.frames[i].lineno != kNativeFrameLineNum) {
-        return i;
-      }
-    }
-
-    // All are native is weird for Java heap samples but do nothing in this
-    // case.
-    return 0;
   }
 };
 
@@ -411,11 +400,15 @@ class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
   ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                                 int64_t duration_nanos, int64_t sampling_rate,
-                                ProfileFrameCache *cache)
+                                ProfileFrameCache *cache,
+                                bool skip_top_native_frames,
+                                std::vector<std::string> skip_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("contentions", "count"),
-            ProfileProtoBuilder::SampleType("delay", "microseconds")) {
+            ProfileProtoBuilder::SampleType("delay", "microseconds"),
+            skip_top_native_frames,
+            skip_frames) {
     builder_.mutable_profile()->set_duration_nanos(duration_nanos);
     builder_.mutable_profile()->set_period(sampling_rate);
     builder_.mutable_profile()->set_default_sample_type(
@@ -427,9 +420,6 @@ class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
     builder_.Finalize();
     return std::unique_ptr<perftools::profiles::Profile>(builder_.Consume());
   }
-
- protected:
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace) override { return 0; }
 
  private:
   // Multiply the (count, metric) values by the sampling_rate.

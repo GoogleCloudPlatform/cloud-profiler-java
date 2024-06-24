@@ -18,6 +18,7 @@
 
 using std::string;
 using std::unique_ptr;
+using std::vector;
 
 namespace google {
 namespace javaprofiler {
@@ -39,13 +40,17 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                                          ProfileFrameCache *native_cache,
                                          int64_t sampling_rate,
                                          const SampleType &count_type,
-                                         const SampleType &metric_type)
+                                         const SampleType &metric_type,
+                                         bool skip_top_native_frames,
+                                         vector<string> skip_frames)
     : sampling_rate_(sampling_rate),
       jni_env_(jni_env),
       jvmti_env_(jvmti_env),
       method_info_cache_(jni_env, jvmti_env),
       native_cache_(native_cache),
-      location_builder_(&builder_) {
+      location_builder_(&builder_),
+      skip_top_native_frames_(skip_top_native_frames)
+      {
   AddSampleType(count_type);
   AddSampleType(metric_type);
   builder_.mutable_profile()->set_default_sample_type(
@@ -101,6 +106,29 @@ void ProfileProtoBuilder::UnsampleMetrics() {
     sample->set_value(kCount, static_cast<double>(count) * ratio);
     sample->set_value(kMetric, static_cast<double>(metric_value) * ratio);
   }
+}
+
+bool ProfileProtoBuilder::SkipFrame(
+    const string &function_name) const {
+  bool result = false;
+  return result;
+}
+
+int ProfileProtoBuilder::SkipTopNativeFrames(const JVMPI_CallTrace &trace) {
+  if (!skip_top_native_frames_) {
+    return 0;
+  }
+
+  // Skip until we see the first Java frame.
+  for (int i = 0; i < trace.num_frames; i++) {
+    if (trace.frames[i].lineno != kNativeFrameLineNum) {
+      return i;
+    }
+  }
+
+  // All are native is weird for Java heap samples but do nothing in this
+  // case.
+  return 0;
 }
 
 unique_ptr<perftools::profiles::Profile>
@@ -488,7 +516,8 @@ unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForHeap(
   // Cache can be nullptr because the heap sampler can be using a JVMTI
   // Java-only stackframe gatherer.
   return unique_ptr<ProfileProtoBuilder>(
-      new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache));
+      new HeapProfileProtoBuilder(jni_env, jvmti_env, sampling_rate, cache,
+                                  true, {}));
 }
 
 unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
@@ -498,7 +527,7 @@ unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForCpu(
       << "CPU profiles may have native frames, cache must be provided";
   return unique_ptr<ProfileProtoBuilder>(
       new CpuProfileProtoBuilder(jni_env, jvmti_env, duration_ns,
-                                 sampling_rate, cache));
+                                 sampling_rate, cache, false, {}));
 }
 
 unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
@@ -507,7 +536,7 @@ unique_ptr<ProfileProtoBuilder> ProfileProtoBuilder::ForContention(
   CHECK (cache != nullptr)
       << "Contention profiles may have native frames, cache must be provided";
   return unique_ptr<ProfileProtoBuilder>(new ContentionProfileProtoBuilder(
-      jni_env, jvmti_env, sampling_rate, duration_nanos, cache));
+      jni_env, jvmti_env, sampling_rate, duration_nanos, cache, false, {}));
 }
 
 }  // namespace javaprofiler
