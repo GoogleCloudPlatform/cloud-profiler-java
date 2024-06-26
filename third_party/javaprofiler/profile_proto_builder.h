@@ -157,6 +157,11 @@ class TraceSamples {
       traces_;
 };
 
+enum class NativeSymbolization {
+  SYMBOLS,
+  NO_SYMBOLS
+};
+
 // Store locations previously seen so that the profile is only
 // modified for new locations.
 class LocationBuilder {

@@ -289,7 +289,7 @@ void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
   if (!native_cache_) {
     int64_t address = reinterpret_cast<int64_t>(jvm_frame.method_id);
     perftools::profiles::Location *location = location_builder_.LocationFor(
-        "", "[Unknown non-Java frame]", "", 0, 0, address);
+        "", "[Unknown non-Java frame]", "", 0, kNativeFrameLineNum, address);
     sample->add_location_id(location->id());
     return;
   }
@@ -380,16 +380,20 @@ perftools::profiles::Location *LocationBuilder::LocationFor(
 
   locations_[info] = location;
 
-  auto line = location->add_line();
+  // If this is a native frame with no symbolization, we don't want to add a
+  // line number to the profile.
+  if (line_number != kNativeFrameLineNum) {
+    auto line = location->add_line();
 
-  string simplified_name = function_name;
-  SimplifyFunctionName(&simplified_name);
-  auto function_id =
-      builder_->FunctionId(simplified_name.c_str(), function_name.c_str(),
-                           file_name.c_str(), start_line);
+    string simplified_name = function_name;
+    SimplifyFunctionName(&simplified_name);
+    auto function_id =
+        builder_->FunctionId(simplified_name.c_str(), function_name.c_str(),
+                            file_name.c_str(), start_line);
 
-  line->set_function_id(function_id);
-  line->set_line(line_number);
+    line->set_function_id(function_id);
+    line->set_line(line_number);
+  }
 
   return location;
 }
