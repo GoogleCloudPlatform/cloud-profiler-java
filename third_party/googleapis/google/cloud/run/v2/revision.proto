@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import "google/api/resource.proto";
 import "google/api/routing.proto";
 import "google/cloud/run/v2/condition.proto";
 import "google/cloud/run/v2/k8s.min.proto";
+import "google/cloud/run/v2/status.proto";
 import "google/cloud/run/v2/vendor_settings.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/duration.proto";
@@ -54,7 +55,8 @@ service Revisions {
     option (google.api.method_signature) = "name";
   }
 
-  // Lists Revisions from a given Service, or from a given location.
+  // Lists Revisions from a given Service, or from a given location.  Results
+  // are sorted by creation time, descending.
   rpc ListRevisions(ListRevisionsRequest) returns (ListRevisionsResponse) {
     option (google.api.http) = {
       get: "/v2/{parent=projects/*/locations/*/services/*}/revisions"
@@ -292,6 +294,10 @@ message Revision {
 
   // Enable session affinity.
   bool session_affinity = 38;
+
+  // Output only. The current effective scaling settings for the revision.
+  RevisionScalingStatus scaling_status = 39
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. A system-generated fingerprint for this version of the
   // resource. May be used to detect modification conflict during updates.

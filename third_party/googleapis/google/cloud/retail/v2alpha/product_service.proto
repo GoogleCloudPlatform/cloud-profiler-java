@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -196,10 +196,11 @@ service ProductService {
     };
   }
 
-  // It is recommended to use the
+  // We recommend that you use the
   // [ProductService.AddLocalInventories][google.cloud.retail.v2alpha.ProductService.AddLocalInventories]
-  // method instead of
-  // [ProductService.AddFulfillmentPlaces][google.cloud.retail.v2alpha.ProductService.AddFulfillmentPlaces].
+  // method instead of the
+  // [ProductService.AddFulfillmentPlaces][google.cloud.retail.v2alpha.ProductService.AddFulfillmentPlaces]
+  // method.
   // [ProductService.AddLocalInventories][google.cloud.retail.v2alpha.ProductService.AddLocalInventories]
   // achieves the same results but provides more fine-grained control over
   // ingesting local inventory data.
@@ -238,10 +239,11 @@ service ProductService {
     };
   }
 
-  // It is recommended to use the
+  // We recommend that you use the
   // [ProductService.RemoveLocalInventories][google.cloud.retail.v2alpha.ProductService.RemoveLocalInventories]
-  // method instead of
-  // [ProductService.RemoveFulfillmentPlaces][google.cloud.retail.v2alpha.ProductService.RemoveFulfillmentPlaces].
+  // method instead of the
+  // [ProductService.RemoveFulfillmentPlaces][google.cloud.retail.v2alpha.ProductService.RemoveFulfillmentPlaces]
+  // method.
   // [ProductService.RemoveLocalInventories][google.cloud.retail.v2alpha.ProductService.RemoveLocalInventories]
   // achieves the same results but provides more fine-grained control over
   // ingesting local inventory data.

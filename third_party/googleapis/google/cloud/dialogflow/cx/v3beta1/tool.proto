@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -454,12 +454,6 @@ message Tool {
 
   // Required. High level description of the Tool and its usage.
   string description = 3 [(google.api.field_behavior) = REQUIRED];
-
-  // The list of derived action names for the tool.
-  repeated string actions = 6 [deprecated = true];
-
-  // The list of derived type schemas for the tool.
-  repeated string schemas = 7 [deprecated = true];
 
   // Specification of the Tool.
   oneof specification {

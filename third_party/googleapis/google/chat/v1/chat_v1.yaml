@@ -21,6 +21,7 @@ authentication:
   - selector: google.chat.v1.ChatService.CreateMembership
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.memberships,
         https://www.googleapis.com/auth/chat.import,
         https://www.googleapis.com/auth/chat.memberships,
         https://www.googleapis.com/auth/chat.memberships.app
@@ -47,6 +48,7 @@ authentication:
   - selector: google.chat.v1.ChatService.DeleteMembership
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.memberships,
         https://www.googleapis.com/auth/chat.import,
         https://www.googleapis.com/auth/chat.memberships,
         https://www.googleapis.com/auth/chat.memberships.app
@@ -65,6 +67,7 @@ authentication:
   - selector: google.chat.v1.ChatService.DeleteSpace
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.delete,
         https://www.googleapis.com/auth/chat.delete,
         https://www.googleapis.com/auth/chat.import
   - selector: google.chat.v1.ChatService.FindDirectMessage
@@ -80,6 +83,8 @@ authentication:
   - selector: google.chat.v1.ChatService.GetMembership
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.memberships,
+        https://www.googleapis.com/auth/chat.admin.memberships.readonly,
         https://www.googleapis.com/auth/chat.bot,
         https://www.googleapis.com/auth/chat.memberships,
         https://www.googleapis.com/auth/chat.memberships.readonly
@@ -92,12 +97,37 @@ authentication:
   - selector: google.chat.v1.ChatService.GetSpace
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.spaces,
+        https://www.googleapis.com/auth/chat.admin.spaces.readonly,
         https://www.googleapis.com/auth/chat.bot,
         https://www.googleapis.com/auth/chat.spaces,
         https://www.googleapis.com/auth/chat.spaces.readonly
+  - selector: google.chat.v1.ChatService.GetSpaceEvent
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.memberships,
+        https://www.googleapis.com/auth/chat.memberships.readonly,
+        https://www.googleapis.com/auth/chat.messages,
+        https://www.googleapis.com/auth/chat.messages.reactions,
+        https://www.googleapis.com/auth/chat.messages.reactions.readonly,
+        https://www.googleapis.com/auth/chat.messages.readonly,
+        https://www.googleapis.com/auth/chat.spaces,
+        https://www.googleapis.com/auth/chat.spaces.readonly
+  - selector: google.chat.v1.ChatService.GetSpaceReadState
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.users.readstate,
+        https://www.googleapis.com/auth/chat.users.readstate.readonly
+  - selector: google.chat.v1.ChatService.GetThreadReadState
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.users.readstate,
+        https://www.googleapis.com/auth/chat.users.readstate.readonly
   - selector: google.chat.v1.ChatService.ListMemberships
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.memberships,
+        https://www.googleapis.com/auth/chat.admin.memberships.readonly,
         https://www.googleapis.com/auth/chat.bot,
         https://www.googleapis.com/auth/chat.import,
         https://www.googleapis.com/auth/chat.memberships,
@@ -115,6 +145,17 @@ authentication:
         https://www.googleapis.com/auth/chat.messages.reactions,
         https://www.googleapis.com/auth/chat.messages.reactions.readonly,
         https://www.googleapis.com/auth/chat.messages.readonly
+  - selector: google.chat.v1.ChatService.ListSpaceEvents
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.memberships,
+        https://www.googleapis.com/auth/chat.memberships.readonly,
+        https://www.googleapis.com/auth/chat.messages,
+        https://www.googleapis.com/auth/chat.messages.reactions,
+        https://www.googleapis.com/auth/chat.messages.reactions.readonly,
+        https://www.googleapis.com/auth/chat.messages.readonly,
+        https://www.googleapis.com/auth/chat.spaces,
+        https://www.googleapis.com/auth/chat.spaces.readonly
   - selector: google.chat.v1.ChatService.ListSpaces
     oauth:
       canonical_scopes: |-
@@ -126,6 +167,12 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/chat.spaces,
         https://www.googleapis.com/auth/chat.spaces.create
+  - selector: google.chat.v1.ChatService.UpdateMembership
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.memberships,
+        https://www.googleapis.com/auth/chat.import,
+        https://www.googleapis.com/auth/chat.memberships
   - selector: google.chat.v1.ChatService.UpdateMessage
     oauth:
       canonical_scopes: |-
@@ -135,8 +182,13 @@ authentication:
   - selector: google.chat.v1.ChatService.UpdateSpace
     oauth:
       canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.admin.spaces,
         https://www.googleapis.com/auth/chat.import,
         https://www.googleapis.com/auth/chat.spaces
+  - selector: google.chat.v1.ChatService.UpdateSpaceReadState
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/chat.users.readstate
   - selector: google.chat.v1.ChatService.UploadAttachment
     oauth:
       canonical_scopes: |-
