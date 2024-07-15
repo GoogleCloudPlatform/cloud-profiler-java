@@ -9,34 +9,49 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
+# buildifier: disable=load-on-top
+
 # This is an API workspace, having public visibility by default makes perfect sense.
 package(default_visibility = ["//visibility:public"])
 
 ##############################################################################
 # Common
 ##############################################################################
-load("@rules_proto//proto:defs.bzl", "proto_library")
+# buildifier: disable=same-origin-load
 load("@com_google_googleapis_imports//:imports.bzl", "proto_library_with_info")
+load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
     name = "discoveryengine_proto",
     srcs = [
+        "answer.proto",
+        "chunk.proto",
         "common.proto",
         "completion.proto",
         "completion_service.proto",
+        "control.proto",
+        "control_service.proto",
         "conversation.proto",
         "conversational_search_service.proto",
         "data_store.proto",
         "data_store_service.proto",
         "document.proto",
+        "document_processing_config.proto",
         "document_service.proto",
         "engine.proto",
         "engine_service.proto",
+        "grounded_generation_service.proto",
+        "grounding.proto",
         "import_config.proto",
+        "project.proto",
+        "project_service.proto",
         "purge_config.proto",
+        "rank_service.proto",
+        "recommendation_service.proto",
         "schema.proto",
         "schema_service.proto",
         "search_service.proto",
+        "session.proto",
         "site_search_engine.proto",
         "site_search_engine_service.proto",
         "user_event.proto",
@@ -64,12 +79,14 @@ proto_library_with_info(
     deps = [
         ":discoveryengine_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
     ],
 )
 
 ##############################################################################
 # Java
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "java_gapic_assembly_gradle_pkg",
@@ -99,11 +116,13 @@ java_gapic_library(
     service_yaml = "discoveryengine_v1.yaml",
     test_deps = [
         ":discoveryengine_java_grpc",
+        "//google/cloud/location:location_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":discoveryengine_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
     ],
 )
 
@@ -112,6 +131,8 @@ java_gapic_test(
     test_classes = [
         "com.google.cloud.discoveryengine.v1.CompletionServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1.CompletionServiceClientTest",
+        "com.google.cloud.discoveryengine.v1.ControlServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1.ControlServiceClientTest",
         "com.google.cloud.discoveryengine.v1.ConversationalSearchServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1.ConversationalSearchServiceClientTest",
         "com.google.cloud.discoveryengine.v1.DataStoreServiceClientHttpJsonTest",
@@ -120,6 +141,14 @@ java_gapic_test(
         "com.google.cloud.discoveryengine.v1.DocumentServiceClientTest",
         "com.google.cloud.discoveryengine.v1.EngineServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1.EngineServiceClientTest",
+        "com.google.cloud.discoveryengine.v1.GroundedGenerationServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1.GroundedGenerationServiceClientTest",
+        "com.google.cloud.discoveryengine.v1.ProjectServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1.ProjectServiceClientTest",
+        "com.google.cloud.discoveryengine.v1.RankServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1.RankServiceClientTest",
+        "com.google.cloud.discoveryengine.v1.RecommendationServiceClientHttpJsonTest",
+        "com.google.cloud.discoveryengine.v1.RecommendationServiceClientTest",
         "com.google.cloud.discoveryengine.v1.SchemaServiceClientHttpJsonTest",
         "com.google.cloud.discoveryengine.v1.SchemaServiceClientTest",
         "com.google.cloud.discoveryengine.v1.SearchServiceClientHttpJsonTest",
@@ -148,6 +177,7 @@ java_gapic_assembly_gradle_pkg(
 ##############################################################################
 # Go
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
@@ -182,6 +212,7 @@ go_gapic_library(
     deps = [
         ":discoveryengine_go_proto",
         "//google/api:httpbody_go_proto",
+        "//google/cloud/location:location_go_proto",
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go_longrunning//:go_default_library",
         "@com_google_cloud_go_longrunning//autogen:go_default_library",
@@ -205,6 +236,7 @@ go_gapic_assembly_pkg(
 ##############################################################################
 # Python
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "py_gapic_assembly_pkg",
@@ -219,7 +251,8 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1.yaml",
     transport = "grpc+rest",
-    deps = [],
+    deps = [
+    ],
 )
 
 py_test(
@@ -243,6 +276,7 @@ py_gapic_assembly_pkg(
 ##############################################################################
 # PHP
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
@@ -263,7 +297,9 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1.yaml",
     transport = "grpc+rest",
-    deps = [":discoveryengine_php_proto"],
+    deps = [
+        ":discoveryengine_php_proto",
+    ],
 )
 
 # Open Source Packages
@@ -278,6 +314,7 @@ php_gapic_assembly_pkg(
 ##############################################################################
 # Node.js
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "nodejs_gapic_assembly_pkg",
@@ -308,6 +345,7 @@ nodejs_gapic_assembly_pkg(
 ##############################################################################
 # Ruby
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
@@ -330,9 +368,7 @@ ruby_grpc_library(
 ruby_cloud_gapic_library(
     name = "discoveryengine_ruby_gapic",
     srcs = [":discoveryengine_proto_with_info"],
-    extra_protoc_parameters = [
-        "ruby-cloud-gem-name=google-cloud-discovery_engine-v1",
-    ],
+    extra_protoc_parameters = ["ruby-cloud-gem-name=google-cloud-discovery_engine-v1"],
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1.yaml",
@@ -356,6 +392,7 @@ ruby_gapic_assembly_pkg(
 ##############################################################################
 # C#
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "csharp_gapic_assembly_pkg",
@@ -382,6 +419,7 @@ csharp_gapic_library(
     grpc_service_config = "discoveryengine_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "discoveryengine_v1.yaml",
+    transport = "grpc+rest",
     deps = [
         ":discoveryengine_csharp_grpc",
         ":discoveryengine_csharp_proto",
@@ -401,6 +439,7 @@ csharp_gapic_assembly_pkg(
 ##############################################################################
 # C++
 ##############################################################################
+# buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "cc_grpc_library",

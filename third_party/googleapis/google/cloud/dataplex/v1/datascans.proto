@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,6 +124,23 @@ service DataScanService {
       get: "/v1/{parent=projects/*/locations/*/dataScans/*}/jobs"
     };
     option (google.api.method_signature) = "parent";
+  }
+
+  // Generates recommended data quality rules based on the results of a data
+  // profiling scan.
+  //
+  // Use the recommendations to build rules for a data quality scan.
+  rpc GenerateDataQualityRules(GenerateDataQualityRulesRequest)
+      returns (GenerateDataQualityRulesResponse) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/locations/*/dataScans/*}:generateDataQualityRules"
+      body: "*"
+      additional_bindings {
+        post: "/v1/{name=projects/*/locations/*/dataScans/*/jobs/*}:generateDataQualityRules"
+        body: "*"
+      }
+    };
+    option (google.api.method_signature) = "name";
   }
 }
 
@@ -367,6 +384,24 @@ message ListDataScanJobsResponse {
   string next_page_token = 2;
 }
 
+// Request details for generating data quality rule recommendations.
+message GenerateDataQualityRulesRequest {
+  // Required. The name must be one of the following:
+  //
+  // * The name of a data scan with at least one successful, completed data
+  // profiling job
+  // * The name of a successful, completed data profiling job (a data scan job
+  // where the job type is data profiling)
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response details for data quality rule recommendations.
+message GenerateDataQualityRulesResponse {
+  // The data quality rules that Dataplex generates based on the results
+  // of a data profiling scan.
+  repeated DataQualityRule rule = 1;
+}
+
 // Represents a user-visible job which provides the insights for the related
 // data source.
 //
@@ -412,6 +447,10 @@ message DataScan {
 
     // The time when the latest DataScanJob ended.
     google.protobuf.Timestamp latest_job_end_time = 5;
+
+    // Optional. The time when the DataScanJob execution was created.
+    google.protobuf.Timestamp latest_job_create_time = 6
+        [(google.api.field_behavior) = OPTIONAL];
   }
 
   // Output only. The relative resource name of the scan, of the form:

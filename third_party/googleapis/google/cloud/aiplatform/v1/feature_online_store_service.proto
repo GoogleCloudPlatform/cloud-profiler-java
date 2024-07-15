@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -141,6 +141,11 @@ message FetchFeatureValuesResponse {
     // Feature values in proto Struct format.
     google.protobuf.Struct proto_struct = 2;
   }
+
+  // The data key associated with this response.
+  // Will only be populated for
+  // [FeatureOnlineStoreService.StreamingFetchFeatureValues][] RPCs.
+  FeatureViewDataKey data_key = 4;
 }
 
 // A query to find a number of similar entities.
