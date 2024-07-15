@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ service SubscriptionsService {
     option (google.api.http) = {
       get: "/v1/subscriptions"
     };
-    option (google.api.method_signature) = "page_size, page_token, filter";
+    option (google.api.method_signature) = "filter";
   }
 
   // Updates or renews a Google Workspace subscription. To learn how to use this

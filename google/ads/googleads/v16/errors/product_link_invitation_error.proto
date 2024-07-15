@@ -47,5 +47,8 @@ message ProductLinkInvitationErrorEnum {
     // access to the invited account. Use the ProductLinkService to directly
     // create an active link.
     NO_INVITATION_REQUIRED = 4;
+
+    // The customer is not permitted to create the invitation.
+    CUSTOMER_NOT_PERMITTED_TO_CREATE_INVITATION = 5;
   }
 }

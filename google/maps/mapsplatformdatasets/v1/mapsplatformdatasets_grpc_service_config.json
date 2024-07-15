@@ -37,7 +37,7 @@
         },
         {
           "service": "google.maps.mapsplatformdatasets.v1.MapsPlatformDatasets",
-          "method": "ListDatasetVersions"
+          "method": "FetchDatasetErrors"
         }
       ],
       "timeout": "60s",
