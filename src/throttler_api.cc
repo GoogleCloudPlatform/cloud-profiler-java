@@ -279,6 +279,12 @@ APIThrottler::APIThrottler(
       closed_(false),
       backing_off_for_testing_(false) {
   grpc_init();
+  // Note from the gRPC team :
+  // gpr_set_log_function will work only till gRPC version 1.64. Versions after
+  // that do not support gpr_set_log_function. However since your function
+  // GRPCLog is equivalent to what gRPC is doing internally, it would be safe to
+  // delete this line and the entire GRPCLog function when you upgrade gRPC to
+  // version 1.65 or later.
   gpr_set_log_function(GRPCLog);
 
   // Create a random number generator.

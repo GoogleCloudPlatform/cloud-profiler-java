@@ -47,7 +47,7 @@ bool ParseKeyValueList(const std::string& s,
     if (k.empty()) {
       return false;
     }
-    (*out)[k] = kv.substr(pos + 1);
+    (*out)[std::move(k)] = kv.substr(pos + 1);
   }
   return true;
 }

@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "src/clock.h"
@@ -161,7 +162,7 @@ std::string CloudEnv::ProjectID(HTTPRequest* req) {
     return resp;
   }
 
-  project_id_ = resp;
+  project_id_ = std::move(resp);
   return project_id_;
 }
 
@@ -218,7 +219,7 @@ std::string CloudEnv::Oauth2AccessToken(HTTPRequest* req) {
       continue;
     }
     if (pair[0] == "access_token") {
-      return pair[1];
+      return std::move(pair[1]);
     }
   }
   LOG(ERROR) << "Could not parse access token out of '" << resp << "'";

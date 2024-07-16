@@ -18,6 +18,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "src/clock.h"
@@ -215,7 +216,7 @@ void Worker::ProfileThread(jvmtiEnv *jvmti_env, JNIEnv *jni_env, void *arg) {
       LOG(ERROR) << "No profile bytes collected, skipping the upload";
       continue;
     }
-    if (!w->throttler_->Upload(profile)) {
+    if (!w->throttler_->Upload(std::move(profile))) {
       LOG(ERROR) << "Error on profile upload, discarding the profile";
     }
   }

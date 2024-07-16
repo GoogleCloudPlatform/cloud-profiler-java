@@ -35,7 +35,7 @@ namespace {
 using google::javaprofiler::JVMPI_CallFrame;
 
 std::vector<JVMPI_CallFrame> TransformFrames(jvmtiFrameInfo *stack_frames,
-                                             int count) {
+                                             jint count) {
   std::vector<JVMPI_CallFrame> frames(count);
 
   for (int i = 0; i < count; i++) {
