@@ -16,12 +16,17 @@
 
 #include <grpc/grpc_security.h>
 #include <grpc/support/string_util.h>
+#include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
+#include <grpcpp/support/status.h>
 
 #include <algorithm>
 #include <chrono>  // NOLINT
+#include <cstddef>
+#include <cstdint>
+#include <ctime>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -36,6 +41,7 @@
 #include "src/globals.h"
 #include "src/pem_roots.h"
 #include "src/string.h"
+#include "src/throttler.h"
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "google/protobuf/duration.pb.h"  // NOLINT
 #include "google/rpc/error_details.pb.h"  // NOLINT
