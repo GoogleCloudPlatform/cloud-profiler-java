@@ -1,7 +1,7 @@
 type: google.api.Service
 config_version: 3
 name: managedkafka.googleapis.com
-title: Apache Kafka for BigQuery API
+title: Managed Service for Apache Kafka API
 
 apis:
 - name: google.cloud.location.Locations
@@ -57,7 +57,7 @@ authentication:
 
 publishing:
   new_issue_uri: https://issuetracker.google.com/issues/new?component=1376234
-  documentation_uri: https://cloud.google.com/managed-kafka
+  documentation_uri: https://cloud.google.com/managed-service-for-apache-kafka/docs
   api_short_name: managedkafka
   github_label: 'api: managedkafka'
   doc_tag_prefix: managedkafka
@@ -97,3 +97,4 @@ publishing:
       common:
         destinations:
         - PACKAGE_MANAGER
+  proto_reference_documentation_uri: https://cloud.google.com/managed-service-for-apache-kafka/docs/reference/rpc

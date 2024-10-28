@@ -205,17 +205,31 @@ message Attributes {
 
   // Custom label 4 for custom grouping of items in a Shopping campaign.
   optional string custom_label_4 = 50;
+
+  // Number and amount of installments to pay for an item.
+  HeadlineOfferInstallment headline_offer_installment = 51;
+
+  // Number of periods (months or years) and amount of payment per period
+  // for an item with an associated subscription contract.
+  HeadlineOfferSubscriptionCost headline_offer_subscription_cost = 52;
 }
 
-// The certification for the product.
+// The certification for the product. Use the this attribute to describe
+// certifications, such as energy efficiency ratings, associated with a product.
 message Certification {
-  // Name of the certification.
+  // The name of the certification. At this time, the most common value is
+  // "EPREL", which represents energy efficiency certifications in the EU
+  // European Registry for Energy Labeling (EPREL) database.
   string name = 1;
 
-  // Name of the certification body.
+  // The authority or certification body responsible for issuing the
+  // certification. At this time, the most common value is "EC" or
+  // “European_Commission” for energy labels in the EU.
   string authority = 2;
 
-  // A unique code to identify the certification.
+  // The code of the certification. For example, for the EPREL certificate with
+  // the link https://eprel.ec.europa.eu/screen/product/dishwashers2019/123456
+  // the code is 123456. The code is required for European Energy Labels.
   string code = 3;
 }
 
@@ -328,4 +342,43 @@ message CssProductStatus {
   // Date on which the item expires, in [ISO
   // 8601](http://en.wikipedia.org/wiki/ISO_8601) format.
   google.protobuf.Timestamp google_expiration_date = 7;
+}
+
+// The SubscriptionCost of the product.
+message HeadlineOfferSubscriptionCost {
+  // The type of subscription period.
+  // Supported values are:
+  //   * "`month`"
+  //   * "`year`"
+  SubscriptionPeriod period = 1;
+
+  // The number of subscription periods the buyer has to pay.
+  int64 period_length = 2;
+
+  // The amount the buyer has to pay per subscription period.
+  google.shopping.type.Price amount = 3;
+}
+
+// A message that represents installment.
+message HeadlineOfferInstallment {
+  // The number of installments the buyer has to pay.
+  int64 months = 1;
+
+  // The amount the buyer has to pay per month.
+  google.shopping.type.Price amount = 2;
+
+  // The up-front down payment amount the buyer has to pay.
+  google.shopping.type.Price downpayment = 3;
+}
+
+// The subscription period of the product.
+enum SubscriptionPeriod {
+  // Indicates that the subscription period is unspecified.
+  SUBSCRIPTION_PERIOD_UNSPECIFIED = 0;
+
+  // Indicates that the subscription period is month.
+  MONTH = 1;
+
+  // Indicates that the subscription period is year.
+  YEAR = 2;
 }
