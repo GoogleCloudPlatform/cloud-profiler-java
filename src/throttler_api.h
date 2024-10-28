@@ -17,9 +17,13 @@
 #ifndef CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 #define CLOUD_PROFILER_AGENT_JAVA_THROTTLER_API_H_
 
+#include <grpcpp/client_context.h>
+#include <grpcpp/support/status.h>
 #include <jni.h>
 
 #include <atomic>
+#include <cstdint>
+#include <ctime>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <random>

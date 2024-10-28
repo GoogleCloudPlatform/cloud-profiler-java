@@ -68,12 +68,12 @@ RUN mkdir /tmp/openssl && cd /tmp/openssl && \
     cd ~ && rm -rf /tmp/openssl
 
 # curl
-RUN git clone --depth=1 -b curl-7_69_1 https://github.com/curl/curl.git /tmp/curl && \
+RUN git clone --depth=1 -b curl-8_10_1 https://github.com/curl/curl.git /tmp/curl && \
     cd /tmp/curl && \
     ./buildconf && \
     ./configure --disable-ldap --disable-shared --without-libssh2 \
                 --without-librtmp --without-libidn --enable-static \
-                --without-libidn2 \
+                --without-libidn2 --without-libpsl \
                 --with-pic --with-ssl=/usr/local/ssl/ && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/curl

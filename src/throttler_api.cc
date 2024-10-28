@@ -16,12 +16,17 @@
 
 #include <grpc/grpc_security.h>
 #include <grpc/support/string_util.h>
+#include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
+#include <grpcpp/support/status.h>
 
 #include <algorithm>
 #include <chrono>  // NOLINT
+#include <cstddef>
+#include <cstdint>
+#include <ctime>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -36,6 +41,7 @@
 #include "src/globals.h"
 #include "src/pem_roots.h"
 #include "src/string.h"
+#include "src/throttler.h"
 #include "google/devtools/cloudprofiler/v2/profiler.grpc.pb.h"
 #include "google/protobuf/duration.pb.h"  // NOLINT
 #include "google/rpc/error_details.pb.h"  // NOLINT
@@ -76,6 +82,7 @@ const char kServiceVersionLabel[] = "version";
 // Range of random number
 const int64_t kRandomRange = 65536;
 
+#ifdef STANDALONE_BUILD
 // Routes GRPC logging through cloud profiler logger.
 // Otherwise GRPC would log to stderr.
 void GRPCLog(gpr_log_func_args* args) {
@@ -93,6 +100,7 @@ void GRPCLog(gpr_log_func_args* args) {
                  << args->message;
   }
 }
+#endif  // STANDALONE_BUILD
 
 // Overrides the default SSL roots. Otherwise gRPC calls would fail if a SSL
 // roots file can't be found neither at a location specified by
@@ -285,7 +293,9 @@ APIThrottler::APIThrottler(
   // GRPCLog is equivalent to what gRPC is doing internally, it would be safe to
   // delete this line and the entire GRPCLog function when you upgrade gRPC to
   // version 1.65 or later.
+#ifdef STANDALONE_BUILD
   gpr_set_log_function(GRPCLog);
+#endif  // STANDALONE_BUILD
 
   // Create a random number generator.
   gen_ = std::default_random_engine(clock_->Now().tv_nsec / 1000);

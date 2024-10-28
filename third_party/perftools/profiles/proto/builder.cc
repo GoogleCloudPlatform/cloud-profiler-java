@@ -71,7 +71,10 @@ int64_t Builder::StringId(const char *str) {
   if (str == nullptr || !str[0]) {
     return 0;
   }
+  return InternalStringId(str);
+}
 
+int64_t Builder::InternalStringId(const std::string &str) {
   const int64_t index = profile_->string_table_size();
   const auto inserted = strings_.emplace(str, index);
   if (!inserted.second) {
@@ -106,6 +109,22 @@ uint64_t Builder::FunctionId(const char *name, const char *system_name,
   function->set_filename(file_index);
   function->set_start_line(start_line);
   return index;
+}
+
+void Builder::SetDocURL(const std::string &url) {
+  const std::string kHttp = "http://";
+  const std::string kHttps = "https://";
+
+  if (!url.empty() && url.compare(0, kHttp.size(), kHttp) != 0 &&
+      url.compare(0, kHttps.size(), kHttps) != 0) {
+    if (error_.empty()) {
+      error_ = "setting invalid profile doc URL '";
+      error_.append(url);
+      error_.append("'");
+    }
+    return;
+  }
+  profile_->set_doc_url(InternalStringId(url));
 }
 
 bool Builder::Emit(std::string *output) {
@@ -265,6 +284,11 @@ bool Builder::CheckValid(const Profile &profile) {
 // - Creates missing locations for unsymbolized profiles.
 // - Associates locations to the corresponding mappings.
 bool Builder::Finalize() {
+  if (!error_.empty()) {
+    // We really should be returning an absl::Status instead of logging here.
+    LOG(ERROR) << error_;
+    return false;
+  }
   if (profile_->location_size() == 0) {
     IndexMap address_to_id;
     address_to_id.reserve(profile_->sample_size());
