@@ -40,7 +40,6 @@ proto_library_with_info(
     name = "admin_proto_with_info",
     deps = [
         ":admin_proto",
-        "//google/cloud:common_resources_proto",
     ],
 )
 
@@ -88,8 +87,8 @@ java_gapic_library(
 java_gapic_test(
     name = "admin_java_gapic_test_suite",
     test_classes = [
-        "com.google.marketingplatform.admin.v1alpha.MarketingplatformAdminServiceClientHttpJsonTest",
-        "com.google.marketingplatform.admin.v1alpha.MarketingplatformAdminServiceClientTest",
+        "com.google.ads.marketingplatform.admin.v1alpha.MarketingplatformAdminServiceClientHttpJsonTest",
+        "com.google.ads.marketingplatform.admin.v1alpha.MarketingplatformAdminServiceClientTest",
     ],
     runtime_deps = [":admin_java_gapic_test"],
 )
@@ -170,6 +169,11 @@ py_gapic_library(
     name = "admin_py_gapic",
     srcs = [":admin_proto"],
     grpc_service_config = "marketingplatform_admin_v1alpha_grpc_service_config.json",
+    opt_args = [
+        "python-gapic-namespace=google.ads",
+        "python-gapic-name=marketingplatform_admin",
+        "warehouse-package-name=google-ads-marketingplatform-admin",
+    ],
     rest_numeric_enums = True,
     service_yaml = "marketingplatformadmin_v1alpha.yaml",
     transport = "grpc+rest",
@@ -245,7 +249,7 @@ load(
 
 nodejs_gapic_library(
     name = "admin_nodejs_gapic",
-    package_name = "@google-cloud/admin",
+    package_name = "@google-ads/marketing-platform-admin",
     src = ":admin_proto_with_info",
     extra_protoc_parameters = ["metadata"],
     grpc_service_config = "marketingplatform_admin_v1alpha_grpc_service_config.json",
@@ -325,6 +329,7 @@ load(
 
 csharp_proto_library(
     name = "admin_csharp_proto",
+    extra_opts = [],
     deps = [":admin_proto"],
 )
 
@@ -337,7 +342,6 @@ csharp_grpc_library(
 csharp_gapic_library(
     name = "admin_csharp_gapic",
     srcs = [":admin_proto_with_info"],
-    common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
     grpc_service_config = "marketingplatform_admin_v1alpha_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "marketingplatformadmin_v1alpha.yaml",

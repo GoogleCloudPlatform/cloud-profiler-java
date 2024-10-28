@@ -121,6 +121,12 @@ message Dataset {
 
   // Required. State of the dataset. Ignored when updating dataset.
   State state = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Output only. Reserved for future use.
+  bool satisfies_pzs = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  bool satisfies_pzi = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Document Identifier.
@@ -168,6 +174,12 @@ message DatasetSchema {
 
   // Optional. Schema of the dataset.
   DocumentSchema document_schema = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Output only. Reserved for future use.
+  bool satisfies_pzs = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Reserved for future use.
+  bool satisfies_pzi = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Dataset documents that the batch operation will be applied to.

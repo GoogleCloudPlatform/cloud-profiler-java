@@ -429,7 +429,7 @@ message DocumentInfo {
 
     // The [Document][google.cloud.discoveryengine.v1.Document] resource full
     // name, of the form:
-    // `projects/{project_id}/locations/{location}/collections/{collection_id}/dataStores/{data_store_id}/branches/{branch_id}/documents/{document_id}`
+    // `projects/{project}/locations/{location}/collections/{collection_id}/dataStores/{data_store_id}/branches/{branch_id}/documents/{document_id}`
     string name = 2 [(google.api.resource_reference) = {
       type: "discoveryengine.googleapis.com/Document"
     }];
@@ -453,6 +453,10 @@ message DocumentInfo {
   // The promotion IDs associated with this Document.
   // Currently, this field is restricted to at most one ID.
   repeated string promotion_ids = 4;
+
+  // Output only. Whether the referenced Document can be found in the data
+  // store.
+  bool joined = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Detailed panel information associated with a user event.
