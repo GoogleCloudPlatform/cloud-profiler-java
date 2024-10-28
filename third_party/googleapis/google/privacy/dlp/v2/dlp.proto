@@ -47,13 +47,9 @@ option (google.api.resource_definition) = {
   pattern: "organizations/{organization}/locations/{location}"
 };
 
-// The Cloud Data Loss Prevention (DLP) API is a service that allows clients
-// to detect the presence of Personally Identifiable Information (PII) and other
-// privacy-sensitive data in user-supplied, unstructured data streams, like text
-// blocks or images.
-// The service also includes methods for sensitive data redaction and
-// scheduling of data scans on Google Cloud Platform based data sets.
-//
+// Sensitive Data Protection provides access to a powerful sensitive data
+// inspection, classification, and de-identification platform that works
+// on text, images, and Google Cloud storage repositories.
 // To learn more about concepts and find how-to guides see
 // https://cloud.google.com/sensitive-data-protection/docs/.
 service DlpService {
@@ -160,7 +156,7 @@ service DlpService {
   rpc CreateInspectTemplate(CreateInspectTemplateRequest)
       returns (InspectTemplate) {
     option (google.api.http) = {
-      post: "/v2/{parent=organizations/*}/inspectTemplates"
+      post: "/v2/{parent=projects/*/locations/*}/inspectTemplates"
       body: "*"
       additional_bindings {
         post: "/v2/{parent=organizations/*/locations/*}/inspectTemplates"
@@ -171,7 +167,7 @@ service DlpService {
         body: "*"
       }
       additional_bindings {
-        post: "/v2/{parent=projects/*/locations/*}/inspectTemplates"
+        post: "/v2/{parent=organizations/*}/inspectTemplates"
         body: "*"
       }
     };
@@ -185,7 +181,7 @@ service DlpService {
   rpc UpdateInspectTemplate(UpdateInspectTemplateRequest)
       returns (InspectTemplate) {
     option (google.api.http) = {
-      patch: "/v2/{name=organizations/*/inspectTemplates/*}"
+      patch: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
       body: "*"
       additional_bindings {
         patch: "/v2/{name=organizations/*/locations/*/inspectTemplates/*}"
@@ -196,7 +192,7 @@ service DlpService {
         body: "*"
       }
       additional_bindings {
-        patch: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
+        patch: "/v2/{name=organizations/*/inspectTemplates/*}"
         body: "*"
       }
     };
@@ -209,13 +205,13 @@ service DlpService {
   // to learn more.
   rpc GetInspectTemplate(GetInspectTemplateRequest) returns (InspectTemplate) {
     option (google.api.http) = {
-      get: "/v2/{name=organizations/*/inspectTemplates/*}"
+      get: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
       additional_bindings {
         get: "/v2/{name=organizations/*/locations/*/inspectTemplates/*}"
       }
       additional_bindings { get: "/v2/{name=projects/*/inspectTemplates/*}" }
       additional_bindings {
-        get: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
+        get: "/v2/{name=organizations/*/inspectTemplates/*}"
       }
     };
     option (google.api.method_signature) = "name";
@@ -228,13 +224,13 @@ service DlpService {
   rpc ListInspectTemplates(ListInspectTemplatesRequest)
       returns (ListInspectTemplatesResponse) {
     option (google.api.http) = {
-      get: "/v2/{parent=organizations/*}/inspectTemplates"
+      get: "/v2/{parent=projects/*/locations/*}/inspectTemplates"
       additional_bindings {
         get: "/v2/{parent=organizations/*/locations/*}/inspectTemplates"
       }
       additional_bindings { get: "/v2/{parent=projects/*}/inspectTemplates" }
       additional_bindings {
-        get: "/v2/{parent=projects/*/locations/*}/inspectTemplates"
+        get: "/v2/{parent=organizations/*}/inspectTemplates"
       }
     };
     option (google.api.method_signature) = "parent";
@@ -247,13 +243,13 @@ service DlpService {
   rpc DeleteInspectTemplate(DeleteInspectTemplateRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/v2/{name=organizations/*/inspectTemplates/*}"
+      delete: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
       additional_bindings {
         delete: "/v2/{name=organizations/*/locations/*/inspectTemplates/*}"
       }
       additional_bindings { delete: "/v2/{name=projects/*/inspectTemplates/*}" }
       additional_bindings {
-        delete: "/v2/{name=projects/*/locations/*/inspectTemplates/*}"
+        delete: "/v2/{name=organizations/*/inspectTemplates/*}"
       }
     };
     option (google.api.method_signature) = "name";
@@ -898,6 +894,10 @@ service DlpService {
     option (google.api.http) = {
       post: "/v2/{parent=projects/*/locations/*}/connections"
       body: "*"
+      additional_bindings {
+        post: "/v2/{parent=organizations/*/locations/*}/connections"
+        body: "*"
+      }
     };
     option (google.api.method_signature) = "parent, connection";
   }
@@ -906,15 +906,22 @@ service DlpService {
   rpc GetConnection(GetConnectionRequest) returns (Connection) {
     option (google.api.http) = {
       get: "/v2/{name=projects/*/locations/*/connections/*}"
+      additional_bindings {
+        get: "/v2/{name=organizations/*/locations/*/connections/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
 
-  // Lists Connections in a parent.
+  // Lists Connections in a parent. Use SearchConnections to see all connections
+  // within an organization.
   rpc ListConnections(ListConnectionsRequest)
       returns (ListConnectionsResponse) {
     option (google.api.http) = {
       get: "/v2/{parent=projects/*/locations/*}/connections"
+      additional_bindings {
+        get: "/v2/{parent=organizations/*/locations/*}/connections"
+      }
     };
     option (google.api.method_signature) = "parent";
   }
@@ -936,6 +943,9 @@ service DlpService {
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v2/{name=projects/*/locations/*/connections/*}"
+      additional_bindings {
+        delete: "/v2/{name=organizations/*/locations/*/connections/*}"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -945,6 +955,10 @@ service DlpService {
     option (google.api.http) = {
       patch: "/v2/{name=projects/*/locations/*/connections/*}"
       body: "*"
+      additional_bindings {
+        patch: "/v2/{name=organizations/*/locations/*/connections/*}"
+        body: "*"
+      }
     };
     option (google.api.method_signature) = "name";
   }
@@ -1567,9 +1581,9 @@ message RedactImageRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -1632,9 +1646,9 @@ message DeidentifyContentRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -1701,9 +1715,9 @@ message ReidentifyContentRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -1773,9 +1787,9 @@ message InspectContentRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -2258,7 +2272,7 @@ message ListInfoTypesRequest {
   //
   // The format of this value is as follows:
   //
-  //     locations/<var>LOCATION_ID</var>
+  //     `locations/{location_id}`
   string parent = 4;
 
   // BCP-47 language code for localized infoType friendly
@@ -3357,8 +3371,7 @@ message CryptoReplaceFfxFpeConfig {
     // This must be encoded as ASCII.
     // The order of characters does not matter.
     // The full list of allowed characters is:
-    // <code>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
-    // ~`!@#$%^&*()_-+={[}]|\:;"'<,>.?/</code>
+    // ``0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~`!@#$%^&*()_-+={[}]|\:;"'<,>.?/``
     string custom_alphabet = 5;
 
     // The native way to select the alphabet. Must be in the range [2, 95].
@@ -4281,13 +4294,13 @@ message CreateInspectTemplateRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   // + Organizations scope, location specified:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   // + Organizations scope, no location specified (defaults to global):
-  //   `organizations/`<var>ORG_ID</var>
+  //   `organizations/{org_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4355,13 +4368,13 @@ message ListInspectTemplatesRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   // + Organizations scope, location specified:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   // + Organizations scope, no location specified (defaults to global):
-  //   `organizations/`<var>ORG_ID</var>
+  //   `organizations/{org_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4434,9 +4447,9 @@ message CreateJobTriggerRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4507,9 +4520,9 @@ message CreateDiscoveryConfigRequest {
   // (project or organization):
   //
   // + Projects scope:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Organizations scope:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4568,7 +4581,7 @@ message ListDiscoveryConfigsRequest {
   // Required. Parent resource name.
   //
   // The format of this value is as follows:
-  // `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  // `projects/{project_id}/locations/{location_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4638,9 +4651,9 @@ message CreateDlpJobRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4683,9 +4696,9 @@ message ListJobTriggersRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -4794,6 +4807,18 @@ message InspectJobConfig {
   repeated Action actions = 4;
 }
 
+// Whether a profile being created is the first generation or an update.
+enum ProfileGeneration {
+  // Unused.
+  PROFILE_GENERATION_UNSPECIFIED = 0;
+
+  // The profile is the first profile for the resource.
+  PROFILE_GENERATION_NEW = 1;
+
+  // The profile is an update to a previous profile.
+  PROFILE_GENERATION_UPDATE = 2;
+}
+
 // A task to execute when a data profile has been generated.
 message DataProfileAction {
   // If set, the detailed data profiles will be persisted to the location
@@ -4868,6 +4893,66 @@ message DataProfileAction {
     ERROR_CHANGED = 4;
   }
 
+  // Message expressing intention to publish to Google Security Operations.
+  message PublishToChronicle {}
+
+  // If set, a summary finding will be created/updated in SCC for each profile.
+  message PublishToSecurityCommandCenter {}
+
+  // If set, attaches the [tags]
+  // (https://cloud.google.com/resource-manager/docs/tags/tags-overview)
+  // provided to profiled resources. Tags support [access
+  // control](https://cloud.google.com/iam/docs/tags-access-control). You can
+  // conditionally grant or deny access to a resource based on whether the
+  // resource has a specific tag.
+  message TagResources {
+    // The tag to attach to profiles matching the condition. At most one
+    // `TagCondition` can be specified per sensitivity level.
+    message TagCondition {
+      // The tag value to attach to resources.
+      TagValue tag = 1;
+
+      // The type of condition on which attaching the tag will be predicated.
+      oneof type {
+        // Conditions attaching the tag to a resource on its profile having this
+        // sensitivity score.
+        SensitivityScore sensitivity_score = 2;
+      }
+    }
+
+    // A value of a tag.
+    message TagValue {
+      // The format of the tag value.
+      oneof format {
+        // The namespaced name for the tag value to attach to resources. Must be
+        // in the format `{parent_id}/{tag_key_short_name}/{short_name}`, for
+        // example, "123456/environment/prod".
+        string namespaced_value = 1;
+      }
+    }
+
+    // The tags to associate with different conditions.
+    repeated TagCondition tag_conditions = 1;
+
+    // The profile generations for which the tag should be attached to
+    // resources. If you attach a tag to only new profiles, then if the
+    // sensitivity score of a profile subsequently changes, its tag doesn't
+    // change. By default, this field includes only new profiles. To include
+    // both new and updated profiles for tagging, this field should explicitly
+    // include both `PROFILE_GENERATION_NEW` and `PROFILE_GENERATION_UPDATE`.
+    repeated ProfileGeneration profile_generations_to_tag = 2;
+
+    // Whether applying a tag to a resource should lower the risk of the profile
+    // for that resource. For example, in conjunction with an [IAM deny
+    // policy](https://cloud.google.com/iam/docs/deny-overview), you can deny
+    // all principals a permission if a tag value is present, mitigating the
+    // risk of the resource. This also lowers the data risk of resources at the
+    // lower levels of the resource hierarchy. For example, reducing the data
+    // risk of a table data profile also reduces the data risk of the
+    // constituent column data profiles.
+    bool lower_data_risk_to_low = 3;
+  }
+
   // Type of action to execute when a profile is generated.
   oneof action {
     // Export data profiles into a provided location.
@@ -4875,6 +4960,18 @@ message DataProfileAction {
 
     // Publish a message into the Pub/Sub topic.
     PubSubNotification pub_sub_notification = 2;
+
+    // Publishes generated data profiles to Google Security Operations.
+    // For more information, see [Use Sensitive Data Protection data in
+    // context-aware
+    // analytics](https://cloud.google.com/chronicle/docs/detection/usecase-dlp-high-risk-user-download).
+    PublishToChronicle publish_to_chronicle = 3;
+
+    // Publishes findings to SCC for each data profile.
+    PublishToSecurityCommandCenter publish_to_scc = 4;
+
+    // Tags the profiled resources with the specified tag values.
+    TagResources tag_resources = 8;
   }
 }
 
@@ -4893,6 +4990,9 @@ message DataProfileJobConfig {
   // account that exists within this project must have access to all resources
   // that are profiled, and the Cloud DLP API must be enabled.
   string project_id = 5;
+
+  // Must be set only when scanning other clouds.
+  OtherCloudDiscoveryStartingLocation other_cloud_starting_location = 8;
 
   // Detection logic for profile generation.
   //
@@ -4947,8 +5047,8 @@ message BigQueryTableTypes {
   repeated BigQueryTableType types = 1;
 }
 
-// Over time new types may be added. Currently VIEW, MATERIALIZED_VIEW,
-// and SNAPSHOT are not supported.
+// Over time new types may be added. Currently VIEW, MATERIALIZED_VIEW, and
+// non-BigLake external tables are not supported.
 enum BigQueryTableTypeCollection {
   // Unused.
   BIG_QUERY_COLLECTION_UNSPECIFIED = 0;
@@ -4966,8 +5066,8 @@ enum BigQueryTableTypeCollection {
   BIG_QUERY_COLLECTION_ONLY_SUPPORTED_TYPES = 2;
 }
 
-// Over time new types may be added. Currently VIEW, MATERIALIZED_VIEW,
-// SNAPSHOT, and non-BigLake external tables are not supported.
+// Over time new types may be added. Currently VIEW, MATERIALIZED_VIEW, and
+// non-BigLake external tables are not supported.
 enum BigQueryTableType {
   // Unused.
   BIG_QUERY_TABLE_TYPE_UNSPECIFIED = 0;
@@ -4977,6 +5077,9 @@ enum BigQueryTableType {
 
   // A table that references data stored in Cloud Storage.
   BIG_QUERY_TABLE_TYPE_EXTERNAL_BIG_LAKE = 2;
+
+  // A snapshot of a BigQuery table.
+  BIG_QUERY_TABLE_TYPE_SNAPSHOT = 3;
 }
 
 // How frequently data profiles can be updated. New options can be added at a
@@ -5058,6 +5161,9 @@ message DiscoveryConfig {
   // Only set when the parent is an org.
   OrgConfig org_config = 2;
 
+  // Must be set only when scanning other clouds.
+  OtherCloudDiscoveryStartingLocation other_cloud_starting_location = 12;
+
   // Detection logic for profile generation.
   //
   // Not all template features are used by Discovery. FindingLimits,
@@ -5124,6 +5230,10 @@ message DiscoveryTarget {
     // Cloud Storage target for Discovery. The first target to match a table
     // will be the one applied.
     CloudStorageDiscoveryTarget cloud_storage_target = 4;
+
+    // Other clouds target for discovery. The first target to match a resource
+    // will be the one applied.
+    OtherCloudDiscoveryTarget other_cloud_target = 5;
   }
 }
 
@@ -5246,6 +5356,10 @@ message DiscoveryGenerationCadence {
   // defined by the `InspectTemplate` change.
   // If not set, changing the template will not cause a data profile to update.
   DiscoveryInspectTemplateModifiedCadence inspect_template_modified_cadence = 3;
+
+  // Frequency at which profiles should be updated, regardless of whether the
+  // underlying resource has changed. Defaults to never.
+  DataProfileUpdateFrequency refresh_frequency = 4;
 }
 
 // The cadence at which to update data profiles when a table is modified.
@@ -5491,6 +5605,11 @@ message DiscoveryCloudSqlGenerationCadence {
   // frequency regardless of whether the underlying tables have changed.
   // Defaults to never.
   DataProfileUpdateFrequency refresh_frequency = 2;
+
+  // Governs when to update data profiles when the inspection rules
+  // defined by the `InspectTemplate` change.
+  // If not set, changing the template will not cause a data profile to update.
+  DiscoveryInspectTemplateModifiedCadence inspect_template_modified_cadence = 3;
 }
 
 // Discovery target for credentials and secrets in cloud resource metadata.
@@ -5726,6 +5845,208 @@ message DiscoveryFileStoreConditions {
   }
 }
 
+// Target used to match against for discovery of resources from other clouds.
+// An [AWS connector in Security Command Center
+// (Enterprise](https://cloud.google.com/security-command-center/docs/connect-scc-to-aws)
+// is required to use this feature.
+message OtherCloudDiscoveryTarget {
+  // Required. The type of data profiles generated by this discovery target.
+  // Supported values are:
+  // * aws/s3/bucket
+  DataSourceType data_source_type = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The resources that the discovery cadence applies to. The
+  // first target with a matching filter will be the one to apply to a resource.
+  DiscoveryOtherCloudFilter filter = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. In addition to matching the filter, these conditions must be true
+  // before a profile is generated.
+  DiscoveryOtherCloudConditions conditions = 3
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Type of cadence.
+  oneof cadence {
+    // How often and when to update data profiles. New resources that match both
+    // the filter and conditions are scanned as quickly as possible depending on
+    // system capacity.
+    DiscoveryOtherCloudGenerationCadence generation_cadence = 4;
+
+    // Disable profiling for resources that match this filter.
+    Disabled disabled = 5;
+  }
+}
+
+// Determines which resources from the other cloud will have profiles generated.
+// Includes the ability to filter by resource names.
+message DiscoveryOtherCloudFilter {
+  // Whether the filter applies to a specific set of resources or all
+  // other resources. The first filter to match will be applied, regardless of
+  // the condition. Defaults to `others` if none is set.
+  oneof filter {
+    // A collection of resources for this filter to apply to.
+    OtherCloudResourceCollection collection = 1;
+
+    // The resource to scan. Configs using this filter can only have one target
+    // (the target with this single resource reference).
+    OtherCloudSingleResourceReference single_resource = 2;
+
+    // Optional. Catch-all. This should always be the last target in the list
+    // because anything above it will apply first. Should only appear once in a
+    // configuration. If none is specified, a default one will be added
+    // automatically.
+    AllOtherResources others = 100 [(google.api.field_behavior) = OPTIONAL];
+  }
+}
+
+// Match resources using regex filters.
+message OtherCloudResourceCollection {
+  // The first filter containing a pattern that matches a resource will be used.
+  oneof pattern {
+    // A collection of regular expressions to match a resource against.
+    OtherCloudResourceRegexes include_regexes = 1;
+  }
+}
+
+// A collection of regular expressions to determine what resources to match
+// against.
+message OtherCloudResourceRegexes {
+  // A group of regular expression patterns to match against one or more
+  // resources.
+  // Maximum of 100 entries. The sum of all regular expression's length can't
+  // exceed 10 KiB.
+  repeated OtherCloudResourceRegex patterns = 1;
+}
+
+// A pattern to match against one or more resources. At least one pattern must
+// be specified. Regular expressions use RE2
+// [syntax](https://github.com/google/re2/wiki/Syntax); a guide can be found
+// under the google/re2 repository on GitHub.
+message OtherCloudResourceRegex {
+  // The type of resource regex to use.
+  oneof resource_regex {
+    // Regex for Amazon S3 buckets.
+    AmazonS3BucketRegex amazon_s3_bucket_regex = 1;
+  }
+}
+
+// AWS account regex.
+message AwsAccountRegex {
+  // Optional. Regex to test the AWS account ID against.
+  // If empty, all accounts match.
+  string account_id_regex = 1 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Amazon S3 bucket regex.
+message AmazonS3BucketRegex {
+  // The AWS account regex.
+  AwsAccountRegex aws_account_regex = 1;
+
+  // Optional. Regex to test the bucket name against.
+  // If empty, all buckets match.
+  string bucket_name_regex = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Identifies a single resource, like a single Amazon S3 bucket.
+message OtherCloudSingleResourceReference {
+  // The resource to scan.
+  oneof resource {
+    // Amazon S3 bucket.
+    AmazonS3Bucket amazon_s3_bucket = 1;
+  }
+}
+
+// AWS account.
+message AwsAccount {
+  // Required. AWS account ID.
+  string account_id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Amazon S3 bucket.
+message AmazonS3Bucket {
+  // The AWS account.
+  AwsAccount aws_account = 1;
+
+  // Required. The bucket name.
+  string bucket_name = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Requirements that must be true before a resource is profiled for the first
+// time.
+message DiscoveryOtherCloudConditions {
+  // Minimum age a resource must be before Cloud DLP can profile it. Value must
+  // be 1 hour or greater.
+  google.protobuf.Duration min_age = 1;
+
+  // The conditions to apply.
+  oneof conditions {
+    // Amazon S3 bucket conditions.
+    AmazonS3BucketConditions amazon_s3_bucket_conditions = 2;
+  }
+}
+
+// Amazon S3 bucket conditions.
+message AmazonS3BucketConditions {
+  // Supported Amazon S3 bucket types.
+  // Defaults to TYPE_ALL_SUPPORTED.
+  enum BucketType {
+    // Unused.
+    TYPE_UNSPECIFIED = 0;
+
+    // All supported classes.
+    TYPE_ALL_SUPPORTED = 1;
+
+    // A general purpose Amazon S3 bucket.
+    TYPE_GENERAL_PURPOSE = 2;
+  }
+
+  // Supported Amazon S3 object storage classes.
+  // Defaults to ALL_SUPPORTED_CLASSES.
+  enum ObjectStorageClass {
+    // Unused.
+    UNSPECIFIED = 0;
+
+    // All supported classes.
+    ALL_SUPPORTED_CLASSES = 1;
+
+    // Standard object class.
+    STANDARD = 2;
+
+    // Standard - infrequent access object class.
+    STANDARD_INFREQUENT_ACCESS = 4;
+
+    // Glacier - instant retrieval object class.
+    GLACIER_INSTANT_RETRIEVAL = 6;
+
+    // Objects in the S3 Intelligent-Tiering access tiers.
+    INTELLIGENT_TIERING = 7;
+  }
+
+  // Optional. Bucket types that should be profiled.
+  // Optional. Defaults to TYPE_ALL_SUPPORTED if unspecified.
+  repeated BucketType bucket_types = 1 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Object classes that should be profiled.
+  // Optional. Defaults to ALL_SUPPORTED_CLASSES if unspecified.
+  repeated ObjectStorageClass object_storage_classes = 2
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
+// How often existing resources should have their profiles refreshed.
+// New resources are scanned as quickly as possible depending on system
+// capacity.
+message DiscoveryOtherCloudGenerationCadence {
+  // Optional. Frequency to update profiles regardless of whether the underlying
+  // resource has changes. Defaults to never.
+  DataProfileUpdateFrequency refresh_frequency = 1
+      [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Governs when to update data profiles when the inspection rules
+  // defined by the `InspectTemplate` change.
+  // If not set, changing the template will not cause a data profile to update.
+  DiscoveryInspectTemplateModifiedCadence inspect_template_modified_cadence = 2
+      [(google.api.field_behavior) = OPTIONAL];
+}
+
 // The location to begin a discovery scan. Denotes an organization ID or folder
 // ID within an organization.
 message DiscoveryStartingLocation {
@@ -5734,8 +6055,33 @@ message DiscoveryStartingLocation {
     // The ID of an organization to scan.
     int64 organization_id = 1;
 
-    // The ID of the folder within an organization to scan.
+    // The ID of the folder within an organization to be scanned.
     int64 folder_id = 2;
+  }
+}
+
+// The other cloud starting location for discovery.
+message OtherCloudDiscoveryStartingLocation {
+  // The AWS starting location for discovery.
+  message AwsDiscoveryStartingLocation {
+    // The scope of this starting location.
+    oneof scope {
+      // The AWS account ID that this discovery config applies to.
+      // Within an AWS organization, you can find the AWS account ID inside an
+      // AWS account ARN. Example:
+      // arn:{partition}:organizations::{management_account_id}:account/{org_id}/{account_id}
+      string account_id = 2;
+
+      // All AWS assets stored in Asset Inventory that didn't match other AWS
+      // discovery configs.
+      bool all_asset_inventory_assets = 3;
+    }
+  }
+
+  // The other cloud starting location for discovery.
+  oneof location {
+    // The AWS starting location for discovery.
+    AwsDiscoveryStartingLocation aws_location = 1;
   }
 }
 
@@ -5837,9 +6183,9 @@ message ListDlpJobsRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -5956,13 +6302,13 @@ message CreateDeidentifyTemplateRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   // + Organizations scope, location specified:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   // + Organizations scope, no location specified (defaults to global):
-  //   `organizations/`<var>ORG_ID</var>
+  //   `organizations/{org_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -6032,13 +6378,13 @@ message ListDeidentifyTemplatesRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   // + Organizations scope, location specified:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   // + Organizations scope, no location specified (defaults to global):
-  //   `organizations/`<var>ORG_ID</var>
+  //   `organizations/{org_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -6229,13 +6575,13 @@ message CreateStoredInfoTypeRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   // + Organizations scope, location specified:
-  //   `organizations/`<var>ORG_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `organizations/{org_id}/locations/{location_id}`
   // + Organizations scope, no location specified (defaults to global):
-  //   `organizations/`<var>ORG_ID</var>
+  //   `organizations/{org_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -6305,9 +6651,9 @@ message ListStoredInfoTypesRequest {
   // location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
   //
   // + Projects scope, location specified:
-  //   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
+  //   `projects/{project_id}/locations/{location_id}`
   // + Projects scope, no location specified (defaults to global):
-  //   `projects/`<var>PROJECT_ID</var>
+  //   `projects/{project_id}`
   //
   // The following example `parent` string specifies a parent project with the
   // identifier `example-project`, and specifies the `europe-west3` location
@@ -6851,7 +7197,7 @@ message ProjectDataProfile {
   // The resource name of the profile.
   string name = 1;
 
-  // Project ID that was profiled.
+  // Project ID or account that was profiled.
   string project_id = 2;
 
   // The last time the profile was generated.
@@ -6954,13 +7300,14 @@ message TableDataProfile {
   // locations.
   string dataset_location = 29;
 
-  // If the resource is BigQuery, the  dataset ID.
+  // If the resource is BigQuery, the dataset ID.
   string dataset_id = 25;
 
-  // If the resource is BigQuery, the BigQuery table ID.
+  // The table ID.
   string table_id = 26;
 
-  // The resource name of the resource profiled.
+  // The Cloud Asset Inventory resource that was profiled in order to generate
+  // this TableDataProfile.
   // https://cloud.google.com/apis/design/resource_names#full_resource_name
   string full_resource = 3;
 
@@ -7219,15 +7566,15 @@ message ColumnDataProfile {
   // The Google Cloud project ID that owns the profiled resource.
   string dataset_project_id = 19;
 
-  // The BigQuery location where the dataset's data is stored.
+  // If supported, the location where the dataset's data is stored.
   // See https://cloud.google.com/bigquery/docs/locations for supported
-  // locations.
+  // BigQuery locations.
   string dataset_location = 20;
 
-  // The BigQuery dataset ID.
+  // The BigQuery dataset ID, if the resource profiled is a BigQuery table.
   string dataset_id = 21;
 
-  // The BigQuery table ID.
+  // The table ID.
   string table_id = 22;
 
   // The name of the column.
@@ -7269,6 +7616,7 @@ message ColumnDataProfile {
 // The profile for a file store.
 //
 // * Cloud Storage: maps 1:1 with a bucket.
+// * Amazon S3: maps 1:1 with a bucket.
 message FileStoreDataProfile {
   option (google.api.resource) = {
     type: "dlp.googleapis.com/FileStoreDataProfile"
@@ -7301,12 +7649,15 @@ message FileStoreDataProfile {
   string project_data_profile = 3;
 
   // The Google Cloud project ID that owns the resource.
+  // For Amazon S3 buckets, this is the AWS Account Id.
   string project_id = 4;
 
   // The location of the file store.
   //
   // * Cloud Storage:
   // https://cloud.google.com/storage/docs/locations#available-locations
+  // * Amazon S3:
+  // https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints
   string file_store_location = 5;
 
   // For resources that have multiple storage locations, these are those
@@ -7324,10 +7675,14 @@ message FileStoreDataProfile {
   // The file store path.
   //
   // * Cloud Storage: `gs://{bucket}`
+  // * Amazon S3: `s3://{bucket}`
   string file_store_path = 6;
 
   // The resource name of the resource profiled.
   // https://cloud.google.com/apis/design/resource_names#full_resource_name
+  //
+  // Example format of an S3 bucket full resource name:
+  // `//cloudasset.googleapis.com/organizations/{org_id}/otherCloudConnections/aws/arn:aws:s3:::{bucket_name}`
   string full_resource = 24;
 
   // The snapshot of the configurations used to generate the profile.
@@ -7412,10 +7767,12 @@ message FileClusterSummary {
   repeated Error errors = 6;
 
   // A sample of file types scanned in this cluster. Empty if no files were
-  // scanned.
+  // scanned. File extensions can be derived from the file name or the file
+  // content.
   repeated FileExtensionInfo file_extensions_scanned = 7;
 
   // A sample of file types seen in this cluster. Empty if no files were seen.
+  // File extensions can be derived from the file name or the file content.
   repeated FileExtensionInfo file_extensions_seen = 8;
 
   // True if no files exist in this cluster. If the bucket had more files than
@@ -7502,7 +7859,12 @@ message ListFileStoreDataProfilesRequest {
   // * A restriction has the form of `{field} {operator} {value}`.
   // * Supported fields/values:
   //     - `project_id` - The Google Cloud project ID.
+  //     - `account_id` - The AWS account ID.
   //     - `file_store_path` - The path like "gs://bucket".
+  //     - `data_source_type` - The profile's data source type, like
+  //     "google/storage/bucket".
+  //     - `data_storage_location` - The location where the file store's data is
+  //     stored, like "us-central1".
   //     - `sensitivity_level` - HIGH|MODERATE|LOW
   //     - `data_risk_level` - HIGH|MODERATE|LOW
   //     - `resource_visibility`: PUBLIC|RESTRICTED
@@ -7637,8 +7999,15 @@ message DataProfilePubSubMessage {
 
 // Request message for CreateConnection.
 message CreateConnectionRequest {
-  // Required. Parent resource name in the format:
-  // `projects/{project}/locations/{location}`.
+  // Required. Parent resource name.
+  //
+  // The format of this value varies depending on the scope of the request
+  // (project or organization):
+  //
+  // + Projects scope:
+  //   `projects/{project_id}/locations/{location_id}`
+  // + Organizations scope:
+  //   `organizations/{org_id}/locations/{location_id}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -7662,8 +8031,9 @@ message GetConnectionRequest {
 
 // Request message for ListConnections.
 message ListConnectionsRequest {
-  // Required. Parent name, for example:
-  // `projects/project-id/locations/global`.
+  // Required. Resource name of the organization or project, for
+  // example, `organizations/433245324/locations/europe` or
+  // `projects/project-id/locations/asia`.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -7684,8 +8054,9 @@ message ListConnectionsRequest {
 
 // Request message for SearchConnections.
 message SearchConnectionsRequest {
-  // Required. Parent name, typically an organization, without location.
-  // For example: `organizations/12345678`.
+  // Required. Resource name of the organization or project with a wildcard
+  // location, for example, `organizations/433245324/locations/-` or
+  // `projects/project-id/locations/-`.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
@@ -7759,6 +8130,7 @@ message Connection {
   option (google.api.resource) = {
     type: "dlp.googleapis.com/Connection"
     pattern: "projects/{project}/locations/{location}/connections/{connection}"
+    pattern: "organizations/{organization}/locations/{location}/connections/{connection}"
   };
 
   // Output only. Name of the connection:
@@ -7884,14 +8256,19 @@ message DeleteTableDataProfileRequest {
 // Message used to identify the type of resource being profiled.
 message DataSourceType {
   // Output only. An identifying string to the type of resource being profiled.
-  // Current values: google/bigquery/table, google/project
+  // Current values:
+  //
+  // * google/bigquery/table
+  // * google/project
+  // * google/sql/table
+  // * google/gcs/bucket
   string data_source = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Message used to identify file cluster type being profiled.
 message FileClusterType {
   // Cluster type. Each cluster corresponds to a set of file types.
-  // Over time new types may be added.
+  // Over time, new types may be added and files may move between clusters.
   enum Cluster {
     // Unused.
     CLUSTER_UNSPECIFIED = 0;

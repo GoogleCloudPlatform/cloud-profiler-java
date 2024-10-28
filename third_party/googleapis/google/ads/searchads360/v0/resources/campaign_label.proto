@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,4 +62,8 @@ message CampaignLabel {
       type: "searchads360.googleapis.com/Label"
     }
   ];
+
+  // Output only. The ID of the Customer which owns the label.
+  optional int64 owner_customer_id = 6
+      [(google.api.field_behavior) = OUTPUT_ONLY];
 }

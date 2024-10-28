@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,16 @@ message AdGroup {
     (google.api.field_behavior) = OUTPUT_ONLY,
     (google.api.resource_reference) = {
       type: "searchads360.googleapis.com/AdGroupLabel"
+    }
+  ];
+
+  // Output only. The resource names of effective labels attached to this ad
+  // group. An effective label is a label inherited or directly assigned to this
+  // ad group.
+  repeated string effective_labels = 66 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {
+      type: "searchads360.googleapis.com/AdGroupEffectiveLabel"
     }
   ];
 

@@ -173,6 +173,9 @@ message SupervisedTuningDatasetDistribution {
   // Output only. Sum of a given population of values.
   int64 sum = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Output only. Sum of a given population of values that are billable.
+  int64 billable_sum = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // Output only. The minimum of the population values.
   double min = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -208,6 +211,10 @@ message SupervisedTuningDataStats {
 
   // Output only. Number of billable characters in the tuning dataset.
   int64 total_billable_character_count = 3
+      [deprecated = true, (google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Number of billable tokens in the tuning dataset.
+  int64 total_billable_token_count = 9
       [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Output only. Number of tuning steps for this Tuning Job.
@@ -228,6 +235,14 @@ message SupervisedTuningDataStats {
   // Output only. Sample user messages in the training dataset uri.
   repeated Content user_dataset_examples = 8
       [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The number of examples in the dataset that have been truncated by any
+  // amount.
+  int64 total_truncated_example_count = 10;
+
+  // A partial sample of the indices (starting from 1) of the truncated
+  // examples.
+  repeated int64 truncated_example_indices = 11;
 }
 
 // The tuning data statistic values for
@@ -270,7 +285,7 @@ message SupervisedHyperParameters {
   AdapterSize adapter_size = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
-// Tuning Spec for Supervised Tuning.
+// Tuning Spec for Supervised Tuning for first party models.
 message SupervisedTuningSpec {
   // Required. Cloud Storage path to file containing training dataset for
   // tuning. The dataset must be formatted as a JSONL file.
@@ -283,4 +298,27 @@ message SupervisedTuningSpec {
   // Optional. Hyperparameters for SFT.
   SupervisedHyperParameters hyper_parameters = 3
       [(google.api.field_behavior) = OPTIONAL];
+}
+
+// TunedModel Reference for legacy model migration.
+message TunedModelRef {
+  // The Tuned Model Reference for the model.
+  oneof tuned_model_ref {
+    // Support migration from model registry.
+    string tuned_model = 1 [(google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Model"
+    }];
+
+    // Support migration from tuning job list page, from gemini-1.0-pro-002
+    // to 1.5 and above.
+    string tuning_job = 2 [(google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/TuningJob"
+    }];
+
+    // Support migration from tuning job list page, from bison model to gemini
+    // model.
+    string pipeline_job = 3 [(google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/PipelineJob"
+    }];
+  }
 }

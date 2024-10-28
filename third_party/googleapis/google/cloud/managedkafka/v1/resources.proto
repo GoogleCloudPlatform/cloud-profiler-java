@@ -154,8 +154,6 @@ message GcpConfig {
   // must be located in the same region as the cluster and cannot be changed.
   // Structured like:
   // projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.
-  // Note that the project component only accepts a project ID, and not a
-  // project number.
   string kms_key = 2 [
     (google.api.field_behavior) = OPTIONAL,
     (google.api.field_behavior) = IMMUTABLE,
@@ -208,7 +206,7 @@ message ConsumerTopicMetadata {
 
 // Metadata for a consumer group corresponding to a specific partition.
 message ConsumerPartitionMetadata {
-  // Required. The offset for this partition, or 0 if no offset has been
+  // Required. The current offset for this partition, or 0 if no offset has been
   // committed.
   int64 offset = 1 [(google.api.field_behavior) = REQUIRED];
 

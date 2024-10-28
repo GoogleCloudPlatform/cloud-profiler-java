@@ -7,6 +7,7 @@ apis:
 - name: google.cloud.aiplatform.v1.DatasetService
 - name: google.cloud.aiplatform.v1.DeploymentResourcePoolService
 - name: google.cloud.aiplatform.v1.EndpointService
+- name: google.cloud.aiplatform.v1.EvaluationService
 - name: google.cloud.aiplatform.v1.FeatureOnlineStoreAdminService
 - name: google.cloud.aiplatform.v1.FeatureOnlineStoreService
 - name: google.cloud.aiplatform.v1.FeatureRegistryService
@@ -59,6 +60,7 @@ types:
 - name: google.cloud.aiplatform.v1.CreateIndexEndpointOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateIndexOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateMetadataStoreOperationMetadata
+- name: google.cloud.aiplatform.v1.CreateNotebookExecutionJobOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateNotebookRuntimeTemplateOperationMetadata
 - name: google.cloud.aiplatform.v1.CreatePersistentResourceOperationMetadata
 - name: google.cloud.aiplatform.v1.CreateRegistryFeatureOperationMetadata
@@ -181,6 +183,8 @@ http:
     - post: '/v1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
     - post: '/v1/{resource=projects/*/locations/*/models/*}:getIamPolicy'
     - post: '/v1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:getIamPolicy'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*}:getIamPolicy'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*/featureViews/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/models/*}:getIamPolicy'
@@ -198,6 +202,10 @@ http:
     - post: '/v1/{resource=projects/*/locations/*/models/*}:setIamPolicy'
       body: '*'
     - post: '/v1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:setIamPolicy'
+      body: '*'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*}:setIamPolicy'
+      body: '*'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*/featureViews/*}:setIamPolicy'
       body: '*'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
       body: '*'
@@ -219,6 +227,8 @@ http:
     - post: '/v1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
     - post: '/v1/{resource=projects/*/locations/*/models/*}:testIamPermissions'
     - post: '/v1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:testIamPermissions'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*}:testIamPermissions'
+    - post: '/v1/{resource=projects/*/locations/*/featureOnlineStores/*/featureViews/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/models/*}:testIamPermissions'
@@ -701,6 +711,10 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.aiplatform.v1.EvaluationService.EvaluateInstances
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
   - selector: 'google.cloud.aiplatform.v1.FeatureOnlineStoreAdminService.*'
     oauth:
       canonical_scopes: |-
@@ -889,8 +903,25 @@ publishing:
   organization: CLOUD
   library_settings:
   - version: google.cloud.aiplatform.v1
+    java_settings:
+      common: {}
+    cpp_settings:
+      common: {}
+    php_settings:
+      common: {}
+    python_settings:
+      common: {}
+      experimental_features:
+        rest_async_io_enabled: true
+    node_settings:
+      common: {}
     dotnet_settings:
+      common: {}
       renamed_resources:
         datalabeling.googleapis.com/Dataset: DataLabelingDataset
         automl.googleapis.com/Dataset: AutoMLDataset
         automl.googleapis.com/Model: AutoMLModel
+    ruby_settings:
+      common: {}
+    go_settings:
+      common: {}
