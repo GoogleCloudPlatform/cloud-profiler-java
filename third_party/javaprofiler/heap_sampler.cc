@@ -49,15 +49,6 @@ std::vector<JVMPI_CallFrame> TransformFrames(jvmtiFrameInfo *stack_frames,
   return frames;
 }
 
-std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTrace(JNIEnv *jni) {
-  std::unique_ptr<std::vector<JVMPI_CallFrame>> trace_result = nullptr;
-
-// Cannot use the fast stacktrace for standalone builds as their standard
-// libraries do not support getcontext.
-
-  return trace_result;
-}
-
 std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
     JNIEnv *jni, jvmtiEnv *jvmti, jthread thread) {
   jint count = 0;
@@ -143,7 +134,6 @@ std::atomic<HeapMonitor *> HeapMonitor::heap_monitor_;
 
 std::atomic<jvmtiEnv *> HeapMonitor::jvmti_;
 std::atomic<int> HeapMonitor::sampling_interval_;
-std::atomic<bool> HeapMonitor::use_jvm_trace_;
 std::vector<AllocationInstrumentationFunction>
     HeapMonitor::alloc_inst_functions_;
 std::vector<GarbageInstrumentationFunction> HeapMonitor::gc_inst_functions_;
@@ -353,9 +343,7 @@ bool HeapMonitor::Supported(jvmtiEnv *jvmti) {
 void HeapMonitor::AddSample(JNIEnv *jni_env, jthread thread, jobject object,
                             jclass object_klass, jlong size, jbyte *name,
                             jint name_len, jlong thread_id) {
-  auto trace = use_jvm_trace_.load()
-                   ? GetTrace(jni_env)
-                   : GetTraceUsingJvmti(jni_env, jvmti_.load(), thread);
+  auto trace = GetTraceUsingJvmti(jni_env, jvmti_.load(), thread);
   if (trace == nullptr) {
     return;
   }
@@ -448,7 +436,7 @@ void HeapMonitor::AddCallback(jvmtiEventCallbacks *callbacks) {
 
 // Currently, we enable once and forget about it.
 bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
-                         int max_garbage_size, bool use_jvm_trace) {
+                         int max_garbage_size) {
   if (!Supported(jvmti)) {
     LOG(WARNING) << "Heap sampling is not supported by the JVM, disabling the "
                  << " heap sampling monitor";
@@ -493,12 +481,7 @@ bool HeapMonitor::Enable(jvmtiEnv *jvmti, JNIEnv *jni, int sampling_interval,
     return false;
   }
 
-  if (use_jvm_trace) {
-    Asgct::SetAsgct(Accessors::GetJvmFunction<ASGCTType>("AsyncGetCallTrace"));
-  }
-
   sampling_interval_.store(sampling_interval);
-  use_jvm_trace_.store(use_jvm_trace);
   jvmti_.store(jvmti);
 
   // Ensure this is really a singleton i.e. don't recreate it if sampling is
