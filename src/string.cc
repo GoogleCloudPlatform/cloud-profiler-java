@@ -14,6 +14,7 @@
 
 #include "src/string.h"
 
+#include <cstddef>
 #include <map>
 #include <sstream>
 #include <string>
