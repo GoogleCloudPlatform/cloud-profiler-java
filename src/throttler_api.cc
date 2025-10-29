@@ -26,7 +26,9 @@
 #include <chrono>  // NOLINT
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -58,6 +60,9 @@ DEFINE_string(cprof_profile_labels, "",
               "names must be in dns-label-like-format");
 DEFINE_bool(cprof_use_insecure_creds_for_testing, false,
             "use insecure channel creds, for testing only");
+DEFINE_string(cprof_service_account_json_file, "",
+              "path to service account JSON file for authentication; "
+              "if not set, uses Application Default Credentials");
 
 namespace cloud {
 namespace profiler {
@@ -111,6 +116,20 @@ grpc_ssl_roots_override_result OverrideSSLRoots(char** pem_root_certs) {
   return GRPC_SSL_ROOTS_OVERRIDE_OK;
 }
 
+bool ReadFileContents(const std::string& path, std::string* out) {
+  if (path.empty()) {
+    return false;
+  }
+  std::ifstream file(path, std::ios::in | std::ios::binary);
+  if (!file) {
+    return false;
+  }
+  std::ostringstream buffer;
+  buffer << file.rdbuf();
+  *out = buffer.str();
+  return true;
+}
+
 // Creates the profiler gRPC API stub. Returns nullptr on error.
 std::unique_ptr<api::grpc::ProfilerService::StubInterface>
 NewProfilerServiceStub(const std::string& addr, const std::string& language) {
@@ -119,9 +138,38 @@ NewProfilerServiceStub(const std::string& addr, const std::string& language) {
     creds = grpc::InsecureChannelCredentials();
   } else {
     grpc_set_ssl_roots_override_callback(&OverrideSSLRoots);
-    creds = grpc::GoogleDefaultCredentials();
+
+    if (!FLAGS_cprof_service_account_json_file.empty()) {
+
+      std::string service_account_contents;
+      if (!ReadFileContents(FLAGS_cprof_service_account_json_file,
+                            &service_account_contents)) {
+        LOG(ERROR) << "Failed to read service account JSON file from "
+                   << FLAGS_cprof_service_account_json_file;
+        return nullptr;
+      }
+
+      auto call_creds = grpc::ServiceAccountJWTAccessCredentials(
+          service_account_contents);
+      if (call_creds == nullptr) {
+        LOG(ERROR) << "Failed to create service account call credentials";
+        return nullptr;
+      }
+
+      grpc::SslCredentialsOptions ssl_options;
+      auto ssl_creds = grpc::SslCredentials(ssl_options);
+      if (ssl_creds == nullptr) {
+        LOG(ERROR) << "Failed to create SSL credentials";
+        return nullptr;
+      }
+
+      creds = grpc::CompositeChannelCredentials(ssl_creds, call_creds);
+    } else {
+      creds = grpc::GoogleDefaultCredentials();
+    }
+
     if (creds == nullptr) {
-      LOG(ERROR) << "Failed to get Google default credentials";
+      LOG(ERROR) << "Failed to initialize channel credentials";
       return nullptr;
     }
   }
