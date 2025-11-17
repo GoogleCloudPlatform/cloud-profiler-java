@@ -44,8 +44,6 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
                                          bool skip_top_native_frames,
                                          vector<string> skip_frames)
     : sampling_rate_(sampling_rate),
-      jni_env_(jni_env),
-      jvmti_env_(jvmti_env),
       method_info_cache_(jni_env, jvmti_env),
       native_cache_(native_cache),
       location_builder_(&builder_),

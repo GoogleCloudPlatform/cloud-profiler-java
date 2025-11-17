@@ -17,6 +17,7 @@
 #ifndef THIRD_PARTY_JAVAPROFILER_PROFILE_PROTO_BUILDER_H__
 #define THIRD_PARTY_JAVAPROFILER_PROFILE_PROTO_BUILDER_H__
 
+#include <jni.h>
 #include <jvmti.h>
 #include <link.h>
 
@@ -338,9 +339,6 @@ class ProfileProtoBuilder {
 
   void AddLabels(const TraceAndLabels &trace_and_labels,
                  perftools::profiles::Sample *sample);
-
-  JNIEnv *jni_env_;
-  jvmtiEnv *jvmti_env_;
 
   MethodInfoCache method_info_cache_;
   ProfileFrameCache *native_cache_;
