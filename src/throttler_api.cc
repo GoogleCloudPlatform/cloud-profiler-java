@@ -161,8 +161,10 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
                             int64_t* backoff_ns) {
   *backoff_ns = 0;
   auto md = ctx.GetServerTrailingMetadata();
-  auto it = md.find(kRetryInfoMetadata);
-  if (it != md.end() && !it->second.empty()) {
+  auto eq_range = md.equal_range(kRetryInfoMetadata);
+  auto it = eq_range.first;
+  auto end = eq_range.second;
+  if (it != end && !it->second.empty()) {
     google::rpc::RetryInfo ri;
     if (!ri.ParseFromArray(it->second.data(), it->second.size())) {
       return false;
