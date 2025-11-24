@@ -48,12 +48,10 @@ class HeapObjectTrace {
   // This object owns the jweak object parameter. It is freed when the object
   // is sent to the garbage list, and the object is set to nullptr.
   HeapObjectTrace(jweak object, jlong size, std::vector<JVMPI_CallFrame> frames,
-                  jbyte *name, int name_length, jlong thread_id)
+                  jlong thread_id)
       : object_(object),
         size_(size),
         frames_(std::move(frames)),
-        name_(name),
-        name_length_(name_length),
         thread_id_(thread_id) {}
 
   HeapObjectTrace(jweak object, jlong size,
@@ -71,10 +69,6 @@ class HeapObjectTrace {
   std::vector<JVMPI_CallFrame> &Frames() { return frames_; }
 
   jlong Size() const { return size_; }
-
-  jbyte *Name() const { return name_; }
-
-  int NameLength() const { return name_length_; }
 
   jlong ThreadId() const { return thread_id_; }
 
@@ -97,8 +91,6 @@ class HeapObjectTrace {
   jweak object_;
   jlong size_;
   std::vector<JVMPI_CallFrame> frames_;
-  jbyte *name_;
-  int name_length_;
   jlong thread_id_;
 };
 
@@ -119,8 +111,7 @@ class HeapEventStorage {
 
   // Adds an object to the storage system.
   void Add(JNIEnv *jni, jthread thread, jobject object, jclass klass,
-           jlong size, std::vector<JVMPI_CallFrame> frames, jbyte *name,
-           jint name_len, jlong thread_id);
+           jlong size, std::vector<JVMPI_CallFrame> frames, jlong thread_id);
 
   // Returns a perftools::profiles::Profile with the objects stored via
   // calls to the Add method.
@@ -233,8 +224,7 @@ class HeapMonitor {
       JNIEnv *env, bool force_gc);
 
   static void AddSample(JNIEnv *jni_env, jthread thread, jobject object,
-                        jclass object_klass, jlong size, jbyte *name,
-                        jint name_len, jlong thread_id);
+                        jclass object_klass, jlong size, jlong thread_id);
 
   static void InvokeAllocationInstrumentationFunctions(jlong thread_id,
                                                        jbyte *name,
