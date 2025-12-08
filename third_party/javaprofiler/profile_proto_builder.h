@@ -21,7 +21,6 @@
 #include <jvmti.h>
 #include <link.h>
 
-#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -29,6 +28,7 @@
 #include <vector>
 
 #include "perftools/profiles/proto/builder.h"
+#include "absl/strings/string_view.h"
 #include "third_party/javaprofiler/method_info.h"
 #include "third_party/javaprofiler/stacktrace_decls.h"
 
@@ -213,8 +213,6 @@ class ProfileFrameCache {
   virtual perftools::profiles::Location *GetLocation(
       const JVMPI_CallFrame &jvm_frame, LocationBuilder *location_builder) = 0;
 
-  virtual std::string GetFunctionName(const JVMPI_CallFrame &jvm_frame) = 0;
-
   virtual ~ProfileFrameCache() {}
 };
 
@@ -263,6 +261,15 @@ class ProfileProtoBuilder {
   void AddArtificialTrace(const std::string &name, int count,
                           int sampling_rate);
 
+  // Sets the regular expression which is used to drop matching frames, along
+  // with their successors.
+  void SetDropFrames(absl::string_view drop_frames) {
+    if (drop_frames.empty()) {
+      return;
+    }
+    builder_.mutable_profile()->set_drop_frames(builder_.StringId(drop_frames));
+  }
+
   // Builds the proto. Calling any other method on the class after calling
   // this has undefined behavior.
   virtual std::unique_ptr<perftools::profiles::Profile> CreateProto() = 0;
@@ -299,12 +306,11 @@ class ProfileProtoBuilder {
   // Create the profile proto builder, if native_cache is nullptr, then no
   // information about native frames can be provided. The proto buffer will then
   // contain "Unknown native method" frames.
-  ProfileProtoBuilder(JNIEnv *env, jvmtiEnv *jvmti_env,
-                      ProfileFrameCache *native_cache, int64_t sampling_rate,
-                      const SampleType &count_type,
-                      const SampleType &metric_type,
-                      bool skip_top_native_frames,
-                      std::vector<std::string> skip_frames);
+  ProfileProtoBuilder(JNIEnv* env, jvmtiEnv* jvmti_env,
+                      ProfileFrameCache* native_cache, int64_t sampling_rate,
+                      const SampleType& count_type,
+                      const SampleType& metric_type,
+                      bool skip_top_native_frames);
 
   // Build the proto, unsampling the sample metrics. Calling any other method
   // on the class after calling this has undefined behavior.
@@ -318,8 +324,7 @@ class ProfileProtoBuilder {
   int64_t sampling_rate_ = 0;
 
  private:
-  bool SkipFrame(const std::string &function_name) const;
-  int SkipTopNativeFrames(const JVMPI_CallTrace &trace);
+  int SkipTopNativeFrames(const JVMPI_CallTrace& trace) const;
   void AddSampleType(const SampleType &sample_type);
   void SetPeriodType(const SampleType &metric_type);
   void InitSampleValues(perftools::profiles::Sample *sample, int64_t count,
@@ -359,17 +364,14 @@ double CalculateSamplingRatio(int64_t rate, int64_t count,
 
 class CpuProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  CpuProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+  CpuProfileProtoBuilder(JNIEnv* jni_env, jvmtiEnv* jvmti_env,
                          int64_t duration_ns, int64_t sampling_rate,
-                         ProfileFrameCache *cache,
-                         bool skip_top_native_frames,
-                         std::vector<std::string> skip_frames)
+                         ProfileFrameCache* cache, bool skip_top_native_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("samples", "count"),
             ProfileProtoBuilder::SampleType("cpu", "nanoseconds"),
-            skip_top_native_frames,
-            skip_frames) {
+            skip_top_native_frames) {
     builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
@@ -381,18 +383,14 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
 
 class HeapProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  HeapProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
-                          int64_t sampling_rate, ProfileFrameCache *cache,
-                          bool skip_top_native_frames,
-                          std::vector<std::string> skip_frames)
+  HeapProfileProtoBuilder(JNIEnv* jni_env, jvmtiEnv* jvmti_env,
+                          int64_t sampling_rate, ProfileFrameCache* cache,
+                          bool skip_top_native_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("inuse_objects", "count"),
             ProfileProtoBuilder::SampleType("inuse_space", "bytes"),
-            skip_top_native_frames,
-            skip_frames)
-        {
-  }
+            skip_top_native_frames) {}
 
   std::unique_ptr<perftools::profiles::Profile> CreateProto() override {
     return CreateUnsampledProto();
@@ -401,17 +399,15 @@ class HeapProfileProtoBuilder : public ProfileProtoBuilder {
 
 class ContentionProfileProtoBuilder : public ProfileProtoBuilder {
  public:
-  ContentionProfileProtoBuilder(JNIEnv *jni_env, jvmtiEnv *jvmti_env,
+  ContentionProfileProtoBuilder(JNIEnv* jni_env, jvmtiEnv* jvmti_env,
                                 int64_t duration_nanos, int64_t sampling_rate,
-                                ProfileFrameCache *cache,
-                                bool skip_top_native_frames,
-                                std::vector<std::string> skip_frames)
+                                ProfileFrameCache* cache,
+                                bool skip_top_native_frames)
       : ProfileProtoBuilder(
             jni_env, jvmti_env, cache, sampling_rate,
             ProfileProtoBuilder::SampleType("contentions", "count"),
             ProfileProtoBuilder::SampleType("delay", "microseconds"),
-            skip_top_native_frames,
-            skip_frames) {
+            skip_top_native_frames) {
     builder_.mutable_profile()->set_duration_nanos(duration_nanos);
     builder_.mutable_profile()->set_period(sampling_rate);
     builder_.mutable_profile()->set_default_sample_type(

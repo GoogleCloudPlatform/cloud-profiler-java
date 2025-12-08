@@ -35,8 +35,6 @@ class TestProfileFrameCache : public ProfileFrameCache {
     return &nop_;
   }
 
-  std::string GetFunctionName(const JVMPI_CallFrame &jvm_frame) { return ""; }
-
  private:
   perftools::profiles::Location nop_;
 };
