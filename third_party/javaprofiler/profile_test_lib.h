@@ -26,12 +26,12 @@ namespace google {
 namespace javaprofiler {
 
 class TestProfileFrameCache : public ProfileFrameCache {
-  void ProcessTraces(const ProfileStackTrace *traces, int num_traces) override {
+  void ProcessTraces(const ProfileStackTrace* traces, int num_traces) override {
   }
 
-  perftools::profiles::Location *GetLocation(
-      const JVMPI_CallFrame &jvm_frame,
-      LocationBuilder *location_builder) override {
+  perftools::profiles::Location* GetLocation(
+      const JVMPI_CallFrame& jvm_frame,
+      LocationBuilder* location_builder) override {
     return &nop_;
   }
 

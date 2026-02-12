@@ -19,16 +19,16 @@ namespace javaprofiler {
 
 ASGCTType Asgct::asgct_;
 
-std::mutex *AttributeTable::mutex_;
-std::unordered_map<std::string, int> *AttributeTable::string_map_;
-std::vector<std::string> *AttributeTable::strings_;
+std::mutex* AttributeTable::mutex_;
+std::unordered_map<std::string, int>* AttributeTable::string_map_;
+std::vector<std::string>* AttributeTable::strings_;
 
-bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
+bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace* trace) {
   uint64_t hash_val = CalculateHash(attr, trace->num_frames, &trace->frames[0]);
 
   for (int64_t i = 0; i < MaxEntries(); i++) {
     int64_t idx = (i + hash_val) % MaxEntries();
-    auto &entry = traces_[idx];
+    auto& entry = traces_[idx];
     int64_t count_zero = 0;
     entry.active_updates.fetch_add(1, std::memory_order_acquire);
     int64_t count = entry.count.load(std::memory_order_acquire);
@@ -40,7 +40,7 @@ bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
           // with Extract, so decrement active_updates early.
           entry.active_updates.fetch_sub(1, std::memory_order_release);
           // memcpy is not async safe
-          JVMPI_CallFrame *fb = entry.frame_buffer;
+          JVMPI_CallFrame* fb = entry.frame_buffer;
           int num_frames = trace->num_frames;
           for (int frame_num = 0; frame_num < num_frames; ++frame_num) {
             fb[frame_num].lineno = trace->frames[frame_num].lineno;
@@ -80,12 +80,12 @@ bool AsyncSafeTraceMultiset::Add(int attr, JVMPI_CallTrace *trace) {
   return false;
 }
 
-int AsyncSafeTraceMultiset::Extract(int location, int64_t *attr, int max_frames,
-                                    JVMPI_CallFrame *frames, int64_t *count) {
+int AsyncSafeTraceMultiset::Extract(int location, int64_t* attr, int max_frames,
+                                    JVMPI_CallFrame* frames, int64_t* count) {
   if (location < 0 || location >= MaxEntries()) {
     return 0;
   }
-  auto &entry = traces_[location];
+  auto& entry = traces_[location];
   int64_t c = entry.count.load(std::memory_order_acquire);
   if (c <= 0) {
     // Unused or in process of being updated, skip for now.
@@ -115,7 +115,7 @@ int AsyncSafeTraceMultiset::Extract(int location, int64_t *attr, int max_frames,
   return num_frames;
 }
 
-void TraceMultiset::Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
+void TraceMultiset::Add(int64_t attr, int num_frames, JVMPI_CallFrame* frames,
                         int64_t count) {
   CallTrace t;
   t.attr = attr;
@@ -129,7 +129,7 @@ void TraceMultiset::Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
   traces_.emplace(std::move(t), count);
 }
 
-int HarvestSamples(AsyncSafeTraceMultiset *from, TraceMultiset *to) {
+int HarvestSamples(AsyncSafeTraceMultiset* from, TraceMultiset* to) {
   int trace_count = 0;
   int64_t num_traces = from->MaxEntries();
   for (int64_t i = 0; i < num_traces; i++) {
@@ -147,7 +147,7 @@ int HarvestSamples(AsyncSafeTraceMultiset *from, TraceMultiset *to) {
 }
 
 uint64_t CalculateHash(int64_t attr, int num_frames,
-                       const JVMPI_CallFrame *frame) {
+                       const JVMPI_CallFrame* frame) {
   // Make hash-value
   uint64_t h = attr;
   h += h << 10;
@@ -165,8 +165,8 @@ uint64_t CalculateHash(int64_t attr, int num_frames,
   return h;
 }
 
-bool Equal(int num_frames, const JVMPI_CallFrame *f1,
-           const JVMPI_CallFrame *f2) {
+bool Equal(int num_frames, const JVMPI_CallFrame* f1,
+           const JVMPI_CallFrame* f2) {
   // Compare individual members to avoid differences in padding.
   for (int i = 0; i < num_frames; i++) {
     if (f1[i].method_id != f2[i].method_id || f1[i].lineno != f2[i].lineno) {

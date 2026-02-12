@@ -15,6 +15,7 @@
 #include "third_party/javaprofiler/display.h"
 
 #include <inttypes.h>
+
 #include <cstring>
 
 #include "third_party/javaprofiler/stacktrace_fixer.h"
@@ -26,7 +27,7 @@ namespace {
 
 // This method changes the standard class signature "Lfoo/bar;" format
 // to a more readable "foo.bar" format.
-bool CleanJavaSignature(char *signature_ptr) {
+bool CleanJavaSignature(char* signature_ptr) {
   size_t signature_length = strlen(signature_ptr);  // ugh!
   if (signature_length < 3) {  // I'm not going to even try.
     return false;
@@ -50,16 +51,16 @@ const char kMethodIDUnknown[] = "UnknownMethodID";
 // Since the method is unknown, associated signature is empty.
 const char kSignatureUnknown[] = "";
 
-void GetMethodName(jvmtiEnv *jvmti, jmethodID method_id,
-                   std::string *method_name, std::string *signature) {
+void GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
+                   std::string* method_name, std::string* signature) {
   jint error;
   JvmtiScopedPtr<char> signature_ptr(jvmti);
   JvmtiScopedPtr<char> name_ptr(jvmti);
 
   // Get method name, put it in name_ptr
   if ((error = jvmti->GetMethodName(method_id, name_ptr.GetRef(),
-                                    signature_ptr.GetRef(),
-                                    nullptr)) == JVMTI_ERROR_NONE) {
+                                    signature_ptr.GetRef(), nullptr)) ==
+      JVMTI_ERROR_NONE) {
     *method_name = name_ptr.Get();
     *signature = signature_ptr.Get();
     return;
@@ -88,9 +89,9 @@ void GetMethodName(jvmtiEnv *jvmti, jmethodID method_id,
   *signature = kSignatureUnknown;
 }
 
-void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
-                         jclass declaring_class, std::string *file_name,
-                         std::string *class_name) {
+void GetClassAndFileName(jvmtiEnv* jvmti, jmethodID method_id,
+                         jclass declaring_class, std::string* file_name,
+                         std::string* class_name) {
   JvmtiScopedPtr<char> source_name_ptr(jvmti);
   if (JVMTI_ERROR_NONE !=
       jvmti->GetSourceFileName(declaring_class, source_name_ptr.GetRef())) {
@@ -117,9 +118,9 @@ void GetClassAndFileName(jvmtiEnv *jvmti, jmethodID method_id,
   }
 }
 
-void FillFieldsWithUnknown(std::string *file_name, std::string *class_name,
-                           std::string *method_name, std::string *signature,
-                           int *line_number) {
+void FillFieldsWithUnknown(std::string* file_name, std::string* class_name,
+                           std::string* method_name, std::string* signature,
+                           int* line_number) {
   *file_name = kFileUnknown;
   *class_name = kClassUnknown;
   *method_name = kMethodUnknown;
@@ -129,9 +130,9 @@ void FillFieldsWithUnknown(std::string *file_name, std::string *class_name,
   }
 }
 
-void FillMethodSignatureAndLine(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
-                                std::string *method_name,
-                                std::string *signature, int *line_number) {
+void FillMethodSignatureAndLine(jvmtiEnv* jvmti, const JVMPI_CallFrame& frame,
+                                std::string* method_name,
+                                std::string* signature, int* line_number) {
   GetMethodName(jvmti, frame.method_id, method_name, signature);
 
   // frame.lineno is actually a bci if it is a Java method; Asgct is piggy
@@ -144,7 +145,7 @@ void FillMethodSignatureAndLine(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
 
 }  // end namespace
 
-jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
+jint GetLineNumber(jvmtiEnv* jvmti, jmethodID method, jlocation location) {
   jint entry_count;
   JvmtiScopedPtr<jvmtiLineNumberEntry> table_ptr_ctr(jvmti);
   jint line_number = -1;
@@ -161,16 +162,16 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
     if (JVMTI_ERROR_ABSENT_INFORMATION == jvmti_error) {
       static bool no_debug_info = false;
       if (!no_debug_info) {
-        LOG(INFO)
-            << "No line number information was found in your bytecode."
-               " Some monitoring interfaces may report -1 ""for line numbers.";
+        LOG(INFO) << "No line number information was found in your bytecode."
+                     " Some monitoring interfaces may report -1 "
+                     "for line numbers.";
         no_debug_info = true;
       }
     }
     return -1;
   }
 
-  jvmtiLineNumberEntry *table_ptr = table_ptr_ctr.Get();
+  jvmtiLineNumberEntry* table_ptr = table_ptr_ctr.Get();
   if (entry_count == 1) {
     return table_ptr[0].line_number;
   }
@@ -198,10 +199,10 @@ jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location) {
   return -1;
 }
 
-bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
-                           const JVMPI_CallFrame &frame, std::string *file_name,
-                           std::string *class_name, std::string *method_name,
-                           std::string *signature, int *line_number) {
+bool GetStackFrameElements(JNIEnv* jni, jvmtiEnv* jvmti,
+                           const JVMPI_CallFrame& frame, std::string* file_name,
+                           std::string* class_name, std::string* method_name,
+                           std::string* signature, int* line_number) {
   if (!jvmti) {
     FillFieldsWithUnknown(file_name, class_name, method_name, signature,
                           line_number);
@@ -223,10 +224,10 @@ bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
                                class_name, method_name, signature, line_number);
 }
 
-bool GetStackFrameElements(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
-                           jclass declaring_class, std::string *file_name,
-                           std::string *class_name, std::string *method_name,
-                           std::string *signature, int *line_number) {
+bool GetStackFrameElements(jvmtiEnv* jvmti, const JVMPI_CallFrame& frame,
+                           jclass declaring_class, std::string* file_name,
+                           std::string* class_name, std::string* method_name,
+                           std::string* signature, int* line_number) {
   if (!jvmti) {
     FillFieldsWithUnknown(file_name, class_name, method_name, signature,
                           line_number);

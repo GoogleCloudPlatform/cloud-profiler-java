@@ -24,19 +24,19 @@
 
 namespace google {
 namespace javaprofiler {
-  // Simplifies the name of a function to make it more human readable, and group
-  // related functions under a single name.
-void SimplifyFunctionName(std::string *name);
+// Simplifies the name of a function to make it more human readable, and group
+// related functions under a single name.
+void SimplifyFunctionName(std::string* name);
 
 // Fix the parameter signature from a JVM type signature to a pretty-print
 // one.
-void FixMethodParameters(std::string *signature);
+void FixMethodParameters(std::string* signature);
 
 // Convert class name format from "pkg/name/class" to "pkg.name.class".
-void FixPath(std::string *s);
+void FixPath(std::string* s);
 
 // Pretty-prints a JVM type signature.
-void PrettyPrintSignature(std::string *s);
+void PrettyPrintSignature(std::string* s);
 }  // namespace javaprofiler
 }  // namespace google
 

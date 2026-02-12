@@ -24,7 +24,7 @@
 namespace google {
 namespace javaprofiler {
 
-int64_t MethodInfo::LineNumber(const JVMPI_CallFrame &frame) {
+int64_t MethodInfo::LineNumber(const JVMPI_CallFrame& frame) {
   // lineno is actually the BCI of the frame.
   int bci = frame.lineno;
 

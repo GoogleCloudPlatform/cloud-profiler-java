@@ -55,9 +55,9 @@ typedef struct {
 //   frames     - the JVMPI_CallFrames that make up this trace. Callee
 //                followed by callers.
 typedef struct {
-  JNIEnv *env_id;
+  JNIEnv* env_id;
   jint num_frames;
-  JVMPI_CallFrame *frames;
+  JVMPI_CallFrame* frames;
 } JVMPI_CallTrace;
 
 // Placeholder (fake) line number for native frames in ASGCT_CallFrame. A native

@@ -38,7 +38,7 @@ inline struct timespec TimeAdd(const struct timespec t1,
   return t;
 }
 
-inline bool TimeLessThan(const struct timespec &t1, const struct timespec &t2) {
+inline bool TimeLessThan(const struct timespec& t1, const struct timespec& t2) {
   return (t1.tv_sec < t2.tv_sec) ||
          (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec);
 }
@@ -49,7 +49,7 @@ inline struct timespec NanosToTimeSpec(int64_t nanos) {
   return timespec{seconds, nano_seconds};
 }
 
-inline int64_t TimeSpecToNanos(const struct timespec &ts) {
+inline int64_t TimeSpecToNanos(const struct timespec& ts) {
   return kNanosPerSecond * ts.tv_sec + ts.tv_nsec;
 }
 
@@ -81,10 +81,10 @@ class Clock {
 
 // Determines if there is time for another lap before reaching the finish line.
 // Uses a margin of multiple laps to ensure to not overrun the finish line.
-bool AlmostThere(Clock *clock, const struct timespec &finish,
-                 const struct timespec &lap);
+bool AlmostThere(Clock* clock, const struct timespec& finish,
+                 const struct timespec& lap);
 
-Clock *DefaultClock();
+Clock* DefaultClock();
 
 }  // namespace javaprofiler
 }  // namespace google

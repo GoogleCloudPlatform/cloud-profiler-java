@@ -35,11 +35,11 @@ namespace javaprofiler {
 const int kMaxFramesToCapture = 128;
 
 uint64_t CalculateHash(int64_t attr, int num_frames,
-                       const JVMPI_CallFrame *frame);
-bool Equal(int num_frames, const JVMPI_CallFrame *f1,
-           const JVMPI_CallFrame *f2);
+                       const JVMPI_CallFrame* frame);
+bool Equal(int num_frames, const JVMPI_CallFrame* f1,
+           const JVMPI_CallFrame* f2);
 
-typedef void (*ASGCTType)(JVMPI_CallTrace *, jint, void *);
+typedef void (*ASGCTType)(JVMPI_CallTrace*, jint, void*);
 
 const int kNumCallTraceErrors = 10;
 
@@ -71,7 +71,7 @@ class AttributeTable {
     strings_->push_back("");
   }
 
-  static int RegisterString(const char *value) {
+  static int RegisterString(const char* value) {
     if (mutex_ == nullptr || value == nullptr || !*value) {
       // Not initialized or empty string.
       return 0;
@@ -97,9 +97,9 @@ class AttributeTable {
   }
 
  private:
-  static std::mutex *mutex_;
-  static std::unordered_map<std::string, int> *string_map_;
-  static std::vector<std::string> *strings_;
+  static std::mutex* mutex_;
+  static std::unordered_map<std::string, int>* string_map_;
+  static std::vector<std::string>* strings_;
 };
 
 // Multiset of stack traces. There is a maximum number of distinct
@@ -124,13 +124,11 @@ class AsyncSafeTraceMultiset {
  public:
   AsyncSafeTraceMultiset() { Reset(); }
 
-  void Reset() {
-    memset(traces_, 0, sizeof(traces_));
-  }
+  void Reset() { memset(traces_, 0, sizeof(traces_)); }
 
   // Add a trace to the set. If it is already present, increment its
   // count. This operation is thread safe and async safe.
-  bool Add(int attr, JVMPI_CallTrace *trace);
+  bool Add(int attr, JVMPI_CallTrace* trace);
 
   // Extract a trace from the array. frames must point to at least
   // max_frames contiguous frames. It will return the number of frames
@@ -138,8 +136,8 @@ class AsyncSafeTraceMultiset {
   // there is no valid trace at this location.  This operation is
   // thread safe with respect to Add() but only a single call to
   // Extract can be done at a time.
-  int Extract(int location, int64_t *attr, int max_frames,
-              JVMPI_CallFrame *frames, int64_t *count);
+  int Extract(int location, int64_t* attr, int max_frames,
+              JVMPI_CallFrame* frames, int64_t* count);
 
   int64_t MaxEntries() const { return kMaxStackTraces; }
 
@@ -186,14 +184,14 @@ class TraceMultiset {
   } CallTrace;
 
   struct CallTraceHash {
-    std::size_t operator()(const CallTrace &trace) const {
+    std::size_t operator()(const CallTrace& trace) const {
       return CalculateHash(trace.attr, trace.frames.size(),
                            trace.frames.data());
     }
   };
 
   struct CallTraceEqual {
-    bool operator()(const CallTrace &t1, const CallTrace &t2) const {
+    bool operator()(const CallTrace& t1, const CallTrace& t2) const {
       if (t1.attr != t2.attr) {
         return false;
       }
@@ -212,7 +210,7 @@ class TraceMultiset {
 
   // Add a trace to the array. If it is already in the array,
   // increment its count.
-  void Add(int64_t attr, int num_frames, JVMPI_CallFrame *frames,
+  void Add(int64_t attr, int num_frames, JVMPI_CallFrame* frames,
            int64_t count);
 
   typedef CountMap::iterator iterator;
@@ -237,7 +235,7 @@ class TraceMultiset {
 // and copies them into a trace multiset. It returns the number of samples
 // that were copied. This is thread-safe with respect to other threads adding
 // samples into the asyncsafe set.
-int HarvestSamples(AsyncSafeTraceMultiset *from, TraceMultiset *to);
+int HarvestSamples(AsyncSafeTraceMultiset* from, TraceMultiset* to);
 
 }  // namespace javaprofiler
 }  // namespace google

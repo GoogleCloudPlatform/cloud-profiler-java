@@ -44,10 +44,10 @@ struct NumLabelValue {
   const std::string unit;
 
   // Constructor with a value and unit name.
-  NumLabelValue(int64_t v = 0, const std::string &u = "") : value(v), unit(u) {}
+  NumLabelValue(int64_t v = 0, const std::string& u = "") : value(v), unit(u) {}
 
   // Equality operator with another NumLabelValue.
-  bool operator==(const NumLabelValue &other) const {
+  bool operator==(const NumLabelValue& other) const {
     return value == other.value && unit == other.unit;
   }
 
@@ -61,11 +61,11 @@ struct SampleLabel {
   SampleLabel() : key(""), is_string_label(true) {}
 
   // Constructor for a string label.
-  SampleLabel(const std::string &k, const std::string &str)
+  SampleLabel(const std::string& k, const std::string& str)
       : key(k), str_label(str), is_string_label(true) {}
 
   // Constructor for a numerical label.
-  SampleLabel(const std::string &k, int64_t num, const std::string &unit = "")
+  SampleLabel(const std::string& k, int64_t num, const std::string& unit = "")
       : key(k), num_label(num, unit), is_string_label(false) {}
 
   // The label key.
@@ -80,7 +80,7 @@ struct SampleLabel {
   const bool is_string_label;
 
   // Equality operator for the label.
-  bool operator==(const SampleLabel &other) const;
+  bool operator==(const SampleLabel& other) const;
 
   // Hash method for this numerical label.
   size_t Hash(size_t current_hash_value) const;
@@ -90,25 +90,25 @@ struct SampleLabel {
 // constructing the profile proto.
 struct TraceAndLabels {
   // Constructor for a trace without labels.
-  TraceAndLabels(const JVMPI_CallTrace *t) : trace(t) {}
+  TraceAndLabels(const JVMPI_CallTrace* t) : trace(t) {}
 
   // Constructor for a trace with labels.
-  TraceAndLabels(const JVMPI_CallTrace *t, const std::vector<SampleLabel> &l)
+  TraceAndLabels(const JVMPI_CallTrace* t, const std::vector<SampleLabel>& l)
       : trace(t), labels(l) {}
 
   // Adds a string label to the associated trace.
-  void AddLabel(const std::string &key, const std::string &str_value) {
+  void AddLabel(const std::string& key, const std::string& str_value) {
     labels.push_back({key, str_value});
   }
 
   // Adds a numeric label to the associated trace.
-  void AddLabel(const std::string &key, int64_t num_value,
-                const std::string &unit = "") {
+  void AddLabel(const std::string& key, int64_t num_value,
+                const std::string& unit = "") {
     labels.push_back({key, num_value, unit});
   }
 
   // Trace associated with given labels.
-  const JVMPI_CallTrace *trace;
+  const JVMPI_CallTrace* trace;
   // Labels associated with the trace.
   std::vector<SampleLabel> labels;
 };
@@ -117,12 +117,12 @@ struct TraceAndLabels {
 // potential labels associated with this trace.
 struct ProfileStackTrace {
   // Constructor for a stack trace without any label.
-  ProfileStackTrace(const JVMPI_CallTrace *trace = nullptr, int64_t m_value = 0)
+  ProfileStackTrace(const JVMPI_CallTrace* trace = nullptr, int64_t m_value = 0)
       : metric_value(m_value), trace_and_labels(trace) {}
 
   // Constructor for a stack trace with labels.
-  ProfileStackTrace(const JVMPI_CallTrace *trace, int64_t m_value,
-                    const std::vector<SampleLabel> &labels)
+  ProfileStackTrace(const JVMPI_CallTrace* trace, int64_t m_value,
+                    const std::vector<SampleLabel>& labels)
       : metric_value(m_value), trace_and_labels(trace, labels) {}
 
   // Metric associated with the trace and labels.
@@ -137,47 +137,43 @@ class TraceSamples {
  public:
   // Returns an existing sample with the same trace and labels if exists,
   // nullptr otherwise.
-  perftools::profiles::Sample *SampleFor(const TraceAndLabels &trace) const;
+  perftools::profiles::Sample* SampleFor(const TraceAndLabels& trace) const;
 
   // Adds a given trace and label to storage and associates it with a given
   // sample.
-  void Add(const TraceAndLabels &trace, perftools::profiles::Sample *sample);
+  void Add(const TraceAndLabels& trace, perftools::profiles::Sample* sample);
 
  private:
   struct TraceHash {
-    size_t operator()(const TraceAndLabels &trace_values) const;
+    size_t operator()(const TraceAndLabels& trace_values) const;
   };
 
   struct TraceEquals {
-    bool operator()(const TraceAndLabels &trace_values1,
-                    const TraceAndLabels &trace_values2) const;
+    bool operator()(const TraceAndLabels& trace_values1,
+                    const TraceAndLabels& trace_values2) const;
   };
 
-  std::unordered_map<TraceAndLabels, perftools::profiles::Sample *, TraceHash,
+  std::unordered_map<TraceAndLabels, perftools::profiles::Sample*, TraceHash,
                      TraceEquals>
       traces_;
 };
 
-enum class NativeSymbolization {
-  SYMBOLS,
-  NO_SYMBOLS
-};
+enum class NativeSymbolization { SYMBOLS, NO_SYMBOLS };
 
 // Store locations previously seen so that the profile is only
 // modified for new locations.
 class LocationBuilder {
  public:
-  explicit LocationBuilder(perftools::profiles::Builder *builder)
+  explicit LocationBuilder(perftools::profiles::Builder* builder)
       : builder_(builder) {}
 
   // Return an existing or new location matching the given parameters,
   // modifying the profile as needed to add new function and location
   // information.
-  perftools::profiles::Location *LocationFor(const std::string &class_name,
-                                             const std::string &function_name,
-                                             const std::string &file_name,
-                                             int start_line,
-                                             int line_number,
+  perftools::profiles::Location* LocationFor(const std::string& class_name,
+                                             const std::string& function_name,
+                                             const std::string& file_name,
+                                             int start_line, int line_number,
                                              int64_t address);
 
  private:
@@ -190,28 +186,29 @@ class LocationBuilder {
   };
 
   struct LocationInfoHash {
-    size_t operator()(const LocationInfo &info) const;
+    size_t operator()(const LocationInfo& info) const;
   };
 
   struct LocationInfoEquals {
-    bool operator()(const LocationInfo &info1, const LocationInfo &info2) const;
+    bool operator()(const LocationInfo& info1, const LocationInfo& info2) const;
   };
 
-  perftools::profiles::Builder *builder_;
+  perftools::profiles::Builder* builder_;
 
-  std::unordered_map<LocationInfo, perftools::profiles::Location *,
-      LocationInfoHash, LocationInfoEquals> locations_;
+  std::unordered_map<LocationInfo, perftools::profiles::Location*,
+                     LocationInfoHash, LocationInfoEquals>
+      locations_;
 };
 
 // Remember traces and use the information to create locations with native
 // information if supported.
 class ProfileFrameCache {
  public:
-  virtual void ProcessTraces(const ProfileStackTrace *traces,
+  virtual void ProcessTraces(const ProfileStackTrace* traces,
                              int num_traces) = 0;
 
-  virtual perftools::profiles::Location *GetLocation(
-      const JVMPI_CallFrame &jvm_frame, LocationBuilder *location_builder) = 0;
+  virtual perftools::profiles::Location* GetLocation(
+      const JVMPI_CallFrame& jvm_frame, LocationBuilder* location_builder) = 0;
 
   virtual ~ProfileFrameCache() {}
 };
@@ -230,13 +227,13 @@ class ProfileFrameCache {
 // cache-size management.
 class MethodInfoCache {
  public:
-  MethodInfoCache(JNIEnv *jni_env, jvmtiEnv *jvmti_env);
+  MethodInfoCache(JNIEnv* jni_env, jvmtiEnv* jvmti_env);
 
-  MethodInfo *Method(jmethodID id);
+  MethodInfo* Method(jmethodID id);
 
  private:
-  JNIEnv *jni_env_;
-  jvmtiEnv *jvmti_env_;
+  JNIEnv* jni_env_;
+  jvmtiEnv* jvmti_env_;
 
   std::unordered_map<jmethodID, std::unique_ptr<MethodInfo>> methods_;
 };
@@ -248,17 +245,17 @@ class ProfileProtoBuilder {
 
   // Adds traces to the proto. The traces array must not be deleted
   // before calling CreateProto.
-  void AddTraces(const ProfileStackTrace *traces, int num_traces);
+  void AddTraces(const ProfileStackTrace* traces, int num_traces);
 
   // Adds traces to the proto, where each trace has a defined count
   // of occurrences. The traces array must not be deleted
   // before calling CreateProto.
-  void AddTraces(const ProfileStackTrace *traces, const int32_t *counts,
+  void AddTraces(const ProfileStackTrace* traces, const int32_t* counts,
                  int num_traces);
 
   // Adds a "fake" trace with a single frame. Used to represent JVM
   // tasks such as JIT compilation and GC.
-  void AddArtificialTrace(const std::string &name, int count,
+  void AddArtificialTrace(const std::string& name, int count,
                           int sampling_rate);
 
   // Sets the regular expression which is used to drop matching frames, along
@@ -281,22 +278,22 @@ class ProfileProtoBuilder {
   // GetStackTrace and remain in pure Java land frames. Other ForX methods
   // will fail an assertion when attempting a nullptr cache.
   static std::unique_ptr<ProfileProtoBuilder> ForHeap(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t sampling_rate,
-      ProfileFrameCache *cache = nullptr);
+      JNIEnv* jni_env, jvmtiEnv* jvmti_env, int64_t sampling_rate,
+      ProfileFrameCache* cache = nullptr);
 
-  static std::unique_ptr<ProfileProtoBuilder> ForCpu(JNIEnv *jni_env,
-                                                     jvmtiEnv *jvmti_env,
+  static std::unique_ptr<ProfileProtoBuilder> ForCpu(JNIEnv* jni_env,
+                                                     jvmtiEnv* jvmti_env,
                                                      int64_t duration_ns,
                                                      int64_t sampling_rate,
-                                                     ProfileFrameCache *cache);
+                                                     ProfileFrameCache* cache);
 
   static std::unique_ptr<ProfileProtoBuilder> ForContention(
-      JNIEnv *jni_env, jvmtiEnv *jvmti_env, int64_t duration_ns,
-      int64_t sampling_rate, ProfileFrameCache *cache);
+      JNIEnv* jni_env, jvmtiEnv* jvmti_env, int64_t duration_ns,
+      int64_t sampling_rate, ProfileFrameCache* cache);
 
  protected:
   struct SampleType {
-    SampleType(const std::string &type_in, const std::string &unit_in)
+    SampleType(const std::string& type_in, const std::string& unit_in)
         : type(type_in), unit(unit_in) {}
 
     std::string type;
@@ -325,28 +322,28 @@ class ProfileProtoBuilder {
 
  private:
   int SkipTopNativeFrames(const JVMPI_CallTrace& trace) const;
-  void AddSampleType(const SampleType &sample_type);
-  void SetPeriodType(const SampleType &metric_type);
-  void InitSampleValues(perftools::profiles::Sample *sample, int64_t count,
+  void AddSampleType(const SampleType& sample_type);
+  void SetPeriodType(const SampleType& metric_type);
+  void InitSampleValues(perftools::profiles::Sample* sample, int64_t count,
                         int64_t metric);
-  void UpdateSampleValues(perftools::profiles::Sample *sample, int64_t count,
+  void UpdateSampleValues(perftools::profiles::Sample* sample, int64_t count,
                           int64_t size);
-  void AddTrace(const ProfileStackTrace &trace, int32_t count);
-  void AddJavaInfo(const JVMPI_CallFrame &jvm_frame,
-                   perftools::profiles::Profile *profile,
-                   perftools::profiles::Sample *sample);
-  void AddNativeInfo(const JVMPI_CallFrame &jvm_frame,
-                     perftools::profiles::Profile *profile,
-                     perftools::profiles::Sample *sample);
+  void AddTrace(const ProfileStackTrace& trace, int32_t count);
+  void AddJavaInfo(const JVMPI_CallFrame& jvm_frame,
+                   perftools::profiles::Profile* profile,
+                   perftools::profiles::Sample* sample);
+  void AddNativeInfo(const JVMPI_CallFrame& jvm_frame,
+                     perftools::profiles::Profile* profile,
+                     perftools::profiles::Sample* sample);
   void UnsampleMetrics();
 
-  int64_t Location(MethodInfo *method, const JVMPI_CallFrame &frame);
+  int64_t Location(MethodInfo* method, const JVMPI_CallFrame& frame);
 
-  void AddLabels(const TraceAndLabels &trace_and_labels,
-                 perftools::profiles::Sample *sample);
+  void AddLabels(const TraceAndLabels& trace_and_labels,
+                 perftools::profiles::Sample* sample);
 
   MethodInfoCache method_info_cache_;
-  ProfileFrameCache *native_cache_;
+  ProfileFrameCache* native_cache_;
   TraceSamples trace_samples_;
   LocationBuilder location_builder_;
 

@@ -28,8 +28,8 @@ namespace javaprofiler {
 // Accessors for a JNIEnv for this thread.
 class Accessors {
  public:
-  static void SetCurrentJniEnv(JNIEnv *env) { env_ = env; }
-  static JNIEnv *CurrentJniEnv() { return env_; }
+  static void SetCurrentJniEnv(JNIEnv* env) { env_ = env; }
+  static JNIEnv* CurrentJniEnv() { return env_; }
 
   static void SetAttribute(int64_t value) { attr_ = value; }
   static int64_t GetAttribute() { return attr_; }
@@ -46,10 +46,10 @@ class Accessors {
   // For all Java threads, InitTags() is called inside the callback function of
   // onThreadStart. However, non-Java threads do not trigger the callback,
   // which leaves InitTags() not called.
-  static const Tags &GetTags() {
+  static const Tags& GetTags() {
     return tags_ == nullptr ? Tags::Empty() : *tags_;
   }
-  static Tags *GetMutableTags() { return tags_; }
+  static Tags* GetMutableTags() { return tags_; }
 
   // AllocateAndCopyTags() and ApplyAndDeleteTags() are used to propagate tags
   // between threads. The usage should be like:
@@ -64,14 +64,14 @@ class Accessors {
 
   // Copies the thread-local tags. Returns the pointer of newly allocated Tags
   // on success; otherwise, return nullptr.
-  static Tags *AllocateAndCopyTags();
+  static Tags* AllocateAndCopyTags();
   // Overrides the thread-local tags with the tags passed in and releases the
   // memory pointed by tags.
-  static void ApplyAndDeleteTags(Tags *tags);
+  static void ApplyAndDeleteTags(Tags* tags);
 
   template <class FunctionType>
-  static inline FunctionType GetJvmFunction(const char *function_name) {
-    static void *handle = GetJvmLibHandle();
+  static inline FunctionType GetJvmFunction(const char* function_name) {
+    static void* handle = GetJvmLibHandle();
     if (handle == nullptr) {
       return nullptr;
     }
@@ -81,8 +81,8 @@ class Accessors {
   }
 
  private:
-  static void *GetJvmLibHandle() {
-    void *handle = dlopen("libjvm.so", RTLD_LAZY);
+  static void* GetJvmLibHandle() {
+    void* handle = dlopen("libjvm.so", RTLD_LAZY);
     if (handle != nullptr) {
       return handle;
     }
@@ -103,13 +103,13 @@ class Accessors {
   // in musl / Alpine, see
   // https://wiki.musl-libc.org/design-concepts.html#Thread-local-storage.
 #if defined(JAVAPROFILER_GLOBAL_DYNAMIC_TLS) || defined(ALPINE)
-  static __thread JNIEnv *env_ __attribute__((tls_model("global-dynamic")));
+  static __thread JNIEnv* env_ __attribute__((tls_model("global-dynamic")));
   static __thread int64_t attr_ __attribute__((tls_model("global-dynamic")));
-  static __thread Tags *tags_ __attribute__((tls_model("global-dynamic")));
+  static __thread Tags* tags_ __attribute__((tls_model("global-dynamic")));
 #else
-  static __thread JNIEnv *env_ __attribute__((tls_model("initial-exec")));
+  static __thread JNIEnv* env_ __attribute__((tls_model("initial-exec")));
   static __thread int64_t attr_ __attribute__((tls_model("initial-exec")));
-  static __thread Tags *tags_ __attribute__((tls_model("initial-exec")));
+  static __thread Tags* tags_ __attribute__((tls_model("initial-exec")));
 #endif
 };
 

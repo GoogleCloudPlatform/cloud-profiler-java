@@ -19,9 +19,9 @@
 namespace google {
 namespace javaprofiler {
 
-__thread JNIEnv *Accessors::env_;
+__thread JNIEnv* Accessors::env_;
 __thread int64_t Accessors::attr_;
-__thread Tags *Accessors::tags_;
+__thread Tags* Accessors::tags_;
 
 void Accessors::InitTags() {
   assert(tags_ == nullptr);
@@ -29,7 +29,7 @@ void Accessors::InitTags() {
 }
 
 void Accessors::DestroyTags() {
-  const Tags *tags_tmp = tags_;
+  const Tags* tags_tmp = tags_;
   tags_ = nullptr;
   // The thread local storage tags_ is set to null before deallocation to avoid
   // getting the destructed object in the signal handler. The compiler barrier
@@ -39,11 +39,11 @@ void Accessors::DestroyTags() {
   delete tags_tmp;
 }
 
-Tags *Accessors::AllocateAndCopyTags() {
+Tags* Accessors::AllocateAndCopyTags() {
   return tags_ == nullptr ? nullptr : new Tags(*tags_);
 }
 
-void Accessors::ApplyAndDeleteTags(Tags *tags) {
+void Accessors::ApplyAndDeleteTags(Tags* tags) {
   if (tags_ != nullptr) {
     *tags_ = std::move(*tags);
   }
