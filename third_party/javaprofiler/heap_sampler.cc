@@ -66,24 +66,6 @@ std::unique_ptr<std::vector<JVMPI_CallFrame>> GetTraceUsingJvmti(
       new std::vector<JVMPI_CallFrame>(TransformFrames(stack_frames, count)));
 }
 
-static jstring GetClassName(JNIEnv* jni_env, jobject object,
-                            jclass object_klass) {
-  jclass cls = jni_env->FindClass("java/lang/Class");
-  jmethodID get_name_id =
-      jni_env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
-  jstring name_obj = static_cast<jstring>(
-      jni_env->CallObjectMethod(object_klass, get_name_id));
-  return name_obj;
-}
-
-static jlong GetThreadId(JNIEnv* jni_env, jthread thread) {
-  jclass thread_class = jni_env->FindClass("java/lang/Thread");
-  jmethodID get_id_method_id =
-      jni_env->GetMethodID(thread_class, "getId", "()J");
-  jlong thread_id = jni_env->CallLongMethod(thread, get_id_method_id);
-  return thread_id;
-}
-
 extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv* jvmti_env,
                                              JNIEnv* jni_env, jthread thread,
                                              jobject object,
@@ -92,19 +74,11 @@ extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv* jvmti_env,
     return;
   }
 
-  if (!google::javaprofiler::HeapMonitor::HasAllocationInstrumentation() &&
-      !google::javaprofiler::HeapMonitor::HasGarbageInstrumentation()) {
-    google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
-                                                 object_klass, size, 0);
-    return;
-  }
-  jlong thread_id = GetThreadId(jni_env, thread);
-
   google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
-                                               object_klass, size, thread_id);
+                                               object_klass, size);
   // Invoke all functions in HeapMonitor::alloc_inst_functions_
   google::javaprofiler::HeapMonitor::InvokeAllocationInstrumentationFunctions(
-      thread_id, nullptr, 0, size, 0);
+      size);
 }
 
 extern "C" JNIEXPORT void GarbageCollectionFinish(jvmtiEnv* jvmti_env) {
@@ -118,15 +92,14 @@ namespace javaprofiler {
 
 const HeapEventStorage::GcCallback HeapMonitor::gc_callback_ =
     [](const HeapObjectTrace& elem) {
-      HeapMonitor::InvokeGarbageInstrumentationFunctions(
-          elem.ThreadId(), nullptr, 0, elem.Size(), 0);
+      HeapMonitor::InvokeGarbageInstrumentationFunctions(elem.Size());
     };
 
 std::atomic<HeapMonitor*> HeapMonitor::heap_monitor_;
 
 std::atomic<jvmtiEnv*> HeapMonitor::jvmti_;
 std::atomic<int> HeapMonitor::sampling_interval_;
-std::vector<AllocationInstrumentationFunction>
+std::vector<AllocationSamplingInstrumentationFunction>
     HeapMonitor::alloc_inst_functions_;
 std::vector<GarbageInstrumentationFunction> HeapMonitor::gc_inst_functions_;
 
@@ -141,15 +114,14 @@ HeapEventStorage::HeapEventStorage(jvmtiEnv* jvmti, ProfileFrameCache* cache,
 
 void HeapEventStorage::Add(JNIEnv* jni, jthread thread, jobject object,
                            jclass klass, jlong size,
-                           std::vector<JVMPI_CallFrame> frames,
-                           jlong thread_id) {
+                           std::vector<JVMPI_CallFrame> frames) {
   jweak weak_ref = jni->NewWeakGlobalRef(object);
   if (jni->ExceptionCheck()) {
     LOG(WARNING) << "Failed to create NewWeakGlobalRef, skipping heap sample";
     return;
   }
 
-  HeapObjectTrace live_object(weak_ref, size, std::move(frames), thread_id);
+  HeapObjectTrace live_object(weak_ref, size, std::move(frames));
 
   // Only now lock and get things done quickly.
   std::lock_guard<std::mutex> lock(storage_lock_);
@@ -332,7 +304,7 @@ bool HeapMonitor::Supported(jvmtiEnv* jvmti) {
 }
 
 void HeapMonitor::AddSample(JNIEnv* jni_env, jthread thread, jobject object,
-                            jclass object_klass, jlong size, jlong thread_id) {
+                            jclass object_klass, jlong size) {
   auto trace = GetTraceUsingJvmti(jni_env, jvmti_.load(), thread);
   if (trace == nullptr) {
     return;
@@ -345,22 +317,21 @@ void HeapMonitor::AddSample(JNIEnv* jni_env, jthread thread, jobject object,
     return;
   }
   instance->storage_.Add(jni_env, thread, object, object_klass, size,
-                         std::move(*trace), thread_id);
+                         std::move(*trace));
 }
 
-void HeapMonitor::InvokeAllocationInstrumentationFunctions(
-    jlong thread_id, jbyte* name, int name_length, jlong size, jlong gcontext) {
+void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong size) {
   HeapMonitor* instance = TryGetInstance();
   if (instance == nullptr) {
     return;
   }
   for (auto fn : instance->alloc_inst_functions_) {
-    fn(thread_id, name, name_length, size, gcontext);
+    fn(size);
   }
 }
 
 void HeapMonitor::AddAllocationInstrumentation(
-    AllocationInstrumentationFunction fn) {
+    AllocationSamplingInstrumentationFunction fn) {
   HeapMonitor* instance = TryGetInstance();
   if (instance == nullptr) {
     return;
@@ -368,30 +339,13 @@ void HeapMonitor::AddAllocationInstrumentation(
   instance->alloc_inst_functions_.push_back(fn);
 }
 
-bool HeapMonitor::HasAllocationInstrumentation() {
-  HeapMonitor* instance = TryGetInstance();
-  if (instance == nullptr) {
-    return false;
-  }
-  return !instance->alloc_inst_functions_.empty();
-}
-
-bool HeapMonitor::HasGarbageInstrumentation() {
-  HeapMonitor* instance = TryGetInstance();
-  if (instance == nullptr) {
-    return false;
-  }
-  return !instance->gc_inst_functions_.empty();
-}
-
-void HeapMonitor::InvokeGarbageInstrumentationFunctions(
-    jlong thread_id, jbyte* name, int name_length, jlong size, jlong gcontext) {
+void HeapMonitor::InvokeGarbageInstrumentationFunctions(jlong size) {
   HeapMonitor* instance = TryGetInstance();
   if (instance == nullptr) {
     return;
   }
   for (auto fn : instance->gc_inst_functions_) {
-    fn(thread_id, name, name_length, size, gcontext);
+    fn(size);
   }
 }
 
