@@ -28,8 +28,12 @@
 #include <mutex>  // NOLINT
 #include <vector>
 
+#include "absl/base/thread_annotations.h"
+#include "absl/container/inlined_vector.h"
+#include "absl/synchronization/mutex.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
 
+// Deprecated. Use jvmtiEventSampledObjectAlloc callback instead.
 typedef void (*AllocationSamplingInstrumentationFunction)(jlong size);
 
 typedef void (*GarbageInstrumentationFunction)(jlong size);
@@ -211,8 +215,21 @@ class HeapMonitor {
   static void AddSample(JNIEnv* jni_env, jthread thread, jobject object,
                         jclass object_klass, jlong size);
 
+  // Adds a callback to be called when an object is allocated.
+  // The callback may be executed concurrently by multiple threads, so it must
+  // take care of thread safety.
+  static void AddSampledObjectAllocCallback(
+      jvmtiEventSampledObjectAlloc callback);
+
+  static void InvokeSampledObjectAllocCallbacks(jvmtiEnv* jvmti_env,
+                                                JNIEnv* jni_env, jthread thread,
+                                                jobject object,
+                                                jclass object_klass,
+                                                jlong size);
+
   static void InvokeAllocationInstrumentationFunctions(jlong size);
 
+  // Deprecated. Use AddSampledObjectAllocCallback instead.
   static void AddAllocationInstrumentation(
       AllocationSamplingInstrumentationFunction fn);
 
@@ -275,6 +292,10 @@ class HeapMonitor {
   static std::atomic<jvmtiEnv*> jvmti_;
   static std::atomic<int> sampling_interval_;
 
+  absl::Mutex sampled_object_alloc_callbacks_lock_;
+  absl::InlinedVector<jvmtiEventSampledObjectAlloc, 2>
+      sampled_object_alloc_callbacks_
+          ABSL_GUARDED_BY(sampled_object_alloc_callbacks_lock_);
   std::list<GcEvent> gc_notify_events_;
   bool gc_thread_shutdown = false;
   std::condition_variable gc_waiting_cv_;

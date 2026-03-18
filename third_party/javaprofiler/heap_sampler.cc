@@ -24,6 +24,8 @@
 #include <mutex>  // NOLINT
 #include <vector>
 
+#include "absl/container/inlined_vector.h"
+#include "absl/synchronization/mutex.h"
 #include "third_party/javaprofiler/accessors.h"
 #include "third_party/javaprofiler/heap_sampler.h"
 #include "third_party/javaprofiler/profile_proto_builder.h"
@@ -74,6 +76,8 @@ extern "C" JNIEXPORT void SampledObjectAlloc(jvmtiEnv* jvmti_env,
     return;
   }
 
+  google::javaprofiler::HeapMonitor::InvokeSampledObjectAllocCallbacks(
+      jvmti_env, jni_env, thread, object, object_klass, size);
   google::javaprofiler::HeapMonitor::AddSample(jni_env, thread, object,
                                                object_klass, size);
   // Invoke all functions in HeapMonitor::alloc_inst_functions_
@@ -318,6 +322,41 @@ void HeapMonitor::AddSample(JNIEnv* jni_env, jthread thread, jobject object,
   }
   instance->storage_.Add(jni_env, thread, object, object_klass, size,
                          std::move(*trace));
+}
+
+void HeapMonitor::AddSampledObjectAllocCallback(
+    jvmtiEventSampledObjectAlloc callback) {
+  if (callback == nullptr) {
+    return;
+  }
+  HeapMonitor* instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  absl::MutexLock lock(&instance->sampled_object_alloc_callbacks_lock_);
+  instance->sampled_object_alloc_callbacks_.push_back(callback);
+}
+
+void HeapMonitor::InvokeSampledObjectAllocCallbacks(
+    jvmtiEnv* jvmti_env, JNIEnv* jni_env, jthread thread, jobject object,
+    jclass object_klass, jlong size) {
+  HeapMonitor* instance = TryGetInstance();
+  if (instance == nullptr) {
+    return;
+  }
+  absl::InlinedVector<jvmtiEventSampledObjectAlloc, 2> callbacks;
+  {
+    // Copy the callbacks to a local variable to avoid holding the lock while
+    // invoking the callbacks.
+    absl::MutexLock lock(&instance->sampled_object_alloc_callbacks_lock_);
+    if (instance->sampled_object_alloc_callbacks_.empty()) {
+      return;
+    }
+    callbacks = instance->sampled_object_alloc_callbacks_;
+  }
+  for (jvmtiEventSampledObjectAlloc callback : callbacks) {
+    (*callback)(jvmti_env, jni_env, thread, object, object_klass, size);
+  }
 }
 
 void HeapMonitor::InvokeAllocationInstrumentationFunctions(jlong size) {
