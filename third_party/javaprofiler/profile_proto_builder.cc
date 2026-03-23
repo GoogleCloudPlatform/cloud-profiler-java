@@ -49,7 +49,7 @@ ProfileProtoBuilder::ProfileProtoBuilder(JNIEnv* jni_env, jvmtiEnv* jvmti_env,
   AddSampleType(count_type);
   AddSampleType(metric_type);
   builder_.mutable_profile()->set_default_sample_type(
-      builder_.StringId(metric_type.type.c_str()));
+      builder_.StringId(metric_type.type));
 
   SetPeriodType(metric_type);
 }
@@ -142,14 +142,14 @@ ProfileProtoBuilder::CreateUnsampledProto() {
 
 void ProfileProtoBuilder::AddSampleType(const SampleType& sample_type) {
   auto sample_type_proto = builder_.mutable_profile()->add_sample_type();
-  sample_type_proto->set_type(builder_.StringId(sample_type.type.c_str()));
-  sample_type_proto->set_unit(builder_.StringId(sample_type.unit.c_str()));
+  sample_type_proto->set_type(builder_.StringId(sample_type.type));
+  sample_type_proto->set_unit(builder_.StringId(sample_type.unit));
 }
 
 void ProfileProtoBuilder::SetPeriodType(const SampleType& metric_type) {
   auto period_type = builder_.mutable_profile()->mutable_period_type();
-  period_type->set_type(builder_.StringId(metric_type.type.c_str()));
-  period_type->set_unit(builder_.StringId(metric_type.unit.c_str()));
+  period_type->set_type(builder_.StringId(metric_type.type));
+  period_type->set_unit(builder_.StringId(metric_type.unit));
 }
 
 void ProfileProtoBuilder::UpdateSampleValues(
@@ -168,15 +168,15 @@ void ProfileProtoBuilder::AddLabels(const TraceAndLabels& trace_and_labels,
                                     perftools::profiles::Sample* sample) {
   for (const auto& label : trace_and_labels.labels) {
     auto new_label = sample->add_label();
-    new_label->set_key(builder_.StringId(label.key.c_str()));
+    new_label->set_key(builder_.StringId(label.key));
 
     if (label.is_string_label) {
-      new_label->set_str(builder_.StringId(label.str_label.c_str()));
+      new_label->set_str(builder_.StringId(label.str_label));
     } else {
       new_label->set_num(label.num_label.value);
       // Note that if the unit is not defined in the label, it will be empty and
       // thus end up being a 0 as, by definition, "" has 0 as a string Id.
-      new_label->set_num_unit(builder_.StringId(label.num_label.unit.c_str()));
+      new_label->set_num_unit(builder_.StringId(label.num_label.unit));
     }
   }
 }
