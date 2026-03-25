@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include "perftools/profiles/proto/aslr.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/string_view.h"
@@ -132,28 +133,28 @@ bool Builder::Emit(std::string *output) {
   return Marshal(*profile_, output);
 }
 
-bool Builder::Marshal(const Profile &profile, std::string *output) {
+bool Builder::Marshal(const Profile& profile, std::string* output) {
   *output = "";
   StringOutputStream stream(output);
   GzipOutputStream gzip_stream(&stream);
-  if (!profile.SerializeToZeroCopyStream(&gzip_stream)) {
+  if (!internal::SerializeWithAslrEntropyRedaction(profile, gzip_stream)) {
     LOG(ERROR) << "Failed to serialize to gzip stream";
     return false;
   }
   return gzip_stream.Close();
 }
 
-bool Builder::MarshalToFile(const Profile &profile, int fd) {
+bool Builder::MarshalToFile(const Profile& profile, int fd) {
   FileOutputStream stream(fd);
   GzipOutputStream gzip_stream(&stream);
-  if (!profile.SerializeToZeroCopyStream(&gzip_stream)) {
+  if (!internal::SerializeWithAslrEntropyRedaction(profile, gzip_stream)) {
     LOG(ERROR) << "Failed to serialize to gzip stream";
     return false;
   }
   return gzip_stream.Close();
 }
 
-bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
+bool Builder::MarshalToFile(const Profile& profile, const char* filename) {
   int fd;
   while ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0 &&
          errno == EINTR) {
