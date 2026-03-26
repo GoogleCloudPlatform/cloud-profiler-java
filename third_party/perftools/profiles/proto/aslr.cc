@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <limits>
 
-#include "perftools/profiles/proto/profile.proto.h"
 #include "absl/container/flat_hash_map.h"
 
 #include "google/protobuf/arena.h"
