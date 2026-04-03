@@ -41,7 +41,7 @@ class ProfileProtoBuilder {
       const google::javaprofiler::NativeProcessInfo &native_info)
       : jvmti_(jvmti), native_info_(native_info) {
     for (const auto &it : google::javaprofiler::AttributeTable::GetStrings()) {
-      builder_.StringId(it.c_str());
+      builder_.StringId(absl::NullSafeStringView(it.c_str()));
     }
   }
 
@@ -227,18 +227,22 @@ void ProfileProtoBuilder::Populate(
     int64_t period_ns) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
 
-  profile->mutable_period_type()->set_type(builder_.StringId(profile_type));
-  profile->mutable_period_type()->set_unit(builder_.StringId("nanoseconds"));
+  profile->mutable_period_type()->set_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
+  profile->mutable_period_type()->set_unit(
+      builder_.StringIdForMigration("nanoseconds"));
   profile->set_period(period_ns);
   perftools::profiles::ValueType *sample_type = profile->add_sample_type();
-  sample_type->set_type(builder_.StringId("sample"));
-  sample_type->set_unit(builder_.StringId("count"));
+  sample_type->set_type(builder_.StringIdForMigration("sample"));
+  sample_type->set_unit(builder_.StringIdForMigration("count"));
 
   sample_type = profile->add_sample_type();
-  sample_type->set_type(builder_.StringId(profile_type));
-  sample_type->set_unit(builder_.StringId("nanoseconds"));
+  sample_type->set_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
+  sample_type->set_unit(builder_.StringIdForMigration("nanoseconds"));
 
-  profile->set_default_sample_type(builder_.StringId(profile_type));
+  profile->set_default_sample_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
 
   profile->set_duration_nanos(duration_ns);
 
@@ -259,7 +263,8 @@ void ProfileProtoBuilder::Populate(
     m->set_id(profile->mapping_size());
     m->set_memory_start(mapping.start);
     m->set_memory_limit(mapping.limit);
-    m->set_filename(builder_.StringId(mapping.name.c_str()));
+    m->set_filename(
+        builder_.StringId(absl::NullSafeStringView(mapping.name.c_str())));
   }
 }
 
@@ -280,7 +285,7 @@ void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
 
   if (attr != 0) {
     perftools::profiles::Label *label = sample->add_label();
-    label->set_key(builder_.StringId("attr"));
+    label->set_key(builder_.StringIdForMigration("attr"));
     label->set_str(attr);
   }
 }
