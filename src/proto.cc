@@ -41,7 +41,7 @@ class ProfileProtoBuilder {
       const google::javaprofiler::NativeProcessInfo &native_info)
       : jvmti_(jvmti), native_info_(native_info) {
     for (const auto &it : google::javaprofiler::AttributeTable::GetStrings()) {
-      builder_.StringId(absl::NullSafeStringView(it.c_str()));
+      builder_.StringId(it);
     }
   }
 
@@ -263,8 +263,7 @@ void ProfileProtoBuilder::Populate(
     m->set_id(profile->mapping_size());
     m->set_memory_start(mapping.start);
     m->set_memory_limit(mapping.limit);
-    m->set_filename(
-        builder_.StringId(absl::NullSafeStringView(mapping.name.c_str())));
+    m->set_filename(builder_.StringId(mapping.name));
   }
 }
 
