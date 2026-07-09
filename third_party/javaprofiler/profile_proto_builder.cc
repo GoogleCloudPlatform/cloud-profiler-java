@@ -205,9 +205,10 @@ void ProfileProtoBuilder::AddTrace(const ProfileStackTrace& profile_trace,
 
   for (int i = first_frame; i < trace->num_frames; ++i) {
     auto& jvm_frame = trace->frames[i];
+    bool is_leaf_pc = (i == first_frame && is_cpu_profile_);
 
     if (jvm_frame.lineno == kNativeFrameLineNum) {
-      AddNativeInfo(jvm_frame, profile, sample);
+      AddNativeInfo(jvm_frame, profile, sample, is_leaf_pc);
     } else {
       AddJavaInfo(jvm_frame, profile, sample);
     }
@@ -268,17 +269,33 @@ MethodInfo* MethodInfoCache::Method(jmethodID method_id) {
 
 void ProfileProtoBuilder::AddNativeInfo(const JVMPI_CallFrame& jvm_frame,
                                         perftools::profiles::Profile* profile,
-                                        perftools::profiles::Sample* sample) {
+                                        perftools::profiles::Sample* sample,
+                                        bool is_leaf_pc) {
+  int64_t adjusted_address = reinterpret_cast<int64_t>(jvm_frame.method_id);
+
+  // Adjust address by -1, so that the address is within the call instruction
+  // instead of at the start of the return instruction, as per
+  // go/new-z-page#ret-addr-fixup
+  //
+  // Note: This adjustment is not needed for leaf PCs in CPU profiler
+  // (b/496543822)
+  //
+  // We use 0 (NULL) to indicate the absence of a valid address, and so
+  // do not do this where it would be invalid i.e. leading to -1
+  if (!is_leaf_pc && adjusted_address > 0) {
+    adjusted_address--;
+  }
+
   if (!native_cache_) {
-    int64_t address = reinterpret_cast<int64_t>(jvm_frame.method_id);
-    perftools::profiles::Location* location = location_builder_.LocationFor(
-        "", "[Unknown non-Java frame]", "", 0, kNativeFrameLineNum, address);
+    perftools::profiles::Location* location =
+        location_builder_.LocationFor("", "[Unknown non-Java frame]", "", 0,
+                                      kNativeFrameLineNum, adjusted_address);
     sample->add_location_id(location->id());
     return;
   }
 
-  perftools::profiles::Location* location =
-      native_cache_->GetLocation(jvm_frame, &location_builder_);
+  perftools::profiles::Location* location = native_cache_->GetLocation(
+      jvm_frame, &location_builder_, adjusted_address);
 
   sample->add_location_id(location->id());
 }
@@ -327,14 +344,6 @@ perftools::profiles::Location* LocationBuilder::LocationFor(
     const string& class_name, const string& function_name,
     const string& file_name, int start_line, int line_number, int64_t address) {
   auto profile = builder_->mutable_profile();
-
-  // Adjust address by -1, so that the address is within the call instruction
-  // instead of at the start of the return instruction, as per
-  // go/new-z-page#ret-addr-fixup
-  //
-  // We use 0 (NULL) to indicate the absence of a valid address, and so
-  // do not do this where it would be invalid i.e. leading to -1
-  address = (address > 0) ? address - 1 : 0;
 
   LocationInfo info{class_name, function_name, file_name, line_number, address};
 

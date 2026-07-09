@@ -30,8 +30,8 @@ class TestProfileFrameCache : public ProfileFrameCache {
   }
 
   perftools::profiles::Location* GetLocation(
-      const JVMPI_CallFrame& jvm_frame,
-      LocationBuilder* location_builder) override {
+      const JVMPI_CallFrame& jvm_frame, LocationBuilder* location_builder,
+      int64_t adjusted_address) override {
     return &nop_;
   }
 

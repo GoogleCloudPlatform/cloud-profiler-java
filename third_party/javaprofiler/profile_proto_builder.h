@@ -208,7 +208,8 @@ class ProfileFrameCache {
                              int num_traces) = 0;
 
   virtual perftools::profiles::Location* GetLocation(
-      const JVMPI_CallFrame& jvm_frame, LocationBuilder* location_builder) = 0;
+      const JVMPI_CallFrame& jvm_frame, LocationBuilder* location_builder,
+      int64_t adjusted_address) = 0;
 
   virtual ~ProfileFrameCache() {}
 };
@@ -319,6 +320,7 @@ class ProfileProtoBuilder {
 
   perftools::profiles::Builder builder_;
   int64_t sampling_rate_ = 0;
+  bool is_cpu_profile_ = false;
 
  private:
   int SkipTopNativeFrames(const JVMPI_CallTrace& trace) const;
@@ -334,7 +336,7 @@ class ProfileProtoBuilder {
                    perftools::profiles::Sample* sample);
   void AddNativeInfo(const JVMPI_CallFrame& jvm_frame,
                      perftools::profiles::Profile* profile,
-                     perftools::profiles::Sample* sample);
+                     perftools::profiles::Sample* sample, bool is_leaf_pc);
   void UnsampleMetrics();
 
   int64_t Location(MethodInfo* method, const JVMPI_CallFrame& frame);
@@ -369,6 +371,7 @@ class CpuProfileProtoBuilder : public ProfileProtoBuilder {
             ProfileProtoBuilder::SampleType("samples", "count"),
             ProfileProtoBuilder::SampleType("cpu", "nanoseconds"),
             skip_top_native_frames) {
+    is_cpu_profile_ = true;
     builder_.mutable_profile()->set_duration_nanos(duration_ns);
     builder_.mutable_profile()->set_period(sampling_rate);
   }
