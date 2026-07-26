@@ -14,6 +14,8 @@
 
 #include "third_party/javaprofiler/profile_test_lib.h"
 
+#include <iterator>
+
 #include "testing/base/public/gunit.h"
 
 namespace google {
@@ -134,10 +136,10 @@ static jvmtiError GetLineNumberTable(jvmtiEnv* env, jmethodID method,
   JvmProfileTestLib::line_number_call_count++;
 
   size_t table_size =
-      arraysize(fake_line_number_table) * sizeof(jvmtiLineNumberEntry);
+      std::size(fake_line_number_table) * sizeof(jvmtiLineNumberEntry);
   env->Allocate(table_size, reinterpret_cast<unsigned char**>(table_ptr));
 
-  *entry_count_ptr = arraysize(fake_line_number_table);
+  *entry_count_ptr = std::size(fake_line_number_table);
   std::memcpy(*table_ptr, fake_line_number_table, table_size);
 
   return JVMTI_ERROR_NONE;
