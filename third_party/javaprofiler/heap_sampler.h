@@ -198,6 +198,10 @@ class HeapMonitor {
 
   static bool Enabled() { return heap_monitor_ != nullptr; }
 
+  static int GetSamplingInterval() {
+    return sampling_interval_.load(std::memory_order_relaxed);
+  }
+
   // Returns a perftools::profiles::Profile with the objects provided by the
   // HeapEventStorage.
   static std::unique_ptr<perftools::profiles::Profile> GetHeapProfiles(
