@@ -15,7 +15,7 @@
 #
 # Base image
 #
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 #
 # Dependencies
@@ -27,12 +27,11 @@ FROM ubuntu:xenial
 # Kitware installs CMake v3.20.5
 
 RUN apt-get update && apt-get install -y software-properties-common apt-transport-https ca-certificates gnupg wget && \
-    add-apt-repository -y ppa:openjdk-r/ppa && \
     test -f /usr/share/doc/kitware-archive-keyring/copyright || \
     wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
     | gpg --dearmor - \
     | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null && \
-    echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ xenial main' \
+    echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' \
     | tee /etc/apt/sources.list.d/kitware.list >/dev/null && \
     apt-get update && \
     apt-get install kitware-archive-keyring
@@ -82,7 +81,7 @@ RUN git clone --depth=1 -b curl-8_10_1 https://github.com/curl/curl.git /tmp/cur
 RUN git clone --depth=1 -b v2.1.2 https://github.com/gflags/gflags.git /tmp/gflags && \
     cd /tmp/gflags && \
     mkdir build && cd build && \
-    cmake -DCMAKE_CXX_FLAGS=-fpic -DGFLAGS_NAMESPACE=google .. && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_CXX_FLAGS=-fpic -DGFLAGS_NAMESPACE=google .. && \
     make -j && make install && \
     cd ~ && rm -rf /tmp/gflags
 
@@ -101,39 +100,53 @@ RUN mkdir /tmp/glog && cd /tmp/glog && \
 # OpenSSL library itself.
 # Limit the number of threads used by make, as unlimited threads causes
 # memory exhausted error on the Kokoro VM.
-# -DCMAKE_CXX_STANDARD=11 is necessary since it is the minimum version supported
-# by gRPC dependencies. Xenial sets default version to c++98.
+# -DCMAKE_CXX_STANDARD=17 is necessary since it is the minimum version supported
+# by gRPC dependencies.
 #
-# See https://github.com/grpc/grpc/blob/v1.46.7/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
-RUN git clone --depth=1 --recursive -b v1.46.7 https://github.com/grpc/grpc.git /tmp/grpc && \
+# See https://github.com/grpc/grpc/blob/v1.66.0/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh
+RUN git clone --depth=1 --recursive -b v1.66.0 https://github.com/grpc/grpc.git /tmp/grpc && \
     cd /tmp/grpc/ && \
-    # Install protobuf
-    mkdir -p third_party/protobuf/cmake/build && \
-    (cd third_party/protobuf/cmake/build && \
-    cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_CXX_STANDARD=11 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j4 install) && \
-    # Install finish - protobuf
-    # Install gRPC
+    # Modern Protobuf (v22+) depends on Abseil. To prevent symbol conflicts and undefined references
+    # when gRPC links against Protobuf, Abseil must be built and installed as a shared system package
+    # first from gRPC's submodule. Then both Protobuf and gRPC consume it via package (-D..._ABSL_PROVIDER=package).
+    # Protobuf CMakeLists.txt moved to repo root in newer releases, so we build in third_party/protobuf/build.
+    # Step 1: Install Abseil as a shared package first
+    mkdir -p third_party/abseil-cpp/build && \
+    (cd third_party/abseil-cpp/build && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DABSL_BUILD_TESTING=OFF -DABSL_ENABLE_INSTALL=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j8 install) && \
+    # Step 2: Install Protobuf (using shared Abseil package)
+    mkdir -p third_party/protobuf/build && \
+    (cd third_party/protobuf/build && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=package -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j8 install) && \
+    # Step 3: Install gRPC (using shared Abseil and Protobuf packages)
     mkdir -p cmake/build && \
     (cd cmake/build && \
     cmake \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5           \
         -DOPENSSL_ROOT_DIR=/usr/local/ssl            \
         -DOPENSSL_INCLUDE_DIR=/usr/local/ssl/include \
         -DOPENSSL_CRYPTO_LIB=/usr/local/ssl/lib      \
         -DCMAKE_BUILD_TYPE=Release                   \
-        -DCMAKE_CXX_STANDARD=11                      \
+        -DCMAKE_CXX_STANDARD=17                      \
         -DCMAKE_INSTALL_PREFIX=/usr/local/grpc       \
         -DgRPC_INSTALL=ON                            \
         -DgRPC_BUILD_TESTS=OFF                       \
-        -DgRPC_ABSL_PROVIDER=module                  \
+        -DgRPC_ABSL_PROVIDER=package                 \
         -DgRPC_CARES_PROVIDER=module                 \
         -DgRPC_RE2_PROVIDER=module                   \
         -DgRPC_ZLIB_PROVIDER=module                  \
         -DgRPC_PROTOBUF_PROVIDER=package             \
         -DgRPC_SSL_PROVIDER=package                  \
         ../.. && \
-    make -j4 install) && \
+    make -j8 install) && \
+    # gRPC's bundled RE2 submodule (-DgRPC_RE2_PROVIDER=module) does not install a pkg-config file by default.
+    # We generate re2.pc manually so pkg-config --libs --static protobuf grpc++ succeeds when compiling the agent.
+    mkdir -p /usr/local/grpc/lib/pkgconfig && \
+    printf "Name: re2\nDescription: RE2\nVersion: 0.0.0\nLibs: -L/usr/local/grpc/lib -lre2\nCflags: -I/usr/local/grpc/include\n" > /usr/local/grpc/lib/pkgconfig/re2.pc && \
     cd ~ && rm -rf /tmp/grpc
 
-ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+# Add /usr/local/grpc/lib64/pkgconfig and /usr/local/lib/pkgconfig as 64-bit builds on Focal may install .pc files there.
+ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
 ENV PATH="${PATH}:/usr/local/grpc/bin"
