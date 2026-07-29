@@ -98,16 +98,22 @@ RUN git clone --depth=1 --recursive -b v1.66.0 https://github.com/grpc/grpc.git 
     # Step 1: Install Abseil as a shared package first
     mkdir -p third_party/abseil-cpp/build && \
     (cd third_party/abseil-cpp/build && \
-    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DABSL_BUILD_TESTING=OFF -DABSL_ENABLE_INSTALL=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DABSL_BUILD_TESTING=OFF -DABSL_ENABLE_INSTALL=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib .. && \
     make -j8 install) && \
     # Step 2: Install Protobuf (using shared Abseil package)
     mkdir -p third_party/protobuf/build && \
     (cd third_party/protobuf/build && \
-    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=package -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=package -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib .. && \
     make -j8 install) && \
-    # Step 3: Install gRPC (using shared Abseil and Protobuf packages)
+    # Step 3: Install RE2 and generate re2.pc using RE2's official Makefile target (bundled version in gRPC v1.66.0 lacks CMake .pc generation)
+    mkdir -p third_party/re2/build && \
+    (cd third_party/re2/build && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DRE2_BUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib .. && \
+    make -j8 install && \
+    make -C .. common-install prefix=/usr/local) && \
+    # Step 4: Install gRPC (using shared Abseil, Protobuf, and RE2 packages)
     mkdir -p cmake/build && \
-    cd cmake/build && \
+    (cd cmake/build && \
     cmake \
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5           \
         -DOPENSSL_ROOT_DIR=/usr/local/ssl            \
@@ -116,22 +122,19 @@ RUN git clone --depth=1 --recursive -b v1.66.0 https://github.com/grpc/grpc.git 
         -DCMAKE_BUILD_TYPE=Release                   \
         -DCMAKE_CXX_STANDARD=17                      \
         -DCMAKE_INSTALL_PREFIX=/usr/local/grpc       \
+        -DCMAKE_INSTALL_LIBDIR=lib                   \
         -DgRPC_INSTALL=ON                            \
         -DgRPC_BUILD_TESTS=OFF                       \
         -DgRPC_ABSL_PROVIDER=package                 \
         -DgRPC_CARES_PROVIDER=module                 \
-        -DgRPC_RE2_PROVIDER=module                   \
+        -DgRPC_RE2_PROVIDER=package                  \
         -DgRPC_ZLIB_PROVIDER=module                  \
         -DgRPC_PROTOBUF_PROVIDER=package             \
         -DgRPC_SSL_PROVIDER=package                  \
         ../.. && \
-    make -j8 install && \
-    # gRPC's bundled RE2 submodule (-DgRPC_RE2_PROVIDER=module) does not install a pkg-config file by default.
-    # We generate re2.pc manually so pkg-config --libs --static protobuf grpc++ succeeds when compiling the agent.
-    mkdir -p /usr/local/grpc/lib/pkgconfig && \
-    printf "Name: re2\nDescription: RE2\nVersion: 0.0.0\nLibs: -L/usr/local/grpc/lib -lre2\nCflags: -I/usr/local/grpc/include\n" > /usr/local/grpc/lib/pkgconfig/re2.pc && \
+    make -j8 install) && \
     cd ~ && rm -rf /tmp/grpc
 
 # Add /usr/local/grpc/lib64/pkgconfig and /usr/local/lib/pkgconfig as 64-bit builds on Alpine may install .pc files there.
-ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+ENV PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/local/share/pkgconfig"
 ENV PATH="${PATH}:/usr/local/grpc/bin"

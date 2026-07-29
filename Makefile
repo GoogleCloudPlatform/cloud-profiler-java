@@ -32,7 +32,7 @@ CFLAGS = \
 	-g0 \
 	-DSTANDALONE_BUILD \
 	-D_GNU_SOURCE \
-	$(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig" pkg-config --cflags protobuf grpc++)
+	$(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/local/share/pkgconfig" pkg-config --cflags protobuf grpc++)
 
 ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
   # Building on an ARM64 machine.
@@ -168,7 +168,7 @@ VERSION_SCRIPT = $(JAVA_AGENT_PATH)/cloud_profiler_java_agent.lds
 OPT_FLAGS = -O3
 # Static libraries for Protobuf, gRPC, and Abseil are wrapped in -Wl,--start-group ... -Wl,--end-group
 # to resolve cyclic symbol dependencies between generated protobuf code, gRPC, and Abseil logging/debugging internals.
-LDFLAGS = -L/usr/local/lib -L/usr/local/grpc/lib -L/usr/local/grpc/lib64 -static-libstdc++ -shared -Wl,--start-group $(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig" pkg-config --libs --static protobuf grpc++) -labsl_log_internal_message -labsl_log_internal_check_op -labsl_log_internal_nullguard -labsl_die_if_null -labsl_examine_stack -labsl_log_internal_format -labsl_log_internal_proto -labsl_log_internal_log_sink_set -labsl_log_sink -labsl_log_entry -labsl_log_globals -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_demangle_internal -labsl_time -labsl_time_zone -labsl_civil_time -labsl_str_format_internal -labsl_strings -labsl_strings_internal -labsl_int128 -labsl_base -labsl_raw_logging_internal -labsl_spinlock_wait -labsl_throw_delegate -labsl_bad_optional_access -labsl_bad_variant_access -Wl,--end-group
+LDFLAGS = -L/usr/local/lib -L/usr/local/grpc/lib -L/usr/local/grpc/lib64 -static-libstdc++ -shared -Wl,--start-group $(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/local/share/pkgconfig" pkg-config --libs --static protobuf grpc++) -labsl_log_internal_message -labsl_log_internal_check_op -labsl_log_internal_nullguard -labsl_die_if_null -labsl_examine_stack -labsl_log_internal_format -labsl_log_internal_proto -labsl_log_internal_log_sink_set -labsl_log_sink -labsl_log_entry -labsl_log_globals -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_demangle_internal -labsl_time -labsl_time_zone -labsl_civil_time -labsl_str_format_internal -labsl_strings -labsl_strings_internal -labsl_int128 -labsl_base -labsl_raw_logging_internal -labsl_spinlock_wait -labsl_throw_delegate -labsl_bad_optional_access -labsl_bad_variant_access -Wl,--end-group
 LDS_FLAGS = -Wl,-z,defs -Wl,--version-script=$(VERSION_SCRIPT)
 
 LIB_ROOT_PATH ?= /usr/local
