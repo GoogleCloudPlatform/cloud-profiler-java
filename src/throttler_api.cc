@@ -166,7 +166,8 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
   auto end = eq_range.second;
   if (it != end && !it->second.empty()) {
     google::rpc::RetryInfo ri;
-    if (!ri.ParseFromArray(it->second.data(), it->second.size())) {
+    if (!ri.ParseFromString(
+            absl::string_view(it->second.data(), it->second.size()))) {
       return false;
     }
     const google::protobuf::Duration& delay = ri.retry_delay();
