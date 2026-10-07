@@ -17,6 +17,7 @@
 #ifndef GOOGLE_JAVAPROFILER_CLOCK_H_
 #define GOOGLE_JAVAPROFILER_CLOCK_H_
 
+#include <errno.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -31,7 +32,7 @@ constexpr int64_t kNanosPerMilli = 1000 * 1000;
 inline struct timespec TimeAdd(const struct timespec t1,
                                const struct timespec t2) {
   struct timespec t = {t1.tv_sec + t2.tv_sec, t1.tv_nsec + t2.tv_nsec};
-  if (t.tv_nsec > kNanosPerSecond) {
+  if (t.tv_nsec >= kNanosPerSecond) {
     t.tv_sec += t.tv_nsec / kNanosPerSecond;
     t.tv_nsec = t.tv_nsec % kNanosPerSecond;
   }
@@ -68,13 +69,14 @@ class Clock {
 
   // Blocks the current thread until the specified point in time.
   virtual void SleepUntil(struct timespec ts) {
-    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, nullptr) > 0) {
+    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, nullptr) ==
+           EINTR) {
     }
   }
 
   // Blocks the current thread for the specified duration.
   virtual void SleepFor(struct timespec ts) {
-    while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) > 0) {
+    while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) == EINTR) {
     }
   }
 };

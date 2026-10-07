@@ -297,7 +297,7 @@ bool WallProfiler::Collect() {
   pid_t my_tid = GetTid();
 
   Clock *clock = DefaultClock();
-  struct timespec profile_period = {0, period_nanos_};
+  struct timespec profile_period = NanosToTimeSpec(period_nanos_);
   struct timespec finish_line =
       TimeAdd(clock->Now(), NanosToTimeSpec(duration_nanos_));
 
