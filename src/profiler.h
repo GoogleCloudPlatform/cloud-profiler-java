@@ -30,7 +30,7 @@ namespace profiler {
 
 class SignalHandler {
  public:
-  SignalHandler() {}
+  SignalHandler() = default;
 
   // This type is neither copyable nor movable.
   SignalHandler(const SignalHandler &) = delete;
@@ -56,7 +56,7 @@ class Profiler {
   Profiler(const Profiler &) = delete;
   Profiler &operator=(const Profiler &) = delete;
 
-  virtual ~Profiler() {}
+  virtual ~Profiler() = default;
 
   // Collect performance data.
   // Implicitly does a Reset() before starting collection.

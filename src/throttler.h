@@ -43,7 +43,7 @@ constexpr char kTypeThreads[] = "threads";
 // }
 class Throttler {
  public:
-  virtual ~Throttler() {}
+  virtual ~Throttler() = default;
 
   // Waits until the next profiling session can be taken. Once the call returns,
   // the client should collect the profile as soon as possible and upload its
