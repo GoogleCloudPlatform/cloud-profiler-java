@@ -180,7 +180,7 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
 // Initializes deployment information from environment properties and label
 // string in "name1=val1,name2=val2,..." format. Returns false on error.
 bool InitializeDeployment(CloudEnv* env, const std::string& labels,
-                          const std::string& language, api::Deployment* d) {
+                          absl::string_view language, api::Deployment* d) {
   std::string project_id = env->ProjectID();
   if (project_id.empty()) {
     LOG(ERROR) << "Project ID is unknown";

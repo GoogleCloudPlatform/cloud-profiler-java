@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "perftools/profiles/proto/builder.h"
+#include "absl/types/span.h"
 #include "third_party/javaprofiler/display.h"
 #include "third_party/javaprofiler/stacktrace_fixer.h"
 
@@ -68,7 +69,7 @@ class ProfileProtoBuilder {
   }
 
  private:
-  void AddSample(const std::vector<uint64_t> &locations, int64_t count,
+  void AddSample(absl::Span<const uint64_t> locations, int64_t count,
                  int64_t weight, int64_t attr);
   uint64_t LocationID(JNIEnv *jni,
                       const google::javaprofiler::JVMPI_CallFrame &frame);
@@ -266,7 +267,7 @@ void ProfileProtoBuilder::Populate(
   }
 }
 
-void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
+void ProfileProtoBuilder::AddSample(absl::Span<const uint64_t> locations,
                                     int64_t count, int64_t weight,
                                     int64_t attr) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
