@@ -63,7 +63,7 @@ static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
       CreateJvmtiString(jvmti, "()V", sig_str);
       break;
     case 4:
-      CreateJvmtiString(jvmti, "fourthMethodName$$Lambda$42.42", name_str);
+      CreateJvmtiString(jvmti, "fourthMethodName$$Lambda.0x42.run", name_str);
       CreateJvmtiString(jvmti, "()V", sig_str);
       break;
     default:

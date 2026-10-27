@@ -17,7 +17,6 @@
 #include <string.h>
 
 #include <algorithm>
-#include <cctype>
 #include <string>
 
 namespace google {
@@ -56,55 +55,29 @@ void SimplifyDynamicClassName(std::string* name) {
   SimplifySuffixedName(name, "$$", hexdigits);
 }
 
-// Simplifies the name of a lambda method to remove unique values.
-// For JDK 11 and older, replaces $$Lambda$[0-9]+\.[0-9]+ with $$Lambda$.
-//   For example: com.google.something.Something$$Lambda$197.1849072452.run.
-// For JDK 21 and newer, replaces $$Lambda\.0x[0-9a-f]+ with $$Lambda.
-//   For example: com.google.something.Something$$Lambda.0x00007ff38d3c11f8.run.
+// Simplifies the name of a lambda method to replace $$Lambda\.0x[0-9a-f]+ with
+// $$Lambda to remove unique values, for example in
+// com.google.something.Something$$Lambda.0x00007ff38d3c11f8.run.
+// Note that this naming format is valid in JDK 21 and later.
 void SimplifyLambdaName(std::string* name) {
   constexpr char trigger[] = "$$Lambda";
   const size_t trigger_length = strlen(trigger);
 
-  // Assume and handle just one instance of a $$Lambda$ pattern.
+  // Assume and handle just one instance of a $$Lambda pattern.
   size_t first = name->find(trigger);
   if (first == std::string::npos) {
     return;
   }
   first += trigger_length;
-  if (first >= name->size()) {
+  // Skip '.0x'
+  if (first + 3 >= name->size() || (*name)[first] != '.' ||
+      (*name)[first + 1] != '0' || (*name)[first + 2] != 'x') {
     return;
   }
-  bool is_pre_jdk21 = false;
-  if ((*name)[first] == '$') {
-    is_pre_jdk21 = true;
-    first++;
-  }
-
-  size_t last;
-  if (is_pre_jdk21) {
-    if (first >= name->size() || !std::isdigit((*name)[first])) {
-      return;
-    }
-    last = name->find_first_not_of(digits, first);
-    if (last == std::string::npos || (*name)[last] != '.') {
-      return;
-    }
-    last++;  // skip the dot
-    if (last >= name->size() || !std::isdigit((*name)[last])) {
-      return;
-    }
-    last = name->find_first_not_of(digits, last);
-  } else {
-    // Skip '0x'
-    if (first + 3 >= name->size() || (*name)[first] != '.' ||
-        (*name)[first + 1] != '0' || (*name)[first + 2] != 'x') {
-      return;
-    }
-    last = name->find_first_not_of(hexdigits, first + 3);
-    // check for '.' after the 0x... address
-    if (last != std::string::npos && (*name)[last] != '.') {
-      return;
-    }
+  size_t last = name->find_first_not_of(hexdigits, first + 3);
+  // check for '.' after the 0x... address
+  if (last != std::string::npos && (*name)[last] != '.') {
+    return;
   }
 
   if (last == std::string::npos) {
