@@ -17,6 +17,7 @@
 #ifndef GOOGLE_JAVAPROFILER_CLOCK_H_
 #define GOOGLE_JAVAPROFILER_CLOCK_H_
 
+#include <errno.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -31,14 +32,14 @@ constexpr int64_t kNanosPerMilli = 1000 * 1000;
 inline struct timespec TimeAdd(const struct timespec t1,
                                const struct timespec t2) {
   struct timespec t = {t1.tv_sec + t2.tv_sec, t1.tv_nsec + t2.tv_nsec};
-  if (t.tv_nsec > kNanosPerSecond) {
+  if (t.tv_nsec >= kNanosPerSecond) {
     t.tv_sec += t.tv_nsec / kNanosPerSecond;
     t.tv_nsec = t.tv_nsec % kNanosPerSecond;
   }
   return t;
 }
 
-inline bool TimeLessThan(const struct timespec &t1, const struct timespec &t2) {
+inline bool TimeLessThan(const struct timespec& t1, const struct timespec& t2) {
   return (t1.tv_sec < t2.tv_sec) ||
          (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec);
 }
@@ -49,7 +50,7 @@ inline struct timespec NanosToTimeSpec(int64_t nanos) {
   return timespec{seconds, nano_seconds};
 }
 
-inline int64_t TimeSpecToNanos(const struct timespec &ts) {
+inline int64_t TimeSpecToNanos(const struct timespec& ts) {
   return kNanosPerSecond * ts.tv_sec + ts.tv_nsec;
 }
 
@@ -68,23 +69,24 @@ class Clock {
 
   // Blocks the current thread until the specified point in time.
   virtual void SleepUntil(struct timespec ts) {
-    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, nullptr) > 0) {
+    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, nullptr) ==
+           EINTR) {
     }
   }
 
   // Blocks the current thread for the specified duration.
   virtual void SleepFor(struct timespec ts) {
-    while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) > 0) {
+    while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) == EINTR) {
     }
   }
 };
 
 // Determines if there is time for another lap before reaching the finish line.
 // Uses a margin of multiple laps to ensure to not overrun the finish line.
-bool AlmostThere(Clock *clock, const struct timespec &finish,
-                 const struct timespec &lap);
+bool AlmostThere(Clock* clock, const struct timespec& finish,
+                 const struct timespec& lap);
 
-Clock *DefaultClock();
+Clock* DefaultClock();
 
 }  // namespace javaprofiler
 }  // namespace google

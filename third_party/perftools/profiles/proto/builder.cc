@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <string>
 #include <tuple>
@@ -25,8 +26,10 @@
 #include <utility>
 #include <vector>
 
-#include <unordered_map>
-#include <unordered_set>
+#include "perftools/profiles/proto/aslr.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
+#include "absl/strings/string_view.h"
 
 #include "glog/logging.h"
 #include "google/protobuf/io/gzip_stream.h"
@@ -39,13 +42,9 @@ using google::protobuf::RepeatedField;
 
 namespace perftools {
 namespace profiles {
-typedef std::unordered_map<uint64, uint64> IndexMap;
-typedef std::unordered_set<uint64> IndexSet;
-}  // namespace profiles
-}  // namespace perftools
 
-namespace perftools {
-namespace profiles {
+typedef absl::flat_hash_map<uint64_t, uint64_t> IndexMap;
+typedef absl::flat_hash_set<uint64_t> IndexSet;
 
 void AddCallstackToSample(Sample *sample, const void *const *stack, int depth,
                           CallstackType type) {
@@ -67,14 +66,14 @@ Builder::Builder() : profile_(new Profile()) {
   profile_->add_string_table("");
 }
 
-int64_t Builder::StringId(const char *str) {
-  if (str == nullptr || !str[0]) {
+int64_t Builder::StringId(absl::string_view str) {
+  if (str.empty()) {
     return 0;
   }
   return InternalStringId(str);
 }
 
-int64_t Builder::InternalStringId(const std::string &str) {
+int64_t Builder::InternalStringId(absl::string_view str) {
   const int64_t index = profile_->string_table_size();
   const auto inserted = strings_.emplace(str, index);
   if (!inserted.second) {
@@ -87,9 +86,9 @@ int64_t Builder::InternalStringId(const std::string &str) {
 
 uint64_t Builder::FunctionId(const char *name, const char *system_name,
                              const char *file, int64_t start_line) {
-  int64_t name_index = StringId(name);
-  int64_t system_name_index = StringId(system_name);
-  int64_t file_index = StringId(file);
+  int64_t name_index = StringId(absl::NullSafeStringView(name));
+  int64_t system_name_index = StringId(absl::NullSafeStringView(system_name));
+  int64_t file_index = StringId(absl::NullSafeStringView(file));
 
   auto fn =
       std::make_tuple(name_index, system_name_index, file_index, start_line);
@@ -135,28 +134,28 @@ bool Builder::Emit(std::string *output) {
   return Marshal(*profile_, output);
 }
 
-bool Builder::Marshal(const Profile &profile, std::string *output) {
+bool Builder::Marshal(const Profile& profile, std::string* output) {
   *output = "";
   StringOutputStream stream(output);
   GzipOutputStream gzip_stream(&stream);
-  if (!profile.SerializeToZeroCopyStream(&gzip_stream)) {
+  if (!internal::SerializeWithAslrEntropyRedaction(profile, gzip_stream)) {
     LOG(ERROR) << "Failed to serialize to gzip stream";
     return false;
   }
   return gzip_stream.Close();
 }
 
-bool Builder::MarshalToFile(const Profile &profile, int fd) {
+bool Builder::MarshalToFile(const Profile& profile, int fd) {
   FileOutputStream stream(fd);
   GzipOutputStream gzip_stream(&stream);
-  if (!profile.SerializeToZeroCopyStream(&gzip_stream)) {
+  if (!internal::SerializeWithAslrEntropyRedaction(profile, gzip_stream)) {
     LOG(ERROR) << "Failed to serialize to gzip stream";
     return false;
   }
   return gzip_stream.Close();
 }
 
-bool Builder::MarshalToFile(const Profile &profile, const char *filename) {
+bool Builder::MarshalToFile(const Profile& profile, const char* filename) {
   int fd;
   while ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0 &&
          errno == EINTR) {
@@ -314,6 +313,9 @@ bool Builder::Finalize() {
   if (profile_->mapping_size() > 0) {
     std::map<uint64_t, std::pair<uint64_t, uint64_t> > mapping_map;
     for (const auto &mapping : profile_->mapping()) {
+      if (IsFullAddressSpaceMapping(mapping)) {
+        continue;
+      }
       mapping_map[mapping.memory_start()] =
           std::make_pair(mapping.memory_limit(), mapping.id());
     }
@@ -336,6 +338,14 @@ bool Builder::Finalize() {
     }
   }
   return CheckValid(*profile_);
+}
+
+uint64_t Builder::AddFullAddressSpaceMapping() {
+  Mapping* mapping = profile_->add_mapping();
+  mapping->set_id(profile_->mapping_size());
+  mapping->set_memory_start(0);
+  mapping->set_memory_limit(std::numeric_limits<uint64_t>::max());
+  return mapping->id();
 }
 
 }  // namespace profiles

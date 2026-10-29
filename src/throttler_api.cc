@@ -161,10 +161,13 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
                             int64_t* backoff_ns) {
   *backoff_ns = 0;
   auto md = ctx.GetServerTrailingMetadata();
-  auto it = md.find(kRetryInfoMetadata);
-  if (it != md.end() && !it->second.empty()) {
+  auto eq_range = md.equal_range(kRetryInfoMetadata);
+  auto it = eq_range.first;
+  auto end = eq_range.second;
+  if (it != end && !it->second.empty()) {
     google::rpc::RetryInfo ri;
-    if (!ri.ParseFromArray(it->second.data(), it->second.size())) {
+    if (!ri.ParseFromString(
+            absl::string_view(it->second.data(), it->second.size()))) {
       return false;
     }
     const google::protobuf::Duration& delay = ri.retry_delay();
@@ -177,7 +180,7 @@ bool AbortedBackoffDuration(const grpc::ClientContext& ctx,
 // Initializes deployment information from environment properties and label
 // string in "name1=val1,name2=val2,..." format. Returns false on error.
 bool InitializeDeployment(CloudEnv* env, const std::string& labels,
-                          const std::string& language, api::Deployment* d) {
+                          absl::string_view language, api::Deployment* d) {
   std::string project_id = env->ProjectID();
   if (project_id.empty()) {
     LOG(ERROR) << "Project ID is unknown";

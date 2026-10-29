@@ -31,16 +31,16 @@ namespace javaprofiler {
 // Walks the line number table and return the associated Java line number from a
 // given method and location.
 // Returns -1 on error or for native methods.
-jint GetLineNumber(jvmtiEnv *jvmti, jmethodID method, jlocation location);
+jint GetLineNumber(jvmtiEnv* jvmti, jmethodID method, jlocation location);
 
 // Fill the file_name, class_name, method_name, and line_number parameters using
 // the information provided by the frame and using the JVMTI environment.
 // When unknown, it fills the parameters with: UnknownFile, UnknownClass,
 // UnknownMethod, "", and -1.
-bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
-                           const JVMPI_CallFrame &frame, std::string *file_name,
-                           std::string *class_name, std::string *method_name,
-                           std::string *signature, int *line_number);
+bool GetStackFrameElements(JNIEnv* jni, jvmtiEnv* jvmti,
+                           const JVMPI_CallFrame& frame, std::string* file_name,
+                           std::string* class_name, std::string* method_name,
+                           std::string* signature, int* line_number);
 
 // Fill the file_name, class_name, method_name, and line_number parameters using
 // the information provided by the frame and using the JVMTI environment.
@@ -48,10 +48,10 @@ bool GetStackFrameElements(JNIEnv *jni, jvmtiEnv *jvmti,
 // the frame method. Compared to the version above, which must calculate it.
 // When unknown, it fills the parameters with: UnknownFile, UnknownClass,
 // UnknownMethod, "", and -1.
-bool GetStackFrameElements(jvmtiEnv *jvmti, const JVMPI_CallFrame &frame,
-                           jclass declaring_class, std::string *file_name,
-                           std::string *class_name, std::string *method_name,
-                           std::string *signature, int *line_number);
+bool GetStackFrameElements(jvmtiEnv* jvmti, const JVMPI_CallFrame& frame,
+                           jclass declaring_class, std::string* file_name,
+                           std::string* class_name, std::string* method_name,
+                           std::string* signature, int* line_number);
 
 }  // namespace javaprofiler
 }  // namespace google

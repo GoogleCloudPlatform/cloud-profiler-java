@@ -36,7 +36,7 @@ class CloudEnv {
   CloudEnv(const CloudEnv&) = delete;
   CloudEnv& operator=(const CloudEnv&) = delete;
 
-  virtual ~CloudEnv() {}
+  virtual ~CloudEnv() = default;
 
   // Returns the current cloud project ID.
   virtual std::string ProjectID();

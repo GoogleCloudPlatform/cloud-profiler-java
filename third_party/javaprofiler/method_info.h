@@ -17,8 +17,9 @@
 #ifndef GOOGLE_JAVAPROFILER_METHOD_INFO_H_
 #define GOOGLE_JAVAPROFILER_METHOD_INFO_H_
 
-#include <cstdint>
 #include <jvmti.h>
+
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -34,29 +35,27 @@ namespace javaprofiler {
 class MethodInfo {
  public:
   // Constructor providing all the information regarding a method.
-  MethodInfo(jvmtiEnv *jvmti_env,
-             const std::string &method_name,
-             const std::string &class_name,
-             const std::string &file_name,
-             const int &start_line)
+  MethodInfo(jvmtiEnv* jvmti_env, const std::string& method_name,
+             const std::string& class_name, const std::string& file_name,
+             const int& start_line)
       : jvmti_env_(jvmti_env),
         method_name_(method_name),
         class_name_(class_name),
         file_name_(file_name),
         start_line_(start_line) {}
 
-  int64_t LineNumber(const JVMPI_CallFrame &frame);
+  int64_t LineNumber(const JVMPI_CallFrame& frame);
 
-  const std::string &MethodName() const { return method_name_; }
+  const std::string& MethodName() const { return method_name_; }
 
-  const std::string &ClassName() const { return class_name_; }
+  const std::string& ClassName() const { return class_name_; }
 
-  const std::string &FileName() const { return file_name_; }
+  const std::string& FileName() const { return file_name_; }
 
   int StartLine() const { return start_line_; }
 
  private:
-  jvmtiEnv *jvmti_env_;
+  jvmtiEnv* jvmti_env_;
 
   std::string method_name_;
   std::string class_name_;

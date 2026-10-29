@@ -28,20 +28,20 @@ namespace {
 
 // Protects the global variables keys and key_to_id.
 std::mutex mutex;
-const Tags *empty_tags = nullptr;
-const AsyncRefCountedString *empty_async_string = nullptr;
+const Tags* empty_tags = nullptr;
+const AsyncRefCountedString* empty_async_string = nullptr;
 // Stores all the keys.
-std::vector<std::string> *keys = nullptr;
+std::vector<std::string>* keys = nullptr;
 // Maps key to its id. The index of a key stored in keys (called id or key_id)
 // is used to retrieve a key or value quickly as it is very friendly to vectors.
-std::unordered_map<std::string, int32_t> *key_to_id = nullptr;
+std::unordered_map<std::string, int32_t>* key_to_id = nullptr;
 
 // Returns the id of the key if the key has been registered. Otherwise, it tries
 // to add the key and returns its id upon success or returns -1 if there is no
 // extra space.
-int32_t RegisterKey(const std::string &key) {
+int32_t RegisterKey(const std::string& key) {
   std::lock_guard<std::mutex> lock(mutex);
-  const auto &target = key_to_id->find(key);
+  const auto& target = key_to_id->find(key);
   if (target != key_to_id->end()) {
     // Key is found and directly return its id.
     return target->second;
@@ -65,7 +65,7 @@ const char kAttrKey[] = "attr";
 
 // Returns the id of the key if the key has been registered; otherwise, returns
 // -1.
-int32_t Tags::GetIdByKey(const std::string &key) {
+int32_t Tags::GetIdByKey(const std::string& key) {
   std::lock_guard<std::mutex> lock(mutex);
   auto target = key_to_id->find(key);
   if (target == key_to_id->end()) {
@@ -74,13 +74,13 @@ int32_t Tags::GetIdByKey(const std::string &key) {
   return target->second;
 }
 
-void Tags::AsyncSafeCopy(const Tags &from) {
+void Tags::AsyncSafeCopy(const Tags& from) {
   for (int i = 0; i < kMaxNumTags; i++) {
     values_[i].AsyncSafeCopy(from.values_[i]);
   }
 }
 
-bool Tags::Set(const std::string &key, const AsyncRefCountedString &value) {
+bool Tags::Set(const std::string& key, const AsyncRefCountedString& value) {
   // All values are stored in the vector "values_" and "key_id" (resolved by
   // "key") is used to locate the right position.
   int32_t key_id = RegisterKey(key);
@@ -92,18 +92,18 @@ bool Tags::Set(const std::string &key, const AsyncRefCountedString &value) {
 }
 
 void Tags::ClearAll() {
-  for (auto &val : values_) {
+  for (auto& val : values_) {
     val.Reset();
   }
 }
 
 void Tags::AsyncSafeClearAll() {
-  for (auto &val : values_) {
+  for (auto& val : values_) {
     val.AsyncSafeReset();
   }
 }
 
-bool Tags::operator==(const Tags &other) const {
+bool Tags::operator==(const Tags& other) const {
   for (int i = 0; i < kMaxNumTags; i++) {
     if (values_[i] != other.values_[i]) {
       return false;
@@ -114,7 +114,7 @@ bool Tags::operator==(const Tags &other) const {
 
 uint64_t Tags::Hash() const {
   uint64_t h = 0;
-  for (const auto &val : values_) {
+  for (const auto& val : values_) {
     h += val.Hash();
     h += h << 10;
     h ^= h >> 6;
@@ -122,7 +122,7 @@ uint64_t Tags::Hash() const {
   return h;
 }
 
-const AsyncRefCountedString &Tags::Get(const std::string &key) const {
+const AsyncRefCountedString& Tags::Get(const std::string& key) const {
   int32_t key_id = GetIdByKey(key);
   if (key_id >= 0) {
     return values_[key_id];
@@ -149,14 +149,14 @@ void Tags::SetAttribute(int64_t value) {
 }
 
 int64_t Tags::GetAttribute() const {
-  const std::string *value = Get(kAttrKey).Get();
+  const std::string* value = Get(kAttrKey).Get();
   if (value == nullptr) {
     return 0;
   }
   return static_cast<jint>(std::stol(*value));
 }
 
-const Tags &Tags::Empty() { return *empty_tags; }
+const Tags& Tags::Empty() { return *empty_tags; }
 
 bool Tags::Init() {
   {

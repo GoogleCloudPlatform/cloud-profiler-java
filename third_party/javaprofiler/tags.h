@@ -36,12 +36,12 @@ class Tags {
   // Returns the value (in AsyncRefCountedString reference) indexed by "key". Be
   // cautious that the referenced AsyncRefCountedString may change if modifiers
   // (e.g., Set(), Clear()) are invoked later.
-  const AsyncRefCountedString &Get(const std::string &key) const;
+  const AsyncRefCountedString& Get(const std::string& key) const;
   // Sets the value indexed by "key" to "value". It returns true on success;
   // otherwise returns false. The failure usually comes from that "key" does not
   // exist in the key list while there is no space to accommodate this new
   // "key".
-  bool Set(const std::string &key, const AsyncRefCountedString &value);
+  bool Set(const std::string& key, const AsyncRefCountedString& value);
   // Resets all values to nullptr.
   void ClearAll();
   // Returns all the key-value pairs stored in this Tags.
@@ -55,18 +55,18 @@ class Tags {
   // Async-signal-safe version of operator=(const Tags &other). It requires that
   // the instance should be empty (does not refer to any string). Otherwise, it
   // asserts an error.
-  void AsyncSafeCopy(const Tags &from);
+  void AsyncSafeCopy(const Tags& from);
   // Async-signal-safe version of ClearAll(). It will succeed if no enty is
   // removed from the AsyncRefCountedString internal string table. Otherwise, it
   // asserts an error.
   void AsyncSafeClearAll();
   // Async-signal-safe.
-  bool operator==(const Tags &other) const;
+  bool operator==(const Tags& other) const;
   // Async-signal-safe.
   uint64_t Hash() const;
 
   // Async-signal-safe.
-  static const Tags &Empty();
+  static const Tags& Empty();
   // Initializes the internal for key table and empty Tags and
   // AsyncRefCountedString instances. Must be called after
   // AsyncRefCountedString::Init(), and before using Tags to store any key-value
@@ -82,7 +82,7 @@ class Tags {
 
  private:
   // // Returns the id of "key" if "key" is present; otherwise, returns -1.
-  static int32_t GetIdByKey(const std::string &key);
+  static int32_t GetIdByKey(const std::string& key);
 
   AsyncRefCountedString values_[kMaxNumTags];
 

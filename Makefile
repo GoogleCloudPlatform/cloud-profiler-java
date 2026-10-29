@@ -18,8 +18,9 @@ CC = g++
 machine_type := $(shell uname -m)
 
 # -fpermissive used to bypass <:: errors from gcc 4.7
+# -std=c++17 is required by gRPC v1.58+ and modern Abseil dependencies.
 CFLAGS = \
-	-std=c++11 \
+	-std=c++17 \
 	-fpermissive \
 	-fPIC \
 	-Wall \
@@ -31,7 +32,7 @@ CFLAGS = \
 	-g0 \
 	-DSTANDALONE_BUILD \
 	-D_GNU_SOURCE \
-	$(shell pkg-config --cflags protobuf grpc)
+	$(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/local/share/pkgconfig" pkg-config --cflags protobuf grpc++)
 
 ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
   # Building on an ARM64 machine.
@@ -69,6 +70,7 @@ INCLUDES = \
 	-I$(GENFILES_PATH) \
 	-I$(GENFILES_PATH)/third_party \
 	-I$(INCLUDE_PATH) \
+	-I/usr/local/grpc/include \
 	-I$(PROTOBUF_INCLUDE_PATH) \
 
 TARGET_AGENT = $(OUT_PATH)/profiler_java_agent.so
@@ -77,6 +79,7 @@ TARGET_NOTICES = $(OUT_PATH)/NOTICES
 PROFILE_PROTO_SOURCES = \
 	$(GENFILES_PATH)/$(PROFILE_PROTO_PATH)/profile.pb.cc \
 	$(PROFILE_PROTO_PATH)/builder.cc \
+	$(PROFILE_PROTO_PATH)/aslr.cc \
 
 PROFILER_API_SOURCES = \
 	$(GENFILES_PATH)/google/api/annotations.pb.cc \
@@ -163,7 +166,9 @@ HEADERS = \
 
 VERSION_SCRIPT = $(JAVA_AGENT_PATH)/cloud_profiler_java_agent.lds
 OPT_FLAGS = -O3
-LDFLAGS = -L/usr/local/lib -static-libstdc++ -shared $(shell pkg-config --libs --static protobuf grpc++)
+# Static libraries for Protobuf, gRPC, and Abseil are wrapped in -Wl,--start-group ... -Wl,--end-group
+# to resolve cyclic symbol dependencies between generated protobuf code, gRPC, and Abseil logging/debugging internals.
+LDFLAGS = -L/usr/local/lib -L/usr/local/grpc/lib -L/usr/local/grpc/lib64 -static-libstdc++ -shared -Wl,--start-group $(shell PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/ssl/lib/pkgconfig:/usr/local/grpc/lib/pkgconfig:/usr/local/grpc/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/local/share/pkgconfig" pkg-config --libs --static protobuf grpc++) -labsl_log_internal_message -labsl_log_internal_check_op -labsl_log_internal_nullguard -labsl_die_if_null -labsl_examine_stack -labsl_log_internal_format -labsl_log_internal_proto -labsl_log_internal_log_sink_set -labsl_log_sink -labsl_log_entry -labsl_log_globals -labsl_symbolize -labsl_stacktrace -labsl_debugging_internal -labsl_demangle_internal -labsl_time -labsl_time_zone -labsl_civil_time -labsl_str_format_internal -labsl_strings -labsl_strings_internal -labsl_int128 -labsl_base -labsl_raw_logging_internal -labsl_spinlock_wait -labsl_throw_delegate -labsl_bad_optional_access -labsl_bad_variant_access -Wl,--end-group
 LDS_FLAGS = -Wl,-z,defs -Wl,--version-script=$(VERSION_SCRIPT)
 
 LIB_ROOT_PATH ?= /usr/local
@@ -171,11 +176,15 @@ LIB_ROOT_PATH ?= /usr/local
 # Linking OpenSSL statically as different distributions have different version
 # of the libraries, including different soname. And we'd prefer to have a single
 # agent binary which runs everywhere.
+# Static libssl.a, libcrypto.a, and -lz must come after libcurl.a to satisfy encryption and compression symbol requirements.
 LIBS1= \
 	-ldl \
 	-lrt \
 	-pthread \
   $(LIB_ROOT_PATH)/lib/libcurl.a \
+  $(LIB_ROOT_PATH)/ssl/lib/libssl.a \
+  $(LIB_ROOT_PATH)/ssl/lib/libcrypto.a \
+  -lz \
   $(LIB_ROOT_PATH)/lib/libglog.a \
 	$(LIB_ROOT_PATH)/lib/libgflags.a \
 

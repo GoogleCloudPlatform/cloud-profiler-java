@@ -24,6 +24,7 @@
 #include "third_party/javaprofiler/jvmti_error.h"
 
 #include <glog/logging.h>
+
 #include <string>
 
 using std::hash;
@@ -31,14 +32,14 @@ using std::string;
 
 #ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName(const TypeName &);              \
-  void operator=(const TypeName &)
+  TypeName(const TypeName&);               \
+  void operator=(const TypeName&)
 #endif
 
 // Short version: reinterpret_cast produces undefined behavior in many
 // cases where memcpy doesn't.
 template <class Dest, class Source>
-inline Dest bit_cast(const Source &source) {
+inline Dest bit_cast(const Source& source) {
   // Compile time assertion: sizeof(Dest) == sizeof(Source)
   // A compile error here means your Dest and Source have different sizes.
   typedef char VerifySizesAreEqual[sizeof(Dest) == sizeof(Source) ? 1 : -1]
@@ -55,36 +56,36 @@ namespace javaprofiler {
 template <class T>
 class JvmtiScopedPtr {
  public:
-  explicit JvmtiScopedPtr(jvmtiEnv *jvmti) : jvmti_(jvmti), ref_(NULL) {}
+  explicit JvmtiScopedPtr(jvmtiEnv* jvmti) : jvmti_(jvmti), ref_(NULL) {}
 
   // This type is neither copyable nor movable.
   JvmtiScopedPtr(const JvmtiScopedPtr&) = delete;
   JvmtiScopedPtr& operator=(const JvmtiScopedPtr&) = delete;
 
-  JvmtiScopedPtr(jvmtiEnv *jvmti, T *ref) : jvmti_(jvmti), ref_(ref) {}
+  JvmtiScopedPtr(jvmtiEnv* jvmti, T* ref) : jvmti_(jvmti), ref_(ref) {}
 
   ~JvmtiScopedPtr() {
     if (NULL != ref_) {
-      JVMTI_ERROR(jvmti_->Deallocate((unsigned char *)ref_));
+      JVMTI_ERROR(jvmti_->Deallocate((unsigned char*)ref_));
     }
   }
 
-  T **GetRef() {
+  T** GetRef() {
     assert(ref_ == NULL);
     return &ref_;
   }
 
-  T *Get() { return ref_; }
+  T* Get() { return ref_; }
 
  private:
-  jvmtiEnv *jvmti_;
-  T *ref_;
+  jvmtiEnv* jvmti_;
+  T* ref_;
 };
 
 template <class T>
 class ScopedLocalRef {
  public:
-  ScopedLocalRef(JNIEnv *jni, T ref) : jni_(jni), ref_(ref) {}
+  ScopedLocalRef(JNIEnv* jni, T ref) : jni_(jni), ref_(ref) {}
 
   // This type is neither copyable nor movable.
   ScopedLocalRef(const ScopedLocalRef&) = delete;
@@ -99,7 +100,7 @@ class ScopedLocalRef {
   T Get() { return ref_; }
 
  private:
-  JNIEnv *jni_;
+  JNIEnv* jni_;
   T ref_;
 };
 

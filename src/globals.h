@@ -36,13 +36,17 @@ using std::string;  // ALLOW_STD_STRING
 
 #define FRIEND_TEST(A, B)
 
+#ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName &);              \
   void operator=(const TypeName &)
+#endif  // DISALLOW_COPY_AND_ASSIGN
 
+#ifndef DISALLOW_IMPLICIT_CONSTRUCTORS
 #define DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
   TypeName();                                    \
   DISALLOW_COPY_AND_ASSIGN(TypeName)
+#endif  // DISALLOW_IMPLICIT_CONSTRUCTORS
 
 #ifndef CLOUD_PROFILER_AGENT_VERSION
 #define CLOUD_PROFILER_AGENT_VERSION "unknown"

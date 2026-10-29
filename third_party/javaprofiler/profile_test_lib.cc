@@ -14,6 +14,8 @@
 
 #include "third_party/javaprofiler/profile_test_lib.h"
 
+#include <iterator>
+
 #include "testing/base/public/gunit.h"
 
 namespace google {
@@ -23,8 +25,7 @@ std::atomic<int> JvmProfileTestLib::line_number_call_count;
 std::atomic<int> JvmProfileTestLib::method_declaring_class_call_count;
 std::atomic<int> JvmProfileTestLib::method_name_call_count;
 
-static jvmtiError Allocate(jvmtiEnv* jvmti,
-                           jlong size,
+static jvmtiError Allocate(jvmtiEnv* jvmti, jlong size,
                            unsigned char** mem_ptr) {
   *mem_ptr = reinterpret_cast<unsigned char*>(malloc(size));
   return JVMTI_ERROR_NONE;
@@ -62,7 +63,7 @@ static jvmtiError GetMethodName(jvmtiEnv* jvmti, jmethodID method_id,
       CreateJvmtiString(jvmti, "()V", sig_str);
       break;
     case 4:
-      CreateJvmtiString(jvmti, "fourthMethodName$$Lambda$42.42", name_str);
+      CreateJvmtiString(jvmti, "fourthMethodName$$Lambda.0x42.run", name_str);
       CreateJvmtiString(jvmti, "()V", sig_str);
       break;
     default:
@@ -94,15 +95,15 @@ static jvmtiError GetClassSignature(jvmtiEnv* jvmti, jclass declaring_class,
   return JVMTI_ERROR_NONE;
 }
 
-static jvmtiError GetMethodDeclaringClass(jvmtiEnv *env, jmethodID method,
-                                          jclass *declaring_class) {
+static jvmtiError GetMethodDeclaringClass(jvmtiEnv* env, jmethodID method,
+                                          jclass* declaring_class) {
   JvmProfileTestLib::method_declaring_class_call_count++;
   *declaring_class = reinterpret_cast<jclass>(method);
   return JVMTI_ERROR_NONE;
 }
 
-static jvmtiError GetSourceFileName(jvmtiEnv *env, jclass klass,
-                                    char **source_name_ptr) {
+static jvmtiError GetSourceFileName(jvmtiEnv* env, jclass klass,
+                                    char** source_name_ptr) {
   if (source_name_ptr) {
     switch (reinterpret_cast<uint64_t>(klass)) {
       case 1:
@@ -126,23 +127,19 @@ static jvmtiError GetSourceFileName(jvmtiEnv *env, jclass klass,
 }
 
 static jvmtiLineNumberEntry fake_line_number_table[] = {
-  { 30, 4 },
-  { 60, 5 },
-  { 90, 6 },
-  { 120, 7 },
-  { 150, 8 },
+    {30, 4}, {60, 5}, {90, 6}, {120, 7}, {150, 8},
 };
 
-static jvmtiError GetLineNumberTable(jvmtiEnv *env, jmethodID method,
-                                     jint *entry_count_ptr,
-                                     jvmtiLineNumberEntry **table_ptr) {
+static jvmtiError GetLineNumberTable(jvmtiEnv* env, jmethodID method,
+                                     jint* entry_count_ptr,
+                                     jvmtiLineNumberEntry** table_ptr) {
   JvmProfileTestLib::line_number_call_count++;
 
-  size_t table_size = arraysize(fake_line_number_table) *
-      sizeof(jvmtiLineNumberEntry);
+  size_t table_size =
+      std::size(fake_line_number_table) * sizeof(jvmtiLineNumberEntry);
   env->Allocate(table_size, reinterpret_cast<unsigned char**>(table_ptr));
 
-  *entry_count_ptr = arraysize(fake_line_number_table);
+  *entry_count_ptr = std::size(fake_line_number_table);
   std::memcpy(*table_ptr, fake_line_number_table, table_size);
 
   return JVMTI_ERROR_NONE;
@@ -170,7 +167,7 @@ static jvmtiError GetStackTrace(jvmtiEnv* env, jthread thread, jint start_depth,
       break;
   }
 
-  jint count = std::min(max_frame_count, (jint) frames.size());
+  jint count = std::min(max_frame_count, (jint)frames.size());
   memcpy(frame_buffer, &frames[0], sizeof(*frame_buffer) * count);
   *count_ptr = count;
 
@@ -189,8 +186,8 @@ std::vector<JVMPI_CallFrame> CreateStackTrace(int i) {
       frames.push_back({128, reinterpret_cast<jmethodID>(3)});
       break;
     default:
-      // Add nothing
-      ;
+        // Add nothing
+        ;
   }
 
   return frames;

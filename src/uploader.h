@@ -26,7 +26,7 @@ namespace profiler {
 
 class ProfileUploader {
  public:
-  virtual ~ProfileUploader() {}
+  virtual ~ProfileUploader() = default;
   virtual bool Upload(const std::string& profile_type,
                       const std::string& profile) = 0;
 };

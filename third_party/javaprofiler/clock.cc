@@ -18,7 +18,7 @@ namespace google {
 namespace javaprofiler {
 
 namespace {
-  Clock DefaultClockInstance;
+Clock DefaultClockInstance;
 }
 
 bool AlmostThere(Clock* clock, const struct timespec& finish,
@@ -31,9 +31,7 @@ bool AlmostThere(Clock* clock, const struct timespec& finish,
   return TimeLessThan(finish, TimeAdd(now, laps));
 }
 
-Clock* DefaultClock() {
-  return &DefaultClockInstance;
-}
+Clock* DefaultClock() { return &DefaultClockInstance; }
 
 }  // namespace javaprofiler
 }  // namespace google

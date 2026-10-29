@@ -28,7 +28,7 @@ using StringRefCountTable =
 using StringRefCount = StringRefCountTable::value_type;
 
 // Maps string to its reference count.
-std::unordered_map<std::string, std::atomic<int32_t>> *string_table = nullptr;
+std::unordered_map<std::string, std::atomic<int32_t>>* string_table = nullptr;
 // All accesses to string_table should be protected by string_table_mutex.
 std::mutex string_table_mutex;
 
@@ -48,7 +48,7 @@ std::mutex string_table_mutex;
 // Resolves the StringRefCount of a given string, increments the reference count
 // and returns the pointer of StringRefCount. It returns nullptr if the internal
 // string table is not initialized.
-StringRefCount *AcquireByString(const std::string &str) {
+StringRefCount* AcquireByString(const std::string& str) {
   std::lock_guard<std::mutex> lock(string_table_mutex);
   if (string_table == nullptr) {
     return nullptr;
@@ -59,7 +59,7 @@ StringRefCount *AcquireByString(const std::string &str) {
   // atomic copy constructor is deleted. Since gcc-4.8 is used in the docker
   // container to generate the cloud Java agent, use the pair's piecewise
   // constructor to make it compilable under gcc-4.8
-  const auto &it =
+  const auto& it =
       string_table
           ->emplace(std::piecewise_construct, std::forward_as_tuple(str),
                     std::forward_as_tuple(0))
@@ -71,7 +71,7 @@ StringRefCount *AcquireByString(const std::string &str) {
 // Increments the reference count of the given StringRefCount pointer if it is
 // not null, and returns the StringRefCount pointer. It is used to copy the
 // StringRefCount from another AsyncRefCountedString.
-StringRefCount *AcquireByCopy(StringRefCount *str_ref_cnt) {
+StringRefCount* AcquireByCopy(StringRefCount* str_ref_cnt) {
   if (str_ref_cnt != nullptr) {
     // As "other" already holds a valid StringRefCount, we can directly
     // increment the reference count by 1. If "other" is owned by another
@@ -85,7 +85,7 @@ StringRefCount *AcquireByCopy(StringRefCount *str_ref_cnt) {
 // pointer. It is async-signal-safe. If the string is not referred by any other
 // AsyncRefCountedString and needs removing from the string table, it fails by
 // returning false.
-bool AsyncSafeRelease(StringRefCount *str_ref_cnt) {
+bool AsyncSafeRelease(StringRefCount* str_ref_cnt) {
   if (str_ref_cnt == nullptr) {
     return true;
   }
@@ -103,7 +103,7 @@ bool AsyncSafeRelease(StringRefCount *str_ref_cnt) {
 // pointer. It firstly calls AsyncSafeRelease() to release the string. If
 // AsyncSafeRelease(), it acquires the lock of the string table to make it
 // succeed eventually.
-void Release(StringRefCount *str_ref_cnt) {
+void Release(StringRefCount* str_ref_cnt) {
   if (!AsyncSafeRelease(str_ref_cnt)) {
     std::lock_guard<std::mutex> lock(string_table_mutex);
     if (str_ref_cnt->second.fetch_sub(1) == 1) {
@@ -115,12 +115,12 @@ void Release(StringRefCount *str_ref_cnt) {
 
 }  // namespace
 
-AsyncRefCountedString::AsyncRefCountedString(const std::string &str)
+AsyncRefCountedString::AsyncRefCountedString(const std::string& str)
     : AsyncRefCountedString() {
   Release(ptr_.exchange(AcquireByString(str)));
 }
 
-AsyncRefCountedString::AsyncRefCountedString(const AsyncRefCountedString &other)
+AsyncRefCountedString::AsyncRefCountedString(const AsyncRefCountedString& other)
     : AsyncRefCountedString() {
   Release(ptr_.exchange(AcquireByCopy(other.ptr_.load())));
 }
@@ -129,28 +129,28 @@ AsyncRefCountedString::~AsyncRefCountedString() {
   Release(ptr_.exchange(nullptr));
 }
 
-AsyncRefCountedString &AsyncRefCountedString::operator=(
-    const std::string &str) {
+AsyncRefCountedString& AsyncRefCountedString::operator=(
+    const std::string& str) {
   Release(ptr_.exchange(AcquireByString(str)));
   return *this;
 }
 
-AsyncRefCountedString &AsyncRefCountedString::operator=(
-    const AsyncRefCountedString &other) {
+AsyncRefCountedString& AsyncRefCountedString::operator=(
+    const AsyncRefCountedString& other) {
   Release(ptr_.exchange(AcquireByCopy(other.ptr_.load())));
   return *this;
 }
 
-AsyncRefCountedString &AsyncRefCountedString::operator=(
-    AsyncRefCountedString &&other) {
+AsyncRefCountedString& AsyncRefCountedString::operator=(
+    AsyncRefCountedString&& other) {
   Reset();
   ptr_.store(other.ptr_);
   other.ptr_ = nullptr;
   return *this;
 }
 
-AsyncRefCountedString &AsyncRefCountedString::AsyncSafeCopy(
-    const AsyncRefCountedString &other) {
+AsyncRefCountedString& AsyncRefCountedString::AsyncSafeCopy(
+    const AsyncRefCountedString& other) {
   assert(ptr_.load() == nullptr);
   ptr_.exchange(AcquireByCopy(other.ptr_.load()));
   return *this;
@@ -162,8 +162,8 @@ void AsyncRefCountedString::AsyncSafeReset() {
   assert(AsyncSafeRelease(ptr_.exchange(nullptr)));
 }
 
-const std::string *AsyncRefCountedString::Get() const {
-  StringRefCount *str_ref_cnt = ptr_.load();
+const std::string* AsyncRefCountedString::Get() const {
+  StringRefCount* str_ref_cnt = ptr_.load();
   if (str_ref_cnt == nullptr) {
     return nullptr;
   } else {

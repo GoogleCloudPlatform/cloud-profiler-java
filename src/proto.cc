@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "perftools/profiles/proto/builder.h"
+#include "absl/types/span.h"
 #include "third_party/javaprofiler/display.h"
 #include "third_party/javaprofiler/stacktrace_fixer.h"
 
@@ -41,7 +42,7 @@ class ProfileProtoBuilder {
       const google::javaprofiler::NativeProcessInfo &native_info)
       : jvmti_(jvmti), native_info_(native_info) {
     for (const auto &it : google::javaprofiler::AttributeTable::GetStrings()) {
-      builder_.StringId(it.c_str());
+      builder_.StringId(it);
     }
   }
 
@@ -68,7 +69,7 @@ class ProfileProtoBuilder {
   }
 
  private:
-  void AddSample(const std::vector<uint64_t> &locations, int64_t count,
+  void AddSample(absl::Span<const uint64_t> locations, int64_t count,
                  int64_t weight, int64_t attr);
   uint64_t LocationID(JNIEnv *jni,
                       const google::javaprofiler::JVMPI_CallFrame &frame);
@@ -227,7 +228,8 @@ void ProfileProtoBuilder::Populate(
     int64_t period_ns) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
 
-  profile->mutable_period_type()->set_type(builder_.StringId(profile_type));
+  profile->mutable_period_type()->set_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
   profile->mutable_period_type()->set_unit(builder_.StringId("nanoseconds"));
   profile->set_period(period_ns);
   perftools::profiles::ValueType *sample_type = profile->add_sample_type();
@@ -235,10 +237,12 @@ void ProfileProtoBuilder::Populate(
   sample_type->set_unit(builder_.StringId("count"));
 
   sample_type = profile->add_sample_type();
-  sample_type->set_type(builder_.StringId(profile_type));
+  sample_type->set_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
   sample_type->set_unit(builder_.StringId("nanoseconds"));
 
-  profile->set_default_sample_type(builder_.StringId(profile_type));
+  profile->set_default_sample_type(
+      builder_.StringId(absl::NullSafeStringView(profile_type)));
 
   profile->set_duration_nanos(duration_ns);
 
@@ -259,11 +263,11 @@ void ProfileProtoBuilder::Populate(
     m->set_id(profile->mapping_size());
     m->set_memory_start(mapping.start);
     m->set_memory_limit(mapping.limit);
-    m->set_filename(builder_.StringId(mapping.name.c_str()));
+    m->set_filename(builder_.StringId(mapping.name));
   }
 }
 
-void ProfileProtoBuilder::AddSample(const std::vector<uint64_t> &locations,
+void ProfileProtoBuilder::AddSample(absl::Span<const uint64_t> locations,
                                     int64_t count, int64_t weight,
                                     int64_t attr) {
   perftools::profiles::Profile *profile = builder_.mutable_profile();
